@@ -1,0 +1,27 @@
+{
+  "name": "Ssalddel.Unity.CityFarmWorldIntegration.Editor",
+  "rootNamespace": "Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.Runtime",
+    "Ssalddel.Unity.Presentation",
+    "Ssalddel.Unity.Editor",
+    "Ssalddel.Unity.CityFarmWorldIntegration",
+    "Ssalddel.Unity.Farm.Sample",
+    "Ssalddel.Unity.UrbanLogisticsCenter.Sample",
+    "Ssalddel.Unity.UrbanMarket.Sample",
+    "Ssalddel.Unity.ResidentialPickup.Sample",
+    "Unity.UGUI",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.Universal.Runtime"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

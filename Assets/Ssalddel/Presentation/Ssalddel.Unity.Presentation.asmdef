@@ -1,0 +1,14 @@
+{
+  "name": "Ssalddel.Unity.Presentation",
+  "rootNamespace": "Ssalddel.Unity.Presentation",
+  "references": ["Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Unity.UGUI", "Unity.InputSystem"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

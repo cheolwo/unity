@@ -1,0 +1,15 @@
+{
+  "name": "Ssalddel.Unity.Tests.PlayMode",
+  "rootNamespace": "Ssalddel.Unity.Tests.PlayMode",
+  "references": ["Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Ssalddel.Unity.Infrastructure", "Ssalddel.Unity.Presentation", "Ssalddel.Unity.Bootstrap"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": ["TestAssemblies"]
+}

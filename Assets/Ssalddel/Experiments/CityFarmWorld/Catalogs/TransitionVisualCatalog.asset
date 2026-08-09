@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddc0d39cc721e894e8b1558e68062696, type: 3}
+  m_Name: TransitionVisualCatalog
+  m_EditorClassIdentifier: Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.WorldVisualCatalog
+  catalogCode: transition
+  entries:
+  - visualKey: transition.road.rural
+    prefab: {fileID: 1413145884089800, guid: 20f6bd523ebdaf04fa332e6ce565fc03, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.6, y: 0.6, z: 0.6}
+  - visualKey: transition.road.urban
+    prefab: {fileID: 135246, guid: fa07ca939fb86614e840203d85f23f08, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.72, y: 0.72, z: 0.72}

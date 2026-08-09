@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddc0d39cc721e894e8b1558e68062696, type: 3}
+  m_Name: FarmVisualCatalog
+  m_EditorClassIdentifier: Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.WorldVisualCatalog
+  catalogCode: farm
+  entries:
+  - visualKey: farm.soil.dirt
+    prefab: {fileID: 1792054803756928, guid: d7fd0f034fb608643a24ead27702c3a3, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.22, y: 0.22, z: 0.22}
+  - visualKey: farm.soil.rows
+    prefab: {fileID: 1645245720062498, guid: c738b62174ab09f4eb2d7b486398a6ed, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.22, y: 0.22, z: 0.22}
+  - visualKey: farm.crop.potato.small
+    prefab: {fileID: 1347292578903898, guid: 53e5ab917382c9749a58810d6e170537, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.45, y: 0.45, z: 0.45}
+  - visualKey: farm.crop.potato.medium
+    prefab: {fileID: 1640550028191666, guid: 5a7f5d66e03803f48ab0fc24d088724d, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.45, y: 0.45, z: 0.45}
+  - visualKey: farm.crop.potato.large
+    prefab: {fileID: 1819358590325638, guid: e48b8d820d122d64484926ce5e8f6e8c, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.45, y: 0.45, z: 0.45}
+  - visualKey: farm.cargo.potato-box
+    prefab: {fileID: 1982032092821994, guid: 2131bc3845099584ebe0cb30614e96f4, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.75, y: 0.75, z: 0.75}
+  - visualKey: farm.npc.farmer
+    prefab: {fileID: 1160220439793846, guid: 3c3a8236be548bb4c892cf39a5abadfe, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.8, y: 0.8, z: 0.8}
+  - visualKey: farm.building.barn
+    prefab: {fileID: 1427016662113696, guid: 1135f5bcd489da04cb5f4fcb4355006b, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.36, y: 0.36, z: 0.36}
+  - visualKey: farm.building.silo
+    prefab: {fileID: 1957237772272410, guid: ca2a787328680534488b66d6a68eae8d, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.3, y: 0.3, z: 0.3}
+  - visualKey: farm.building.produce-stand
+    prefab: {fileID: 1504926191794242, guid: 95e645d1addbaad4ab26251fd2bdde4c, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.65, y: 0.65, z: 0.65}
+  - visualKey: farm.vehicle.tractor
+    prefab: {fileID: 1667883723368190, guid: a4d9027086d4d5b40b31d85ce0e979a6, type: 3}
+    localPositionCorrection: {x: 0, y: 0, z: 0}
+    localEulerCorrection: {x: 0, y: 0, z: 0}
+    localScale: {x: 0.7, y: 0.7, z: 0.7}

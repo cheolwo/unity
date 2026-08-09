@@ -1,0 +1,25 @@
+{
+  "name": "Ssalddel.Unity.CityFarmWorldIntegration.EditorTests",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.Runtime",
+    "Ssalddel.Unity.Presentation",
+    "Ssalddel.Unity.CityFarmWorldIntegration",
+    "Ssalddel.Unity.CityFarmWorldIntegration.Editor",
+    "Ssalddel.Unity.Farm.Sample",
+    "Ssalddel.Unity.UrbanLogisticsCenter.Sample",
+    "Ssalddel.Unity.UrbanMarket.Sample",
+    "Ssalddel.Unity.ResidentialPickup.Sample"
+  ],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "defineConstraints": ["SSALDDEL_UNITY_TEST_FRAMEWORK"],
+  "versionDefines": [
+    {
+      "name": "com.unity.test-framework",
+      "expression": "1.0.0",
+      "define": "SSALDDEL_UNITY_TEST_FRAMEWORK"
+    }
+  ],
+  "autoReferenced": false
+}

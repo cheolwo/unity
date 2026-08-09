@@ -1,0 +1,14 @@
+{
+  "name": "Ssalddel.Unity.Bootstrap",
+  "rootNamespace": "Ssalddel.Unity.Bootstrap",
+  "references": ["Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Ssalddel.Unity.Infrastructure", "Ssalddel.Unity.Presentation"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

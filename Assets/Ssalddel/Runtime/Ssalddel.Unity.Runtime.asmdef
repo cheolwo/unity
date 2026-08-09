@@ -1,0 +1,14 @@
+{
+  "name": "Ssalddel.Unity.Runtime",
+  "rootNamespace": "Ssalddel.Unity.Runtime",
+  "references": ["Ssalddel.Unity.Data"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}
