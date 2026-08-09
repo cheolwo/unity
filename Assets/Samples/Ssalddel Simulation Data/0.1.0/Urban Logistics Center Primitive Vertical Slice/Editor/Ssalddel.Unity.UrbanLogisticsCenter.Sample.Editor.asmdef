@@ -1,0 +1,21 @@
+{
+  "name": "Ssalddel.Unity.UrbanLogisticsCenter.Sample.Editor",
+  "rootNamespace": "Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.NpcMovement.Sample",
+    "Ssalddel.Unity.UrbanLogisticsCenter.Sample",
+    "VContainer"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

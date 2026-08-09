@@ -1,0 +1,19 @@
+{
+  "name": "Ssalddel.Unity.UrbanLogisticsCenter.Sample",
+  "rootNamespace": "Ssalddel.Unity.Samples.UrbanLogisticsCenter",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.NpcMovement.Sample",
+    "VContainer",
+    "VContainer.Unity"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

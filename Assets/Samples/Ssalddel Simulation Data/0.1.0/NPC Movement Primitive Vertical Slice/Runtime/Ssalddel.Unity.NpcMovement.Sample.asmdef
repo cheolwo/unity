@@ -1,0 +1,16 @@
+{
+  "name": "Ssalddel.Unity.NpcMovement.Sample",
+  "rootNamespace": "Ssalddel.Unity.Samples.NpcMovement",
+  "references": [
+    "Ssalddel.Unity.Data"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

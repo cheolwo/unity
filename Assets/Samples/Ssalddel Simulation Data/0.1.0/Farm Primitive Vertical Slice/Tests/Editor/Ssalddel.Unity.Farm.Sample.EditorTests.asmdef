@@ -1,0 +1,25 @@
+{
+  "name": "Ssalddel.Unity.Farm.Sample.EditorTests",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.Farm.Sample",
+    "Ssalddel.Unity.Farm.Sample.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "defineConstraints": [
+    "SSALDDEL_UNITY_TEST_FRAMEWORK"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.test-framework",
+      "expression": "1.0.0",
+      "define": "SSALDDEL_UNITY_TEST_FRAMEWORK"
+    }
+  ],
+  "autoReferenced": false
+}

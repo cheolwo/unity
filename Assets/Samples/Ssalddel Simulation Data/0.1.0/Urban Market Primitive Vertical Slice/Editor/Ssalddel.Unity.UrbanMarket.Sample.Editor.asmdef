@@ -1,0 +1,22 @@
+{
+  "name": "Ssalddel.Unity.UrbanMarket.Sample.Editor",
+  "rootNamespace": "Ssalddel.Unity.Samples.UrbanMarket.Editor",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.UrbanMarket.Sample",
+    "Unity.AI.Navigation",
+    "VContainer",
+    "VContainer.Unity"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

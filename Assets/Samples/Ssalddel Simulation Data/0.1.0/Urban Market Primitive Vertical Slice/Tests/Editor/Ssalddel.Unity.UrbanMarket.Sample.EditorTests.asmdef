@@ -1,0 +1,26 @@
+{
+  "name": "Ssalddel.Unity.UrbanMarket.Sample.EditorTests",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.UrbanMarket.Sample",
+    "Ssalddel.Unity.UrbanMarket.Sample.Editor",
+    "Unity.AI.Navigation"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "defineConstraints": [
+    "SSALDDEL_UNITY_TEST_FRAMEWORK"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.test-framework",
+      "expression": "1.0.0",
+      "define": "SSALDDEL_UNITY_TEST_FRAMEWORK"
+    }
+  ],
+  "autoReferenced": false
+}
