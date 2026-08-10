@@ -30,6 +30,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         [Header("Candidate composition values")]
         [SerializeField, Range(45f, 55f)] private float pitch = 50f;
+        [SerializeField, Min(1f)] private float maxDistance = 110f;
         [SerializeField, Min(1f)] private float worldDistance = 96f;
         [SerializeField, Min(1f)] private float zoneDistance = 28f;
         [SerializeField, Min(1f)] private float objectDistance = 20f;
@@ -57,6 +58,7 @@ namespace Ssalddel.Unity.Presentation.World
             ? stateMachine.State.YawQuarterTurns : 0;
         public float Distance => initialized && stateMachine != null
             ? stateMachine.State.Distance : 0f;
+        public float ConfiguredMaxDistance => maxDistance;
         public float ConfiguredWorldDistance => worldDistance;
         public float ConfiguredZoneDistance => zoneDistance;
         public float ConfiguredObjectDistance => objectDistance;
@@ -119,6 +121,7 @@ namespace Ssalddel.Unity.Presentation.World
 
             var settings = new DioramaCameraSettings
             {
+                MaxDistance = maxDistance,
                 WorldDistance = worldDistance,
                 ZoneDistance = zoneDistance,
                 ObjectDistance = objectDistance,
@@ -140,12 +143,14 @@ namespace Ssalddel.Unity.Presentation.World
             float targetObjectDistance,
             float targetWorldFieldOfView,
             float targetZoneFieldOfView,
-            float targetObjectFieldOfView)
+            float targetObjectFieldOfView,
+            float targetMaxDistance = 110f)
         {
             if (targetPitch < 45f || targetPitch > 55f)
                 throw new InvalidOperationException("DioramaCameraPitchInvalid");
             var settings = new DioramaCameraSettings
             {
+                MaxDistance = targetMaxDistance,
                 WorldDistance = targetWorldDistance,
                 ZoneDistance = targetZoneDistance,
                 ObjectDistance = targetObjectDistance,
@@ -156,12 +161,22 @@ namespace Ssalddel.Unity.Presentation.World
             settings.Validate();
 
             pitch = targetPitch;
+            maxDistance = targetMaxDistance;
             worldDistance = targetWorldDistance;
             zoneDistance = targetZoneDistance;
             objectDistance = targetObjectDistance;
             worldFieldOfView = targetWorldFieldOfView;
             zoneFieldOfView = targetZoneFieldOfView;
             objectFieldOfView = targetObjectFieldOfView;
+            initialized = false;
+            Initialize();
+        }
+
+        public void ConfigureInitialFocus(string anchorId)
+        {
+            if (string.IsNullOrWhiteSpace(anchorId))
+                throw new InvalidOperationException("DioramaCameraInitialFocusEmpty");
+            initialFocusAnchorId = anchorId;
             initialized = false;
             Initialize();
         }
