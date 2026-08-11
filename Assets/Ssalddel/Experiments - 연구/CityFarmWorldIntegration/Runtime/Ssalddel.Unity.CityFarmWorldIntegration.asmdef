@@ -1,0 +1,20 @@
+{
+  "name": "Ssalddel.Unity.CityFarmWorldIntegration",
+  "rootNamespace": "Ssalddel.Unity.Experiments.CityFarmWorldIntegration",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.Presentation",
+    "Ssalddel.Unity.UrbanMarket.Sample",
+    "Unity.UGUI",
+    "Unity.Newtonsoft.Json"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

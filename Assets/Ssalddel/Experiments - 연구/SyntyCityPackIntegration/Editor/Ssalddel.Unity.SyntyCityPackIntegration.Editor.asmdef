@@ -1,0 +1,22 @@
+{
+  "name": "Ssalddel.Unity.SyntyCityPackIntegration.Editor",
+  "rootNamespace": "Ssalddel.Unity.Editor.Experiments",
+  "references": [
+    "Ssalddel.Unity.Data",
+    "Ssalddel.Unity.UrbanMarket.Sample",
+    "Ssalddel.Unity.UrbanMarket.Sample.Editor",
+    "Ssalddel.Unity.UrbanLogisticsCenter.Sample",
+    "Ssalddel.Unity.UrbanLogisticsCenter.Sample.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

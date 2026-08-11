@@ -1,7 +1,7 @@
 {
   "name": "Ssalddel.Unity.Editor",
   "rootNamespace": "Ssalddel.Unity.Editor",
-  "references": ["Ssalddel.Unity.Runtime", "Ssalddel.Unity.Presentation", "Ssalddel.Unity.Bootstrap", "Unity.UGUI", "Unity.InputSystem", "Unity.RenderPipelines.Core.Runtime", "Unity.RenderPipelines.Universal.Runtime"],
+  "references": ["Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Ssalddel.Unity.Presentation", "Ssalddel.Unity.Bootstrap", "Unity.UGUI", "Unity.InputSystem", "Unity.RenderPipelines.Core.Runtime", "Unity.RenderPipelines.Universal.Runtime"],
   "includePlatforms": ["Editor"],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

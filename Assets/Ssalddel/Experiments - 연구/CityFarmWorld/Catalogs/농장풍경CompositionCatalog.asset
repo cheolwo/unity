@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b072983dfa47e6045bf02d1dc20d4863, type: 3}
+  m_Name: "\uB18D\uC7A5\uD48D\uACBDCompositionCatalog"
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uB18D\uC7A5\uD48D\uACBDCompositionCatalog"
+  entries:
+  - setName: "\uAC10\uC790\uBC2D \uB450\uB801"
+    variantCode: A
+    prefab: {fileID: 5429054574127294816, guid: bd8d560d0a4dcb447a34f753a7ab1ba0, type: 3}
+    footprint: {x: 14, y: 12}
+  - setName: "\uAC10\uC790\uBC2D \uB450\uB801"
+    variantCode: B
+    prefab: {fileID: 6413268302580439435, guid: 6d1d29a4f33829f4aacbd3c985d1a03e, type: 3}
+    footprint: {x: 14, y: 12}
+  - setName: "\uAC10\uC790\uBC2D \uB450\uB801"
+    variantCode: C
+    prefab: {fileID: 3696574056345039905, guid: 2734ece489d1e0b489a531bd32006e45, type: 3}
+    footprint: {x: 14, y: 12}
+  - setName: "\uD63C\uD569 \uC791\uBB3C\uBC2D"
+    variantCode: A
+    prefab: {fileID: 3396639082632223190, guid: ff464c590478d884c871fd43251402ca, type: 3}
+    footprint: {x: 16, y: 14}
+  - setName: "\uD63C\uD569 \uC791\uBB3C\uBC2D"
+    variantCode: B
+    prefab: {fileID: 1684630258604272099, guid: 07bc0d8d3d0fbfd4783aa51f76b03545, type: 3}
+    footprint: {x: 16, y: 14}
+  - setName: "\uD63C\uD569 \uC791\uBB3C\uBC2D"
+    variantCode: C
+    prefab: {fileID: 3273847737407592523, guid: 67a65e907d73b95459aa2c9ee83c8eb7, type: 3}
+    footprint: {x: 16, y: 14}
+  - setName: "\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9"
+    variantCode: A
+    prefab: {fileID: 6847503479151602550, guid: 6414d7a141f19df49bc9b5784ef0ee73, type: 3}
+    footprint: {x: 20, y: 18}
+  - setName: "\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9"
+    variantCode: B
+    prefab: {fileID: 679910196460361079, guid: 9907822b5d1d7314ca730f4d03d70559, type: 3}
+    footprint: {x: 20, y: 18}
+  - setName: "\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9"
+    variantCode: C
+    prefab: {fileID: 324182925690009948, guid: 16a6a20a94e8b8546ae928d93b7f6b0e, type: 3}
+    footprint: {x: 20, y: 18}
+  - setName: "\uB18D\uAE30\uACC4 \uB300\uAE30\uC7A5"
+    variantCode: A
+    prefab: {fileID: 1792747739303907501, guid: 44b0bc7b840f6d74dbed85f2cde0164d, type: 3}
+    footprint: {x: 18, y: 14}
+  - setName: "\uB18D\uAE30\uACC4 \uB300\uAE30\uC7A5"
+    variantCode: B
+    prefab: {fileID: 4228997211970033545, guid: acf412b879271304e9b282a105709a1f, type: 3}
+    footprint: {x: 18, y: 14}
+  - setName: "\uB18D\uAE30\uACC4 \uB300\uAE30\uC7A5"
+    variantCode: C
+    prefab: {fileID: 3937028342387486939, guid: 323c3748b11c6b046a0b31e12bd118d7, type: 3}
+    footprint: {x: 18, y: 14}
+  - setName: "\uB18D\uC0B0\uBB3C \uC9C1\uD310\uC7A5"
+    variantCode: A
+    prefab: {fileID: 6298208568368280296, guid: 633a441514423cc4f9f51911629fc8fd, type: 3}
+    footprint: {x: 16, y: 14}
+  - setName: "\uB18D\uC0B0\uBB3C \uC9C1\uD310\uC7A5"
+    variantCode: B
+    prefab: {fileID: 1980450732044851033, guid: 16b1f8210a2f68c42956f7d548ea1709, type: 3}
+    footprint: {x: 16, y: 14}
+  - setName: "\uB18D\uC0B0\uBB3C \uC9C1\uD310\uC7A5"
+    variantCode: C
+    prefab: {fileID: 3639346864210253074, guid: 4b998033542eb554a94f03b1daecb072, type: 3}
+    footprint: {x: 16, y: 14}
+  - setName: "\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5"
+    variantCode: A
+    prefab: {fileID: 4168583767720606273, guid: 2da8e1c9dc5705d4e9334162248a79de, type: 3}
+    footprint: {x: 16, y: 12}
+  - setName: "\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5"
+    variantCode: B
+    prefab: {fileID: 7915017653574340055, guid: 3bcdf1c36d932694a857b9e94b185288, type: 3}
+    footprint: {x: 16, y: 12}
+  - setName: "\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5"
+    variantCode: C
+    prefab: {fileID: 2003651536560686893, guid: 2dd3905e1e3fcae439e16e05d83edc8a, type: 3}
+    footprint: {x: 16, y: 12}
+  - setName: "\uB18D\uB85C \uAD50\uCC28\uB85C"
+    variantCode: A
+    prefab: {fileID: 1845627889751722059, guid: 40f11de63c37d1a4685dd3cca95d50d6, type: 3}
+    footprint: {x: 18, y: 18}
+  - setName: "\uB18D\uB85C \uAD50\uCC28\uB85C"
+    variantCode: B
+    prefab: {fileID: 756152928540536595, guid: 15433cefe42e8b54c90f3702ae9020a2, type: 3}
+    footprint: {x: 18, y: 18}
+  - setName: "\uB18D\uB85C \uAD50\uCC28\uB85C"
+    variantCode: C
+    prefab: {fileID: 6034416907529041709, guid: f7ae4b0509b9f0b488536290aa832427, type: 3}
+    footprint: {x: 18, y: 18}
+  - setName: "\uC218\uBAA9 \uC644\uCDA9\uC9C0"
+    variantCode: A
+    prefab: {fileID: 8717966861838583686, guid: ff8cdd5d11989234890aefca1f97534c, type: 3}
+    footprint: {x: 20, y: 12}
+  - setName: "\uC218\uBAA9 \uC644\uCDA9\uC9C0"
+    variantCode: B
+    prefab: {fileID: 5215708476200860409, guid: 5cff90111114a77489acc581a45da530, type: 3}
+    footprint: {x: 20, y: 12}
+  - setName: "\uC218\uBAA9 \uC644\uCDA9\uC9C0"
+    variantCode: C
+    prefab: {fileID: 6187753463367773091, guid: b3b4be9dc59b45d46a33774d5154bfe8, type: 3}
+    footprint: {x: 20, y: 12}
