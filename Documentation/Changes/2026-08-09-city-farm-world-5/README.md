@@ -1,6 +1,6 @@
 # WORLD-5 Visual Quality and Evidence Gate
 
-Final prototype scene: `Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmVisualQualityGate.unity`
+Final prototype scene: `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시시각품질검증.unity`
 
 - Zone focus distance: 26, selected from Game View comparison
 - HUD source: existing `CargoJourneyView`; no new Simulation or Operational fact

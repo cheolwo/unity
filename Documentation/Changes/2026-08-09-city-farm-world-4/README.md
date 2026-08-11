@@ -1,6 +1,6 @@
 # WORLD-4 Cargo Journey
 
-`CityFarmCargoJourney.unity`는 WORLD-3 Scene을 보존한 별도 Presentation 증거 Scene이다.
+`농장도시화물이동.unity`는 WORLD-3 Scene을 보존한 별도 Presentation 증거 Scene이다.
 
 - 동일 cargo: `cargo:transport-71`
 - 현재 근거: `ArrivedAtWarehouse` → Urban Logistics `Current`

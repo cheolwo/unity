@@ -2,8 +2,8 @@
 
 ## Scope
 
-- Scene: `Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmBusinessViewIntegration.unity`
-- Source baseline preserved: `CityFarmSyntyWorldPrototype.unity`
+- Scene: `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시업무화면통합.unity`
+- Source baseline preserved: `농장도시신티월드시제품.unity`
 - Existing Views: Farm 6x6 soil tile, Logistics facility, Urban Market shelf and Concept Card, Residential pickup
 - Fallback boundary: `WorldPresentationFallbackView` swaps only Synty `VisualRoot` and primitive child
 

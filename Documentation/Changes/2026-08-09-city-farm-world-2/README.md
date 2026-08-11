@@ -2,8 +2,8 @@
 
 ## Scope
 
-- Scene: `Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmSyntyWorldPrototype.unity`
-- Source baseline preserved: `CityFarmMacroWorldBlockout.unity`
+- Scene: `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시신티월드시제품.unity`
+- Source baseline preserved: `농장도시공간배치초안.unity`
 - Catalogs: Farm, Urban, and Transition `WorldVisualCatalog` assets
 - Visual boundary: `VisualKey -> WorldVisualCatalog -> WorldVisualInstanceView -> VisualRoot -> Synty prefab instance`
 - Dedicated post-processing: global Volume profile with Color Adjustments, Neutral Tonemapping, and restrained Bloom

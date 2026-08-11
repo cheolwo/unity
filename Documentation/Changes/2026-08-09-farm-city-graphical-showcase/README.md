@@ -2,8 +2,8 @@
 
 ## Scene
 
-- `Assets/Ssalddel/Experiments/CityFarmWorld/FarmCityGraphicalShowcase.unity`
-- source Scene: `CityFarmVisualQualityGate.unity` (unchanged)
+- `Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시그래픽전시.unity`
+- source Scene: `농장도시시각품질검증.unity` (unchanged)
 - environment root: `WorldBootstrap/Farm City Graphical Environment`
 
 ## Presentation inventory
