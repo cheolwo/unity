@@ -2,6 +2,7 @@ using System.Linq;
 using NUnit.Framework;
 using Ssalddel.Unity.Exhibition;
 using Ssalddel.Unity.Presentation.World;
+using Ssalddel.Unity.Runtime.Exhibition;
 using Ssalddel.Unity.Runtime.ExhibitionFixtures;
 
 namespace Ssalddel.Unity.Tests.EditMode
@@ -15,6 +16,11 @@ namespace Ssalddel.Unity.Tests.EditMode
                 typeof(통합전시관Presenter).GetMethod(
                     nameof(통합전시관Presenter.Initialize),
                     new[] { typeof(통합전시관Snapshot) }),
+                Is.Not.Null);
+            Assert.That(
+                typeof(통합전시관Presenter).GetMethod(
+                    nameof(통합전시관Presenter.Initialize),
+                    new[] { typeof(통합전시관ServerBoundSnapshot) }),
                 Is.Not.Null);
             Assert.That(
                 typeof(통합전시관Presenter).GetMethod("CreateFixtureApiModel"),

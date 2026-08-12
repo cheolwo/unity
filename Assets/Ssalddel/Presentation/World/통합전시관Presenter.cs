@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Ssalddel.Unity.Exhibition;
+using Ssalddel.Unity.Runtime.Exhibition;
 using Ssalddel.Unity.Runtime.ExhibitionFixtures;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,12 +33,14 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private string initialExhibitStableId = "exhibit:city:food-delivery";
 
         private 통합전시관Snapshot snapshot = null!;
+        private 통합전시관SimulationSessionState? simulationSession;
         private string selectedExhibitStableId = string.Empty;
         private bool listenersBound;
 
         public int 전시수 => snapshot?.Exhibits.Length ?? 0;
         public string 선택ExhibitStableId => selectedExhibitStableId;
         public string ManifestRevision => snapshot?.Revision ?? string.Empty;
+        public long SimulationSessionRevision => simulationSession?.Revision ?? -1;
         public bool 운영Command제공여부 => false;
 
         public void Configure(
@@ -65,10 +68,27 @@ namespace Ssalddel.Unity.Presentation.World
         private void Start() => Initialize();
 
         public void Initialize()
-            => Initialize(new 통합전시관Mapper().Map(
+        {
+            simulationSession = null;
+            InitializeSnapshot(new 통합전시관Mapper().Map(
                 통합전시관FixtureApiModelFactory.CreateFixtureApiModel()));
+        }
 
         public void Initialize(통합전시관Snapshot source)
+        {
+            simulationSession = null;
+            InitializeSnapshot(source);
+        }
+
+        public void Initialize(통합전시관ServerBoundSnapshot source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            source.Validate();
+            simulationSession = source.Session;
+            InitializeSnapshot(source.Snapshot);
+        }
+
+        private void InitializeSnapshot(통합전시관Snapshot source)
         {
             ValidateWiring();
             snapshot = source ?? throw new ArgumentNullException(nameof(source));
