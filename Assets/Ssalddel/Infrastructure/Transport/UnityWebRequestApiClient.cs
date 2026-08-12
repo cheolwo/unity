@@ -120,7 +120,7 @@ namespace Ssalddel.Unity.Infrastructure.Transport
             IUnityAccessTokenProvider accessTokenProvider = null)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
-            options.Validate();
+            options.ValidateOperationalConnection();
             inner = new UnityWebRequestApiClient(
                 options.OperationalApiBaseUrl,
                 accessTokenProvider);
@@ -142,7 +142,7 @@ namespace Ssalddel.Unity.Infrastructure.Transport
             IUnityAccessTokenProvider accessTokenProvider = null)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
-            options.Validate();
+            options.ValidateSimulationRehearsalConnection();
             inner = new UnityWebRequestApiClient(
                 options.SimulationRehearsalApiBaseUrl,
                 accessTokenProvider);

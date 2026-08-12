@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Ssalddel.Unity.Application.Bootstrap;
 using Ssalddel.Unity.Data;
+using Ssalddel.Unity.Infrastructure.Transport;
 using Ssalddel.Unity.Runtime.Configuration;
 using Ssalddel.Unity.Runtime.Identity;
 using Ssalddel.Unity.Runtime.Ledgers;
@@ -33,6 +34,30 @@ namespace Ssalddel.Unity.Tests.EditMode
             };
 
             Assert.Throws<InvalidOperationException>(options.Validate);
+        }
+
+        [Test]
+        public void 운영ApiClient는_예행연습서버주소에_의존하지않는다()
+        {
+            var options = new UnityClientRuntimeOptions
+            {
+                OperationalApiBaseUrl = "https://api.example.test",
+                SimulationRehearsalApiBaseUrl = "invalid-rehearsal-address",
+            };
+
+            Assert.DoesNotThrow(() => new OperationalUnityWebRequestApiClient(options));
+        }
+
+        [Test]
+        public void 예행연습ApiClient는_운영서버주소에_의존하지않는다()
+        {
+            var options = new UnityClientRuntimeOptions
+            {
+                OperationalApiBaseUrl = "invalid-operational-address",
+                SimulationRehearsalApiBaseUrl = "http://simulation.example.test",
+            };
+
+            Assert.DoesNotThrow(() => new SimulationRehearsalUnityWebRequestApiClient(options));
         }
 
         [Test]

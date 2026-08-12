@@ -38,15 +38,29 @@ namespace Ssalddel.Unity.Runtime.Configuration
 
         public void Validate()
         {
-            ValidateHttpBaseUrl(OperationalApiBaseUrl, "운영 API");
-            ValidateHttpBaseUrl(SimulationRehearsalApiBaseUrl, "예행연습·게임 세계 API");
+            ValidateOperationalConnection();
+            ValidateSimulationRehearsalConnection();
+            ValidateDetailNavigation();
+            ValidateExecutionPolicy();
+        }
 
+        public void ValidateOperationalConnection()
+            => ValidateHttpBaseUrl(OperationalApiBaseUrl, "운영 API");
+
+        public void ValidateSimulationRehearsalConnection()
+            => ValidateHttpBaseUrl(SimulationRehearsalApiBaseUrl, "예행연습·게임 세계 API");
+
+        public void ValidateDetailNavigation()
+        {
             if (!Uri.TryCreate(DetailBaseUrl, UriKind.Absolute, out var detailUri)
                 || (detailUri.Scheme != Uri.UriSchemeHttp && detailUri.Scheme != Uri.UriSchemeHttps))
             {
                 throw new InvalidOperationException("상세 페이지 기준 주소는 HTTP 또는 HTTPS 절대 주소여야 합니다.");
             }
+        }
 
+        public void ValidateExecutionPolicy()
+        {
             if (!UnityExecutionModeCodes.IsSupported(ExecutionMode))
             {
                 throw new InvalidOperationException("지원하지 않는 Unity 실행 모드입니다.");

@@ -2,15 +2,29 @@ using System.Linq;
 using NUnit.Framework;
 using Ssalddel.Unity.Exhibition;
 using Ssalddel.Unity.Presentation.World;
+using Ssalddel.Unity.Runtime.ExhibitionFixtures;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
     public sealed class 통합전시관Tests
     {
         [Test]
+        public void Presenter는_예행연습상태생성과_외부상태주입을_분리한다()
+        {
+            Assert.That(
+                typeof(통합전시관Presenter).GetMethod(
+                    nameof(통합전시관Presenter.Initialize),
+                    new[] { typeof(통합전시관Snapshot) }),
+                Is.Not.Null);
+            Assert.That(
+                typeof(통합전시관Presenter).GetMethod("CreateFixtureApiModel"),
+                Is.Null);
+        }
+
+        [Test]
         public void Fixture는_모판_현실관측_Simulation을_분리한다()
         {
-            var source = 통합전시관Presenter.CreateFixtureApiModel();
+            var source = 통합전시관FixtureApiModelFactory.CreateFixtureApiModel();
             var snapshot = new 통합전시관Mapper().Map(source);
 
             Assert.That(snapshot.Exhibits, Has.Length.EqualTo(6));
@@ -28,7 +42,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         public void EXH5는_음식주문부터_기사인계와_주문자수령을_별도권한과확정으로분리한다()
         {
             var snapshot = new 통합전시관Mapper().Map(
-                통합전시관Presenter.CreateFixtureApiModel());
+                통합전시관FixtureApiModelFactory.CreateFixtureApiModel());
             var exhibit = snapshot.Exhibits.Single(value =>
                 value.ExhibitStableId == "exhibit:city:food-delivery");
 
@@ -57,7 +71,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         public void EXH4는_개인의향_집단Preview_마트공개_운영재고를_공개범위별로분리한다()
         {
             var snapshot = new 통합전시관Mapper().Map(
-                통합전시관Presenter.CreateFixtureApiModel());
+                통합전시관FixtureApiModelFactory.CreateFixtureApiModel());
             var exhibit = snapshot.Exhibits.Single(value =>
                 value.ExhibitStableId == "exhibit:town-city:orderer-group-urban-market");
 
@@ -85,7 +99,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         public void EXH3는_같은Cargo계보와_도착입고검수보관경계를_분리한다()
         {
             var snapshot = new 통합전시관Mapper().Map(
-                통합전시관Presenter.CreateFixtureApiModel());
+                통합전시관FixtureApiModelFactory.CreateFixtureApiModel());
             var exhibit = snapshot.Exhibits.Single(value =>
                 value.ExhibitStableId == "exhibit:logistics:cargo-hub-warehouse");
 
@@ -107,7 +121,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         public void 현실관측은_미수집과운영미확인을_숨기지않는다()
         {
             var snapshot = new 통합전시관Mapper().Map(
-                통합전시관Presenter.CreateFixtureApiModel());
+                통합전시관FixtureApiModelFactory.CreateFixtureApiModel());
             var observation = snapshot.Exhibits.Single(value =>
                 value.ExhibitStableId == "exhibit:public-data:potato-observation");
 
@@ -122,7 +136,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         public void 연구와읽기전시는_GenericConfirm을_제공하지않는다()
         {
             var snapshot = new 통합전시관Mapper().Map(
-                통합전시관Presenter.CreateFixtureApiModel());
+                통합전시관FixtureApiModelFactory.CreateFixtureApiModel());
 
             Assert.That(snapshot.Exhibits
                 .Where(value => value.ExperienceModeCode != 통합전시관ExperienceModeCodes.Simulation)
