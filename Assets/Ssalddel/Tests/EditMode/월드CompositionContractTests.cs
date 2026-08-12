@@ -10,7 +10,7 @@ namespace Ssalddel.Unity.Tests.EditMode
     public sealed class 월드CompositionContractTests
     {
         private const string FarmCatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/농장풍경CompositionCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/농장풍경CompositionCatalog.asset";
 
         [Test]
         public void 기존농장스물네Set는_공통Contract로손실없이적응된다()

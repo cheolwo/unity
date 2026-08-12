@@ -26,7 +26,8 @@ namespace Ssalddel.Unity.Tests.EditMode
 
             var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
                 "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset").ToOptions();
-            Assert.That(settings.ApiBaseUrl, Is.EqualTo("http://localhost:5104"));
+            Assert.That(settings.OperationalApiBaseUrl, Is.EqualTo("https://localhost:7117/"));
+            Assert.That(settings.SimulationRehearsalApiBaseUrl, Is.EqualTo("http://localhost:5204/"));
             Assert.That(settings.DetailBaseUrl, Is.EqualTo("http://localhost:5238"));
             Assert.That(settings.AllowFixtureData, Is.False);
         }

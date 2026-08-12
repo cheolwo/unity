@@ -15,17 +15,17 @@ namespace Ssalddel.Unity.Editor
     public static class 도로GateCompositionSetBuilder
     {
         public const string CatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/도로GateCompositionCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/도로GateCompositionCatalog.asset";
         public const string PrefabRoot =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/RoadGate";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/RoadGate";
         public const string PreviewScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/RoadGateCompositionLibraryPreview.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/도로출입구조합모음미리보기.unity";
         public const string PreviewGroundMaterialPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/RoadGatePreviewGround.mat";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/RoadGatePreviewGround.mat";
         public const string PreviewInternalConnectorMaterialPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/RoadGatePreviewInternalConnector.mat";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/RoadGatePreviewInternalConnector.mat";
         public const string PreviewExternalConnectorMaterialPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/RoadGatePreviewExternalConnector.mat";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/RoadGatePreviewExternalConnector.mat";
 
         public const float TownCityCellSize = 5f;
         public const float FarmCellSize = 11.910614f;

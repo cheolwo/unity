@@ -14,12 +14,12 @@ namespace Ssalddel.Unity.Editor
     public static class 공용AnimationPreviewBuilder
     {
         public const string CatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/공용AnimationCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/공용AnimationCatalog.asset";
         public const string PreviewScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/CommonAnimationPreview.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/공용동작미리보기.unity";
 
         private const string MaterialRoot =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/CommonAnimationMaterials";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/CommonAnimationMaterials";
         private const string FarmCharacter =
             "Assets/Synty/PolygonFarm/Prefabs/Characters/SM_Chr_Farmer_Male_01.prefab";
         private const string TownCharacter =

@@ -67,7 +67,7 @@ namespace Ssalddel.Unity.Bootstrap
 
             lifetimeCancellation = new CancellationTokenSource();
             var options = runtimeSettings.ToOptions();
-            var apiClient = new UnityWebRequestApiClient(options);
+            var apiClient = new OperationalUnityWebRequestApiClient(options);
             var repository = new CommunityWorldMapRepository(apiClient);
             var useCase = new LoadPublicWorldMapUseCase(repository);
             var navigator = new ObservationDetailNavigator(options.DetailBaseUrl);

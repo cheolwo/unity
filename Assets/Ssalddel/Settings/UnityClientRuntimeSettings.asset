@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73a7adaa9df6de04898cfa34423e03bb, type: 3}
   m_Name: UnityClientRuntimeSettings
   m_EditorClassIdentifier: Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.Configuration.UnityClientRuntimeSettings
-  apiBaseUrl: http://localhost:5104
+  operationalApiBaseUrl: https://localhost:7117/
+  simulationRehearsalApiBaseUrl: http://localhost:5204/
   detailBaseUrl: http://localhost:5238
   executionMode: Simulation
   allowFixtureData: 0

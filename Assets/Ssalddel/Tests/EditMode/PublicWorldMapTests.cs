@@ -113,7 +113,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(controller.CurrentState.KeepsExistingMarkers, Is.True);
         }
 
-        private sealed class StubApiClient : IUnityApiClient
+        private sealed class StubApiClient : IOperationalUnityApiClient
         {
             private readonly UnityApiResponse response;
             public UnityApiRequest LastRequest { get; private set; }

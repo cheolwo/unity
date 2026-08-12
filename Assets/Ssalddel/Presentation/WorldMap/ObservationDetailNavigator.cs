@@ -14,9 +14,9 @@ namespace Ssalddel.Unity.Presentation.WorldMap
         private readonly Uri baseAddress;
         private readonly Action<string> open;
 
-        public ObservationDetailNavigator(string apiBaseUrl, Action<string> openUrl = null)
+        public ObservationDetailNavigator(string detailBaseUrl, Action<string> openUrl = null)
         {
-            baseAddress = new Uri((apiBaseUrl ?? string.Empty).TrimEnd('/') + "/", UriKind.Absolute);
+            baseAddress = new Uri((detailBaseUrl ?? string.Empty).TrimEnd('/') + "/", UriKind.Absolute);
             open = openUrl ?? UnityEngine.Application.OpenURL;
         }
 

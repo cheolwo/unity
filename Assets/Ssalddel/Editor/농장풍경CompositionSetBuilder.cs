@@ -15,11 +15,11 @@ namespace Ssalddel.Unity.Editor
     public static class 농장풍경CompositionSetBuilder
     {
         public const string CatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/농장풍경CompositionCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/농장풍경CompositionCatalog.asset";
         public const string PrefabRoot =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/Farm";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/Farm";
         public const string PreviewScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/FarmCompositionSetLibraryPreview.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/농장풍경조합모음미리보기.unity";
 
         private const string VendorRoot = "Assets/Synty/PolygonFarm/Prefabs";
 
@@ -64,7 +64,7 @@ namespace Ssalddel.Unity.Editor
         public static void BuildFromCommandLine()
         {
             Build();
-            if (Application.isBatchMode) EditorApplication.Exit(0);
+            if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(0);
         }
 
         [MenuItem("Ssalddel/Farm Composition/Open Library Preview")]

@@ -13,9 +13,9 @@ namespace Ssalddel.Unity.Infrastructure.WorldMap
     {
         private const string Route = "api/v1/community/world-map/observations";
         private const string DefaultBoundaryNotice = "공개 관측 정보이며 개인 위치, 재고, 계약 또는 신청 가능 여부를 의미하지 않습니다.";
-        private readonly IUnityApiClient apiClient;
+        private readonly IOperationalUnityApiClient apiClient;
 
-        public CommunityWorldMapRepository(IUnityApiClient apiClient) =>
+        public CommunityWorldMapRepository(IOperationalUnityApiClient apiClient) =>
             this.apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
 
         public async Task<PublicWorldMapSnapshot> LoadAsync(string datasetCode, CancellationToken cancellationToken)

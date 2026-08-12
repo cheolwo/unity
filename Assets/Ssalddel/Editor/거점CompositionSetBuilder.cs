@@ -15,18 +15,18 @@ namespace Ssalddel.Unity.Editor
     public static class 거점CompositionSetBuilder
     {
         public const string CatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/거점CompositionCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/거점CompositionCatalog.asset";
         public const string PrefabRoot =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/Anchors";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/Anchors";
         public const string PreviewScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/AnchorCompositionLibraryPreview.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/거점조합모음미리보기.unity";
 
         private const string PreviewGroundMaterialPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/AnchorPreviewGround.mat";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/AnchorPreviewGround.mat";
         private const string PreviewConnectorMaterialPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/AnchorPreviewConnector.mat";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/AnchorPreviewConnector.mat";
         private const string PreviewSocketMaterialPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/AnchorPreviewSocket.mat";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/AnchorPreviewSocket.mat";
         private const string FarmRoot = "Assets/Synty/PolygonFarm/Prefabs/";
         private const string TownRoot = "Assets/Synty/PolygonTown/Prefabs/";
         private const string CityRoot = "Assets/Synty/PolygonCity/Prefabs/";

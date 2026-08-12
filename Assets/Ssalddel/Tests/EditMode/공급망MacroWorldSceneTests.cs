@@ -10,7 +10,7 @@ namespace Ssalddel.Unity.Tests.EditMode
     public sealed class 공급망MacroWorldSceneTests
     {
         private const string ScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmMacroWorldBlockout.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시공간배치초안.unity";
 
         [Test]
         public void 저장Scene은_6개Zone과5개Route및CameraFocus를직렬화한다()

@@ -26,7 +26,8 @@ namespace Ssalddel.Unity.Tests.EditMode
         {
             var options = new UnityClientRuntimeOptions
             {
-                ApiBaseUrl = "https://api.example.test",
+                OperationalApiBaseUrl = "https://api.example.test",
+                SimulationRehearsalApiBaseUrl = "http://simulation.example.test",
                 ExecutionMode = UnityExecutionModeCodes.Operational,
                 AllowFixtureData = true,
             };
@@ -99,7 +100,8 @@ namespace Ssalddel.Unity.Tests.EditMode
             var useCase = new WorldBootstrapUseCase(
                 new UnityClientRuntimeOptions
                 {
-                    ApiBaseUrl = "http://localhost:5239",
+                    OperationalApiBaseUrl = "http://localhost:5239",
+                    SimulationRehearsalApiBaseUrl = "http://localhost:5204",
                     ExecutionMode = UnityExecutionModeCodes.Simulation,
                     AllowFixtureData = true,
                 },

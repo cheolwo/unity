@@ -15,15 +15,15 @@ namespace Ssalddel.Unity.Editor
     public static class CityFarmSyntyWorldBuilder
     {
         public const string ScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmSyntyWorldPrototype.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시신티월드시제품.unity";
         public const string FarmCatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/FarmVisualCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/FarmVisualCatalog.asset";
         public const string UrbanCatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/UrbanVisualCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/UrbanVisualCatalog.asset";
         public const string TransitionCatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/TransitionVisualCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/TransitionVisualCatalog.asset";
         public const string VolumeProfilePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Profiles/WORLD-2-GlobalVolumeProfile.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Profiles/WORLD-2-GlobalVolumeProfile.asset";
 
         private const string FarmRoot = "Assets/Synty/PolygonFarm/Prefabs/";
         private const string CityRoot = "Assets/Synty/PolygonCity/Prefabs/";
@@ -65,7 +65,7 @@ namespace Ssalddel.Unity.Editor
                 throw new InvalidOperationException("WORLD2MacroWorldWiringInvalid");
             ValidateScene(farm, urban, transition);
             System.IO.Directory.CreateDirectory(
-                "Assets/Ssalddel/Experiments/CityFarmWorld");
+                "Assets/Ssalddel/Experiments - 연구/CityFarmWorld");
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
                 throw new InvalidOperationException("WORLD2SceneSaveFailed");
             AssetDatabase.SaveAssets();

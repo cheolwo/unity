@@ -52,9 +52,10 @@ namespace Ssalddel.Unity.Tests.PlayMode
             var serverTask = ServeOnceAsync(listener, json);
             var root = new GameObject("LoopbackPresenterTest");
             var presenter = root.AddComponent<PublicWorldMapPresenter>();
-            var client = new UnityWebRequestApiClient(new UnityClientRuntimeOptions
+            var client = new OperationalUnityWebRequestApiClient(new UnityClientRuntimeOptions
             {
-                ApiBaseUrl = $"http://127.0.0.1:{port}",
+                OperationalApiBaseUrl = $"http://127.0.0.1:{port}",
+                SimulationRehearsalApiBaseUrl = "http://127.0.0.1:5204",
                 ExecutionMode = UnityExecutionModeCodes.Simulation,
                 AllowFixtureData = false
             });

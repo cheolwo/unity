@@ -1,0 +1,309 @@
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Ssalddel.Unity.Runtime.Transport;
+using Ssalddel.Unity.Runtime.World;
+
+namespace Ssalddel.Unity.Infrastructure.Simulation
+{
+    public sealed class 턴마감ServerAuthorityRepository : I턴마감AuthorityClient
+    {
+        private const string BaseRoute = "api/simulation/v1/sessions/";
+        public const string BootstrapSessionStableId =
+            "simulation-session:706a236b17e544e2a070a0785ae42d19";
+        private readonly ISimulationRehearsalUnityApiClient apiClient;
+
+        public 턴마감ServerAuthorityRepository(ISimulationRehearsalUnityApiClient client)
+            => apiClient = client ?? throw new ArgumentNullException(nameof(client));
+
+        public async Task<턴마감ResultData> 서버기준Session확보Async(
+            CancellationToken cancellationToken)
+        {
+            var response = await SendAsync(
+                "POST", "api/simulation/v1/sessions",
+                JsonConvert.SerializeObject(CreateSessionRequest()), cancellationToken);
+            var created = ParseSession(response.Body);
+            if (created.SessionStableId != BootstrapSessionStableId)
+                throw new InvalidOperationException("TurnClosingBootstrapSessionMismatch");
+            return created;
+        }
+
+        public async Task<턴마감ContextData> GetContextAsync(
+            string sessionStableId, CancellationToken cancellationToken)
+        {
+            var response = await SendAsync(
+                "GET", SessionRoute(sessionStableId) + "/turn-closing-context",
+                string.Empty, cancellationToken);
+            var wire = JsonConvert.DeserializeObject<ContextWire>(response.Body)
+                ?? throw new InvalidOperationException("TurnClosingContextJsonInvalid");
+            var context = new 턴마감ContextData
+            {
+                SessionStableId = wire.SessionStableId ?? string.Empty,
+                TurnNumber = wire.TurnNumber,
+                GameDateLabel = FormatGameDate(wire.GameDate),
+                Revision = wire.Revision,
+                PendingTaskCount = wire.PendingTaskCount,
+                CanCloseTurn = wire.CanCloseTurn,
+                AvailableCards = (wire.AvailableCards ?? Array.Empty<CardWire>())
+                    .Select(MapCard).ToArray(),
+            };
+            ValidateContext(context, sessionStableId);
+            return context;
+        }
+
+        public async Task<턴마감PreviewData> PreviewAsync(
+            string sessionStableId, long expectedRevision, string selectedCardStableId,
+            CancellationToken cancellationToken)
+        {
+            var response = await SendAsync(
+                "POST", SessionRoute(sessionStableId) + "/turn-closing-previews",
+                JsonConvert.SerializeObject(new
+                {
+                    ExpectedRevision = expectedRevision,
+                    SelectedCardStableIds = SelectedCards(selectedCardStableId),
+                }), cancellationToken);
+            var wire = JsonConvert.DeserializeObject<PreviewWire>(response.Body)
+                ?? throw new InvalidOperationException("TurnClosingPreviewJsonInvalid");
+            var preview = new 턴마감PreviewData
+            {
+                PreviewStableId = wire.PreviewStableId ?? string.Empty,
+                BaseRevision = wire.BaseRevision,
+                ClosingTurnNumber = wire.ClosingTurnNumber,
+                NextTurnNumber = wire.NextTurnNumber,
+                NextGameDateLabel = FormatGameDate(wire.NextGameDate),
+                PendingTaskCount = wire.PendingTaskCount,
+                SelectedCards = (wire.SelectedCards ?? Array.Empty<CardWire>())
+                    .Select(MapCard).ToArray(),
+            };
+            if (preview.BaseRevision != expectedRevision
+                || preview.NextTurnNumber != preview.ClosingTurnNumber + 1
+                || preview.SelectedCards.Length != SelectedCards(selectedCardStableId).Length)
+                throw new InvalidOperationException("TurnClosingPreviewAuthorityMismatch");
+            return preview;
+        }
+
+        public async Task<턴마감ResultData> ConfirmAsync(
+            string sessionStableId, string commandId, long expectedRevision,
+            string selectedCardStableId, CancellationToken cancellationToken)
+        {
+            var selected = SelectedCards(selectedCardStableId);
+            await SendAsync(
+                "POST", SessionRoute(sessionStableId) + "/turn-closings/confirm",
+                JsonConvert.SerializeObject(new
+                {
+                    CommandId = commandId,
+                    ExpectedRevision = expectedRevision,
+                    Preview = new
+                    {
+                        ExpectedRevision = expectedRevision,
+                        SelectedCardStableIds = selected,
+                    },
+                }), cancellationToken);
+
+            // 최종 확인 응답을 화면 권위로 삼지 않고 서버 기준 세션을 다시 읽는다.
+            var canonical = await RefreshSessionAsync(sessionStableId, cancellationToken);
+            if (canonical.Revision != expectedRevision + 1
+                || canonical.ActiveCardStableId != (selectedCardStableId ?? string.Empty))
+                throw new InvalidOperationException("TurnClosingCanonicalSessionMismatch");
+            return canonical;
+        }
+
+        public async Task<턴마감ResultData> RefreshSessionAsync(
+            string sessionStableId, CancellationToken cancellationToken)
+            => ParseSession((await SendAsync(
+                "GET", SessionRoute(sessionStableId), string.Empty, cancellationToken)).Body);
+
+        private async Task<UnityApiResponse> SendAsync(
+            string method, string relativePath, string body,
+            CancellationToken cancellationToken)
+        {
+            var response = await apiClient.SendAsync(new UnityApiRequest
+            {
+                Method = method,
+                RelativePath = relativePath,
+                JsonBody = body,
+                RequiresAuthentication = false,
+            }, cancellationToken);
+            if (!response.IsSuccess)
+                throw new InvalidOperationException("TurnClosingServerRequestFailed:"
+                    + response.StatusCode + ":" + response.ErrorCode);
+            return response;
+        }
+
+        private static string SessionRoute(string sessionStableId)
+        {
+            if (string.IsNullOrWhiteSpace(sessionStableId))
+                throw new InvalidOperationException("TurnClosingSessionStableIdMissing");
+            return BaseRoute + Uri.EscapeDataString(sessionStableId.Trim());
+        }
+
+        private static string[] SelectedCards(string stableId)
+            => string.IsNullOrEmpty(stableId) ? Array.Empty<string>() : new[] { stableId };
+
+        private static 턴마감CardData MapCard(CardWire wire)
+        {
+            var card = new 턴마감CardData
+            {
+                CardStableId = wire.CardStableId ?? string.Empty,
+                CardRevision = wire.CardRevision ?? string.Empty,
+                CardKindCode = wire.CardKindCode ?? string.Empty,
+                Title = wire.Title ?? string.Empty,
+                Summary = wire.Summary ?? string.Empty,
+                EffectCode = wire.EffectCode ?? string.Empty,
+                TargetStatCode = wire.TargetStatCode ?? string.Empty,
+                StatDelta = wire.StatDelta,
+                SourceStableId = wire.SourceStableId ?? string.Empty,
+                RegionKey = wire.RegionKey ?? string.Empty,
+                AvailableFromGameDate = ParseOptionalDate(wire.AvailableFromGameDate),
+                AvailableThroughGameDate = ParseOptionalDate(wire.AvailableThroughGameDate),
+                CalendarRevision = wire.CalendarRevision ?? string.Empty,
+                EffectRuleRevision = wire.EffectRuleRevision ?? string.Empty,
+                SourceUrl = wire.SourceUrl ?? string.Empty,
+                EvidenceCheckedAtUtc = ParseOptionalDate(wire.EvidenceCheckedAtUtc),
+            };
+            턴마감FixtureAuthorityClient.ValidateCard(card);
+            return card;
+        }
+
+        private static void ValidateContext(턴마감ContextData context, string expectedSession)
+        {
+            if (context.SessionStableId != expectedSession || context.TurnNumber <= 0
+                || context.Revision < 0 || context.PendingTaskCount < 0
+                || context.AvailableCards.Select(value => value.CardStableId).Distinct().Count()
+                    != context.AvailableCards.Length)
+                throw new InvalidOperationException("TurnClosingContextAuthorityMismatch");
+        }
+
+        private static 턴마감ResultData ParseSession(string json)
+        {
+            var wire = JsonConvert.DeserializeObject<SessionWire>(json)
+                ?? throw new InvalidOperationException("TurnClosingSessionJsonInvalid");
+            var world = wire.WorldContext
+                ?? throw new InvalidOperationException("TurnClosingWorldContextMissing");
+            var settlement = wire.Settlement
+                ?? throw new InvalidOperationException("TurnClosingSettlementMissing");
+            var effect = (wire.ActiveTurnCardEffects ?? Array.Empty<ActiveEffectWire>())
+                .SingleOrDefault();
+            var marketFood = (settlement.MarketSupplyByProduct ?? Array.Empty<MarketWire>())
+                .Where(value => value.ProductStableId == "product:potato")
+                .Sum(value => value.Quantity);
+            var districts = (settlement.Districts ?? Array.Empty<DistrictWire>())
+                .Select(value => new SimulationWorldDistrictNode(
+                    value.DistrictStableId ?? string.Empty, Array.Empty<string>()))
+                .ToArray();
+            var snapshot = new SimulationWorldShellSnapshot(
+                wire.SessionStableId ?? string.Empty,
+                wire.Revision,
+                world.WorldTick,
+                FormatGameDate(world.GameDate),
+                settlement.TreasuryBalance,
+                settlement.LaborAvailable,
+                settlement.LaborReserved,
+                marketFood,
+                settlement.FoodReserveEquivalent,
+                settlement.FoodSecurityDays,
+                settlement.ActiveTaskStableIds?.Length ?? 0,
+                "SimulationServer",
+                new[]
+                {
+                    new SimulationWorldSettlementNode(
+                        settlement.SettlementStableId ?? string.Empty, districts),
+                });
+            return new 턴마감ResultData
+            {
+                SessionStableId = snapshot.SessionStableId,
+                Revision = wire.Revision,
+                WorldTick = world.WorldTick,
+                ActiveTurnNumber = effect?.ActiveTurnNumber ?? world.WorldTick + 1,
+                ActiveCardStableId = effect?.CardStableId ?? string.Empty,
+                ActiveEffectCode = effect?.EffectCode ?? string.Empty,
+                WorldSnapshot = snapshot,
+            };
+        }
+
+        private static string FormatGameDate(string value)
+            => DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeUniversal, out var parsed)
+                ? parsed.ToString("Year 1 · MM-dd", CultureInfo.InvariantCulture)
+                : throw new InvalidOperationException("TurnClosingGameDateInvalid");
+
+        private static DateTimeOffset? ParseOptionalDate(string value)
+            => string.IsNullOrWhiteSpace(value)
+                ? null
+                : DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal, out var parsed)
+                    ? parsed
+                    : throw new InvalidOperationException("TurnClosingCardDateInvalid");
+
+        private static object CreateSessionRequest()
+            => new
+            {
+                ClientRequestId = "706a236b-17e5-44e2-a070-a0785ae42d19",
+                ScenarioStableId = "scenario:unity.turn-closing-server",
+                ScenarioDataRevision = "simulation-data:turn-closing-server:1",
+                ScenarioSeed = 240811,
+                RuleRevision = "turn-closing-rule:1",
+                DurationTicks = 28,
+                WorldContext = new
+                {
+                    FactionStableId = "faction:sim.borderland-1",
+                    TerritoryStableId = "territory:sim.borderland-1",
+                    SettlementStableId = "settlement:sim.border-town-1",
+                    GameDateStartsOn = "2026-04-12T00:00:00+00:00",
+                },
+                Settlement = new
+                {
+                    TreasuryBalance = 1000000m, CurrencyCode = "KRW",
+                    LaborCapacityTotal = 100m, LaborReserved = 25m,
+                    StorageCapacity = 2000m, StorageOccupied = 1200m,
+                    StorageUnitCode = "KGM", PopulationCount = 100,
+                    PopulationFoodDemandPerTick = 100m, GarrisonCount = 20,
+                    GarrisonFoodDemandPerTick = 20m,
+                    FoodEquivalentUnitCode = "FoodEquivalentUnit",
+                    FoodEquivalentRuleRevision = "food-equivalent:fixture-r1",
+                    Districts = new[]
+                    {
+                        District("district:farm", "FarmDistrict"),
+                        District("district:town", "TownDistrict"),
+                        District("district:market", "MarketDistrict"),
+                        District("district:storage", "StorageDistrict"),
+                        District("district:logistics", "LogisticsDistrict"),
+                        District("district:residential", "ResidentialDistrict"),
+                        District("district:garrison", "GarrisonDistrict"),
+                        District("district:gate", "GateDistrict"),
+                    },
+                    Facilities = new[]
+                    {
+                        new { FacilityStableId = "facility:sim.storage", FacilityTypeCode = "Storage", DistrictStableId = "district:storage", SourceStableIds = Sources() },
+                        new { FacilityStableId = "facility:sim.market", FacilityTypeCode = "Market", DistrictStableId = "district:market", SourceStableIds = Sources() },
+                    },
+                    MarketSupplyByProduct = new[]
+                    {
+                        new { ProductStableId = "product:potato", Quantity = 300m, UnitCode = "KGM", SourceStableIds = Sources() },
+                    },
+                    ReserveStockLots = new[]
+                    {
+                        new { StockLotStableId = "stock-lot:sim.food-1", ProductStableId = "product:potato", StorageFacilityStableId = "facility:sim.storage", Quantity = 1200m, OutboundReservedQuantity = 0m, UnitCode = "KGM", FoodEquivalentQuantity = 1200m, OutboundReservedFoodEquivalentQuantity = 0m, SourceStableIds = Sources() },
+                    },
+                    SourceStableIds = Sources(),
+                },
+            };
+
+        private static object District(string id, string type)
+            => new { DistrictStableId = id, DistrictTypeCode = type, SourceStableIds = Sources() };
+        private static string[] Sources() => new[] { "source:unity.turn-closing-server-r1" };
+
+        [Serializable] private sealed class ContextWire { public string SessionStableId; public int TurnNumber; public string GameDate; public long Revision; public int PendingTaskCount; public bool CanCloseTurn; public CardWire[] AvailableCards; }
+        [Serializable] private sealed class PreviewWire { public string PreviewStableId; public long BaseRevision; public int ClosingTurnNumber; public int NextTurnNumber; public string NextGameDate; public int PendingTaskCount; public CardWire[] SelectedCards; }
+        [Serializable] private sealed class CardWire { public string CardStableId; public string CardRevision; public string CardKindCode; public string Title; public string Summary; public string EffectCode; public string TargetStatCode; public int StatDelta; public string SourceStableId; public string RegionKey; public string AvailableFromGameDate; public string AvailableThroughGameDate; public string CalendarRevision; public string EffectRuleRevision; public string SourceUrl; public string EvidenceCheckedAtUtc; }
+        [Serializable] private sealed class SessionWire { public string SessionStableId; public long Revision; public WorldWire WorldContext; public SettlementWire Settlement; public ActiveEffectWire[] ActiveTurnCardEffects; }
+        [Serializable] private sealed class WorldWire { public int WorldTick; public string GameDate; }
+        [Serializable] private sealed class SettlementWire { public string SettlementStableId; public decimal TreasuryBalance; public decimal LaborAvailable; public decimal LaborReserved; public decimal FoodReserveEquivalent; public decimal FoodSecurityDays; public string[] ActiveTaskStableIds; public MarketWire[] MarketSupplyByProduct; public DistrictWire[] Districts; }
+        [Serializable] private sealed class MarketWire { public string ProductStableId; public decimal Quantity; }
+        [Serializable] private sealed class DistrictWire { public string DistrictStableId; }
+        [Serializable] private sealed class ActiveEffectWire { public string CardStableId; public string EffectCode; public int ActiveTurnNumber; }
+    }
+}

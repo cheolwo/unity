@@ -12,7 +12,7 @@ namespace Ssalddel.Unity.Tests.EditMode
     public sealed class CityFarmSyntyWorldSceneTests
     {
         private const string ScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmSyntyWorldPrototype.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시신티월드시제품.unity";
         [Test]
         public void 저장Scene은_WorldWiring과CatalogPrefab및GlobalVolume을유지한다()
         {

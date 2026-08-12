@@ -1,0 +1,222 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78e4c4fc10a256c46848f3d52c22d373, type: 3}
+  m_Name: "\uD1B5\uD569\uC804\uC2DC\uAD00ObjectVisualCatalog"
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uD1B5\uD569\uC804\uC2DC\uAD00ObjectVisualCatalog"
+  catalogRevision: integrated-exhibition-object-visual-catalog:obj-7a.r1
+  entries:
+  - objectStableId: seedbed-object:farm.potato-harvest-box.a
+    displayName: "\uAC10\uC790 \uC218\uD655 \uC0C1\uC790"
+    visualVariantKey: farm.potato-harvest-box.a
+    placementProfileKey: placement-profile:farm.harvest-box.a
+    requiredSocketCodes:
+    - Cargo
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 1858239679784978051, guid: 9f7f420d327e50a4c9691dc8757fe9bf, type: 3}
+    footprint: {x: 2.4, y: 2.2}
+    measuredBoundsSize: {x: 2.2, y: 1.1211519, z: 1.317592}
+  - objectStableId: seedbed-object:town.hub-inbound-gate.a
+    displayName: "Hub \uC785\uACE0 Gate"
+    visualVariantKey: town.hub-inbound-gate.a
+    placementProfileKey: placement-profile:town.hub-inbound-gate.a
+    requiredSocketCodes:
+    - Entry
+    - Exit
+    - Vehicle
+    - Cargo
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 3721350188492286094, guid: 74737640cb580fc43a8fbbf42b4983b9, type: 3}
+    footprint: {x: 7.5, y: 6.5}
+    measuredBoundsSize: {x: 5.027338, y: 4.4745626, z: 7}
+  - objectStableId: seedbed-object:shared.food-pickup-handoff-box.a
+    displayName: "\uC74C\uC2DD \uD53D\uC5C5 \uC778\uACC4 \uC0C1\uC790"
+    visualVariantKey: shared.food-pickup-handoff-box.a
+    placementProfileKey: placement-profile:shared.food-pickup-handoff-box.a
+    requiredSocketCodes:
+    - Cargo
+    - Actor
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 4572349937696170035, guid: 6b285b8bd1d59d94181c6a113e73d479, type: 3}
+    footprint: {x: 1.8, y: 1.6}
+    measuredBoundsSize: {x: 1.6, y: 0.14070606, z: 0.8076678}
+  - objectStableId: seedbed-object:farm.greenhouse.a
+    displayName: "\uB18D\uC7A5 \uC628\uC2E4"
+    visualVariantKey: farm.greenhouse.a
+    placementProfileKey: placement-profile:farm.greenhouse.a
+    requiredSocketCodes:
+    - Entry
+    - CropBed
+    - Irrigation
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 6206574951421895438, guid: 035f1a7178657fd4abfda40d61aa826d, type: 3}
+    footprint: {x: 7.5, y: 6.5}
+    measuredBoundsSize: {x: 5.0585957, y: 4.5313535, z: 7.0000005}
+  - objectStableId: seedbed-object:farm.potato-row.a
+    displayName: "\uAC10\uC790 \uBC2D\uACE0\uB791"
+    visualVariantKey: farm.potato-row.a
+    placementProfileKey: placement-profile:farm.potato-row.a
+    requiredSocketCodes:
+    - Crop
+    - SoilObservation
+    - Irrigation
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 5104508552522645100, guid: fb48900b282423248aad42e0356731aa, type: 3}
+    footprint: {x: 4.8, y: 4.8}
+    measuredBoundsSize: {x: 4.3324213, y: 0.17223035, z: 4.4}
+  - objectStableId: seedbed-object:farm.potato-plant-visual.a
+    displayName: "\uAC10\uC790 \uC7AC\uBC30\uCCB4"
+    visualVariantKey: farm.potato-plant-visual.a
+    placementProfileKey: placement-profile:farm.potato-plant-visual.a
+    requiredSocketCodes:
+    - Soil
+    - WeatherObservation
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 2217593497862070126, guid: 08b66e01506aae7469e71ec726083165, type: 3}
+    footprint: {x: 2, y: 2}
+    measuredBoundsSize: {x: 1.8, y: 1.5390064, z: 1.7244345}
+  - objectStableId: seedbed-object:farm.irrigation-sprinkler.a
+    displayName: "\uBC2D \uAD00\uC218 \uC2A4\uD504\uB9C1\uD074\uB7EC"
+    visualVariantKey: farm.irrigation-sprinkler.a
+    placementProfileKey: placement-profile:farm.irrigation-sprinkler.a
+    requiredSocketCodes:
+    - WaterInput
+    - CropTarget
+    - WeatherObservation
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 3098181861285388045, guid: 236194ea7b866524ea625be47f1dfe40, type: 3}
+    footprint: {x: 2.2, y: 2.2}
+    measuredBoundsSize: {x: 0.1802895, y: 2, z: 0.33401167}
+  - objectStableId: seedbed-object:town.delivery-truck.a
+    displayName: "\uD654\uBB3C \uBC30\uC1A1 \uCC28\uB7C9"
+    visualVariantKey: town.delivery-truck.a
+    placementProfileKey: placement-profile:town.delivery-truck.a
+    requiredSocketCodes:
+    - Driver
+    - Cargo
+    - RouteEntry
+    - RouteExit
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 7030892883812641320, guid: d247c654aa27cb04e94b566739a48fcd, type: 3}
+    footprint: {x: 5.2, y: 3}
+    measuredBoundsSize: {x: 1.7286595, y: 2.3635283, z: 4.8}
+  - objectStableId: seedbed-object:shared.cargo-pallet.a
+    displayName: "\uACF5\uC6A9 \uD654\uBB3C Pallet"
+    visualVariantKey: shared.cargo-pallet.a
+    placementProfileKey: placement-profile:shared.cargo-pallet.a
+    requiredSocketCodes:
+    - Cargo
+    - Forklift
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 1072161533534642149, guid: d461a8aef4598fe4099e91b453fa95f0, type: 3}
+    footprint: {x: 2.2, y: 2.2}
+    measuredBoundsSize: {x: 1.8, y: 0.30979294, z: 1.6387488}
+  - objectStableId: seedbed-object:farm.pallet-crate.a
+    displayName: "\uB18D\uC7A5 \uCD9C\uD558 Pallet Crate"
+    visualVariantKey: farm.pallet-crate.a
+    placementProfileKey: placement-profile:farm.pallet-crate.a
+    requiredSocketCodes:
+    - HarvestCargo
+    - Vehicle
+    - HubHandoff
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 8710339759228146406, guid: 29b9157184f13fc48938c95aec8ca284, type: 3}
+    footprint: {x: 2.7, y: 2.5}
+    measuredBoundsSize: {x: 2.3, y: 1.1721133, z: 1.3774843}
+  - objectStableId: seedbed-object:town.resident-visual.a
+    displayName: "\uC8FC\uBBFC \uAD00\uC810 Visual"
+    visualVariantKey: town.resident-visual.a
+    placementProfileKey: placement-profile:town.resident-visual.a
+    requiredSocketCodes:
+    - Perspective
+    - AggregateBoundary
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 1731776341180752535, guid: 2132ca25f43c2b349bc0f7fc2e8622fe, type: 3}
+    footprint: {x: 1.3, y: 1.3}
+    measuredBoundsSize: {x: 2.1999998, y: 2.1147037, z: 0.640111}
+  - objectStableId: seedbed-object:town.grouping-cart-table.a
+    displayName: "\uC9D1\uB2E8\uC218\uC694 Cart Table"
+    visualVariantKey: town.grouping-cart-table.a
+    placementProfileKey: placement-profile:town.grouping-cart-table.a
+    requiredSocketCodes:
+    - IntentInput
+    - AggregateOutput
+    - ConsentBoundary
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 1153068289749479701, guid: 4383cd03111c97c49863ff51875ba1e0, type: 3}
+    footprint: {x: 3.3, y: 2.3}
+    measuredBoundsSize: {x: 3, y: 2.6411185, z: 1.5625851}
+  - objectStableId: seedbed-object:city.urban-market-building.a
+    displayName: "\uB3C4\uC2EC\uB9C8\uD2B8 Shop"
+    visualVariantKey: city.urban-market-building.a
+    placementProfileKey: placement-profile:city.urban-market-building.a
+    requiredSocketCodes:
+    - Entry
+    - PublicProduct
+    - DemandSignal
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 7527933338394727454, guid: e17682d0cee5d2540a8a9ac1b1865b52, type: 3}
+    footprint: {x: 7.5, y: 6.5}
+    measuredBoundsSize: {x: 6.322378, y: 3.8615649, z: 7}
+  - objectStableId: seedbed-object:city.operator-inventory-shelf.a
+    displayName: "\uC6B4\uC601\uC790 \uC804\uC6A9 \uC7AC\uACE0 Shelf"
+    visualVariantKey: city.operator-inventory-shelf.a
+    placementProfileKey: placement-profile:city.operator-inventory-shelf.a
+    requiredSocketCodes:
+    - Inventory
+    - ShelfTask
+    - Operator
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 1258166835975374197, guid: 7b5b7bbeae9d5a640aefafb6114892b7, type: 3}
+    footprint: {x: 3.3, y: 1.8}
+    measuredBoundsSize: {x: 2.3723555, y: 3, z: 1.3678739}
+  - objectStableId: seedbed-object:city.market-operator-visual.a
+    displayName: "\uB9C8\uD2B8 \uC6B4\uC601\uC790 Visual"
+    visualVariantKey: city.market-operator-visual.a
+    placementProfileKey: placement-profile:city.market-operator-visual.a
+    requiredSocketCodes:
+    - Perspective
+    - Inventory
+    - ShelfTask
+    - Interaction
+    - Label
+    - CameraFocus
+    prefab: {fileID: 4045623160942810868, guid: 33c73d112c734b1459fbcf315ff3156b, type: 3}
+    footprint: {x: 1.3, y: 1.3}
+    measuredBoundsSize: {x: 2.1999998, y: 2.1242905, z: 0.6374843}

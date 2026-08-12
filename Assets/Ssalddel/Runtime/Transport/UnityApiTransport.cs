@@ -52,4 +52,12 @@ namespace Ssalddel.Unity.Runtime.Transport
             UnityApiRequest request,
             CancellationToken cancellationToken);
     }
+
+    public interface IOperationalUnityApiClient : IUnityApiClient
+    {
+    }
+
+    public interface ISimulationRehearsalUnityApiClient : IUnityApiClient
+    {
+    }
 }

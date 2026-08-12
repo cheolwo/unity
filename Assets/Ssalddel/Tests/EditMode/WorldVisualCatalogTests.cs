@@ -11,7 +11,7 @@ namespace Ssalddel.Unity.Tests.EditMode
     public sealed class WorldVisualCatalogTests
     {
         private const string CatalogRoot =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/";
         [Test]
         public void VisualKey는_Vendor파일명을Domain계약으로노출하지않는다()
         {

@@ -12,9 +12,9 @@ namespace Ssalddel.Unity.Tests.EditMode
     public sealed class 농장풍경CompositionSetTests
     {
         private const string CatalogPath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Catalogs/농장풍경CompositionCatalog.asset";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/농장풍경CompositionCatalog.asset";
         private const string PreviewScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CompositionSets/FarmCompositionSetLibraryPreview.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/농장풍경조합모음미리보기.unity";
 
         [Test]
         public void 여덟풍경Set는_A_B_C_스물네Prefab으로해결된다()

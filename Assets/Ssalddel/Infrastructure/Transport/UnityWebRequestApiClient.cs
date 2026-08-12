@@ -14,16 +14,19 @@ namespace Ssalddel.Unity.Infrastructure.Transport
         private readonly IUnityAccessTokenProvider _accessTokenProvider;
 
         public UnityWebRequestApiClient(
-            UnityClientRuntimeOptions options,
+            string apiBaseUrl,
             IUnityAccessTokenProvider accessTokenProvider = null)
         {
-            if (options == null)
+            if (!Uri.TryCreate(apiBaseUrl, UriKind.Absolute, out var baseAddress)
+                || (baseAddress.Scheme != Uri.UriSchemeHttp
+                    && baseAddress.Scheme != Uri.UriSchemeHttps))
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentException(
+                    "API 기준 주소는 HTTP 또는 HTTPS 절대 주소여야 합니다.",
+                    nameof(apiBaseUrl));
             }
 
-            options.Validate();
-            _baseAddress = new Uri(options.ApiBaseUrl.TrimEnd('/') + "/", UriKind.Absolute);
+            _baseAddress = new Uri(apiBaseUrl.TrimEnd('/') + "/", UriKind.Absolute);
             _accessTokenProvider = accessTokenProvider;
         }
 
@@ -106,5 +109,48 @@ namespace Ssalddel.Unity.Infrastructure.Transport
                 await completion.Task.ConfigureAwait(false);
             }
         }
+    }
+
+    public sealed class OperationalUnityWebRequestApiClient : IOperationalUnityApiClient
+    {
+        private readonly UnityWebRequestApiClient inner;
+
+        public OperationalUnityWebRequestApiClient(
+            UnityClientRuntimeOptions options,
+            IUnityAccessTokenProvider accessTokenProvider = null)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            options.Validate();
+            inner = new UnityWebRequestApiClient(
+                options.OperationalApiBaseUrl,
+                accessTokenProvider);
+        }
+
+        public Task<UnityApiResponse> SendAsync(
+            UnityApiRequest request,
+            CancellationToken cancellationToken)
+            => inner.SendAsync(request, cancellationToken);
+    }
+
+    public sealed class SimulationRehearsalUnityWebRequestApiClient
+        : ISimulationRehearsalUnityApiClient
+    {
+        private readonly UnityWebRequestApiClient inner;
+
+        public SimulationRehearsalUnityWebRequestApiClient(
+            UnityClientRuntimeOptions options,
+            IUnityAccessTokenProvider accessTokenProvider = null)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            options.Validate();
+            inner = new UnityWebRequestApiClient(
+                options.SimulationRehearsalApiBaseUrl,
+                accessTokenProvider);
+        }
+
+        public Task<UnityApiResponse> SendAsync(
+            UnityApiRequest request,
+            CancellationToken cancellationToken)
+            => inner.SendAsync(request, cancellationToken);
     }
 }

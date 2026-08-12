@@ -12,9 +12,9 @@ namespace Ssalddel.Unity.Editor
     public static class CityFarmMacroWorldBuilder
     {
         public const string ScenePath =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/CityFarmMacroWorldBlockout.unity";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/농장도시공간배치초안.unity";
         private const string MaterialRoot =
-            "Assets/Ssalddel/Experiments/CityFarmWorld/Materials";
+            "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Materials";
         private const string WorldFocusAnchorId = "camera-focus:world.city-farm-supply-chain";
 
         [MenuItem("Ssalddel/WORLD-1/Build City Farm Macro World")]
@@ -76,7 +76,7 @@ namespace Ssalddel.Unity.Editor
             if (!worldView.ValidateWiring())
                 throw new InvalidOperationException("SupplyChainMacroWorldWiringInvalid");
 
-            System.IO.Directory.CreateDirectory("Assets/Ssalddel/Experiments/CityFarmWorld");
+            System.IO.Directory.CreateDirectory("Assets/Ssalddel/Experiments - 연구/CityFarmWorld");
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
                 throw new InvalidOperationException("SupplyChainMacroWorldSceneSaveFailed");
             AssetDatabase.SaveAssets();

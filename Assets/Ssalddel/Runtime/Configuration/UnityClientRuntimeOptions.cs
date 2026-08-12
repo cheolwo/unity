@@ -26,7 +26,9 @@ namespace Ssalddel.Unity.Runtime.Configuration
 
     public sealed class UnityClientRuntimeOptions
     {
-        public string ApiBaseUrl { get; set; } = "http://localhost:5104";
+        public string OperationalApiBaseUrl { get; set; } = "https://localhost:7117/";
+
+        public string SimulationRehearsalApiBaseUrl { get; set; } = "http://localhost:5204/";
 
         public string DetailBaseUrl { get; set; } = "http://localhost:5238";
 
@@ -36,11 +38,8 @@ namespace Ssalddel.Unity.Runtime.Configuration
 
         public void Validate()
         {
-            if (!Uri.TryCreate(ApiBaseUrl, UriKind.Absolute, out var uri)
-                || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
-            {
-                throw new InvalidOperationException("API base URL은 HTTP 또는 HTTPS 절대 주소여야 합니다.");
-            }
+            ValidateHttpBaseUrl(OperationalApiBaseUrl, "운영 API");
+            ValidateHttpBaseUrl(SimulationRehearsalApiBaseUrl, "예행연습·게임 세계 API");
 
             if (!Uri.TryCreate(DetailBaseUrl, UriKind.Absolute, out var detailUri)
                 || (detailUri.Scheme != Uri.UriSchemeHttp && detailUri.Scheme != Uri.UriSchemeHttps))
@@ -57,6 +56,16 @@ namespace Ssalddel.Unity.Runtime.Configuration
                 && AllowFixtureData)
             {
                 throw new InvalidOperationException("Operational 모드에서는 fixture 데이터를 허용할 수 없습니다.");
+            }
+        }
+
+        private static void ValidateHttpBaseUrl(string value, string label)
+        {
+            if (!Uri.TryCreate(value, UriKind.Absolute, out var uri)
+                || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            {
+                throw new InvalidOperationException(
+                    label + " 기준 주소는 HTTP 또는 HTTPS 절대 주소여야 합니다.");
             }
         }
     }

@@ -1,0 +1,174 @@
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Ssalddel.Unity.Runtime.Transport;
+using Ssalddel.Unity.Runtime.World;
+
+namespace Ssalddel.Unity.Infrastructure.Simulation
+{
+    public sealed class 물류이동AuthorityRepository : I물류이동AuthorityClient
+    {
+        private const string BaseRoute = "api/simulation/v1/sessions/";
+        private readonly ISimulationRehearsalUnityApiClient apiClient;
+
+        public 물류이동AuthorityRepository(ISimulationRehearsalUnityApiClient client)
+            => apiClient = client ?? throw new ArgumentNullException(nameof(client));
+
+        public async Task<물류이동PreviewData> PreviewAsync(
+            string sessionStableId,
+            물류이동PreviewRequestData request,
+            CancellationToken cancellationToken)
+        {
+            var before = await GetAsync(sessionStableId, cancellationToken);
+            var response = await SendAsync("POST", Route(sessionStableId)
+                + "/logistics-movement-previews", JsonConvert.SerializeObject(request), cancellationToken);
+            var wire = JsonConvert.DeserializeObject<PreviewWire>(response.Body)
+                ?? throw new InvalidOperationException("SimulationLogisticsPreviewJsonInvalid");
+            return new 물류이동PreviewData
+            {
+                SessionStableId = before.SessionStableId,
+                ObservedRevision = before.Revision,
+                ObservedWorldTick = before.WorldTick,
+                CargoStableId = wire.CargoStableId ?? string.Empty,
+                Quantity = wire.Quantity,
+                UnitCode = wire.UnitCode ?? string.Empty,
+                RequiredRouteTicks = wire.RequiredRouteTicks,
+                DestinationStockCandidateStableId = wire.DestinationStockCandidateStableId ?? string.Empty,
+                BoundaryCodes = wire.BoundaryCodes ?? Array.Empty<string>(),
+                Request = request,
+            };
+        }
+
+        public async Task<물류이동AuthoritySnapshot> ConfirmAsync(
+            string sessionStableId,
+            long expectedRevision,
+            물류이동PreviewRequestData request,
+            CancellationToken cancellationToken)
+        {
+            var response = await SendAsync("POST", Route(sessionStableId)
+                + "/logistics-movements/confirm", JsonConvert.SerializeObject(new
+                {
+                    CommandId = "command:unity.logistics.confirm:" + expectedRevision,
+                    ExpectedRevision = expectedRevision,
+                    Movement = request,
+                }), cancellationToken);
+            return ParseSnapshot(response.Body);
+        }
+
+        public async Task<물류이동AuthoritySnapshot> AdvanceAsync(
+            string sessionStableId,
+            long expectedRevision,
+            CancellationToken cancellationToken)
+        {
+            var response = await SendAsync("POST", Route(sessionStableId) + "/ticks",
+                JsonConvert.SerializeObject(new
+                {
+                    CommandId = "command:unity.logistics.tick:" + expectedRevision,
+                    ExpectedRevision = expectedRevision,
+                    TickCount = 1,
+                }), cancellationToken);
+            return ParseSnapshot(response.Body);
+        }
+
+        private async Task<물류이동AuthoritySnapshot> GetAsync(
+            string sessionStableId,
+            CancellationToken cancellationToken)
+            => ParseSnapshot((await SendAsync("GET", Route(sessionStableId), string.Empty,
+                cancellationToken)).Body);
+
+        private async Task<UnityApiResponse> SendAsync(
+            string method,
+            string path,
+            string body,
+            CancellationToken cancellationToken)
+        {
+            var response = await apiClient.SendAsync(new UnityApiRequest
+            {
+                Method = method,
+                RelativePath = path,
+                JsonBody = body,
+                RequiresAuthentication = false,
+            }, cancellationToken);
+            if (!response.IsSuccess)
+                throw new InvalidOperationException("SimulationAuthorityRequestFailed:"
+                    + response.StatusCode + ":" + response.ErrorCode);
+            return response;
+        }
+
+        private static string Route(string sessionStableId)
+        {
+            if (string.IsNullOrWhiteSpace(sessionStableId))
+                throw new InvalidOperationException("SimulationSessionStableIdMissing");
+            return BaseRoute + Uri.EscapeDataString(sessionStableId.Trim());
+        }
+
+        private static 물류이동AuthoritySnapshot ParseSnapshot(string json)
+        {
+            var wire = JsonConvert.DeserializeObject<SessionWire>(json)
+                ?? throw new InvalidOperationException("SimulationSessionSnapshotJsonInvalid");
+            var settlement = wire.Settlement
+                ?? throw new InvalidOperationException("SimulationSettlementSnapshotMissing");
+            var movement = wire.LogisticsMovements?.SingleOrDefault();
+            var task = wire.Tasks?.FirstOrDefault(value => value.TaskStableId == movement?.TaskStableId);
+            var allocation = settlement.HarvestLotAllocations?.FirstOrDefault(
+                value => value.AllocationStableId == movement?.SourceAllocationStableId);
+            var worldTick = wire.WorldContext?.WorldTick ?? wire.CurrentTick;
+            var gameDate = DateTimeOffset.TryParse(wire.WorldContext?.GameDate,
+                CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var parsed)
+                ? parsed.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                : "Simulation date unavailable";
+            var settlementSnapshot = new 정착지상호작용AuthoritySnapshot
+            {
+                SessionStableId = wire.SessionStableId ?? string.Empty,
+                Revision = wire.Revision,
+                WorldTick = worldTick,
+                GameDateLabel = gameDate,
+                TreasuryBalance = settlement.TreasuryBalance,
+                TreasuryReserved = settlement.TreasuryReserved,
+                LaborAvailable = settlement.LaborAvailable,
+                LaborReserved = settlement.LaborReserved,
+                MarketFoodSupplyKg = settlement.MarketSupplyByProduct?
+                    .Where(value => value.ProductStableId == "product:potato").Sum(value => value.Quantity) ?? 0m,
+                ReserveFoodEquivalent = settlement.FoodReserveEquivalent,
+                StorageOccupied = settlement.StorageOccupied,
+                StorageReserved = settlement.StorageReserved,
+                FoodSecurityDays = settlement.FoodSecurityDays,
+                ActiveTaskCount = settlement.ActiveTaskStableIds?.Length ?? 0,
+                AllocationStateCode = allocation?.StateCode ?? string.Empty,
+                TaskStateCode = task?.StateCode ?? string.Empty,
+                SourceModeCode = "SimulationServer",
+            };
+            return new 물류이동AuthoritySnapshot
+            {
+                SessionStableId = settlementSnapshot.SessionStableId,
+                Revision = wire.Revision,
+                WorldTick = worldTick,
+                GameDateLabel = gameDate,
+                CargoStableId = movement?.CargoStableId ?? 물류이동Fixture.CargoStableId,
+                MovementStateCode = movement?.StateCode ?? string.Empty,
+                TaskStateCode = task?.StateCode ?? string.Empty,
+                Quantity = movement?.Quantity ?? 300m,
+                ReservedQuantity = movement?.ReservedQuantity ?? 0m,
+                SourceAvailableQuantity = allocation?.AvailableQuantity ?? 300m,
+                CompletedRouteTicks = movement?.CompletedRouteTicks ?? 0,
+                RequiredRouteTicks = movement?.RequiredRouteTicks ?? 3,
+                RouteStableId = movement?.RouteStableId ?? "route:sim.farm-hub-1",
+                DestinationStockCandidateStableId = movement?.DestinationStockCandidateStableId ?? string.Empty,
+                SourceModeCode = "SimulationServer",
+                Settlement = settlementSnapshot,
+            };
+        }
+
+        [Serializable] private sealed class PreviewWire { public string? CargoStableId; public decimal Quantity; public string? UnitCode; public int RequiredRouteTicks; public string? DestinationStockCandidateStableId; public string[]? BoundaryCodes; }
+        [Serializable] private sealed class SessionWire { public string? SessionStableId; public int CurrentTick; public long Revision; public WorldWire? WorldContext; public SettlementWire? Settlement; public MovementWire[]? LogisticsMovements; public TaskWire[]? Tasks; }
+        [Serializable] private sealed class WorldWire { public int WorldTick; public string? GameDate; }
+        [Serializable] private sealed class SettlementWire { public decimal TreasuryBalance; public decimal TreasuryReserved; public decimal LaborAvailable; public decimal LaborReserved; public decimal StorageOccupied; public decimal StorageReserved; public decimal FoodReserveEquivalent; public decimal FoodSecurityDays; public string[]? ActiveTaskStableIds; public MarketWire[]? MarketSupplyByProduct; public AllocationWire[]? HarvestLotAllocations; }
+        [Serializable] private sealed class MarketWire { public string? ProductStableId; public decimal Quantity; }
+        [Serializable] private sealed class AllocationWire { public string? AllocationStableId; public string? StateCode; public decimal AvailableQuantity; }
+        [Serializable] private sealed class MovementWire { public string? CargoStableId; public string? StateCode; public string? SourceAllocationStableId; public string? TaskStableId; public decimal Quantity; public decimal ReservedQuantity; public int CompletedRouteTicks; public int RequiredRouteTicks; public string? RouteStableId; public string? DestinationStockCandidateStableId; }
+        [Serializable] private sealed class TaskWire { public string? TaskStableId; public string? StateCode; }
+    }
+}
