@@ -134,6 +134,41 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public void 저장Scene은_PlayerCameraRig계층과_InputSystem전략카메라를가진다()
+        {
+            var scene = SceneManager.GetSceneByPath(ScenePath);
+            if (!scene.isLoaded)
+                scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                var root = Find(scene, "SimulationWorldShell");
+                var playerRig = root.transform.Find("CameraSystem/PlayerCameraRig");
+                var pivot = playerRig?.Find("CameraPivot");
+                var camera = pivot?.Find("Main Camera");
+                var controller = playerRig?.GetComponent<전략카메라Controller>();
+
+                Assert.That(playerRig, Is.Not.Null);
+                Assert.That(pivot, Is.Not.Null);
+                Assert.That(camera, Is.Not.Null);
+                Assert.That(camera!.CompareTag("MainCamera"), Is.True);
+                Assert.That(controller, Is.Not.Null);
+                Assert.DoesNotThrow(() => controller!.ValidateConfiguration());
+                Assert.That(controller!.WorldMinimum, Is.EqualTo(new Vector2(-65f, -50f)));
+                Assert.That(controller.WorldMaximum, Is.EqualTo(new Vector2(65f, 50f)));
+                Assert.That(controller.MinimumZoomDistance, Is.EqualTo(12f));
+                Assert.That(controller.MaximumZoomDistance, Is.EqualTo(110f));
+                Assert.That(UnityEngine.Object.FindFirstObjectByType<UnityEngine.InputSystem.UI.InputSystemUIInputModule>(),
+                    Is.Not.Null);
+                Assert.That(UnityEngine.Object.FindFirstObjectByType<UnityEngine.EventSystems.StandaloneInputModule>(),
+                    Is.Null);
+            }
+            finally
+            {
+                if (scene.isLoaded) EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        [Test]
         public void 저장Scene은_WorldSettlementDistrictObjectNavigationTarget을가진다()
         {
             var scene = SceneManager.GetSceneByPath(ScenePath);

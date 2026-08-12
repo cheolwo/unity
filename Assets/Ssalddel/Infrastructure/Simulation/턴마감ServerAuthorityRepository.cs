@@ -9,7 +9,7 @@ using Ssalddel.Unity.Runtime.World;
 
 namespace Ssalddel.Unity.Infrastructure.Simulation
 {
-    public sealed class 턴마감ServerAuthorityRepository : I턴마감AuthorityClient
+    public sealed class 턴마감ServerAuthorityRepository : I타로턴마감AuthorityClient
     {
         private const string BaseRoute = "api/simulation/v1/sessions/";
         public const string BootstrapSessionStableId =
@@ -49,6 +49,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 CanCloseTurn = wire.CanCloseTurn,
                 AvailableCards = (wire.AvailableCards ?? Array.Empty<CardWire>())
                     .Select(MapCard).ToArray(),
+                TarotDraw = MapTarotDraw(wire.TarotDraw),
             };
             ValidateContext(context, sessionStableId);
             return context;
@@ -111,6 +112,101 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             return canonical;
         }
 
+        public async Task<타로객체반응PreviewData> Preview타로객체반응Async(
+            string sessionStableId, long expectedRevision, string drawStableId,
+            CancellationToken cancellationToken)
+        {
+            var response = await SendAsync(
+                "POST", SessionRoute(sessionStableId) + "/tarot-object-reaction-previews",
+                JsonConvert.SerializeObject(new
+                {
+                    ExpectedRevision = expectedRevision,
+                    DrawStableId = drawStableId,
+                }), cancellationToken);
+            var wire = JsonConvert.DeserializeObject<TarotObjectReactionPreviewWire>(response.Body)
+                ?? throw new InvalidOperationException("TarotObjectReactionPreviewJsonInvalid");
+            var result = new 타로객체반응PreviewData
+            {
+                PreviewStableId = wire.PreviewStableId ?? string.Empty,
+                BaseRevision = wire.BaseRevision,
+                TurnNumber = wire.TurnNumber,
+                DrawStableId = wire.DrawStableId ?? string.Empty,
+                ObjectCatalogRevision = wire.ObjectCatalogRevision ?? string.Empty,
+                IsCandidateOnly = wire.IsCandidateOnly,
+                DoesNotMutateSession = wire.DoesNotMutateSession,
+                CardReactions = (wire.CardReactions ?? Array.Empty<TarotCardReactionWire>())
+                    .Select(value => new 타로Card객체반응Data
+                    {
+                        OfferStableId = value.OfferStableId ?? string.Empty,
+                        CardStableId = value.CardStableId ?? string.Empty,
+                        OrientationCode = value.OrientationCode ?? string.Empty,
+                        HighlightObjectStableIds = value.HighlightObjectStableIds
+                            ?? Array.Empty<string>(),
+                        ObjectReactions = (value.ObjectReactions
+                                ?? Array.Empty<TarotObjectReactionWire>())
+                            .Select(reaction => new 타로객체반응Data
+                            {
+                                ObjectStableId = reaction.ObjectStableId ?? string.Empty,
+                                PlacementStableId = reaction.PlacementStableId ?? string.Empty,
+                                ReactionStateCode = reaction.ReactionStateCode ?? string.Empty,
+                                CanHighlightInWorld = reaction.CanHighlightInWorld,
+                                KoreanSummary = reaction.KoreanSummary ?? string.Empty,
+                                StateSourceStableIds = reaction.StateSourceStableIds
+                                    ?? Array.Empty<string>(),
+                                BlockReasonCodes = reaction.BlockReasonCodes
+                                    ?? Array.Empty<string>(),
+                            }).ToArray(),
+                    }).ToArray(),
+            };
+            if (result.BaseRevision != expectedRevision
+                || result.DrawStableId != drawStableId
+                || !result.IsCandidateOnly || !result.DoesNotMutateSession
+                || result.CardReactions.Length != 3)
+                throw new InvalidOperationException("TarotObjectReactionPreviewAuthorityMismatch");
+            return result;
+        }
+
+        public async Task<턴마감PreviewData> Preview타로Async(
+            string sessionStableId, long expectedRevision, 턴마감타로SelectionData selection,
+            CancellationToken cancellationToken)
+        {
+            ValidateSelection(selection);
+            var response = await SendAsync(
+                "POST", SessionRoute(sessionStableId) + "/turn-closing-previews",
+                JsonConvert.SerializeObject(new
+                {
+                    ExpectedRevision = expectedRevision,
+                    SelectedCardStableIds = Array.Empty<string>(),
+                    SelectedTarotCard = selection,
+                }), cancellationToken);
+            return ParsePreview(response.Body, expectedRevision, selection.CardStableId);
+        }
+
+        public async Task<턴마감ResultData> Confirm타로Async(
+            string sessionStableId, string commandId, long expectedRevision,
+            턴마감타로SelectionData selection, CancellationToken cancellationToken)
+        {
+            ValidateSelection(selection);
+            await SendAsync(
+                "POST", SessionRoute(sessionStableId) + "/turn-closings/confirm",
+                JsonConvert.SerializeObject(new
+                {
+                    CommandId = commandId,
+                    ExpectedRevision = expectedRevision,
+                    Preview = new
+                    {
+                        ExpectedRevision = expectedRevision,
+                        SelectedCardStableIds = Array.Empty<string>(),
+                        SelectedTarotCard = selection,
+                    },
+                }), cancellationToken);
+            var canonical = await RefreshSessionAsync(sessionStableId, cancellationToken);
+            if (canonical.Revision != expectedRevision + 1
+                || canonical.ActiveCardStableId != selection.CardStableId)
+                throw new InvalidOperationException("TarotTurnClosingCanonicalSessionMismatch");
+            return canonical;
+        }
+
         public async Task<턴마감ResultData> RefreshSessionAsync(
             string sessionStableId, CancellationToken cancellationToken)
             => ParseSession((await SendAsync(
@@ -142,6 +238,69 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
 
         private static string[] SelectedCards(string stableId)
             => string.IsNullOrEmpty(stableId) ? Array.Empty<string>() : new[] { stableId };
+
+        private static void ValidateSelection(턴마감타로SelectionData selection)
+        {
+            if (selection == null || string.IsNullOrWhiteSpace(selection.OfferStableId)
+                || string.IsNullOrWhiteSpace(selection.CardStableId)
+                || (selection.OrientationCode != 턴마감타로OrientationCodes.Upright
+                    && selection.OrientationCode != 턴마감타로OrientationCodes.Reversed))
+                throw new InvalidOperationException("TarotTurnSelectionInvalid");
+        }
+
+        private static 턴마감PreviewData ParsePreview(
+            string json, long expectedRevision, string selectedCardStableId)
+        {
+            var wire = JsonConvert.DeserializeObject<PreviewWire>(json)
+                ?? throw new InvalidOperationException("TurnClosingPreviewJsonInvalid");
+            var preview = new 턴마감PreviewData
+            {
+                PreviewStableId = wire.PreviewStableId ?? string.Empty,
+                BaseRevision = wire.BaseRevision,
+                ClosingTurnNumber = wire.ClosingTurnNumber,
+                NextTurnNumber = wire.NextTurnNumber,
+                NextGameDateLabel = FormatGameDate(wire.NextGameDate),
+                PendingTaskCount = wire.PendingTaskCount,
+                SelectedCards = (wire.SelectedCards ?? Array.Empty<CardWire>())
+                    .Select(MapCard).ToArray(),
+            };
+            if (preview.BaseRevision != expectedRevision
+                || preview.NextTurnNumber != preview.ClosingTurnNumber + 1
+                || preview.SelectedCards.Length != 1
+                || preview.SelectedCards[0].CardStableId != selectedCardStableId)
+                throw new InvalidOperationException("TarotTurnClosingPreviewAuthorityMismatch");
+            return preview;
+        }
+
+        private static 턴마감타로DrawData MapTarotDraw(TarotDrawWire? wire)
+        {
+            if (wire == null) return new 턴마감타로DrawData();
+            var draw = new 턴마감타로DrawData
+            {
+                DrawStableId = wire.DrawStableId ?? string.Empty,
+                DeckStableId = wire.DeckStableId ?? string.Empty,
+                DeckRevision = wire.DeckRevision ?? string.Empty,
+                DrawRuleRevision = wire.DrawRuleRevision ?? string.Empty,
+                TurnNumber = wire.TurnNumber,
+                TurnHistoryHash = wire.TurnHistoryHash ?? string.Empty,
+                Offers = (wire.Offers ?? Array.Empty<TarotOfferWire>())
+                    .Select(value => new 턴마감타로OfferData
+                    {
+                        OfferStableId = value.OfferStableId ?? string.Empty,
+                        OfferSlotNumber = value.OfferSlotNumber,
+                        CardCopyStableId = value.CardCopyStableId ?? string.Empty,
+                        OrientationCode = value.OrientationCode ?? string.Empty,
+                        Card = MapCard(value.Card ?? new CardWire()),
+                    }).OrderBy(value => value.OfferSlotNumber).ToArray(),
+            };
+            if (!draw.IsAvailable
+                || draw.Offers.Select(value => value.OfferStableId).Distinct().Count() != 3
+                || draw.Offers.Any(value => value.OrientationCode
+                    != 턴마감타로OrientationCodes.Upright
+                    && value.OrientationCode != 턴마감타로OrientationCodes.Reversed))
+                throw new InvalidOperationException("TarotDrawAuthorityMismatch");
+            return draw;
+        }
 
         private static 턴마감CardData MapCard(CardWire wire)
         {
@@ -251,7 +410,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 {
                     FactionStableId = "faction:sim.borderland-1",
                     TerritoryStableId = "territory:sim.borderland-1",
-                    SettlementStableId = "settlement:sim.border-town-1",
+                    SettlementStableId = SimulationWorldShellFixture.SettlementStableId,
                     GameDateStartsOn = "2026-04-12T00:00:00+00:00",
                 },
                 Settlement = new
@@ -296,7 +455,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             => new { DistrictStableId = id, DistrictTypeCode = type, SourceStableIds = Sources() };
         private static string[] Sources() => new[] { "source:unity.turn-closing-server-r1" };
 
-        [Serializable] private sealed class ContextWire { public string SessionStableId; public int TurnNumber; public string GameDate; public long Revision; public int PendingTaskCount; public bool CanCloseTurn; public CardWire[] AvailableCards; }
+        [Serializable] private sealed class ContextWire { public string SessionStableId; public int TurnNumber; public string GameDate; public long Revision; public int PendingTaskCount; public bool CanCloseTurn; public CardWire[] AvailableCards; public TarotDrawWire TarotDraw; }
         [Serializable] private sealed class PreviewWire { public string PreviewStableId; public long BaseRevision; public int ClosingTurnNumber; public int NextTurnNumber; public string NextGameDate; public int PendingTaskCount; public CardWire[] SelectedCards; }
         [Serializable] private sealed class CardWire { public string CardStableId; public string CardRevision; public string CardKindCode; public string Title; public string Summary; public string EffectCode; public string TargetStatCode; public int StatDelta; public string SourceStableId; public string RegionKey; public string AvailableFromGameDate; public string AvailableThroughGameDate; public string CalendarRevision; public string EffectRuleRevision; public string SourceUrl; public string EvidenceCheckedAtUtc; }
         [Serializable] private sealed class SessionWire { public string SessionStableId; public long Revision; public WorldWire WorldContext; public SettlementWire Settlement; public ActiveEffectWire[] ActiveTurnCardEffects; }
@@ -305,5 +464,10 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         [Serializable] private sealed class MarketWire { public string ProductStableId; public decimal Quantity; }
         [Serializable] private sealed class DistrictWire { public string DistrictStableId; }
         [Serializable] private sealed class ActiveEffectWire { public string CardStableId; public string EffectCode; public int ActiveTurnNumber; }
+        [Serializable] private sealed class TarotDrawWire { public string DrawStableId; public string DeckStableId; public string DeckRevision; public string DrawRuleRevision; public int TurnNumber; public string TurnHistoryHash; public TarotOfferWire[] Offers; }
+        [Serializable] private sealed class TarotOfferWire { public string OfferStableId; public int OfferSlotNumber; public string CardCopyStableId; public string OrientationCode; public CardWire Card; }
+        [Serializable] private sealed class TarotObjectReactionPreviewWire { public string PreviewStableId; public long BaseRevision; public int TurnNumber; public string DrawStableId; public string ObjectCatalogRevision; public bool IsCandidateOnly; public bool DoesNotMutateSession; public TarotCardReactionWire[] CardReactions; }
+        [Serializable] private sealed class TarotCardReactionWire { public string OfferStableId; public string CardStableId; public string OrientationCode; public TarotObjectReactionWire[] ObjectReactions; public string[] HighlightObjectStableIds; }
+        [Serializable] private sealed class TarotObjectReactionWire { public string ObjectStableId; public string PlacementStableId; public string ReactionStateCode; public bool CanHighlightInWorld; public string KoreanSummary; public string[] StateSourceStableIds; public string[] BlockReasonCodes; }
     }
 }

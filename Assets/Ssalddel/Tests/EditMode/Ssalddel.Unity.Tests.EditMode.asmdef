@@ -1,7 +1,7 @@
 {
   "name": "Ssalddel.Unity.Tests.EditMode",
   "rootNamespace": "Ssalddel.Unity.Tests.EditMode",
-  "references": ["Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Ssalddel.Unity.Infrastructure", "Ssalddel.Unity.Presentation", "Ssalddel.Unity.Bootstrap", "Unity.UGUI", "Unity.RenderPipelines.Core.Runtime"],
+  "references": ["Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Ssalddel.Unity.Infrastructure", "Ssalddel.Unity.Presentation", "Ssalddel.Unity.Bootstrap", "Unity.UGUI", "Unity.InputSystem", "Unity.RenderPipelines.Core.Runtime"],
   "includePlatforms": ["Editor"],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

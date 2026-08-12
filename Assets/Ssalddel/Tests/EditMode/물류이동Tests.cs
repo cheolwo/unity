@@ -30,6 +30,11 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(coordinator.CurrentSnapshot.SourceAvailableQuantity, Is.EqualTo(300m));
             Assert.That(coordinator.CurrentPreview!.DestinationStockCandidateStableId,
                 Is.EqualTo("stock-candidate:arrival:cargo:sim.potato-1"));
+            Assert.That(coordinator.CurrentPreview.RecommendedCarrierCandidateStableId,
+                Is.EqualTo(화물배차Fixture.RecommendedCandidateStableId));
+            Assert.That(coordinator.CurrentPreview.CandidateEvaluations, Has.Length.EqualTo(3));
+            Assert.That(coordinator.CurrentPreview.CandidateEvaluations,
+                Has.Exactly(1).Matches<화물배차후보평가Data>(value => value.IsRecommended));
         }
 
         [Test]
@@ -44,6 +49,9 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(coordinator.CurrentSnapshot.MovementStateCode, Is.EqualTo("Reserved"));
             Assert.That(coordinator.CurrentSnapshot.ReservedQuantity, Is.EqualTo(300m));
             Assert.That(coordinator.CurrentSnapshot.SourceAvailableQuantity, Is.Zero);
+            Assert.That(coordinator.CurrentSnapshot.CarrierCandidateStableId,
+                Is.EqualTo(화물배차Fixture.RecommendedCandidateStableId));
+            Assert.That(coordinator.CurrentSnapshot.DispatchStateCode, Is.EqualTo("배차확정"));
 
             await coordinator.AdvanceAsync();
             Assert.That(coordinator.CurrentSnapshot.CargoStableId,
@@ -71,7 +79,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             var preview = await repository.PreviewAsync(
                 SimulationWorldShellFixture.SessionStableId, request, CancellationToken.None);
             var confirmed = await repository.ConfirmAsync(
-                SimulationWorldShellFixture.SessionStableId, 15, request, CancellationToken.None);
+                SimulationWorldShellFixture.SessionStableId, 15, preview, CancellationToken.None);
             var advanced = await repository.AdvanceAsync(
                 SimulationWorldShellFixture.SessionStableId, 16, CancellationToken.None);
 
@@ -79,9 +87,17 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(confirmed.MovementStateCode, Is.EqualTo("Reserved"));
             Assert.That(advanced.MovementStateCode, Is.EqualTo("InTransit"));
             Assert.That(api.Requests, Has.Count.EqualTo(4));
-            Assert.That(api.Requests[1].RelativePath, Does.EndWith("/logistics-movement-previews"));
-            Assert.That(api.Requests[2].RelativePath, Does.EndWith("/logistics-movements/confirm"));
+            Assert.That(preview.RecommendedCarrierCandidateStableId,
+                Is.EqualTo(화물배차Fixture.RecommendedCandidateStableId));
+            Assert.That(preview.CandidateEvaluations, Has.Length.EqualTo(3));
+            Assert.That(confirmed.CarrierCandidateStableId,
+                Is.EqualTo(화물배차Fixture.RecommendedCandidateStableId));
+            Assert.That(api.Requests[1].RelativePath, Does.EndWith("/freight-dispatch-previews"));
+            Assert.That(api.Requests[1].JsonBody, Does.Contain("\"Candidates\""));
+            Assert.That(api.Requests[2].RelativePath, Does.EndWith("/freight-dispatches/confirm"));
             Assert.That(api.Requests[2].JsonBody, Does.Contain("\"ExpectedRevision\":15"));
+            Assert.That(api.Requests[2].JsonBody,
+                Does.Contain("\"SelectedCarrierCandidateStableId\":\"carrier-candidate:sim.waiting-truck\""));
             Assert.That(api.Requests[3].RelativePath, Does.EndWith("/ticks"));
             Assert.That(api.Requests[3].JsonBody, Does.Contain("\"TickCount\":1"));
         }
@@ -127,9 +143,9 @@ namespace Ssalddel.Unity.Tests.EditMode
                 CancellationToken cancellationToken)
             {
                 Requests.Add(request);
-                var body = request.RelativePath.EndsWith("logistics-movement-previews")
+                var body = request.RelativePath.EndsWith("freight-dispatch-previews")
                     ? PreviewJson
-                    : request.RelativePath.EndsWith("logistics-movements/confirm")
+                    : request.RelativePath.EndsWith("freight-dispatches/confirm")
                         ? SnapshotJson(16, 14, "Reserved", "Scheduled", 0)
                         : request.RelativePath.EndsWith("/ticks")
                             ? SnapshotJson(17, 15, "InTransit", "InProgress", 1)
@@ -137,10 +153,19 @@ namespace Ssalddel.Unity.Tests.EditMode
                 return Task.FromResult(new UnityApiResponse { StatusCode = 200, Body = body });
             }
 
-            private const string PreviewJson = "{\"cargoStableId\":\"cargo:sim.potato-1\","
+            private const string PreviewJson = "{\"observedRevision\":15,\"observedWorldTick\":14,"
+                + "\"transportRequestStableId\":\"freight-transport:sim.potato-1\","
+                + "\"dispatchOfferStableId\":\"dispatch-offer:freight-transport:sim.potato-1\","
+                + "\"recommendedCarrierCandidateStableId\":\"carrier-candidate:sim.waiting-truck\","
+                + "\"ruleRevision\":\"freight-dispatch-candidate.v1\","
+                + "\"candidateEvaluations\":["
+                + "{\"carrierCandidateStableId\":\"carrier-candidate:sim.waiting-truck\",\"vehicleStableId\":\"vehicle:sim.truck-fresh\",\"isEligible\":true,\"isRecommended\":true,\"rank\":1,\"pickupDistanceKm\":6,\"vehicleCapacity\":400,\"vehicleCapacityUnitCode\":\"KGM\",\"reason\":\"대기 중인 지역 트럭\",\"blockReasonCodes\":[],\"score\":{\"baseScore\":34,\"driverWaitingScore\":9,\"totalScore\":43}},"
+                + "{\"carrierCandidateStableId\":\"carrier-candidate:sim.small-van\",\"vehicleStableId\":\"vehicle:sim.van-small\",\"vehicleCapacity\":200,\"vehicleCapacityUnitCode\":\"KGM\",\"blockReasonCodes\":[\"VehicleCapacityExceeded\"],\"score\":{}},"
+                + "{\"carrierCandidateStableId\":\"carrier-candidate:sim.stale-truck\",\"vehicleStableId\":\"vehicle:sim.truck-stale\",\"vehicleCapacity\":400,\"vehicleCapacityUnitCode\":\"KGM\",\"blockReasonCodes\":[\"CandidateLocationStale\"],\"score\":{}}],"
+                + "\"logisticsMovement\":{\"cargoStableId\":\"cargo:sim.potato-1\","
                 + "\"quantity\":300,\"unitCode\":\"KGM\",\"requiredRouteTicks\":3,"
                 + "\"destinationStockCandidateStableId\":\"stock-candidate:arrival:cargo:sim.potato-1\","
-                + "\"boundaryCodes\":[\"VehicleAnimationIsPresentationOnly\"]}";
+                + "\"boundaryCodes\":[\"VehicleAnimationIsPresentationOnly\"]}}";
 
             private static string SnapshotJson(
                 int revision, int tick, string movement, string task, int progress, bool include = true)
@@ -150,6 +175,7 @@ namespace Ssalddel.Unity.Tests.EditMode
                     + ",\"gameDate\":\"2026-04-15T00:00:00Z\"},"
                     + "\"tasks\":" + (include ? "[{\"taskStableId\":\"task:logistics:cargo:sim.potato-1\",\"stateCode\":\"" + task + "\"}]" : "[]") + ","
                     + "\"logisticsMovements\":" + (include ? "[{\"cargoStableId\":\"cargo:sim.potato-1\",\"stateCode\":\"" + movement + "\",\"sourceAllocationStableId\":\"allocation:harvest-lot:harvest-lot:potato-1\",\"taskStableId\":\"task:logistics:cargo:sim.potato-1\",\"quantity\":300,\"reservedQuantity\":300,\"completedRouteTicks\":" + progress + ",\"requiredRouteTicks\":3,\"routeStableId\":\"route:sim.farm-hub-1\",\"destinationStockCandidateStableId\":\"stock-candidate:arrival:cargo:sim.potato-1\"}]" : "[]") + ","
+                    + "\"freightTransports\":" + (include ? "[{\"transportRequestStableId\":\"freight-transport:sim.potato-1\",\"dispatchStateCode\":\"배차확정\",\"carrierCandidateStableId\":\"carrier-candidate:sim.waiting-truck\",\"vehicleStableId\":\"vehicle:sim.truck-fresh\",\"dispatchDecision\":{\"ruleRevision\":\"freight-dispatch-candidate.v1\"}}]" : "[]") + ","
                     + "\"settlement\":{\"treasuryBalance\":1000000,\"treasuryReserved\":0,\"laborAvailable\":80,\"laborReserved\":0,\"storageOccupied\":1200,\"storageReserved\":0,\"foodReserveEquivalent\":1200,\"foodSecurityDays\":10,\"activeTaskStableIds\":" + (include ? "[\"task:logistics:cargo:sim.potato-1\"]" : "[]") + ",\"marketSupplyByProduct\":[],\"harvestLotAllocations\":[{\"allocationStableId\":\"allocation:harvest-lot:harvest-lot:potato-1\",\"stateCode\":\"Applied\",\"availableQuantity\":" + (include ? "0" : "300") + "}]}}";
         }
     }

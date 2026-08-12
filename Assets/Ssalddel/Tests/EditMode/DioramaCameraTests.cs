@@ -60,6 +60,48 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public void 자유회전과지면이동은_연속Yaw와World경계를지킨다()
+        {
+            var stateMachine = new DioramaCameraStateMachine(
+                new DioramaCameraSettings(),
+                Focus("camera-focus:world.overview", DioramaCameraFocusLevelCodes.World, 0f, 0f, 0f));
+
+            stateMachine.RotateYaw(37.5f);
+            stateMachine.PanWorldWithinBounds(100f, -100f, -20f, 30f, -15f, 25f);
+
+            Assert.That(stateMachine.State.YawDegrees, Is.EqualTo(37.5f).Within(.001f));
+            Assert.That(stateMachine.State.FocusPoint.X, Is.EqualTo(30f));
+            Assert.That(stateMachine.State.FocusPoint.Z, Is.EqualTo(-15f));
+        }
+
+        [Test]
+        public void 전략카메라Controller는_프레임분할과무관한이동량과Zoom범위를사용한다()
+        {
+            var first = CreateStrategyCamera("First");
+            var second = CreateStrategyCamera("Second");
+            try
+            {
+                first.Controller.ApplyMoveInput(Vector2.up, 1f);
+                second.Controller.ApplyMoveInput(Vector2.up, .5f);
+                second.Controller.ApplyMoveInput(Vector2.up, .5f);
+
+                Assert.That(first.Rig.CurrentFocusPosition.z,
+                    Is.EqualTo(second.Rig.CurrentFocusPosition.z).Within(.001f));
+
+                first.Controller.ApplyZoomInput(12000f);
+                Assert.That(first.Rig.Distance, Is.EqualTo(first.Controller.MinimumZoomDistance));
+                first.Controller.ApplyZoomInput(-12000f);
+                Assert.That(first.Rig.Distance, Is.EqualTo(first.Controller.MaximumZoomDistance));
+                Assert.That(first.Controller.Mode, Is.EqualTo(전략카메라탐색Mode.FreeExplore));
+            }
+            finally
+            {
+                Object.DestroyImmediate(first.Root);
+                Object.DestroyImmediate(second.Root);
+            }
+        }
+
+        [Test]
         public void CameraRig은_Perspective와AnchorFocus를적용한다()
         {
             var cameraObject = new GameObject("DioramaTopDownCameraRig");
@@ -157,5 +199,29 @@ namespace Ssalddel.Unity.Tests.EditMode
                 LevelCode = level,
                 Anchor = anchor,
             };
+
+        private static (GameObject Root, DioramaTopDownCameraRig Rig, 전략카메라Controller Controller)
+            CreateStrategyCamera(string name)
+        {
+            var root = new GameObject(name + "PlayerCameraRig");
+            var pivot = new GameObject("CameraPivot").transform;
+            pivot.SetParent(root.transform, false);
+            var cameraObject = new GameObject("Main Camera");
+            cameraObject.transform.SetParent(pivot, false);
+            var anchor = new GameObject(name + "FocusAnchor");
+            anchor.transform.SetParent(root.transform, false);
+            var camera = cameraObject.AddComponent<Camera>();
+            var rig = cameraObject.AddComponent<DioramaTopDownCameraRig>();
+            rig.Configure(camera, new[]
+            {
+                Binding("camera-focus:world.overview", DioramaCameraFocusLevelCodes.World, anchor.transform),
+            }, "camera-focus:world.overview", false);
+            rig.ConfigureInteractionLimits(35f, 75f, 12f, 110f);
+            rig.Initialize();
+            var controller = root.AddComponent<전략카메라Controller>();
+            controller.Configure(rig, pivot, camera, new Vector2(-100f, -100f),
+                new Vector2(100f, 100f), 12f, 110f);
+            return (root, rig, controller);
+        }
     }
 }

@@ -131,6 +131,25 @@ namespace Ssalddel.Unity.Editor
             BuildSettlementScene();
         }
 
+        [MenuItem("Ssalddel/WORLD-SHELL-0/Add Player Strategy Camera")]
+        public static void BuildPlayerStrategyCamera()
+        {
+            OpenShellIfRequired();
+            var root = Required(RootName);
+            var cameraSystem = Required(root.transform, "CameraSystem");
+            var rig = root.GetComponentInChildren<DioramaTopDownCameraRig>(true)
+                ?? throw new InvalidOperationException("SimulationWorldShellCameraMissing");
+            UpgradePlayerCameraHierarchy(cameraSystem, rig);
+
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException("SimulationWorldShellStrategyCameraSaveFailed");
+            AssetDatabase.SaveAssets();
+            ValidatePlayerStrategyCameraOpenScene();
+            Debug.Log("PLAYER-CAMERA-0 built: " + ScenePath);
+        }
+
         [MenuItem("Ssalddel/SETTLEMENT-VISUAL-BASE-0/Build Visual Base")]
         public static void BuildVisualBase()
         {
@@ -605,8 +624,10 @@ namespace Ssalddel.Unity.Editor
             var harvestLotAnchor = FocusAnchor(settlementAnchors, "HarvestLotPotatoFocus", new Vector3(-23f, 1.2f, -2f));
             var cargoAnchor = FocusAnchor(settlementAnchors, "PotatoCargoFocus", new Vector3(14f, 1.2f, -25f));
 
-            var cameraObject = new GameObject("DioramaTopDownCameraRig");
-            cameraObject.transform.SetParent(parent, false);
+            var playerCameraRig = Child(parent, "PlayerCameraRig");
+            var cameraPivot = Child(playerCameraRig, "CameraPivot");
+            var cameraObject = new GameObject("Main Camera");
+            cameraObject.transform.SetParent(cameraPivot, false);
             cameraObject.tag = "MainCamera";
             var camera = cameraObject.AddComponent<Camera>();
             camera.nearClipPlane = .3f;
@@ -642,8 +663,62 @@ namespace Ssalddel.Unity.Editor
                     DioramaCameraFocusLevelCodes.Object, cargoAnchor),
             }, SimulationWorldShellPresenter.WorldMapFocusAnchorId);
             rig.ConfigureComposition(50f, 98f, 30f, 18f, 34f, 30f, 28f, 110f);
+            rig.ConfigureInteractionLimits(35f, 75f, 12f, 110f);
             rig.Initialize();
+            var controller = playerCameraRig.gameObject.AddComponent<전략카메라Controller>();
+            controller.Configure(
+                rig,
+                cameraPivot,
+                camera,
+                new Vector2(-65f, -50f),
+                new Vector2(65f, 50f),
+                12f,
+                110f);
             return rig;
+        }
+
+        private static void UpgradePlayerCameraHierarchy(
+            Transform cameraSystem,
+            DioramaTopDownCameraRig rig)
+        {
+            var camera = rig.GetComponent<Camera>()
+                ?? throw new InvalidOperationException("SimulationWorldShellCameraMissing");
+            var playerCameraRig = cameraSystem.Find("PlayerCameraRig")
+                ?? Child(cameraSystem, "PlayerCameraRig");
+            var cameraPivot = playerCameraRig.Find("CameraPivot")
+                ?? Child(playerCameraRig, "CameraPivot");
+            camera.transform.SetParent(cameraPivot, true);
+            camera.gameObject.name = "Main Camera";
+            camera.gameObject.tag = "MainCamera";
+
+            rig.SetPrototypeInputEnabled(false);
+            rig.ConfigureInteractionLimits(35f, 75f, 12f, 110f);
+            rig.Initialize();
+            var controller = playerCameraRig.GetComponent<전략카메라Controller>()
+                ?? playerCameraRig.gameObject.AddComponent<전략카메라Controller>();
+            controller.Configure(
+                rig,
+                cameraPivot,
+                camera,
+                new Vector2(-65f, -50f),
+                new Vector2(65f, 50f),
+                12f,
+                110f);
+        }
+
+        private static void ValidatePlayerStrategyCameraOpenScene()
+        {
+            var root = Required(RootName);
+            var playerCameraRig = Required(Required(root.transform, "CameraSystem"), "PlayerCameraRig");
+            var cameraPivot = Required(playerCameraRig, "CameraPivot");
+            var camera = Required(cameraPivot, "Main Camera").GetComponent<Camera>();
+            var controller = playerCameraRig.GetComponent<전략카메라Controller>();
+            if (camera == null || controller == null)
+                throw new InvalidOperationException("SimulationWorldShellStrategyCameraMissing");
+            controller.ValidateConfiguration();
+            if (UnityEngine.Object.FindFirstObjectByType<InputSystemUIInputModule>() == null
+                || UnityEngine.Object.FindFirstObjectByType<StandaloneInputModule>() != null)
+                throw new InvalidOperationException("SimulationWorldShellInputSystemConfigurationInvalid");
         }
 
         private static Light BuildLighting(Transform parent)
@@ -750,15 +825,15 @@ namespace Ssalddel.Unity.Editor
                 new Vector2(476f, 42f), 15, TextAnchor.UpperLeft, new Color(.96f, .75f, .32f));
             var detail = Text(card.transform, "DetailText", new Vector2(22f, -132f),
                 new Vector2(476f, 230f), 16, TextAnchor.UpperLeft, Color.white);
-            var preview = Button(card.transform, "PreviewButton", "ROUTE PREVIEW",
+            var preview = Button(card.transform, "PreviewButton", "배차 미리보기",
                 new Vector2(22f, -374f), new Vector2(148f, 48f), new Color(.27f, .52f, .62f));
-            var confirm = Button(card.transform, "ConfirmButton", "CONFIRM · RESERVE",
+            var confirm = Button(card.transform, "ConfirmButton", "추천 기사 확정",
                 new Vector2(180f, -374f), new Vector2(154f, 48f), new Color(.76f, .48f, .14f));
-            var tick = Button(card.transform, "TickButton", "WORLD TICK +1",
+            var tick = Button(card.transform, "TickButton", "하루 진행 +1",
                 new Vector2(344f, -374f), new Vector2(154f, 48f), new Color(.20f, .60f, .52f));
             var boundary = Text(card.transform, "BoundaryText", new Vector2(22f, -438f),
                 new Vector2(476f, 42f), 13, TextAnchor.UpperLeft, new Color(.72f, .76f, .78f));
-            boundary.text = "SIMULATION ONLY · 도착 후 검수/입고 Decision 전에는 destination 재고 아님";
+            boundary.text = "시뮬레이션 전용 · 실제 기사 호출 없음 · 도착 후 인수 전에는 목적지 재고 아님";
             var presenter = runtimeRoot.gameObject.AddComponent<물류이동Presenter>();
             presenter.Configure(shell, card, cargo, phase, detail, preview, confirm, tick);
             card.SetActive(false);
@@ -790,9 +865,10 @@ namespace Ssalddel.Unity.Editor
                 new Vector2(22f, -302f), new Vector2(240f, 42f), new Color(.27f, .52f, .62f));
             var confirm = Button(panel.transform, "ConfirmButton", "CONFIRM · 다음 날",
                 new Vector2(278f, -302f), new Vector2(240f, 42f), new Color(.78f, .49f, .13f));
+            var highlighter = runtimeRoot.gameObject.AddComponent<타로객체강조Presenter>();
             var presenter = runtimeRoot.gameObject.AddComponent<턴마감Presenter>();
             presenter.Configure(shell, panel, title, card, status,
-                noCard, fool, chariot, culture, preview, confirm);
+                noCard, fool, chariot, culture, preview, confirm, highlighter);
             var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
                 "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
                 ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");

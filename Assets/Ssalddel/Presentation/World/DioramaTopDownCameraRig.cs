@@ -30,7 +30,10 @@ namespace Ssalddel.Unity.Presentation.World
 
         [Header("Candidate composition values")]
         [SerializeField, Range(45f, 55f)] private float pitch = 50f;
+        [SerializeField, Min(1f)] private float minDistance = 12f;
         [SerializeField, Min(1f)] private float maxDistance = 110f;
+        [SerializeField, Range(1f, 89f)] private float minPitch = 45f;
+        [SerializeField, Range(1f, 89f)] private float maxPitch = 55f;
         [SerializeField, Min(1f)] private float worldDistance = 96f;
         [SerializeField, Min(1f)] private float zoneDistance = 28f;
         [SerializeField, Min(1f)] private float objectDistance = 20f;
@@ -56,12 +59,16 @@ namespace Ssalddel.Unity.Presentation.World
             : string.Empty;
         public int YawQuarterTurns => initialized && stateMachine != null
             ? stateMachine.State.YawQuarterTurns : 0;
+        public float YawDegrees => initialized && stateMachine != null
+            ? stateMachine.State.YawDegrees : 0f;
         public float Distance => initialized && stateMachine != null
             ? stateMachine.State.Distance : 0f;
         public float ConfiguredMaxDistance => maxDistance;
+        public float ConfiguredMinDistance => minDistance;
         public float ConfiguredWorldDistance => worldDistance;
         public float ConfiguredZoneDistance => zoneDistance;
         public float ConfiguredObjectDistance => objectDistance;
+        public bool PrototypeInputEnabled => enablePrototypeInput;
         public Vector3 CurrentFocusPosition => initialized && stateMachine != null
             ? new Vector3(
                 stateMachine.State.FocusPoint.X,
@@ -121,6 +128,9 @@ namespace Ssalddel.Unity.Presentation.World
 
             var settings = new DioramaCameraSettings
             {
+                MinPitch = minPitch,
+                MaxPitch = maxPitch,
+                MinDistance = minDistance,
                 MaxDistance = maxDistance,
                 WorldDistance = worldDistance,
                 ZoneDistance = zoneDistance,
@@ -172,6 +182,24 @@ namespace Ssalddel.Unity.Presentation.World
             Initialize();
         }
 
+        public void ConfigureInteractionLimits(
+            float targetMinPitch,
+            float targetMaxPitch,
+            float targetMinDistance,
+            float targetMaxDistance)
+        {
+            if (targetMinPitch <= 0f || targetMaxPitch < targetMinPitch || targetMaxPitch >= 90f
+                || targetMinDistance <= 0f || targetMaxDistance < targetMinDistance)
+                throw new InvalidOperationException("DioramaCameraInteractionLimitsInvalid");
+            minPitch = targetMinPitch;
+            maxPitch = targetMaxPitch;
+            minDistance = targetMinDistance;
+            maxDistance = targetMaxDistance;
+            initialized = false;
+        }
+
+        public void SetPrototypeInputEnabled(bool enabled) => enablePrototypeInput = enabled;
+
         public void ConfigureInitialFocus(string anchorId)
         {
             if (string.IsNullOrWhiteSpace(anchorId))
@@ -193,6 +221,22 @@ namespace Ssalddel.Unity.Presentation.World
         {
             EnsureInitialized();
             stateMachine.PanWorld(worldDeltaX, worldDeltaZ);
+        }
+
+        public void PanWithinBounds(
+            float worldDeltaX,
+            float worldDeltaZ,
+            Vector2 minimum,
+            Vector2 maximum)
+        {
+            EnsureInitialized();
+            stateMachine.PanWorldWithinBounds(
+                worldDeltaX,
+                worldDeltaZ,
+                minimum.x,
+                maximum.x,
+                minimum.y,
+                maximum.y);
         }
 
         public void ZoomIn()
@@ -219,6 +263,24 @@ namespace Ssalddel.Unity.Presentation.World
             stateMachine.RotateQuarterTurns(1);
         }
 
+        public void RotateYaw(float degrees)
+        {
+            EnsureInitialized();
+            stateMachine.RotateYaw(degrees);
+        }
+
+        public void AdjustPitch(float degrees)
+        {
+            EnsureInitialized();
+            stateMachine.SetPitch(stateMachine.State.Pitch + degrees);
+        }
+
+        public void Zoom(float distanceDelta)
+        {
+            EnsureInitialized();
+            stateMachine.Zoom(distanceDelta);
+        }
+
         public void ApplyNowForTests()
         {
             EnsureInitialized();
@@ -239,7 +301,7 @@ namespace Ssalddel.Unity.Presentation.World
                     + Axis(keyboard.downArrowKey.isPressed, keyboard.upArrowKey.isPressed);
                 if (Mathf.Abs(horizontal) > .01f || Mathf.Abs(vertical) > .01f)
                 {
-                    var yaw = Quaternion.Euler(0f, stateMachine.State.YawQuarterTurns * 90f, 0f);
+                    var yaw = Quaternion.Euler(0f, stateMachine.State.YawDegrees, 0f);
                     var delta = yaw * new Vector3(horizontal, 0f, vertical);
                     stateMachine.PanWorld(
                         delta.x * panUnitsPerSecond * Time.unscaledDeltaTime,
@@ -263,7 +325,7 @@ namespace Ssalddel.Unity.Presentation.World
                 state.FocusPoint.Z);
             var rotation = Quaternion.Euler(
                 state.Pitch,
-                state.YawQuarterTurns * 90f,
+                state.YawDegrees,
                 0f);
             var position = focus + rotation * Vector3.back * state.Distance;
 

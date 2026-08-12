@@ -7,6 +7,10 @@ namespace Ssalddel.Unity.Runtime.World
 {
     public static class 턴마감CardStableIds
     {
+        public const string Empress = "tarot:major.empress";
+        public const string TarotChariot = "tarot:major.chariot";
+        public const string Justice = "tarot:major.justice";
+        public const string Temperance = "tarot:major.temperance";
         public const string Fool = "learning:hongik.fool.beginner-mind";
         public const string Chariot = "learning:hongik.chariot.integrated-progress";
         public const string SeoulCulture = "culture:kr-seoul.living-culture-question.2026";
@@ -41,6 +45,7 @@ namespace Ssalddel.Unity.Runtime.World
         public int PendingTaskCount { get; set; }
         public bool CanCloseTurn { get; set; }
         public 턴마감CardData[] AvailableCards { get; set; } = Array.Empty<턴마감CardData>();
+        public 턴마감타로DrawData TarotDraw { get; set; } = new 턴마감타로DrawData();
     }
 
     public sealed class 턴마감PreviewData
@@ -76,7 +81,20 @@ namespace Ssalddel.Unity.Runtime.World
             string selectedCardStableId, CancellationToken cancellationToken);
     }
 
-    public sealed class 턴마감FixtureAuthorityClient : I턴마감AuthorityClient
+    public interface I타로턴마감AuthorityClient : I턴마감AuthorityClient
+    {
+        Task<타로객체반응PreviewData> Preview타로객체반응Async(
+            string sessionStableId, long expectedRevision, string drawStableId,
+            CancellationToken cancellationToken);
+        Task<턴마감PreviewData> Preview타로Async(
+            string sessionStableId, long expectedRevision, 턴마감타로SelectionData selection,
+            CancellationToken cancellationToken);
+        Task<턴마감ResultData> Confirm타로Async(
+            string sessionStableId, string commandId, long expectedRevision,
+            턴마감타로SelectionData selection, CancellationToken cancellationToken);
+    }
+
+    public sealed class 턴마감FixtureAuthorityClient : I타로턴마감AuthorityClient
     {
         private static readonly 턴마감CardData[] Cards =
         {
@@ -136,6 +154,7 @@ namespace Ssalddel.Unity.Runtime.World
                 PendingTaskCount = 2,
                 CanCloseTurn = true,
                 AvailableCards = Cards.Select(Clone).ToArray(),
+                TarotDraw = 턴마감타로Fixture.CreateDraw(),
             });
 
         public Task<턴마감PreviewData> PreviewAsync(
@@ -167,6 +186,62 @@ namespace Ssalddel.Unity.Runtime.World
                 ActiveTurnNumber = 14,
                 ActiveCardStableId = card?.CardStableId ?? string.Empty,
                 ActiveEffectCode = card?.EffectCode ?? string.Empty,
+                WorldSnapshot = new SimulationWorldShellSnapshot(
+                    sessionStableId, expectedRevision + 1, 13, "Year 1 · 04-13",
+                    12500m, 18m, 6m, 420m, 980m, 12.94m, 1,
+                    "SimulationFixtureAuthority",
+                    new[]
+                    {
+                        new SimulationWorldSettlementNode(
+                            SimulationWorldShellFixture.SettlementStableId,
+                            new[]
+                            {
+                                District("district:farm", "harvest-lot:potato-001"),
+                                District("district:town"), District("district:market"),
+                                District("district:storage"), District("district:logistics"),
+                                District("district:residential"), District("district:garrison"),
+                                District("district:gate"),
+                            }),
+                    }),
+            });
+        }
+
+        public Task<타로객체반응PreviewData> Preview타로객체반응Async(
+            string sessionStableId, long expectedRevision, string drawStableId,
+            CancellationToken cancellationToken)
+            => Task.FromResult(턴마감타로Fixture.CreateObjectReactionPreview(
+                expectedRevision, drawStableId));
+
+        public Task<턴마감PreviewData> Preview타로Async(
+            string sessionStableId, long expectedRevision, 턴마감타로SelectionData selection,
+            CancellationToken cancellationToken)
+        {
+            var offer = 턴마감타로Fixture.FindOffer(selection);
+            return Task.FromResult(new 턴마감PreviewData
+            {
+                PreviewStableId = "turn-closing:" + sessionStableId + ":13",
+                BaseRevision = expectedRevision,
+                ClosingTurnNumber = 13,
+                NextTurnNumber = 14,
+                NextGameDateLabel = "Year 1 · 04-13",
+                PendingTaskCount = 2,
+                SelectedCards = new[] { offer.Card },
+            });
+        }
+
+        public Task<턴마감ResultData> Confirm타로Async(
+            string sessionStableId, string commandId, long expectedRevision,
+            턴마감타로SelectionData selection, CancellationToken cancellationToken)
+        {
+            var offer = 턴마감타로Fixture.FindOffer(selection);
+            return Task.FromResult(new 턴마감ResultData
+            {
+                SessionStableId = sessionStableId,
+                Revision = expectedRevision + 1,
+                WorldTick = 13,
+                ActiveTurnNumber = 14,
+                ActiveCardStableId = offer.Card.CardStableId,
+                ActiveEffectCode = offer.Card.EffectCode,
                 WorldSnapshot = new SimulationWorldShellSnapshot(
                     sessionStableId, expectedRevision + 1, 13, "Year 1 · 04-13",
                     12500m, 18m, 6m, 420m, 980m, 12.94m, 1,

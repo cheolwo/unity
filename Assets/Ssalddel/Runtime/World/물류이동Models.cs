@@ -33,6 +33,68 @@ namespace Ssalddel.Unity.Runtime.World
         public string[] SourceStableIds = Array.Empty<string>();
     }
 
+    [Serializable]
+    public sealed class 화물배차후보RequestData
+    {
+        public string CarrierCandidateStableId = string.Empty;
+        public string VehicleStableId = string.Empty;
+        public bool IsFreightApp;
+        public bool IsVehicleActive;
+        public bool IsDriverOperating;
+        public bool WasPreviouslyRejected;
+        public decimal? LocationAgeMinutes;
+        public decimal? PickupDistanceKm;
+        public decimal? PickupAllowedRadiusKm;
+        public decimal VehicleCapacity;
+        public string VehicleCapacityUnitCode = string.Empty;
+        public bool IsVehicleCompatible;
+        public string[] VehicleBlockReasonCodes = Array.Empty<string>();
+        public decimal DriverWaitingMinutes;
+        public bool? CanCompleteSchedule;
+        public bool? CanInsertSchedule;
+        public bool HasRouteChangeBenefit;
+        public decimal? EstimatedExtraProfit;
+        public decimal? AdditionalDelayMinutes;
+        public string RecommendationTypeCode = "single";
+        public bool IsCargoSensitive;
+        public decimal? ReturnDetourDistanceKm;
+        public bool UsesReturnDestination;
+        public string BaseReason = string.Empty;
+    }
+
+    [Serializable]
+    public sealed class 화물배차RequestData
+    {
+        public string TransportRequestStableId = string.Empty;
+        public decimal LocationFreshnessMinutes = 10m;
+        public decimal BasePickupRadiusKm = 5m;
+        public decimal MaximumRemotePickupRadiusKm = 30m;
+        public decimal RemotePickupAverageSpeedKmH = 40m;
+        public decimal RemotePickupArrivalBufferMinutes = 10m;
+        public decimal? PickupWindowRemainingMinutes;
+        public string? ExcludedCarrierCandidateStableId;
+        public 화물배차후보RequestData[] Candidates = Array.Empty<화물배차후보RequestData>();
+        public string[] SourceStableIds = Array.Empty<string>();
+    }
+
+    public sealed class 화물배차후보평가Data
+    {
+        public string CarrierCandidateStableId { get; set; } = string.Empty;
+        public string VehicleStableId { get; set; } = string.Empty;
+        public bool IsEligible { get; set; }
+        public bool IsRecommended { get; set; }
+        public bool IsSelected { get; set; }
+        public int Rank { get; set; }
+        public decimal? PickupDistanceKm { get; set; }
+        public decimal VehicleCapacity { get; set; }
+        public string VehicleCapacityUnitCode { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+        public string[] BlockReasonCodes { get; set; } = Array.Empty<string>();
+        public decimal BaseScore { get; set; }
+        public decimal DriverWaitingScore { get; set; }
+        public decimal TotalScore { get; set; }
+    }
+
     public sealed class 물류이동PreviewData
     {
         public string SessionStableId { get; set; } = string.Empty;
@@ -43,6 +105,12 @@ namespace Ssalddel.Unity.Runtime.World
         public string UnitCode { get; set; } = string.Empty;
         public int RequiredRouteTicks { get; set; }
         public string DestinationStockCandidateStableId { get; set; } = string.Empty;
+        public string TransportRequestStableId { get; set; } = string.Empty;
+        public string DispatchOfferStableId { get; set; } = string.Empty;
+        public string RecommendedCarrierCandidateStableId { get; set; } = string.Empty;
+        public string DispatchRuleRevision { get; set; } = string.Empty;
+        public 화물배차후보평가Data[] CandidateEvaluations { get; set; }
+            = Array.Empty<화물배차후보평가Data>();
         public string[] BoundaryCodes { get; set; } = Array.Empty<string>();
         public 물류이동PreviewRequestData Request { get; set; } = new();
     }
@@ -63,6 +131,11 @@ namespace Ssalddel.Unity.Runtime.World
         public int RequiredRouteTicks { get; set; }
         public string RouteStableId { get; set; } = string.Empty;
         public string DestinationStockCandidateStableId { get; set; } = string.Empty;
+        public string TransportRequestStableId { get; set; } = string.Empty;
+        public string DispatchStateCode { get; set; } = string.Empty;
+        public string CarrierCandidateStableId { get; set; } = string.Empty;
+        public string VehicleStableId { get; set; } = string.Empty;
+        public string DispatchRuleRevision { get; set; } = string.Empty;
         public string SourceModeCode { get; set; } = string.Empty;
         public 정착지상호작용AuthoritySnapshot Settlement { get; set; } = new();
 
@@ -79,7 +152,7 @@ namespace Ssalddel.Unity.Runtime.World
         Task<물류이동AuthoritySnapshot> ConfirmAsync(
             string sessionStableId,
             long expectedRevision,
-            물류이동PreviewRequestData request,
+            물류이동PreviewData preview,
             CancellationToken cancellationToken);
         Task<물류이동AuthoritySnapshot> AdvanceAsync(
             string sessionStableId,
@@ -138,7 +211,7 @@ namespace Ssalddel.Unity.Runtime.World
                 var next = await authority.ConfirmAsync(
                     CurrentSnapshot.SessionStableId,
                     CurrentSnapshot.Revision,
-                    CurrentPreview.Request,
+                    CurrentPreview,
                     cancellationToken);
                 Apply(next);
                 if (next.MovementStateCode != "Reserved" || next.ReservedQuantity != next.Quantity)
@@ -219,6 +292,58 @@ namespace Ssalddel.Unity.Runtime.World
             };
     }
 
+    public static class 화물배차Fixture
+    {
+        public const string TransportRequestStableId = "freight-transport:sim.potato-1";
+        public const string RecommendedCandidateStableId = "carrier-candidate:sim.waiting-truck";
+
+        public static 화물배차RequestData CreateRequest()
+            => new()
+            {
+                TransportRequestStableId = TransportRequestStableId,
+                PickupWindowRemainingMinutes = 60m,
+                SourceStableIds = new[] { "source:fixture.unity-freight-dispatch-1" },
+                Candidates = new[]
+                {
+                    Candidate("carrier-candidate:sim.small-van", "vehicle:sim.van-small",
+                        200m, 2m, 1m, 10m, "가까운 소형 밴"),
+                    Candidate("carrier-candidate:sim.stale-truck", "vehicle:sim.truck-stale",
+                        400m, 3m, 30m, 30m, "위치 확인이 필요한 트럭"),
+                    Candidate(RecommendedCandidateStableId, "vehicle:sim.truck-fresh",
+                        400m, 6m, 2m, 90m, "대기 중인 지역 트럭"),
+                },
+            };
+
+        private static 화물배차후보RequestData Candidate(
+            string candidateStableId,
+            string vehicleStableId,
+            decimal capacity,
+            decimal distanceKm,
+            decimal locationAgeMinutes,
+            decimal waitingMinutes,
+            string reason)
+            => new()
+            {
+                CarrierCandidateStableId = candidateStableId,
+                VehicleStableId = vehicleStableId,
+                IsFreightApp = true,
+                IsVehicleActive = true,
+                IsDriverOperating = true,
+                LocationAgeMinutes = locationAgeMinutes,
+                PickupDistanceKm = distanceKm,
+                PickupAllowedRadiusKm = 10m,
+                VehicleCapacity = capacity,
+                VehicleCapacityUnitCode = "KGM",
+                IsVehicleCompatible = true,
+                DriverWaitingMinutes = waitingMinutes,
+                CanCompleteSchedule = true,
+                CanInsertSchedule = true,
+                EstimatedExtraProfit = 4_000m,
+                AdditionalDelayMinutes = 5m,
+                BaseReason = reason,
+            };
+    }
+
     public sealed class 물류이동FixtureAuthorityClient : I물류이동AuthorityClient
     {
         private 물류이동AuthoritySnapshot current;
@@ -264,6 +389,11 @@ namespace Ssalddel.Unity.Runtime.World
                 UnitCode = request.UnitCode,
                 RequiredRouteTicks = request.RequiredRouteTicks,
                 DestinationStockCandidateStableId = "stock-candidate:arrival:" + request.CargoStableId,
+                TransportRequestStableId = 화물배차Fixture.TransportRequestStableId,
+                DispatchOfferStableId = "dispatch-offer:" + 화물배차Fixture.TransportRequestStableId,
+                RecommendedCarrierCandidateStableId = 화물배차Fixture.RecommendedCandidateStableId,
+                DispatchRuleRevision = "freight-dispatch-candidate.v1",
+                CandidateEvaluations = CreateCandidateEvaluations(),
                 BoundaryCodes = new[]
                 {
                     "CandidateOnly", "VehicleAnimationIsPresentationOnly",
@@ -275,20 +405,65 @@ namespace Ssalddel.Unity.Runtime.World
         public Task<물류이동AuthoritySnapshot> ConfirmAsync(
             string sessionStableId,
             long expectedRevision,
-            물류이동PreviewRequestData request,
+            물류이동PreviewData preview,
             CancellationToken cancellationToken)
         {
             EnsureRevision(sessionStableId, expectedRevision);
+            if (preview.RecommendedCarrierCandidateStableId != 화물배차Fixture.RecommendedCandidateStableId)
+                throw new InvalidOperationException("SimulationFreightDispatchRecommendationMissing");
             current.Revision++;
             current.MovementStateCode = "Reserved";
             current.TaskStateCode = "Scheduled";
-            current.ReservedQuantity = request.Quantity;
+            current.ReservedQuantity = preview.Quantity;
             current.SourceAvailableQuantity = 0m;
-            current.DestinationStockCandidateStableId = "stock-candidate:arrival:" + request.CargoStableId;
+            current.DestinationStockCandidateStableId = "stock-candidate:arrival:" + preview.CargoStableId;
+            current.TransportRequestStableId = preview.TransportRequestStableId;
+            current.DispatchStateCode = "배차확정";
+            current.CarrierCandidateStableId = preview.RecommendedCarrierCandidateStableId;
+            current.VehicleStableId = "vehicle:sim.truck-fresh";
+            current.DispatchRuleRevision = preview.DispatchRuleRevision;
             current.Settlement.Revision = current.Revision;
             current.Settlement.ActiveTaskCount = 1;
             return Task.FromResult(current.Clone());
         }
+
+        private static 화물배차후보평가Data[] CreateCandidateEvaluations()
+            => new[]
+            {
+                new 화물배차후보평가Data
+                {
+                    CarrierCandidateStableId = "carrier-candidate:sim.waiting-truck",
+                    VehicleStableId = "vehicle:sim.truck-fresh",
+                    IsEligible = true,
+                    IsRecommended = true,
+                    Rank = 1,
+                    PickupDistanceKm = 6m,
+                    VehicleCapacity = 400m,
+                    VehicleCapacityUnitCode = "KGM",
+                    Reason = "대기 중인 지역 트럭 · 상차 6.0km · 기사대기보정 +9 · 추천점수 43",
+                    BaseScore = 34m,
+                    DriverWaitingScore = 9m,
+                    TotalScore = 43m,
+                },
+                new 화물배차후보평가Data
+                {
+                    CarrierCandidateStableId = "carrier-candidate:sim.small-van",
+                    VehicleStableId = "vehicle:sim.van-small",
+                    VehicleCapacity = 200m,
+                    VehicleCapacityUnitCode = "KGM",
+                    BlockReasonCodes = new[] { "VehicleCapacityExceeded" },
+                    Reason = "차단: VehicleCapacityExceeded",
+                },
+                new 화물배차후보평가Data
+                {
+                    CarrierCandidateStableId = "carrier-candidate:sim.stale-truck",
+                    VehicleStableId = "vehicle:sim.truck-stale",
+                    VehicleCapacity = 400m,
+                    VehicleCapacityUnitCode = "KGM",
+                    BlockReasonCodes = new[] { "CandidateLocationStale" },
+                    Reason = "차단: CandidateLocationStale",
+                },
+            };
 
         public Task<물류이동AuthoritySnapshot> AdvanceAsync(
             string sessionStableId,

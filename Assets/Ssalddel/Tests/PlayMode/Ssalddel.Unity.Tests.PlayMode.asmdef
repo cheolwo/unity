@@ -1,7 +1,7 @@
 {
   "name": "Ssalddel.Unity.Tests.PlayMode",
   "rootNamespace": "Ssalddel.Unity.Tests.PlayMode",
-  "references": ["Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Ssalddel.Unity.Infrastructure", "Ssalddel.Unity.Presentation", "Ssalddel.Unity.Bootstrap"],
+  "references": ["Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Ssalddel.Unity.Infrastructure", "Ssalddel.Unity.Presentation", "Ssalddel.Unity.Bootstrap", "Unity.InputSystem"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

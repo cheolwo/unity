@@ -1,5 +1,7 @@
 using System;
 using System.Globalization;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
@@ -141,6 +143,9 @@ namespace Ssalddel.Unity.Presentation.World
                 + " · WorldTick " + snapshot.WorldTick
                 + " · Revision " + snapshot.Revision;
             detailText.text = BuildDetail(snapshot);
+            SetButtonLabel(previewButton, "배차 미리보기");
+            SetButtonLabel(confirmButton, "추천 기사 확정");
+            SetButtonLabel(tickButton, "하루 진행 +1");
             previewButton.interactable = !busy
                 && coordinator.PhaseCode == 물류이동PhaseCodes.CargoSelected;
             confirmButton.interactable = !busy
@@ -155,25 +160,74 @@ namespace Ssalddel.Unity.Presentation.World
             if (coordinator.PhaseCode == 물류이동PhaseCodes.Failed)
                 return "차단: " + coordinator.ErrorCode;
             if (coordinator.CurrentPreview == null)
-                return "Farm packing → Regional hub\n"
-                    + "Preview는 출발·재고·차량을 변경하지 않습니다.";
-            return "Route  " + snapshot.RouteStableId
-                + "\nProgress  " + snapshot.CompletedRouteTicks + " / " + snapshot.RequiredRouteTicks
-                + " ticks\nOrigin stock  " + Number(snapshot.SourceAvailableQuantity) + " kg available"
-                + "\nReserved  " + Number(snapshot.ReservedQuantity) + " kg"
-                + "\nArrival candidate\n" + coordinator.CurrentPreview.DestinationStockCandidateStableId
-                + "\n\n차량 animation은 Presentation이며 도착은 WorldTick Task가 확정합니다.";
+                return "농장 포장장 → 지역 물류 거점\n"
+                    + "300kg 감자를 실을 가상 기사를 비교합니다.\n"
+                    + "미리보기는 재고·배차·차량을 변경하지 않습니다.";
+
+            var preview = coordinator.CurrentPreview;
+            if (coordinator.PhaseCode == 물류이동PhaseCodes.PreviewReady)
+            {
+                var builder = new StringBuilder();
+                builder.Append("배차 후보 ").Append(preview.CandidateEvaluations.Length)
+                    .Append("명 · 규칙 ").Append(preview.DispatchRuleRevision);
+                foreach (var candidate in preview.CandidateEvaluations)
+                {
+                    builder.Append("\n").Append(candidate.IsRecommended ? "★ 추천 " : "· ")
+                        .Append(CandidateLabel(candidate.CarrierCandidateStableId)).Append(" · ")
+                        .Append(Number(candidate.VehicleCapacity)).Append("kg · ");
+                    if (candidate.IsEligible)
+                        builder.Append(Number(candidate.TotalScore)).Append("점 · 상차 ")
+                            .Append(Number(candidate.PickupDistanceKm ?? 0m)).Append("km");
+                    else
+                        builder.Append("차단 · ").Append(BlockLabel(candidate.BlockReasonCodes));
+                }
+                builder.Append("\n\n확정 전: 재고 300kg 사용 가능 · 차량 미출발");
+                return builder.ToString();
+            }
+
+            return "배차  " + CandidateLabel(snapshot.CarrierCandidateStableId)
+                + " · " + snapshot.VehicleStableId
+                + "\n상태  " + snapshot.DispatchStateCode
+                + "\n운송  " + snapshot.CompletedRouteTicks + " / " + snapshot.RequiredRouteTicks
+                + "일 · " + snapshot.MovementStateCode
+                + "\n출발지 재고  " + Number(snapshot.SourceAvailableQuantity) + "kg"
+                + " · 예약 " + Number(snapshot.ReservedQuantity) + "kg"
+                + "\n도착 후보  " + preview.DestinationStockCandidateStableId
+                + "\n\n차량 애니메이션은 표현이며 도착은 WorldTick 작업이 확정합니다.";
         }
 
         private static string PhaseLabel(string phase) => phase switch
         {
-            물류이동PhaseCodes.CargoSelected => "CARGO SELECTED",
-            물류이동PhaseCodes.PreviewReady => "PREVIEW · NO MUTATION",
-            물류이동PhaseCodes.Reserved => "CONFIRMED · STOCK RESERVED",
-            물류이동PhaseCodes.InTransit => "IN TRANSIT",
-            물류이동PhaseCodes.Arrived => "ARRIVED · RECEIVING PENDING",
-            _ => "FAILED",
+            물류이동PhaseCodes.CargoSelected => "화물 선택됨",
+            물류이동PhaseCodes.PreviewReady => "배차 미리보기 · 변경 없음",
+            물류이동PhaseCodes.Reserved => "배차 확정 · 재고 예약",
+            물류이동PhaseCodes.InTransit => "운송 중",
+            물류이동PhaseCodes.Arrived => "도착 · 인수 대기",
+            _ => "진행 실패",
         };
+
+        private static string CandidateLabel(string stableId)
+            => stableId switch
+            {
+                "carrier-candidate:sim.small-van" => "소형 밴 기사",
+                "carrier-candidate:sim.stale-truck" => "위치 미확인 트럭 기사",
+                "carrier-candidate:sim.waiting-truck" => "대기 중인 지역 트럭 기사",
+                _ => stableId,
+            };
+
+        private static string BlockLabel(string[] codes)
+            => string.Join(", ", codes.Select(value => value switch
+            {
+                "VehicleCapacityExceeded" => "적재량 부족",
+                "CandidateLocationStale" => "위치 정보 오래됨",
+                _ => value,
+            }));
+
+        private static void SetButtonLabel(Button button, string label)
+        {
+            var text = button.GetComponentInChildren<Text>(true);
+            if (text != null) text.text = label;
+        }
 
         private static string Number(decimal value)
             => value.ToString("0.##", CultureInfo.InvariantCulture);

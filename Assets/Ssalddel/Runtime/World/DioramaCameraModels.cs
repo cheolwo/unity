@@ -101,6 +101,7 @@ namespace Ssalddel.Unity.Runtime.World
         public string FocusLevelCode { get; internal set; } = string.Empty;
         public DioramaPoint FocusPoint { get; internal set; }
         public int YawQuarterTurns { get; internal set; }
+        public float YawDegrees { get; internal set; }
         public float Pitch { get; internal set; }
         public float Distance { get; internal set; }
         public float FieldOfView { get; internal set; }
@@ -147,6 +148,22 @@ namespace Ssalddel.Unity.Runtime.World
                 State.FocusPoint.Z + deltaZ);
         }
 
+        public void PanWorldWithinBounds(
+            float deltaX,
+            float deltaZ,
+            float minimumX,
+            float maximumX,
+            float minimumZ,
+            float maximumZ)
+        {
+            if (maximumX < minimumX || maximumZ < minimumZ)
+                throw new InvalidOperationException("DioramaCameraWorldBoundsInvalid");
+            State.FocusPoint = new DioramaPoint(
+                Clamp(State.FocusPoint.X + deltaX, minimumX, maximumX),
+                State.FocusPoint.Y,
+                Clamp(State.FocusPoint.Z + deltaZ, minimumZ, maximumZ));
+        }
+
         public void Zoom(float distanceDelta)
         {
             State.Distance = Clamp(
@@ -157,8 +174,14 @@ namespace Ssalddel.Unity.Runtime.World
 
         public void RotateQuarterTurns(int delta)
         {
-            var normalized = (State.YawQuarterTurns + delta) % 4;
-            State.YawQuarterTurns = normalized < 0 ? normalized + 4 : normalized;
+            RotateYaw(delta * 90f);
+        }
+
+        public void RotateYaw(float deltaDegrees)
+        {
+            var normalized = (State.YawDegrees + deltaDegrees) % 360f;
+            State.YawDegrees = normalized < 0f ? normalized + 360f : normalized;
+            State.YawQuarterTurns = ((int)Math.Round(State.YawDegrees / 90f)) % 4;
         }
 
         public void SetPitch(float pitch)

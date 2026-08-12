@@ -11,11 +11,14 @@ using Ssalddel.Unity.Bootstrap;
 using Ssalddel.Unity.Infrastructure.Transport;
 using Ssalddel.Unity.Infrastructure.WorldMap;
 using Ssalddel.Unity.Presentation.WorldMap;
+using Ssalddel.Unity.Presentation.World;
 using Ssalddel.Unity.Runtime.Configuration;
 using Ssalddel.Unity.Runtime.WorldMap;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 namespace Ssalddel.Unity.Tests.PlayMode
 {
@@ -89,7 +92,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
             WorldBootstrapSceneCompositionRoot root = null;
             while (Time.realtimeSinceStartup < deadline)
             {
-                root = UnityEngine.Object.FindFirstObjectByType<WorldBootstrapSceneCompositionRoot>();
+                root = UnityEngine.Object.FindAnyObjectByType<WorldBootstrapSceneCompositionRoot>();
                 if (root?.Controller != null
                     && (root.Controller.CurrentState.Status == PublicWorldMapSceneStatus.Success
                         || root.Controller.CurrentState.Status == PublicWorldMapSceneStatus.InitialLoadError)) break;
@@ -98,7 +101,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
 
             Assert.That(root, Is.Not.Null);
             Assert.That(root.Controller.CurrentState.Status, Is.EqualTo(PublicWorldMapSceneStatus.Success), root.Controller.CurrentState.ErrorMessage);
-            var presenter = UnityEngine.Object.FindFirstObjectByType<PublicWorldMapPresenter>();
+            var presenter = UnityEngine.Object.FindAnyObjectByType<PublicWorldMapPresenter>();
             Assert.That(presenter.MarkerCount, Is.EqualTo(root.Controller.CurrentSnapshot.Markers.Length));
             Assert.That(presenter.MarkerCount, Is.GreaterThan(0));
         }
@@ -149,5 +152,69 @@ namespace Ssalddel.Unity.Tests.PlayMode
             FreshnessCode = "Current",
             BoundaryNotice = "공개 정보이며 개인 위치나 계약을 의미하지 않습니다."
         };
+    }
+
+    public sealed class 전략카메라PlayModeTests
+    {
+        [UnityTest]
+        public IEnumerator GameViewInputSystem의_WASD회전Wheel우클릭Drag가_카메라만변경한다()
+        {
+            SceneManager.LoadScene("SimulationWorldShell", LoadSceneMode.Single);
+            yield return null;
+            var controller = UnityEngine.Object.FindAnyObjectByType<전략카메라Controller>();
+            var rig = UnityEngine.Object.FindAnyObjectByType<DioramaTopDownCameraRig>();
+            var shell = UnityEngine.Object.FindAnyObjectByType<SimulationWorldShellPresenter>();
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(rig, Is.Not.Null);
+            Assert.That(shell, Is.Not.Null);
+
+            var keyboard = InputSystem.AddDevice<Keyboard>("StrategyCameraTestKeyboard");
+            var mouse = InputSystem.AddDevice<Mouse>("StrategyCameraTestMouse");
+            var initialFocus = rig!.CurrentFocusPosition;
+            var initialDistance = rig.Distance;
+            var initialYaw = rig.YawDegrees;
+            var initialTick = shell!.WorldTick;
+            var initialRevision = shell.WorldRevision;
+            try
+            {
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W));
+                yield return null;
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                yield return null;
+                Assert.That(rig.CurrentFocusPosition.z, Is.GreaterThan(initialFocus.z));
+
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.E));
+                yield return null;
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                yield return null;
+                Assert.That(rig.YawDegrees, Is.GreaterThan(initialYaw));
+
+                InputSystem.QueueStateEvent(mouse, new MouseState { scroll = new Vector2(0f, 120f) });
+                yield return null;
+                InputSystem.QueueStateEvent(mouse, new MouseState());
+                yield return null;
+                Assert.That(rig.Distance, Is.LessThan(initialDistance));
+
+                var yawBeforeDrag = rig.YawDegrees;
+                InputSystem.QueueStateEvent(mouse, new MouseState
+                {
+                    buttons = 1 << 1,
+                    delta = new Vector2(60f, -20f),
+                });
+                yield return null;
+                InputSystem.QueueStateEvent(mouse, new MouseState());
+                yield return null;
+                Assert.That(rig.YawDegrees, Is.Not.EqualTo(yawBeforeDrag).Within(.001f));
+
+                Assert.That(controller!.Mode, Is.EqualTo(전략카메라탐색Mode.FreeExplore));
+                Assert.That(shell.WorldTick, Is.EqualTo(initialTick));
+                Assert.That(shell.WorldRevision, Is.EqualTo(initialRevision));
+            }
+            finally
+            {
+                InputSystem.RemoveDevice(mouse);
+                InputSystem.RemoveDevice(keyboard);
+            }
+        }
     }
 }
