@@ -21,6 +21,7 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private DioramaTopDownCameraRig cameraRig = null!;
         [SerializeField] private Transform cameraPivot = null!;
         [SerializeField] private Camera targetCamera = null!;
+        [SerializeField] private SimulationWorldShellPresenter shellPresenter = null!;
 
         [Header("World bounds (X/Z)")]
         [SerializeField] private Vector2 worldMinimum = new(-65f, -50f);
@@ -66,6 +67,11 @@ namespace Ssalddel.Unity.Presentation.World
             ApplyRigLimits();
             cameraRig.SetPrototypeInputEnabled(false);
         }
+
+        public void BindShellPresenter(SimulationWorldShellPresenter presenter)
+            => shellPresenter = presenter != null
+                ? presenter
+                : throw new ArgumentNullException(nameof(presenter));
 
         private void Awake()
         {
@@ -131,6 +137,22 @@ namespace Ssalddel.Unity.Presentation.World
             Mode = 전략카메라탐색Mode.FreeExplore;
         }
 
+        public bool FocusSelectedObject()
+        {
+            var shell = ResolveShellPresenter();
+            if (shell == null || !shell.FocusSelectedObject()) return false;
+            Mode = 전략카메라탐색Mode.ObjectFocus;
+            return true;
+        }
+
+        public bool ClearSelectedObject()
+        {
+            var shell = ResolveShellPresenter();
+            if (shell == null || !shell.ClearObjectSelection()) return false;
+            Mode = 전략카메라탐색Mode.FreeExplore;
+            return true;
+        }
+
         public bool CanBeginWorldPointerInteraction()
             => EventSystem.current == null || !EventSystem.current.IsPointerOverGameObject();
 
@@ -154,6 +176,8 @@ namespace Ssalddel.Unity.Presentation.World
             var vertical = Axis(keyboard.sKey.isPressed, keyboard.wKey.isPressed);
             ApplyMoveInput(new Vector2(horizontal, vertical), deltaTime);
             ApplyKeyboardYaw(Axis(keyboard.qKey.isPressed, keyboard.eKey.isPressed), deltaTime);
+            if (keyboard.fKey.wasPressedThisFrame) FocusSelectedObject();
+            if (keyboard.escapeKey.wasPressedThisFrame) ClearSelectedObject();
         }
 
         private void ReadMouse()
@@ -192,5 +216,12 @@ namespace Ssalddel.Unity.Presentation.World
 
         private static float Axis(bool negative, bool positive)
             => (positive ? 1f : 0f) - (negative ? 1f : 0f);
+
+        private SimulationWorldShellPresenter? ResolveShellPresenter()
+        {
+            if (shellPresenter != null) return shellPresenter;
+            shellPresenter = FindFirstObjectByType<SimulationWorldShellPresenter>();
+            return shellPresenter;
+        }
     }
 }

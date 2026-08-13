@@ -1,6 +1,7 @@
 using System;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Ssalddel.Unity.Presentation.World
 {
@@ -78,8 +79,14 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnMouseDown()
         {
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
             var presenter = FindFirstObjectByType<SimulationWorldShellPresenter>();
-            if (presenter != null) presenter.NavigateTo(this);
+            if (presenter == null) return;
+            if (observationScaleCode == SimulationObservationScaleCodes.Object)
+                presenter.SelectObjectForInteraction(this);
+            else
+                presenter.NavigateTo(this);
         }
     }
 }

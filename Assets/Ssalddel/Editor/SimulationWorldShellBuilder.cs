@@ -76,6 +76,8 @@ namespace Ssalddel.Unity.Editor
                 ui.Back,
                 ui.Pause,
                 ui.Speed);
+            cameraSystem.GetComponentInChildren<전략카메라Controller>(true)
+                .BindShellPresenter(presenter);
             Build정착지상호작용(ui.Canvas, presenter, shellRuntimeRoot.transform);
             Build물류이동(ui.Canvas, presenter, shellRuntimeRoot.transform);
             Build턴마감(ui.Canvas, presenter, shellRuntimeRoot.transform);
@@ -704,6 +706,7 @@ namespace Ssalddel.Unity.Editor
                 new Vector2(65f, 50f),
                 12f,
                 110f);
+            controller.BindShellPresenter(FindPresenter());
         }
 
         private static void ValidatePlayerStrategyCameraOpenScene()
@@ -757,19 +760,19 @@ namespace Ssalddel.Unity.Editor
                 new Vector2(414f, 132f), 17, TextAnchor.UpperLeft, Color.white);
 
             var navigation = Panel(canvas.transform, "NavigationPanel",
-                new Vector2(22f, 22f), new Vector2(760f, 106f), new Vector2(0f, 0f));
+                new Vector2(22f, 22f), new Vector2(760f, 132f), new Vector2(0f, 0f));
             var selection = Text(navigation.transform, "SelectionText", new Vector2(18f, -12f),
-                new Vector2(724f, 42f), 15, TextAnchor.UpperLeft, Color.white);
+                new Vector2(724f, 68f), 15, TextAnchor.UpperLeft, Color.white);
             var worldMap = Button(navigation.transform, "WorldMapButton", "WORLD MAP",
-                new Vector2(18f, -61f), new Vector2(132f, 34f), new Color(.18f, .48f, .63f));
+                new Vector2(18f, -87f), new Vector2(132f, 34f), new Color(.18f, .48f, .63f));
             var settlement = Button(navigation.transform, "SettlementButton", "정착지 내부",
-                new Vector2(158f, -61f), new Vector2(132f, 34f), new Color(.72f, .48f, .18f));
+                new Vector2(158f, -87f), new Vector2(132f, 34f), new Color(.72f, .48f, .18f));
             var back = Button(navigation.transform, "BackButton", "뒤로",
-                new Vector2(298f, -61f), new Vector2(92f, 34f), new Color(.38f, .4f, .42f));
+                new Vector2(298f, -87f), new Vector2(92f, 34f), new Color(.38f, .4f, .42f));
             var pause = Button(navigation.transform, "PauseButton", "PAUSE · 미연결",
-                new Vector2(438f, -61f), new Vector2(124f, 34f), new Color(.25f, .28f, .31f));
+                new Vector2(438f, -87f), new Vector2(124f, 34f), new Color(.25f, .28f, .31f));
             var speed = Button(navigation.transform, "SpeedButton", "1× · 미연결",
-                new Vector2(570f, -61f), new Vector2(124f, 34f), new Color(.25f, .28f, .31f));
+                new Vector2(570f, -87f), new Vector2(124f, 34f), new Color(.25f, .28f, .31f));
 
             return new HudReferences(canvas.transform, mode, identity, economy, selection,
                 worldMap, settlement, back, pause, speed);

@@ -50,6 +50,7 @@ namespace Ssalddel.Unity.Presentation.World
             ?? string.Empty;
         public string CurrentFocusAnchorId => cameraRig != null
             ? cameraRig.CurrentFocusAnchorId : string.Empty;
+        public string SelectionSummary => selectionText != null ? selectionText.text : string.Empty;
 
         private void Awake() => Initialize(SimulationWorldShellFixture.CreateSnapshot());
 
@@ -115,6 +116,41 @@ namespace Ssalddel.Unity.Presentation.World
         {
             if (target == null) throw new ArgumentNullException(nameof(target));
             target.Validate();
+            ApplyTargetState(target);
+            ApplyPresentation(target.FocusAnchorId);
+        }
+
+        public void SelectObjectForInteraction(SimulationWorldNavigationTargetView target)
+        {
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            target.Validate();
+            if (target.ObservationScaleCode != SimulationObservationScaleCodes.Object)
+                throw new InvalidOperationException("SimulationObjectInteractionTargetInvalid");
+            var currentFocusAnchorId = cameraRig.CurrentFocusAnchorId;
+            ApplyTargetState(target);
+            ApplyPresentation(currentFocusAnchorId);
+        }
+
+        public bool FocusSelectedObject()
+        {
+            if (string.IsNullOrWhiteSpace(stateMachine.State.SelectedObjectStableId))
+                return false;
+            cameraRig.Focus(ObjectFocusAnchorPrefix + stateMachine.State.SelectedObjectStableId);
+            cameraRig.ApplyNowForTests();
+            return true;
+        }
+
+        public bool ClearObjectSelection()
+        {
+            if (string.IsNullOrWhiteSpace(stateMachine.State.SelectedObjectStableId))
+                return false;
+            stateMachine.Back();
+            ApplyPresentation(ResolveFocusAnchorId());
+            return true;
+        }
+
+        private void ApplyTargetState(SimulationWorldNavigationTargetView target)
+        {
             if (target.ObservationScaleCode == SimulationObservationScaleCodes.Settlement)
                 stateMachine.ShowSettlement(target.SettlementStableId);
             else if (target.ObservationScaleCode == SimulationObservationScaleCodes.District)
@@ -133,7 +169,6 @@ namespace Ssalddel.Unity.Presentation.World
             }
             else
                 throw new InvalidOperationException("SimulationNavigationTargetScaleUnsupported");
-            ApplyPresentation(target.FocusAnchorId);
         }
 
         public void Back()
@@ -243,15 +278,27 @@ namespace Ssalddel.Unity.Presentation.World
             var state = stateMachine.State;
             if (state.ObservationScaleCode == SimulationObservationScaleCodes.WorldMap)
                 return string.IsNullOrEmpty(state.SelectedSettlementStableId)
-                    ? "Settlement marker를 선택해 정착지 내부로 이동"
-                    : "최근 정착지: " + state.SelectedSettlementStableId;
+                    ? "정착지 표식을 선택해 내부 공간으로 이동"
+                    : "최근 정착지 · " + state.SelectedSettlementStableId;
             var breadcrumb = state.SelectedSettlementStableId;
             if (!string.IsNullOrEmpty(state.SelectedDistrictStableId))
                 breadcrumb += "  ›  " + state.SelectedDistrictStableId;
             if (!string.IsNullOrEmpty(state.SelectedObjectStableId))
                 breadcrumb += "  ›  " + state.SelectedObjectStableId;
+            if (state.ObservationScaleCode == SimulationObservationScaleCodes.Object)
+                return "선택 객체 · " + ObjectLabel(state.SelectedObjectStableId)
+                    + "\n" + breadcrumb
+                    + "\nF 초점 · Esc 선택 해제 · 강조는 업무 완료 근거가 아님";
             return state.ObservationScaleCode.ToUpperInvariant() + "\n" + breadcrumb;
         }
+
+        private static string ObjectLabel(string stableId)
+            => stableId switch
+            {
+                "harvest-lot:potato-001" => "감자 수확 Lot · 300kg",
+                물류이동Fixture.CargoStableId => "감자 운송 화물 · 300kg",
+                _ => stableId,
+            };
 
         private static string Number(decimal value)
             => value.ToString("0.##", CultureInfo.InvariantCulture);

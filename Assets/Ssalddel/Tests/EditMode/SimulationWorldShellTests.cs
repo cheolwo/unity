@@ -238,6 +238,49 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public void 객체클릭선택과_F초점_Esc해제는_Simulation상태를변경하지않는다()
+        {
+            var scene = SceneManager.GetSceneByPath(ScenePath);
+            if (!scene.isLoaded)
+                scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                var root = Find(scene, "SimulationWorldShell");
+                var presenter = root.GetComponentInChildren<SimulationWorldShellPresenter>(true);
+                var controller = root.GetComponentInChildren<전략카메라Controller>(true);
+                var lot = root.GetComponentsInChildren<SimulationWorldNavigationTargetView>(true)
+                    .Single(target => target.ObjectStableId == "harvest-lot:potato-001");
+                presenter.Initialize(SimulationWorldShellFixture.CreateSnapshot());
+                controller.BindShellPresenter(presenter);
+                presenter.ShowSettlement();
+
+                presenter.SelectObjectForInteraction(lot);
+
+                Assert.That(presenter.SelectedObjectStableId,
+                    Is.EqualTo("harvest-lot:potato-001"));
+                Assert.That(presenter.CurrentFocusAnchorId,
+                    Is.EqualTo(SimulationWorldShellPresenter.SettlementFocusAnchorId));
+                Assert.That(presenter.SelectionSummary, Does.Contain("감자 수확 Lot"));
+                Assert.That(presenter.SelectionSummary, Does.Contain("F 초점"));
+                Assert.That(controller.FocusSelectedObject(), Is.True);
+                Assert.That(controller.Mode, Is.EqualTo(전략카메라탐색Mode.ObjectFocus));
+                Assert.That(presenter.CurrentFocusAnchorId,
+                    Is.EqualTo(SimulationWorldShellPresenter.ObjectFocusAnchorPrefix
+                        + "harvest-lot:potato-001"));
+                Assert.That(controller.ClearSelectedObject(), Is.True);
+                Assert.That(presenter.SelectedObjectStableId, Is.Empty);
+                Assert.That(presenter.ObservationScaleCode,
+                    Is.EqualTo(SimulationObservationScaleCodes.District));
+                Assert.That(presenter.WorldTick, Is.EqualTo(12));
+                Assert.That(presenter.WorldRevision, Is.EqualTo(12));
+            }
+            finally
+            {
+                if (scene.isLoaded) EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        [Test]
         public void 저장Scene은_District역할별SyntyVisual과VendorPrefab연결을가진다()
         {
             var scene = SceneManager.GetSceneByPath(ScenePath);

@@ -25,6 +25,11 @@ namespace Ssalddel.Unity.Presentation.World
         private bool busy;
         private bool listenersBound;
 
+        public 물류이동AuthoritySnapshot? CurrentAuthoritySnapshot
+            => coordinator == null ? null : coordinator.CurrentSnapshot;
+        public string CurrentPhaseCode
+            => coordinator == null ? string.Empty : coordinator.PhaseCode;
+
         private void Awake()
         {
             InitializeAuthority(
