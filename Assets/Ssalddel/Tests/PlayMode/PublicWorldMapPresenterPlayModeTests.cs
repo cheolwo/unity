@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -157,7 +158,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
     public sealed class 전략카메라PlayModeTests
     {
         [UnityTest]
-        public IEnumerator GameViewInputSystem의_WASD회전Wheel우클릭Drag가_카메라만변경한다()
+        public IEnumerator GameViewInputSystem의_WASD회전Wheel우클릭Drag_F초점_Esc해제가_카메라와선택만변경한다()
         {
             SceneManager.LoadScene("SimulationWorldShell", LoadSceneMode.Single);
             yield return null;
@@ -206,6 +207,25 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 yield return null;
                 Assert.That(rig.YawDegrees, Is.Not.EqualTo(yawBeforeDrag).Within(.001f));
 
+                shell.ShowSettlement();
+                var lot = UnityEngine.Object.FindObjectsByType<SimulationWorldNavigationTargetView>(
+                        FindObjectsInactive.Include, FindObjectsSortMode.None)
+                    .Single(target => target.ObjectStableId == "harvest-lot:potato-001");
+                shell.SelectObjectForInteraction(lot);
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.F));
+                yield return null;
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                yield return null;
+                Assert.That(controller!.Mode, Is.EqualTo(전략카메라탐색Mode.ObjectFocus));
+                Assert.That(rig.CurrentFocusAnchorId,
+                    Is.EqualTo(SimulationWorldShellPresenter.ObjectFocusAnchorPrefix
+                        + "harvest-lot:potato-001"));
+
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Escape));
+                yield return null;
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                yield return null;
+                Assert.That(shell.SelectedObjectStableId, Is.Empty);
                 Assert.That(controller!.Mode, Is.EqualTo(전략카메라탐색Mode.FreeExplore));
                 Assert.That(shell.WorldTick, Is.EqualTo(initialTick));
                 Assert.That(shell.WorldRevision, Is.EqualTo(initialRevision));
@@ -215,6 +235,61 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 InputSystem.RemoveDevice(mouse);
                 InputSystem.RemoveDevice(keyboard);
             }
+        }
+    }
+
+    public sealed class 플레이어경관PlayModeTests
+    {
+        [UnityTest]
+        public IEnumerator Farm플레이어는_1인칭직접이동과_3인칭선택이동을_표현전용으로수행한다()
+        {
+            var controller = UnityEngine.Object.FindAnyObjectByType<플레이어경관Controller>(
+                FindObjectsInactive.Include);
+            var shell = UnityEngine.Object.FindAnyObjectByType<SimulationWorldShellPresenter>();
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(shell, Is.Not.Null);
+            Assert.That(controller!.ValidateWiring(), Is.True);
+
+            var beforePosition = controller.transform.position;
+            var beforeRotation = controller.FirstPersonCamera.transform.rotation;
+            var beforeTick = shell!.WorldTick;
+            var beforeRevision = shell.WorldRevision;
+            controller.EnterFirstPersonMode();
+            controller.TickPresentation(
+                Vector2.up, new Vector2(24f, -8f), false, .5f);
+            yield return null;
+
+            Assert.That(Vector3.Distance(controller.transform.position, beforePosition),
+                Is.GreaterThan(.5f));
+            Assert.That(Quaternion.Angle(
+                controller.FirstPersonCamera.transform.rotation, beforeRotation),
+                Is.GreaterThan(.1f));
+            Assert.That(controller.CurrentMovementIntent,
+                Is.EqualTo(공용AnimationIntentCodes.Walk));
+            Assert.That(controller.FirstPersonCamera.enabled, Is.True);
+            Assert.That(controller.CurrentMode, Is.EqualTo(플레이어시점Mode.FirstPerson));
+
+            controller.EnterThirdPersonMode();
+            controller.SetThirdPersonSelection(true);
+            var tacticalFocusBefore = controller.TacticalFocus;
+            var tacticalDistanceBefore = controller.TacticalDistance;
+            controller.TickTacticalCamera(Vector2.up, 120f, .25f);
+            var clickMoveBefore = controller.transform.position;
+            controller.SetThirdPersonDestination(clickMoveBefore + Vector3.right * 2f);
+            controller.TickThirdPersonMovement(.25f);
+            yield return null;
+
+            Assert.That(controller.IsSelected, Is.True);
+            Assert.That(Vector3.Distance(controller.TacticalFocus, tacticalFocusBefore),
+                Is.GreaterThan(1f));
+            Assert.That(controller.TacticalDistance, Is.LessThan(tacticalDistanceBefore));
+            Assert.That(Vector3.Distance(controller.transform.position, clickMoveBefore),
+                Is.GreaterThan(.25f));
+            Assert.That(controller.PlayerCamera.enabled, Is.True);
+            Assert.That(controller.CurrentMode, Is.EqualTo(플레이어시점Mode.ThirdPerson));
+            Assert.That(controller.PresentationOnly, Is.True);
+            Assert.That(shell.WorldTick, Is.EqualTo(beforeTick));
+            Assert.That(shell.WorldRevision, Is.EqualTo(beforeRevision));
         }
     }
 }
