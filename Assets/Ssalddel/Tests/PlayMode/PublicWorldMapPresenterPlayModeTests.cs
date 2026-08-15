@@ -243,6 +243,8 @@ namespace Ssalddel.Unity.Tests.PlayMode
         [UnityTest]
         public IEnumerator Farm플레이어는_1인칭직접이동과_3인칭선택이동을_표현전용으로수행한다()
         {
+            SceneManager.LoadScene("SimulationWorldShell", LoadSceneMode.Single);
+            yield return null;
             var controller = UnityEngine.Object.FindAnyObjectByType<플레이어경관Controller>(
                 FindObjectsInactive.Include);
             var shell = UnityEngine.Object.FindAnyObjectByType<SimulationWorldShellPresenter>();
@@ -254,11 +256,12 @@ namespace Ssalddel.Unity.Tests.PlayMode
             var beforeRotation = controller.FirstPersonCamera.transform.rotation;
             var beforeTick = shell!.WorldTick;
             var beforeRevision = shell.WorldRevision;
+            var animationAdapter = controller.GetComponent<공용AnimationAdapter>();
+            Assert.That(animationAdapter, Is.Not.Null);
+            Assert.That(animationAdapter!.UsesFullBodyProceduralPose, Is.True);
             controller.EnterFirstPersonMode();
             controller.TickPresentation(
                 Vector2.up, new Vector2(24f, -8f), false, .5f);
-            yield return null;
-
             Assert.That(Vector3.Distance(controller.transform.position, beforePosition),
                 Is.GreaterThan(.5f));
             Assert.That(Quaternion.Angle(
@@ -266,8 +269,16 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 Is.GreaterThan(.1f));
             Assert.That(controller.CurrentMovementIntent,
                 Is.EqualTo(공용AnimationIntentCodes.Walk));
+            animationAdapter.TickPresentation(.1f);
+            Assert.That(animationAdapter.LocomotionWeight, Is.GreaterThan(0f));
             Assert.That(controller.FirstPersonCamera.enabled, Is.True);
             Assert.That(controller.CurrentMode, Is.EqualTo(플레이어시점Mode.FirstPerson));
+
+            controller.TickPresentation(Vector2.up, Vector2.zero, true, .2f);
+            Assert.That(controller.CurrentMovementIntent,
+                Is.EqualTo(공용AnimationIntentCodes.Run));
+            animationAdapter.TickPresentation(.1f);
+            Assert.That(animationAdapter.LocomotionWeight, Is.GreaterThan(.5f));
 
             controller.EnterThirdPersonMode();
             controller.SetThirdPersonSelection(true);

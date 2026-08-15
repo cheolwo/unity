@@ -9,8 +9,15 @@ namespace Ssalddel.Unity.Presentation.World
     {
         public const string Idle = "idle";
         public const string Walk = "walk";
+        public const string Run = "run";
+        public const string Guard = "guard";
+        public const string Attack = "attack";
+        public const string Stagger = "stagger";
 
-        public static IReadOnlyList<string> All { get; } = new[] { Idle, Walk };
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            Idle, Walk, Run, Guard, Attack, Stagger,
+        };
 
         public static bool IsKnown(string value)
             => !string.IsNullOrWhiteSpace(value)

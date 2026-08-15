@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d3d4193642a41f5ae8c58486f2d808f, type: 3}
+  m_Name: "\uD3C9\uCC3D\uAD70\uC804\uC220CharacterVisualCatalog"
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC804\uC220CharacterVisualCatalog"
+  catalogRevision: pyeongchang-tactical-character.r1
+  entries:
+  - visualKey: character.tactical.allied.farmer-male
+    sideCode: Allied
+    animationPackCode: farm
+    prefab: {fileID: 1160220439793846, guid: 3c3a8236be548bb4c892cf39a5abadfe, type: 3}
+    weight: 2
+    presentationOnly: 1
+  - visualKey: character.tactical.allied.farmer-female
+    sideCode: Allied
+    animationPackCode: farm
+    prefab: {fileID: 1019791486663424, guid: 827a26e9b261b7847ac6cc3df54f2677, type: 3}
+    weight: 2
+    presentationOnly: 1
+  - visualKey: character.tactical.allied.farmer-senior
+    sideCode: Allied
+    animationPackCode: farm
+    prefab: {fileID: 1350103588185370, guid: 6a71738add6483c4e8a1479556240d54, type: 3}
+    weight: 1
+    presentationOnly: 1
+  - visualKey: character.tactical.hostile.charred
+    sideCode: Hostile
+    animationPackCode: mixed
+    prefab: {fileID: 1230988377752467907, guid: e0b13cff52ec7744ab98183b162bcc48, type: 3}
+    weight: 3
+    presentationOnly: 1
+  - visualKey: character.tactical.hostile.skeleton
+    sideCode: Hostile
+    animationPackCode: mixed
+    prefab: {fileID: 3019351386366890193, guid: 5f1e3ed9628a12543adb9c996e045e24, type: 3}
+    weight: 1
+    presentationOnly: 1

@@ -1,4 +1,5 @@
 using Ssalddel.Unity.Runtime.World;
+using Ssalddel.Unity.PlayerActivities;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +10,27 @@ namespace Ssalddel.Unity.Presentation.World
         Strategy,
         FirstPerson,
         ThirdPerson,
+    }
+
+    public static class 카메라시점전환Math
+    {
+        public static float EaseInOut(float progress)
+        {
+            var value = Mathf.Clamp01(progress);
+            return value * value * (3f - 2f * value);
+        }
+
+        public static Vector3 EvaluateCurvedPosition(
+            Vector3 start, Vector3 end, float progress, float arcHeight)
+        {
+            var value = Mathf.Clamp01(progress);
+            var control = Vector3.Lerp(start, end, .5f)
+                + Vector3.up * Mathf.Max(0f, arcHeight);
+            var inverse = 1f - value;
+            return inverse * inverse * start
+                + 2f * inverse * value * control
+                + value * value * end;
+        }
     }
 
     /// <summary>
@@ -28,6 +50,11 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private 공용AnimationAdapter animationAdapter = null!;
         [SerializeField] private GameObject selectionHighlight = null!;
         [SerializeField] private GameObject destinationMarker = null!;
+        [SerializeField] private 공간안전이동Gate movementGate = null!;
+        [SerializeField] private 농장경영시점Controller farmManagement = null!;
+        [SerializeField] private 전투시점Controller combat = null!;
+        [SerializeField, Min(.1f)] private float viewTransitionDuration = .9f;
+        [SerializeField, Min(0f)] private float viewTransitionArcHeight = 1.8f;
         [SerializeField] private bool presentationOnly = true;
 
         private CharacterController _characterController = null!;
@@ -45,10 +72,20 @@ namespace Ssalddel.Unity.Presentation.World
         private float _verticalVelocity;
         private float _walkPhase;
         private Vector3 _visualBasePosition;
-        private Transform? _leftUpperLeg;
-        private Transform? _rightUpperLeg;
-        private Quaternion _leftLegBase;
-        private Quaternion _rightLegBase;
+        private readonly PlayerActivityViewPolicyCatalog _activityViewPolicies =
+            PlayerActivityViewPolicyCatalog.CreateDefault();
+        private PlayerActivityViewDecision _currentViewDecision = null!;
+        private string _currentActivityCode = PlayerActivityCodes.WorldOverview;
+        private Camera? _viewTransitionCamera;
+        private Camera? _viewTransitionTarget;
+        private Vector3 _viewTransitionStartPosition;
+        private Quaternion _viewTransitionStartRotation;
+        private float _viewTransitionStartFieldOfView;
+        private Vector3 _viewTransitionControlPoint;
+        private float _viewTransitionElapsed;
+        private bool _viewTransitionTargetShowsVisual;
+        private bool _viewTransitionTargetEnablesFarmManagement;
+        private bool _viewTransitionVisualSwitched;
 
         public 플레이어경관Profile Profile => profile;
         public Camera PlayerCamera => thirdPersonCamera;
@@ -63,6 +100,19 @@ namespace Ssalddel.Unity.Presentation.World
         public float TacticalDistance => _tacticalDistance;
         public string CurrentMovementIntent => animationAdapter == null
             ? string.Empty : animationAdapter.CurrentIntentCode;
+        public bool MovementBlockedByStreaming { get; private set; }
+        public string CurrentActivityCode => _currentActivityCode;
+        public PlayerActivityViewDecision CurrentViewDecision
+            => _currentViewDecision ?? _activityViewPolicies.Resolve(
+                PlayerActivityCodes.WorldOverview);
+        public 농장경영시점Controller FarmManagement => farmManagement;
+        public 전투시점Controller Combat => combat;
+        public bool IsCameraTransitioning { get; private set; }
+        public float CameraTransitionProgress => !IsCameraTransitioning
+            ? 1f
+            : Mathf.Clamp01(_viewTransitionElapsed / Mathf.Max(.1f, viewTransitionDuration));
+        public float ViewTransitionDuration => viewTransitionDuration;
+        public float ViewTransitionArcHeight => viewTransitionArcHeight;
 
         public void Configure(
             플레이어경관Profile value,
@@ -93,7 +143,6 @@ namespace Ssalddel.Unity.Presentation.World
             _characterController.slopeLimit = 42f;
             _visualBasePosition = visualRoot.localPosition;
             CacheVisualRendererStates();
-            CacheLegBones();
             _yaw = transform.eulerAngles.y;
             _pitch = profile.InitialPitch;
             _tacticalFocus = transform.position;
@@ -123,6 +172,45 @@ namespace Ssalddel.Unity.Presentation.World
                 && GetComponent<CharacterController>() != null
                 && presentationOnly;
 
+        public void RebindVisual(
+            Transform visual,
+            공용AnimationAdapter adapter)
+        {
+            if (visual == null || !visual.IsChildOf(transform)
+                || adapter == null || adapter.transform != transform
+                || !adapter.ValidateWiring())
+                throw new System.ArgumentException("PlayerLandscapeVisualRebindInvalid");
+            visualRoot = visual;
+            animationAdapter = adapter;
+            _visualRenderers = System.Array.Empty<Renderer>();
+            _visualRendererStates = System.Array.Empty<bool>();
+            _visualBasePosition = visualRoot.localPosition;
+            CacheVisualRendererStates();
+            SetVisualVisible(_currentMode != 플레이어시점Mode.FirstPerson);
+        }
+
+        public void ConfigureMovementGate(공간안전이동Gate value)
+            => movementGate = value;
+
+        public void ConfigureFarmManagement(농장경영시점Controller value)
+        {
+            farmManagement = value;
+            if (farmManagement == null || !farmManagement.ValidateWiring())
+                throw new System.ArgumentException("FarmManagementWiringInvalid");
+            farmManagement.SetActive(
+                _currentMode == 플레이어시점Mode.ThirdPerson
+                && string.Equals(_currentActivityCode,
+                    PlayerActivityCodes.FarmManagement,
+                    System.StringComparison.Ordinal));
+        }
+
+        public void ConfigureCombat(전투시점Controller value)
+        {
+            combat = value;
+            if (combat == null || !combat.ValidateWiring())
+                throw new System.ArgumentException("FarmCombatViewWiringInvalid");
+        }
+
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
@@ -140,12 +228,22 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void Update()
         {
-            if (!presentationOnly || Keyboard.current == null) return;
+            if (!presentationOnly) return;
+            if (IsCameraTransitioning) TickCameraTransition(Time.unscaledDeltaTime);
+            if (Keyboard.current == null) return;
+            if (combat != null && combat.HasActiveBeat)
+            {
+                combat.TryHandleCombatInput(Mouse.current);
+                return;
+            }
+            if (combat != null
+                && combat.TryHandleTacticalViewInput(Keyboard.current))
+                return;
             var keyboard = Keyboard.current;
             if (keyboard.f1Key.wasPressedThisFrame) ExitPlayerMode();
             if (keyboard.f2Key.wasPressedThisFrame) EnterFirstPersonMode();
             if (keyboard.f3Key.wasPressedThisFrame) EnterThirdPersonMode();
-            if (!IsPlayerMode) return;
+            if (!IsPlayerMode || IsCameraTransitioning) return;
 
             if (keyboard.escapeKey.wasPressedThisFrame) ReleaseCursor();
             if (_currentMode == 플레이어시점Mode.FirstPerson)
@@ -183,9 +281,15 @@ namespace Ssalddel.Unity.Presentation.World
         {
             var mouse = Mouse.current;
             if (mouse == null) return;
-            if (mouse.leftButton.wasPressedThisFrame) TrySelectPlayer(mouse.position.ReadValue());
-            if (mouse.rightButton.wasPressedThisFrame && _isSelected)
-                TrySetDestination(mouse.position.ReadValue());
+            var farmInputHandled = farmManagement != null
+                && farmManagement.TryHandlePointerInput(mouse, keyboard);
+            if (!farmInputHandled)
+            {
+                if (mouse.leftButton.wasPressedThisFrame)
+                    TrySelectPlayer(mouse.position.ReadValue());
+                if (mouse.rightButton.wasPressedThisFrame && _isSelected)
+                    TrySetDestination(mouse.position.ReadValue());
+            }
             if (mouse.middleButton.isPressed)
                 TickLook(mouse.delta.ReadValue());
             var panInput = Vector2.zero;
@@ -286,8 +390,17 @@ namespace Ssalddel.Unity.Presentation.World
                 _verticalVelocity = -1.5f;
             else
                 _verticalVelocity += Physics.gravity.y * deltaTime;
+            var horizontalMovement = direction * (speed * deltaTime);
+            MovementBlockedByStreaming = movementGate != null
+                && horizontalMovement.sqrMagnitude > .000001f
+                && !movementGate.CanEnter(transform.position + horizontalMovement);
+            if (MovementBlockedByStreaming)
+            {
+                horizontalMovement = Vector3.zero;
+                isMoving = false;
+            }
             _characterController.Move(
-                direction * (speed * deltaTime) + Vector3.up * (_verticalVelocity * deltaTime));
+                horizontalMovement + Vector3.up * (_verticalVelocity * deltaTime));
             var position = transform.position;
             position.x = Mathf.Clamp(position.x, profile.MinimumX, profile.MaximumX);
             position.z = Mathf.Clamp(position.z, profile.MinimumZ, profile.MaximumZ);
@@ -302,15 +415,13 @@ namespace Ssalddel.Unity.Presentation.World
                 _walkPhase += deltaTime * (run ? 11f : 8f);
                 visualRoot.localPosition = _visualBasePosition
                     + Vector3.up * (Mathf.Abs(Mathf.Sin(_walkPhase)) * .025f);
-                animationAdapter.ApplyIntent(공용AnimationIntentCodes.Walk);
-                ApplyLegSwing(Mathf.Sin(_walkPhase) * (run ? 27f : 21f));
+                animationAdapter.ApplyLocomotion(true, run);
             }
             else
             {
                 visualRoot.localPosition = Vector3.Lerp(
                     visualRoot.localPosition, _visualBasePosition, 10f * deltaTime);
-                animationAdapter.ApplyIntent(공용AnimationIntentCodes.Idle);
-                ApplyLegSwing(0f);
+                animationAdapter.ApplyLocomotion(false, false);
             }
         }
 
@@ -318,6 +429,11 @@ namespace Ssalddel.Unity.Presentation.World
         {
             if (_currentMode != 플레이어시점Mode.ThirdPerson
                 || thirdPersonPivot == null || thirdPersonCamera == null) return;
+            ApplyThirdPersonCameraPose();
+        }
+
+        private void ApplyThirdPersonCameraPose()
+        {
             thirdPersonPivot.position = _tacticalFocus + Vector3.up * profile.CameraHeight;
             var origin = thirdPersonPivot.position;
             var direction = -thirdPersonPivot.forward;
@@ -331,61 +447,270 @@ namespace Ssalddel.Unity.Presentation.World
                 thirdPersonPivot.rotation);
         }
 
-        public void EnterPlayerMode() => EnterThirdPersonMode();
+        public void EnterPlayerMode() => EnterFarmManagementMode();
+
+        public void EnterFarmManagementMode()
+            => ApplyActivityViewDecision(_activityViewPolicies.Resolve(
+                PlayerActivityCodes.FarmManagement));
+
+        public void EnterFarmManagementFirstPersonMode()
+            => ApplyActivityViewDecision(_activityViewPolicies.Resolve(
+                PlayerActivityCodes.FarmManagement,
+                PlayerActivityViewModeCodes.FirstPerson));
+
+        public void EnterExplorationMode()
+            => ApplyActivityViewDecision(_activityViewPolicies.Resolve(
+                PlayerActivityCodes.Exploration));
+
+        public void EnterCombatMode(string perspectiveCode)
+        {
+            var viewMode = string.Equals(perspectiveCode,
+                Ssalddel.Unity.Survival.FarmCombatPresentationCodes
+                    .FirstPersonPrecision,
+                System.StringComparison.Ordinal)
+                    ? PlayerActivityViewModeCodes.FirstPerson
+                    : string.Equals(perspectiveCode,
+                        Ssalddel.Unity.Survival.FarmCombatPresentationCodes
+                            .ThirdPersonAwareness,
+                        System.StringComparison.Ordinal)
+                            ? PlayerActivityViewModeCodes.TacticalThirdPerson
+                            : throw new System.ArgumentException(
+                                "FarmCombatPerspectiveInvalid",
+                                nameof(perspectiveCode));
+            ApplyActivityViewDecision(_activityViewPolicies.Resolve(
+                PlayerActivityCodes.Combat, viewMode));
+        }
 
         public void EnterFirstPersonMode()
         {
+            var activityCode = string.Equals(_currentActivityCode,
+                PlayerActivityCodes.FarmManagement,
+                System.StringComparison.Ordinal)
+                ? PlayerActivityCodes.FarmManagement
+                : PlayerActivityCodes.Exploration;
+            ApplyActivityViewDecision(_activityViewPolicies.Resolve(
+                activityCode, PlayerActivityViewModeCodes.FirstPerson));
+        }
+
+        private void EnterFirstPersonModeCore()
+        {
             if (!ValidateWiring()) return;
-            ActivatePlayerCamera(firstPersonCamera);
             _currentMode = 플레이어시점Mode.FirstPerson;
             _yaw = visualRoot.eulerAngles.y;
             _pitch = profile.InitialPitch;
             ApplyLookRotation();
             ApplySelectionState(false);
             ClearDestination();
-            SetVisualVisible(false);
+            if (farmManagement != null) farmManagement.SetActive(false);
+            BeginCameraTransition(firstPersonCamera, false, false);
         }
 
         public void EnterThirdPersonMode()
         {
+            var activityCode = string.Equals(_currentActivityCode,
+                PlayerActivityCodes.Exploration,
+                System.StringComparison.Ordinal)
+                ? PlayerActivityCodes.Exploration
+                : PlayerActivityCodes.FarmManagement;
+            ApplyActivityViewDecision(_activityViewPolicies.Resolve(
+                activityCode, PlayerActivityViewModeCodes.TacticalThirdPerson));
+        }
+
+        private void EnterThirdPersonModeCore()
+        {
             if (!ValidateWiring()) return;
-            ActivatePlayerCamera(thirdPersonCamera);
             _currentMode = 플레이어시점Mode.ThirdPerson;
             _yaw = profile.TacticalYaw;
             _pitch = profile.TacticalPitch;
             _tacticalDistance = profile.CameraDistance;
             FocusTacticalCameraOnPlayer();
             ApplyLookRotation();
-            SetVisualVisible(true);
+            ApplyThirdPersonCameraPose();
             ReleaseCursor();
+            BeginCameraTransition(
+                thirdPersonCamera,
+                true,
+                string.Equals(_currentActivityCode,
+                    PlayerActivityCodes.FarmManagement,
+                    System.StringComparison.Ordinal));
         }
 
         public void ExitPlayerMode()
         {
+            CancelCameraTransition();
             if (firstPersonCamera != null) firstPersonCamera.enabled = false;
             if (thirdPersonCamera != null) thirdPersonCamera.enabled = false;
             if (_previousCamera != null) _previousCamera.enabled = true;
             _previousCamera = null;
             _currentMode = 플레이어시점Mode.Strategy;
+            _currentActivityCode = PlayerActivityCodes.WorldOverview;
+            _currentViewDecision = _activityViewPolicies.Resolve(
+                PlayerActivityCodes.WorldOverview);
+            if (farmManagement != null) farmManagement.SetActive(false);
             ApplySelectionState(false);
             ClearDestination();
             SetVisualVisible(true);
             ReleaseCursor();
         }
 
-        private void ActivatePlayerCamera(Camera target)
+        private void ApplyActivityViewDecision(PlayerActivityViewDecision decision)
+        {
+            if (decision == null || !decision.PresentationOnly
+                || decision.ChangesWorldState)
+                throw new System.ArgumentException("PlayerActivityViewDecisionInvalid");
+            _currentActivityCode = decision.ActivityCode;
+            _currentViewDecision = decision;
+            if (string.Equals(decision.ViewModeCode,
+                    PlayerActivityViewModeCodes.FirstPerson,
+                    System.StringComparison.Ordinal))
+                EnterFirstPersonModeCore();
+            else if (string.Equals(decision.ViewModeCode,
+                         PlayerActivityViewModeCodes.TacticalThirdPerson,
+                         System.StringComparison.Ordinal))
+                EnterThirdPersonModeCore();
+            else
+                ExitPlayerMode();
+        }
+
+        public void TickCameraTransition(float deltaTime)
+        {
+            if (!IsCameraTransitioning || _viewTransitionCamera == null
+                || _viewTransitionTarget == null) return;
+            _viewTransitionElapsed += Mathf.Max(0f, deltaTime);
+            var progress = Mathf.Clamp01(
+                _viewTransitionElapsed / Mathf.Max(.1f, viewTransitionDuration));
+            var eased = 카메라시점전환Math.EaseInOut(progress);
+            var targetPosition = _viewTransitionTarget.transform.position;
+            var targetRotation = _viewTransitionTarget.transform.rotation;
+            var targetFieldOfView = _viewTransitionTarget.fieldOfView;
+            _viewTransitionCamera.transform.SetPositionAndRotation(
+                EvaluateTransitionPosition(targetPosition, eased),
+                Quaternion.Slerp(_viewTransitionStartRotation, targetRotation, eased));
+            _viewTransitionCamera.fieldOfView = Mathf.Lerp(
+                _viewTransitionStartFieldOfView, targetFieldOfView, eased);
+
+            var visualSwitchProgress = _viewTransitionTargetShowsVisual ? .32f : .72f;
+            if (!_viewTransitionVisualSwitched && progress >= visualSwitchProgress)
+            {
+                SetVisualVisible(_viewTransitionTargetShowsVisual);
+                _viewTransitionVisualSwitched = true;
+            }
+            if (progress >= 1f) CompleteCameraTransition();
+        }
+
+        private Vector3 EvaluateTransitionPosition(Vector3 targetPosition, float easedProgress)
+        {
+            var inverse = 1f - easedProgress;
+            return inverse * inverse * _viewTransitionStartPosition
+                + 2f * inverse * easedProgress * _viewTransitionControlPoint
+                + easedProgress * easedProgress * targetPosition;
+        }
+
+        private void BeginCameraTransition(
+            Camera target, bool showVisual, bool enableFarmManagement)
+        {
+            var source = FindActiveCamera();
+            if (!UnityEngine.Application.isPlaying || source == null || source == target)
+            {
+                ActivatePlayerCameraImmediately(target);
+                SetVisualVisible(showVisual);
+                if (farmManagement != null)
+                    farmManagement.SetActive(enableFarmManagement);
+                return;
+            }
+
+            if (source != firstPersonCamera && source != thirdPersonCamera
+                && source != _viewTransitionCamera && _previousCamera == null)
+                _previousCamera = source;
+
+            var transition = EnsureViewTransitionCamera();
+            if (source != transition) transition.CopyFrom(source);
+            transition.transform.SetPositionAndRotation(
+                source.transform.position, source.transform.rotation);
+            transition.fieldOfView = source.fieldOfView;
+            _viewTransitionStartPosition = transition.transform.position;
+            _viewTransitionStartRotation = transition.transform.rotation;
+            _viewTransitionStartFieldOfView = transition.fieldOfView;
+            _viewTransitionControlPoint = Vector3.Lerp(
+                    _viewTransitionStartPosition, target.transform.position, .5f)
+                + Vector3.up * viewTransitionArcHeight;
+            _viewTransitionTarget = target;
+            _viewTransitionElapsed = 0f;
+            _viewTransitionTargetShowsVisual = showVisual;
+            _viewTransitionTargetEnablesFarmManagement = enableFarmManagement;
+            _viewTransitionVisualSwitched = false;
+            IsCameraTransitioning = true;
+            if (farmManagement != null) farmManagement.SetActive(false);
+            DisableAllCamerasExcept(transition);
+            transition.enabled = true;
+        }
+
+        private Camera EnsureViewTransitionCamera()
+        {
+            if (_viewTransitionCamera != null) return _viewTransitionCamera;
+            var root = new GameObject("시점전환Camera");
+            root.transform.SetParent(transform, false);
+            _viewTransitionCamera = root.AddComponent<Camera>();
+            _viewTransitionCamera.enabled = false;
+            return _viewTransitionCamera;
+        }
+
+        private Camera? FindActiveCamera()
+        {
+            if (_viewTransitionCamera != null && _viewTransitionCamera.enabled)
+                return _viewTransitionCamera;
+            if (firstPersonCamera != null && firstPersonCamera.enabled)
+                return firstPersonCamera;
+            if (thirdPersonCamera != null && thirdPersonCamera.enabled)
+                return thirdPersonCamera;
+            var main = Camera.main;
+            if (main != null && main.enabled) return main;
+            foreach (var camera in FindObjectsByType<Camera>(FindObjectsInactive.Include))
+                if (camera != null && camera.enabled) return camera;
+            return null;
+        }
+
+        private void CompleteCameraTransition()
+        {
+            if (_viewTransitionTarget == null) return;
+            var target = _viewTransitionTarget;
+            IsCameraTransitioning = false;
+            if (_viewTransitionCamera != null) _viewTransitionCamera.enabled = false;
+            DisableAllCamerasExcept(target);
+            target.enabled = true;
+            SetVisualVisible(_viewTransitionTargetShowsVisual);
+            if (farmManagement != null)
+                farmManagement.SetActive(_viewTransitionTargetEnablesFarmManagement);
+            _viewTransitionTarget = null;
+            _viewTransitionElapsed = 0f;
+        }
+
+        private void CancelCameraTransition()
+        {
+            IsCameraTransitioning = false;
+            if (_viewTransitionCamera != null) _viewTransitionCamera.enabled = false;
+            _viewTransitionTarget = null;
+            _viewTransitionElapsed = 0f;
+        }
+
+        private void ActivatePlayerCameraImmediately(Camera target)
         {
             foreach (var camera in FindObjectsByType<Camera>(FindObjectsInactive.Include))
             {
-                if (camera == firstPersonCamera || camera == thirdPersonCamera)
-                {
-                    camera.enabled = camera == target;
-                    continue;
-                }
+                if (camera == _viewTransitionCamera) camera.enabled = false;
+                if (camera == firstPersonCamera || camera == thirdPersonCamera) continue;
                 if (camera.enabled && _previousCamera == null) _previousCamera = camera;
                 camera.enabled = false;
             }
+            firstPersonCamera.enabled = target == firstPersonCamera;
+            thirdPersonCamera.enabled = target == thirdPersonCamera;
             target.enabled = true;
+        }
+
+        private static void DisableAllCamerasExcept(Camera exception)
+        {
+            foreach (var camera in FindObjectsByType<Camera>(FindObjectsInactive.Include))
+                camera.enabled = camera == exception;
         }
 
         private void TrySelectPlayer(Vector2 screenPosition)
@@ -456,26 +781,11 @@ namespace Ssalddel.Unity.Presentation.World
                     _visualRenderers[index].enabled = visible && _visualRendererStates[index];
         }
 
-        private void CacheLegBones()
+        private void OnDisable()
         {
-            if (animationAdapter == null || animationAdapter.Animator == null
-                || !animationAdapter.Animator.isHuman) return;
-            _leftUpperLeg = animationAdapter.Animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg);
-            _rightUpperLeg = animationAdapter.Animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
-            if (_leftUpperLeg != null) _leftLegBase = _leftUpperLeg.localRotation;
-            if (_rightUpperLeg != null) _rightLegBase = _rightUpperLeg.localRotation;
+            CancelCameraTransition();
+            ReleaseCursor();
         }
-
-        private void ApplyLegSwing(float angle)
-        {
-            if (_leftUpperLeg == null || _rightUpperLeg == null) CacheLegBones();
-            if (_leftUpperLeg != null)
-                _leftUpperLeg.localRotation = _leftLegBase * Quaternion.Euler(angle, 0f, 0f);
-            if (_rightUpperLeg != null)
-                _rightUpperLeg.localRotation = _rightLegBase * Quaternion.Euler(-angle, 0f, 0f);
-        }
-
-        private void OnDisable() => ReleaseCursor();
 
         private static void ReleaseCursor()
         {
@@ -490,9 +800,11 @@ namespace Ssalddel.Unity.Presentation.World
             GUI.DrawTexture(new Rect(14f, Screen.height - 62f, 940f, 42f),
                 Texture2D.whiteTexture);
             GUI.color = Color.white;
-            var message = _currentMode == 플레이어시점Mode.FirstPerson
-                ? "1인칭 · WASD/방향키 이동 · Shift 달리기 · 클릭 후 마우스 시선 · F3 3인칭 · F1 전략 화면"
-                : "전술 3인칭 · 좌클릭 유닛 선택 · 우클릭 이동 · WASD 화면 이동 · 휠 확대/축소 · F 재집중 · F2 1인칭 · F1 전략"
+            var message = IsCameraTransitioning
+                ? $"시점 전환 중 · 곡선 이동 {CameraTransitionProgress:P0} · 입력은 전환 완료 후 활성화"
+                : _currentMode == 플레이어시점Mode.FirstPerson
+                ? "1인칭 · WASD/방향키 이동 · Shift 달리기 · 클릭 후 마우스 시선 · F3 농장 경영 · F1 전략 화면"
+                : "전술 3인칭 · 농지 다중 선택/작업 초안 · 좌클릭 유닛 선택 · 우클릭 이동 · WASD 화면 이동 · 휠 확대/축소 · F2 1인칭 · F1 전략"
                     + (_isSelected ? " · 선택됨" : " · 캐릭터를 먼저 선택하세요");
             GUI.Label(new Rect(24f, Screen.height - 54f, 920f, 28f), message);
         }
