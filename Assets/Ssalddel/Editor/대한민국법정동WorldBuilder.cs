@@ -28,6 +28,7 @@ namespace Ssalddel.Unity.Editor
         private const string Farm = "Assets/Synty/PolygonFarm/Prefabs/";
         private const string Town = "Assets/Synty/PolygonTown/Prefabs/";
         private const string City = "Assets/Synty/PolygonCity/Prefabs/";
+        private const string Nature = "Assets/Synty/PolygonNature/Prefabs/";
         private const string Generic = "Assets/Synty/PolygonGeneric/Prefabs/";
         private const string Starter = "Assets/Synty/PolygonStarter/Prefabs/";
         private const string EvidenceRoot =
@@ -56,6 +57,10 @@ namespace Ssalddel.Unity.Editor
             var spatialManifest = 평창군공간PipelineFixture.CreateManifest();
             var renderingProfile = 평창군경관RenderingFixture.Create();
             var playerProfile = 평창군플레이어경관Fixture.Create();
+            var fourPackProfile = 평창4Pack경관Profile.CreateDefault();
+            fourPackProfile.Validate();
+            자연경관CompositionSetBuilder.Build();
+            자연경관EventOverlayBuilder.Build();
             var catalog = EnsureCatalog();
             var roleCharacterCatalog = EnsureRoleCharacterCatalog();
             var root = new GameObject("OfficialRegionProjectionRoot");
@@ -64,6 +69,11 @@ namespace Ssalddel.Unity.Editor
             view.Configure(projection);
 
             var pipelineRoot = Child(root.transform, "SpatialPipeline_EPSG5186_TileAreaSet");
+            var fourPackProfileView = pipelineRoot.gameObject
+                .AddComponent<평창4Pack경관ProfileView>();
+            fourPackProfileView.Configure(fourPackProfile);
+            if (!fourPackProfileView.ValidateWiring())
+                throw new InvalidOperationException("PyeongchangFourPackProfileWiringInvalid");
             var tileLayerRoot = Child(pipelineRoot, "Tiles_L0_8000m_L1_2000m_L2_500m");
             var areaRoot = Child(pipelineRoot, "Areas_Farm_Hub_Town");
             var areaSetRoot = Child(pipelineRoot, "AreaSet_pyeongchang-farm-hub-town-v1");
@@ -1315,11 +1325,11 @@ namespace Ssalddel.Unity.Editor
             var residential = new[] { 법정동LandCoverCodes.Residential };
             var logistics = new[] { 법정동LandCoverCodes.Logistics };
             var corridor = new[] { 법정동LandCoverCodes.Corridor };
-            catalog.Configure("legal-dong-scenic-catalog.v1", new[]
+            catalog.Configure("legal-dong-scenic-catalog.v2", new[]
             {
-                Entry(법정동경관VisualKeys.MountainSoft,"PolygonFarm",Farm+"Generic/SM_Generic_Mountains_Soft_01.prefab",forest,all,30f,30f,0,0),
-                Entry(법정동경관VisualKeys.TreePatch,"PolygonFarm",Farm+"Generic/SM_Generic_Tree_Patch_01.prefab",forest,all,12f,25f,0,0),
-                Entry(법정동경관VisualKeys.Tree,"PolygonFarm",Farm+"Generic/SM_Generic_Tree_01.prefab",forestAndCrop,all,3f,25f,2,2),
+                Entry(법정동경관VisualKeys.MountainSoft,"PolygonNature",Nature+"Terrain/SM_Terrain_Mountain_01.prefab",forest,all,30f,30f,0,0,법정동경관CompositionRoleCodes.Proxy,"nature.mountain",.85f,true),
+                Entry(법정동경관VisualKeys.TreePatch,"PolygonNature",자연경관CompositionSetBuilder.PrefabPath(자연경관SetNames.활엽수림군집,월드CompositionVariantCodes.A),forest,all,12f,25f,0,0,법정동경관CompositionRoleCodes.Cluster,"nature.forest.cluster",.9f,true),
+                Entry(법정동경관VisualKeys.Tree,"PolygonNature",Nature+"Trees/SM_Tree_Round_01.prefab",forestAndCrop,all,3f,25f,2,2,법정동경관CompositionRoleCodes.Detail,"nature.tree.broadleaf",.65f,false),
                 Entry(법정동경관VisualKeys.SoilRows,"PolygonFarm",Farm+"Environments/SM_Env_Dirt_Rows_01.prefab",crop,new[]{법정동WorldRoleCodes.Farm},6f,8f,1,1),
                 Entry(법정동경관VisualKeys.Potato,"PolygonFarm",Farm+"Plants/SM_Prop_Plant_Potato_01_L.prefab",crop,new[]{법정동WorldRoleCodes.Farm},1f,8f,2,2),
                 Entry(법정동경관VisualKeys.Barn,"PolygonFarm",Farm+"Buildings/SM_Bld_Barn_01.prefab",crop,new[]{법정동WorldRoleCodes.Farm},9f,8f,0,1),
@@ -1337,9 +1347,17 @@ namespace Ssalddel.Unity.Editor
                 Entry(법정동경관VisualKeys.CargoBox,"PolygonCity",City+"Props/SM_Prop_CardboardBox_01.prefab",logistics,new[]{법정동WorldRoleCodes.Hub},1f,8f,2,2),
                 Entry(법정동경관VisualKeys.Van,"PolygonCity",City+"Vehicles/SM_Veh_Car_Van_01.prefab",logistics,new[]{법정동WorldRoleCodes.Hub},5f,12f,1,2),
                 Entry(법정동경관VisualKeys.Greenhouse,"PolygonFarm",Farm+"Buildings/SM_Bld_Greenhouse_01.prefab",crop,new[]{법정동WorldRoleCodes.Farm},12f,5f,0,1),
-                Entry(법정동경관VisualKeys.ConiferTree,"PolygonGeneric",Generic+"Environment/SM_Gen_Env_Tree_Pine_01.prefab",forest,all,4f,30f,1,1),
-                Entry(법정동경관VisualKeys.Reeds,"PolygonFarm",Farm+"Environments/SM_Env_Reeds_01.prefab",water,all,3f,5f,1,1),
-                Entry(법정동경관VisualKeys.SmallRocks,"PolygonFarm",Farm+"Generic/SM_Generic_Small_Rocks_01.prefab",bare,all,3f,35f,1,1),
+                Entry(법정동경관VisualKeys.ConiferTree,"PolygonNature",Nature+"Trees/SM_Tree_Pine_01.prefab",forest,all,4f,30f,1,1,법정동경관CompositionRoleCodes.Cluster,"nature.tree.conifer",.75f,true),
+                Entry(법정동경관VisualKeys.Reeds,"PolygonNature",Nature+"Plants/SM_Plant_Reeds_01.prefab",water,all,3f,5f,1,1,법정동경관CompositionRoleCodes.Detail,"nature.water-edge",.6f,false),
+                Entry(법정동경관VisualKeys.SmallRocks,"PolygonNature",Nature+"Rocks/SM_Rock_Cluster_Large_01.prefab",bare,all,3f,35f,1,1,법정동경관CompositionRoleCodes.Cluster,"nature.rock.cluster",.55f,true),
+                Entry(법정동경관VisualKeys.BroadleafTree,"PolygonNature",Nature+"Trees/SM_Tree_Birch_02.prefab",forest,all,4f,30f,1,1,법정동경관CompositionRoleCodes.Cluster,"nature.tree.broadleaf",.8f,true),
+                Entry(법정동경관VisualKeys.MixedTreePatch,"PolygonNature",자연경관CompositionSetBuilder.PrefabPath(자연경관SetNames.혼효림군집,월드CompositionVariantCodes.A),forest,all,8f,30f,0,1,법정동경관CompositionRoleCodes.Cluster,"nature.forest.mixed",.85f,true),
+                Entry(법정동경관VisualKeys.Understory,"PolygonNature",Nature+"Plants/SM_Plant_Undergrowth_01.prefab",forest,all,2f,35f,2,2,법정동경관CompositionRoleCodes.Detail,"nature.understory",.5f,false),
+                Entry(법정동경관VisualKeys.ForestEdge,"PolygonNature",Nature+"Plants/SM_Plant_Bush_Leaves_01.prefab",forestAndCrop,all,2f,30f,2,2,법정동경관CompositionRoleCodes.Connector,"nature.forest-edge",.6f,false),
+                Entry(법정동경관VisualKeys.RockWall,"PolygonNature",Nature+"Rocks/SM_Rock_Wall_01.prefab",bare,all,8f,55f,1,1,법정동경관CompositionRoleCodes.Anchor,"nature.rock-wall",.65f,true),
+                Entry(법정동경관VisualKeys.DistantMountain,"PolygonNature",Nature+"Terrain/SM_MountainSkybox_01.prefab",forest,all,35f,45f,0,0,법정동경관CompositionRoleCodes.Proxy,"nature.mountain.distant",.8f,true),
+                Entry(법정동경관VisualKeys.RiverSurface,"PolygonNature",Nature+"Terrain/SM_River_Plane_01.prefab",water,all,8f,5f,1,1,법정동경관CompositionRoleCodes.Connector,"nature.river",.7f,true),
+                Entry(법정동경관VisualKeys.WindLeavesFx,"PolygonNature",Nature+"FX/FX_Leaves_Green_01.prefab",forest,all,5f,45f,2,2,법정동경관CompositionRoleCodes.Detail,"nature.fx.wind-leaves",.45f,false),
             });
             catalog.Validate();
             EditorUtility.SetDirty(catalog);
@@ -1520,7 +1538,11 @@ namespace Ssalddel.Unity.Editor
 
         private static 법정동경관VisualCatalogEntry Entry(
             string key, string pack, string path, string[] covers, string[] roles,
-            float footprint, float maxSlope, int density, int lod)
+            float footprint, float maxSlope, int density, int lod,
+            string compositionRole = 법정동경관CompositionRoleCodes.Detail,
+            string variantGroup = "",
+            float identityWeight = .5f,
+            bool hlodEligible = false)
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path)
                 ?? throw new InvalidOperationException("LegalDongScenicPrefabMissing:" + path);
@@ -1540,7 +1562,12 @@ namespace Ssalddel.Unity.Editor
                 colliders > 0 ? 법정동경관CollisionPolicyCodes.PrefabCollider
                     : 법정동경관CollisionPolicyCodes.FootprintOnly,
                 triangles, materialSlots, materialSlots, shadowCasters,
-                colliders, animators, lod <= 1, true);
+                colliders, animators, lod <= 1, true,
+                compositionRole,
+                string.IsNullOrWhiteSpace(variantGroup) ? key : variantGroup,
+                법정동경관ReviewStatusCodes.Active,
+                identityWeight,
+                hlodEligible);
             return value;
         }
 

@@ -42,6 +42,17 @@ namespace Ssalddel.Unity.Runtime.World
         public const string Residential = "Residential";
         public const string Logistics = "Logistics";
         public const string Corridor = "Corridor";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            Cropland,
+            Forest,
+            Water,
+            BareGround,
+            Residential,
+            Logistics,
+            Corridor
+        };
     }
 
     public static class 법정동경관VisualKeys
@@ -69,6 +80,14 @@ namespace Ssalddel.Unity.Runtime.World
         public const string ConiferTree = "legal.vegetation.tree.conifer";
         public const string Reeds = "legal.water-edge.reeds";
         public const string SmallRocks = "legal.bare-ground.rocks";
+        public const string BroadleafTree = "legal.vegetation.tree.broadleaf";
+        public const string MixedTreePatch = "legal.vegetation.tree.mixed.patch";
+        public const string Understory = "legal.vegetation.understory";
+        public const string ForestEdge = "legal.vegetation.forest-edge";
+        public const string RockWall = "legal.terrain.rock.wall";
+        public const string DistantMountain = "legal.terrain.mountain.distant";
+        public const string RiverSurface = "legal.water.river.surface";
+        public const string WindLeavesFx = "legal.environment.fx.wind-leaves";
 
         public static readonly string[] All =
         {
@@ -76,6 +95,8 @@ namespace Ssalddel.Unity.Runtime.World
             Farmhouse, Tractor, ProduceStand, RuralRoad, Fence, Windmill,
             WaterTower, TownHouse, LogisticsBuilding, Pallet, CargoBox, Van,
             Greenhouse, ConiferTree, Reeds, SmallRocks,
+            BroadleafTree, MixedTreePatch, Understory, ForestEdge,
+            RockWall, DistantMountain, RiverSurface, WindLeavesFx,
         };
     }
 

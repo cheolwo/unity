@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c31e12b199a2704a8872297a6111852, type: 3}
   m_Name: "\uD3C9\uCC3D\uAD70\uBC95\uC815\uB3D9\uACBD\uAD00VisualCatalog"
   m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uBC95\uC815\uB3D9\uACBD\uAD00VisualCatalog"
-  catalogRevision: legal-dong-scenic-catalog.v1
+  catalogRevision: legal-dong-scenic-catalog.v2
   entries:
   - visualKey: legal.terrain.mountain.soft
-    sourcePack: PolygonFarm
-    prefab: {fileID: 1567135862609104, guid: 4dab4627c54a7ef4c81d2c88d41f977a, type: 3}
+    sourcePack: PolygonNature
+    prefab: {fileID: 1092749142366282, guid: 22084b44ff77aa04b8d3f46ea47f9a17, type: 3}
     allowedLandCoverCodes:
     - Forest
     allowedRegionRoleCodes:
@@ -32,17 +32,22 @@ MonoBehaviour:
     - All
     presentationOnly: 1
     collisionPolicyCode: prefab-collider
-    estimatedTriangles: 280
+    estimatedTriangles: 938
     materialSlotCount: 1
     estimatedDrawCalls: 1
     shadowCasterCount: 1
     colliderCount: 1
-    animatorCount: 0
+    animatorCount: 1
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: proxy
+    variantGroupCode: nature.mountain
+    reviewStatusCode: active
+    regionIdentityWeight: 0.85
+    hlodEligible: 1
   - visualKey: legal.vegetation.tree.patch
-    sourcePack: PolygonFarm
-    prefab: {fileID: 1646437010436114, guid: 94dac7c4e5d8a7e44b2c93a46b8eff6d, type: 3}
+    sourcePack: PolygonNature
+    prefab: {fileID: 7877680040253711632, guid: f6ba731226f0f3d41958d214161c17cf, type: 3}
     allowedLandCoverCodes:
     - Forest
     allowedRegionRoleCodes:
@@ -58,17 +63,22 @@ MonoBehaviour:
     - All
     presentationOnly: 1
     collisionPolicyCode: prefab-collider
-    estimatedTriangles: 452
-    materialSlotCount: 1
-    estimatedDrawCalls: 1
-    shadowCasterCount: 1
-    colliderCount: 1
+    estimatedTriangles: 3334
+    materialSlotCount: 7
+    estimatedDrawCalls: 7
+    shadowCasterCount: 6
+    colliderCount: 3
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: cluster
+    variantGroupCode: nature.forest.cluster
+    reviewStatusCode: active
+    regionIdentityWeight: 0.9
+    hlodEligible: 1
   - visualKey: legal.vegetation.tree
-    sourcePack: PolygonFarm
-    prefab: {fileID: 1710936237239570, guid: 7a49ca0e5bf43fa45b5159d6d6265a09, type: 3}
+    sourcePack: PolygonNature
+    prefab: {fileID: 1646885935188752, guid: dafad5d52cd284f4b8229a896f9a966f, type: 3}
     allowedLandCoverCodes:
     - Forest
     - Cropland
@@ -85,7 +95,7 @@ MonoBehaviour:
     - All
     presentationOnly: 1
     collisionPolicyCode: prefab-collider
-    estimatedTriangles: 598
+    estimatedTriangles: 514
     materialSlotCount: 1
     estimatedDrawCalls: 1
     shadowCasterCount: 1
@@ -93,6 +103,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 0
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: nature.tree.broadleaf
+    reviewStatusCode: active
+    regionIdentityWeight: 0.65
+    hlodEligible: 0
   - visualKey: legal.agriculture.soil.rows
     sourcePack: PolygonFarm
     prefab: {fileID: 1645245720062498, guid: c738b62174ab09f4eb2d7b486398a6ed, type: 3}
@@ -117,6 +132,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.agriculture.soil.rows
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.agriculture.crop.potato
     sourcePack: PolygonFarm
     prefab: {fileID: 1819358590325638, guid: e48b8d820d122d64484926ce5e8f6e8c, type: 3}
@@ -141,6 +161,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 0
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.agriculture.crop.potato
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.agriculture.building.barn
     sourcePack: PolygonFarm
     prefab: {fileID: 1427016662113696, guid: 1135f5bcd489da04cb5f4fcb4355006b, type: 3}
@@ -165,6 +190,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.agriculture.building.barn
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.agriculture.building.silo
     sourcePack: PolygonFarm
     prefab: {fileID: 1957237772272410, guid: ca2a787328680534488b66d6a68eae8d, type: 3}
@@ -189,6 +219,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.agriculture.building.silo
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.rural.building.farmhouse
     sourcePack: PolygonFarm
     prefab: {fileID: 1572243783172642, guid: 72c07751c5ab1274e907d46aa40a3134, type: 3}
@@ -213,6 +248,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.rural.building.farmhouse
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.agriculture.vehicle.tractor
     sourcePack: PolygonFarm
     prefab: {fileID: 1667883723368190, guid: a4d9027086d4d5b40b31d85ce0e979a6, type: 3}
@@ -237,6 +277,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 0
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.agriculture.vehicle.tractor
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.rural.building.produce-stand
     sourcePack: PolygonFarm
     prefab: {fileID: 1504926191794242, guid: 95e645d1addbaad4ab26251fd2bdde4c, type: 3}
@@ -261,6 +306,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.rural.building.produce-stand
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.road.rural
     sourcePack: PolygonFarm
     prefab: {fileID: 1413145884089800, guid: 20f6bd523ebdaf04fa332e6ce565fc03, type: 3}
@@ -287,6 +337,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.road.rural
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.rural.prop.fence
     sourcePack: PolygonFarm
     prefab: {fileID: 1731819059591772, guid: 8157d7b10c2fa75449c20daa36513d38, type: 3}
@@ -311,6 +366,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 0
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.rural.prop.fence
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.rural.prop.windmill
     sourcePack: PolygonFarm
     prefab: {fileID: 1853804450421360, guid: 2c837521d4253d74f844a10fd29446ef, type: 3}
@@ -335,6 +395,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.rural.prop.windmill
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.transition.building.water-tower
     sourcePack: PolygonCity
     prefab: {fileID: 198202, guid: b1c9a178d3040a14aac77ac6bcbcc9bd, type: 3}
@@ -359,6 +424,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.transition.building.water-tower
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.town.building.house
     sourcePack: PolygonTown
     prefab: {fileID: 1922134787388308, guid: 47e0f159436d2f441b0a69d9ee6ac4a8, type: 3}
@@ -383,6 +453,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.town.building.house
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.logistics.building.station
     sourcePack: PolygonCity
     prefab: {fileID: 165620, guid: 8a86432aa20034e49aa63a2c97cee0f2, type: 3}
@@ -407,6 +482,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.logistics.building.station
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.logistics.cargo.pallet
     sourcePack: PolygonCity
     prefab: {fileID: 127504, guid: 21dcc5f62e503f0438b4e490cdd00d44, type: 3}
@@ -431,6 +511,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 0
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.logistics.cargo.pallet
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.logistics.cargo.box
     sourcePack: PolygonCity
     prefab: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
@@ -455,6 +540,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 0
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.logistics.cargo.box
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.logistics.vehicle.van
     sourcePack: PolygonCity
     prefab: {fileID: 130278, guid: 94469aeaca2d49442af381840b70bb6c, type: 3}
@@ -479,6 +569,11 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 0
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.logistics.vehicle.van
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.agriculture.building.greenhouse
     sourcePack: PolygonFarm
     prefab: {fileID: 1595881250035684, guid: d18a58184e042eb4cbffba24a88ad835, type: 3}
@@ -503,9 +598,14 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: legal.agriculture.building.greenhouse
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
   - visualKey: legal.vegetation.tree.conifer
-    sourcePack: PolygonGeneric
-    prefab: {fileID: 6131553767378768855, guid: ae12f1ba847c6f74281e7a9a7b0ac7fd, type: 3}
+    sourcePack: PolygonNature
+    prefab: {fileID: 1182756067964316, guid: fc9f550802bde56499ac8b64cac565f0, type: 3}
     allowedLandCoverCodes:
     - Forest
     allowedRegionRoleCodes:
@@ -521,17 +621,22 @@ MonoBehaviour:
     - All
     presentationOnly: 1
     collisionPolicyCode: prefab-collider
-    estimatedTriangles: 559
-    materialSlotCount: 1
-    estimatedDrawCalls: 1
-    shadowCasterCount: 1
+    estimatedTriangles: 1296
+    materialSlotCount: 4
+    estimatedDrawCalls: 4
+    shadowCasterCount: 2
     colliderCount: 1
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: cluster
+    variantGroupCode: nature.tree.conifer
+    reviewStatusCode: active
+    regionIdentityWeight: 0.75
+    hlodEligible: 1
   - visualKey: legal.water-edge.reeds
-    sourcePack: PolygonFarm
-    prefab: {fileID: 1079482479157098, guid: 02c424bec73aad84caf6289c21e490f0, type: 3}
+    sourcePack: PolygonNature
+    prefab: {fileID: 1285638724306004, guid: e4e174b9656fc7e4282a2041b71ca5a3, type: 3}
     allowedLandCoverCodes:
     - Water
     allowedRegionRoleCodes:
@@ -555,9 +660,14 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: nature.water-edge
+    reviewStatusCode: active
+    regionIdentityWeight: 0.6
+    hlodEligible: 0
   - visualKey: legal.bare-ground.rocks
-    sourcePack: PolygonFarm
-    prefab: {fileID: 1208594209347116, guid: e2237f9c45037b34da96772393062ed0, type: 3}
+    sourcePack: PolygonNature
+    prefab: {fileID: 1334708611183978, guid: d0e76f6d08ce67d48994804f237e67eb, type: 3}
     allowedLandCoverCodes:
     - BareGround
     allowedRegionRoleCodes:
@@ -572,8 +682,195 @@ MonoBehaviour:
     seasonCodes:
     - All
     presentationOnly: 1
+    collisionPolicyCode: prefab-collider
+    estimatedTriangles: 988
+    materialSlotCount: 1
+    estimatedDrawCalls: 1
+    shadowCasterCount: 1
+    colliderCount: 1
+    animatorCount: 0
+    clusterAllowed: 1
+    rotationAllowed: 1
+    compositionRoleCode: cluster
+    variantGroupCode: nature.rock.cluster
+    reviewStatusCode: active
+    regionIdentityWeight: 0.55
+    hlodEligible: 1
+  - visualKey: legal.vegetation.tree.broadleaf
+    sourcePack: PolygonNature
+    prefab: {fileID: 1756402572416146, guid: 1000cad1907db004b8d52ddf62c1ae94, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    footprint: {x: 4, y: 4}
+    placementPadding: 0.32
+    slopeRange: {x: 0, y: 30}
+    densityTier: 1
+    lodGroup: 1
+    seasonCodes:
+    - All
+    presentationOnly: 1
+    collisionPolicyCode: prefab-collider
+    estimatedTriangles: 1872
+    materialSlotCount: 3
+    estimatedDrawCalls: 3
+    shadowCasterCount: 2
+    colliderCount: 1
+    animatorCount: 0
+    clusterAllowed: 1
+    rotationAllowed: 1
+    compositionRoleCode: cluster
+    variantGroupCode: nature.tree.broadleaf
+    reviewStatusCode: active
+    regionIdentityWeight: 0.8
+    hlodEligible: 1
+  - visualKey: legal.vegetation.tree.mixed.patch
+    sourcePack: PolygonNature
+    prefab: {fileID: 5883277498434369173, guid: 2647b1aed019adb488a6f8da78f92432, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    footprint: {x: 8, y: 8}
+    placementPadding: 0.64
+    slopeRange: {x: 0, y: 30}
+    densityTier: 0
+    lodGroup: 1
+    seasonCodes:
+    - All
+    presentationOnly: 1
+    collisionPolicyCode: prefab-collider
+    estimatedTriangles: 3892
+    materialSlotCount: 9
+    estimatedDrawCalls: 9
+    shadowCasterCount: 6
+    colliderCount: 3
+    animatorCount: 0
+    clusterAllowed: 1
+    rotationAllowed: 1
+    compositionRoleCode: cluster
+    variantGroupCode: nature.forest.mixed
+    reviewStatusCode: active
+    regionIdentityWeight: 0.85
+    hlodEligible: 1
+  - visualKey: legal.vegetation.understory
+    sourcePack: PolygonNature
+    prefab: {fileID: 1188032362689352, guid: 4ac1d639b5994b345bdc22dd8e415a06, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    footprint: {x: 2, y: 2}
+    placementPadding: 0.25
+    slopeRange: {x: 0, y: 35}
+    densityTier: 2
+    lodGroup: 2
+    seasonCodes:
+    - All
+    presentationOnly: 1
+    collisionPolicyCode: footprint-only
+    estimatedTriangles: 576
+    materialSlotCount: 2
+    estimatedDrawCalls: 2
+    shadowCasterCount: 2
+    colliderCount: 0
+    animatorCount: 0
+    clusterAllowed: 0
+    rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: nature.understory
+    reviewStatusCode: active
+    regionIdentityWeight: 0.5
+    hlodEligible: 0
+  - visualKey: legal.vegetation.forest-edge
+    sourcePack: PolygonNature
+    prefab: {fileID: 1937847600842644, guid: 47d0da1ba5336ef4bb50355db2307fe0, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    footprint: {x: 2, y: 2}
+    placementPadding: 0.25
+    slopeRange: {x: 0, y: 30}
+    densityTier: 2
+    lodGroup: 2
+    seasonCodes:
+    - All
+    presentationOnly: 1
     collisionPolicyCode: footprint-only
     estimatedTriangles: 180
+    materialSlotCount: 2
+    estimatedDrawCalls: 2
+    shadowCasterCount: 2
+    colliderCount: 0
+    animatorCount: 0
+    clusterAllowed: 0
+    rotationAllowed: 1
+    compositionRoleCode: connector
+    variantGroupCode: nature.forest-edge
+    reviewStatusCode: active
+    regionIdentityWeight: 0.6
+    hlodEligible: 0
+  - visualKey: legal.terrain.rock.wall
+    sourcePack: PolygonNature
+    prefab: {fileID: 1269826234957420, guid: f783106e0df273c46808529caaed5e8e, type: 3}
+    allowedLandCoverCodes:
+    - BareGround
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    footprint: {x: 8, y: 8}
+    placementPadding: 0.64
+    slopeRange: {x: 0, y: 55}
+    densityTier: 1
+    lodGroup: 1
+    seasonCodes:
+    - All
+    presentationOnly: 1
+    collisionPolicyCode: prefab-collider
+    estimatedTriangles: 948
+    materialSlotCount: 1
+    estimatedDrawCalls: 1
+    shadowCasterCount: 1
+    colliderCount: 1
+    animatorCount: 1
+    clusterAllowed: 1
+    rotationAllowed: 1
+    compositionRoleCode: anchor
+    variantGroupCode: nature.rock-wall
+    reviewStatusCode: active
+    regionIdentityWeight: 0.65
+    hlodEligible: 1
+  - visualKey: legal.terrain.mountain.distant
+    sourcePack: PolygonNature
+    prefab: {fileID: 1976735639839414, guid: 14f4f60387c6fb64f954511f05df977f, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    footprint: {x: 35, y: 35}
+    placementPadding: 2.8
+    slopeRange: {x: 0, y: 45}
+    densityTier: 0
+    lodGroup: 0
+    seasonCodes:
+    - All
+    presentationOnly: 1
+    collisionPolicyCode: footprint-only
+    estimatedTriangles: 552
     materialSlotCount: 1
     estimatedDrawCalls: 1
     shadowCasterCount: 1
@@ -581,3 +878,70 @@ MonoBehaviour:
     animatorCount: 0
     clusterAllowed: 1
     rotationAllowed: 1
+    compositionRoleCode: proxy
+    variantGroupCode: nature.mountain.distant
+    reviewStatusCode: active
+    regionIdentityWeight: 0.8
+    hlodEligible: 1
+  - visualKey: legal.water.river.surface
+    sourcePack: PolygonNature
+    prefab: {fileID: 1806251082521260, guid: 8f6e03115ed50b943980d68d9115f1bd, type: 3}
+    allowedLandCoverCodes:
+    - Water
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    footprint: {x: 8, y: 8}
+    placementPadding: 0.64
+    slopeRange: {x: 0, y: 5}
+    densityTier: 1
+    lodGroup: 1
+    seasonCodes:
+    - All
+    presentationOnly: 1
+    collisionPolicyCode: footprint-only
+    estimatedTriangles: 2
+    materialSlotCount: 1
+    estimatedDrawCalls: 1
+    shadowCasterCount: 1
+    colliderCount: 0
+    animatorCount: 0
+    clusterAllowed: 1
+    rotationAllowed: 1
+    compositionRoleCode: connector
+    variantGroupCode: nature.river
+    reviewStatusCode: active
+    regionIdentityWeight: 0.7
+    hlodEligible: 1
+  - visualKey: legal.environment.fx.wind-leaves
+    sourcePack: PolygonNature
+    prefab: {fileID: 1809113622707476, guid: 1b09a7fc50f421946b2eda7e5f09e698, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    footprint: {x: 5, y: 5}
+    placementPadding: 0.39999998
+    slopeRange: {x: 0, y: 45}
+    densityTier: 2
+    lodGroup: 2
+    seasonCodes:
+    - All
+    presentationOnly: 1
+    collisionPolicyCode: footprint-only
+    estimatedTriangles: 0
+    materialSlotCount: 2
+    estimatedDrawCalls: 2
+    shadowCasterCount: 0
+    colliderCount: 0
+    animatorCount: 0
+    clusterAllowed: 0
+    rotationAllowed: 1
+    compositionRoleCode: detail
+    variantGroupCode: nature.fx.wind-leaves
+    reviewStatusCode: active
+    regionIdentityWeight: 0.45
+    hlodEligible: 0

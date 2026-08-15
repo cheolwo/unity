@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54f65a2dca2a48c9aaf08b685eb3d6df, type: 3}
+  m_Name: "\uD3C9\uCC3D\uAD70\uC790\uC5F0\uACBD\uAD00EventOverlayCatalog"
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC790\uC5F0\uACBD\uAD00EventOverlayCatalog"
+  entries:
+  - presentationKey: survival.seasonal-defense.warning
+    overlayName: "\uACC4\uC808 \uBC29\uC5B4 \uC804\uC870"
+    prefab: {fileID: 4336350635070833530, guid: 0fadde97e2cb5e841a6963b123e11286, type: 3}
+    moodCode: survival-event
+    natureRoleCode: event-only
+    presentationOnly: 1
+  - presentationKey: survival.zombie-warning
+    overlayName: "\uB2AA \uC704\uD611 \uC804\uC870"
+    prefab: {fileID: 1334483235415159134, guid: 18f3451d37650ee4aa9df99ff90947bb, type: 3}
+    moodCode: survival-event
+    natureRoleCode: event-only
+    presentationOnly: 1
+  - presentationKey: survival.raider-approach
+    overlayName: "\uD3D0\uD5C8 \uC811\uADFC \uD754\uC801"
+    prefab: {fileID: 3493864271731821358, guid: 62f9d44f20bb7014f87b29fdf227b94b, type: 3}
+    moodCode: survival-event
+    natureRoleCode: event-only
+    presentationOnly: 1
+  - presentationKey: survival.damage-assessment
+    overlayName: "\uD53C\uD574 \uD604\uC7A5"
+    prefab: {fileID: 1516713236071591333, guid: b196ae7a1209f564889c2a4d7f3786b3, type: 3}
+    moodCode: survival-event
+    natureRoleCode: event-only
+    presentationOnly: 1
+  - presentationKey: survival.tactical.squad.zombie-pressure
+    overlayName: "\uB3D9\uAD74 \uC555\uB825 \uC804\uC870"
+    prefab: {fileID: 8209172616418555119, guid: df0b9acc3bc29a84685d00fd8cb5c180, type: 3}
+    moodCode: survival-event
+    natureRoleCode: event-only
+    presentationOnly: 1

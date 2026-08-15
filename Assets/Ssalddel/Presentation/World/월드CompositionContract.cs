@@ -8,6 +8,7 @@ namespace Ssalddel.Unity.Presentation.World
 {
     public static class 월드CompositionPackCodes
     {
+        public const string Nature = "nature";
         public const string Farm = "farm";
         public const string Town = "town";
         public const string City = "city";
@@ -16,6 +17,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         public static IReadOnlyList<string> All { get; } = new[]
         {
+            Nature,
             Farm,
             Town,
             City,

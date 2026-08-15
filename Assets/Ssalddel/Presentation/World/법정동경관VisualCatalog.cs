@@ -13,6 +13,33 @@ namespace Ssalddel.Unity.Presentation.World
         public const string PrefabCollider = "prefab-collider";
     }
 
+    public static class 법정동경관CompositionRoleCodes
+    {
+        public const string Anchor = "anchor";
+        public const string Cluster = "cluster";
+        public const string Connector = "connector";
+        public const string Detail = "detail";
+        public const string Proxy = "proxy";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            Anchor, Cluster, Connector, Detail, Proxy,
+        };
+    }
+
+    public static class 법정동경관ReviewStatusCodes
+    {
+        public const string Indexed = "indexed";
+        public const string Reviewed = "reviewed";
+        public const string Approved = "approved";
+        public const string Active = "active";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            Indexed, Reviewed, Approved, Active,
+        };
+    }
+
     [Serializable]
     public sealed class 법정동경관VisualCatalogEntry
     {
@@ -38,6 +65,13 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private int animatorCount;
         [SerializeField] private bool clusterAllowed;
         [SerializeField] private bool rotationAllowed = true;
+        [SerializeField] private string compositionRoleCode =
+            법정동경관CompositionRoleCodes.Detail;
+        [SerializeField] private string variantGroupCode = string.Empty;
+        [SerializeField] private string reviewStatusCode =
+            법정동경관ReviewStatusCodes.Active;
+        [SerializeField] private float regionIdentityWeight = .5f;
+        [SerializeField] private bool hlodEligible;
 
         public string VisualKey => visualKey;
         public string SourcePack => sourcePack;
@@ -60,6 +94,11 @@ namespace Ssalddel.Unity.Presentation.World
         public int AnimatorCount => animatorCount;
         public bool ClusterAllowed => clusterAllowed;
         public bool RotationAllowed => rotationAllowed;
+        public string CompositionRoleCode => compositionRoleCode;
+        public string VariantGroupCode => variantGroupCode;
+        public string ReviewStatusCode => reviewStatusCode;
+        public float RegionIdentityWeight => regionIdentityWeight;
+        public bool HlodEligible => hlodEligible;
 
         public void Configure(
             string key, string pack, GameObject sourcePrefab,
@@ -68,6 +107,22 @@ namespace Ssalddel.Unity.Presentation.World
             float padding, string collisionPolicy, long triangles,
             int materials, int drawCalls, int shadowCasters,
             int colliders, int animators, bool canCluster, bool canRotate)
+            => Configure(
+                key, pack, sourcePrefab, landCovers, roles, size, slopes,
+                density, lod, seasons, padding, collisionPolicy, triangles,
+                materials, drawCalls, shadowCasters, colliders, animators,
+                canCluster, canRotate, 법정동경관CompositionRoleCodes.Detail,
+                key, 법정동경관ReviewStatusCodes.Active, .5f, false);
+
+        public void Configure(
+            string key, string pack, GameObject sourcePrefab,
+            string[] landCovers, string[] roles, Vector2 size,
+            Vector2 slopes, int density, int lod, string[] seasons,
+            float padding, string collisionPolicy, long triangles,
+            int materials, int drawCalls, int shadowCasters,
+            int colliders, int animators, bool canCluster, bool canRotate,
+            string compositionRole, string variantGroup, string reviewStatus,
+            float identityWeight, bool canBuildHlod)
         {
             visualKey = key;
             sourcePack = pack;
@@ -90,6 +145,11 @@ namespace Ssalddel.Unity.Presentation.World
             animatorCount = animators;
             clusterAllowed = canCluster;
             rotationAllowed = canRotate;
+            compositionRoleCode = compositionRole ?? string.Empty;
+            variantGroupCode = variantGroup ?? string.Empty;
+            reviewStatusCode = reviewStatus ?? string.Empty;
+            regionIdentityWeight = identityWeight;
+            hlodEligible = canBuildHlod;
         }
 
         public bool Validate()
@@ -106,7 +166,13 @@ namespace Ssalddel.Unity.Presentation.World
                     || collisionPolicyCode == 법정동경관CollisionPolicyCodes.PrefabCollider)
                 && estimatedTriangles >= 0 && materialSlotCount >= 0
                 && estimatedDrawCalls >= 0 && shadowCasterCount >= 0
-                && colliderCount >= 0 && animatorCount >= 0;
+                && colliderCount >= 0 && animatorCount >= 0
+                && 법정동경관CompositionRoleCodes.All.Contains(
+                    compositionRoleCode, StringComparer.Ordinal)
+                && !string.IsNullOrWhiteSpace(variantGroupCode)
+                && 법정동경관ReviewStatusCodes.All.Contains(
+                    reviewStatusCode, StringComparer.Ordinal)
+                && regionIdentityWeight is >= 0f and <= 1f;
     }
 
     [CreateAssetMenu(menuName = "Ssalddel/Presentation/법정동 경관 Visual Catalog")]
