@@ -17,6 +17,8 @@ namespace Ssalddel.Unity.Editor
         public const string ScenePath = "Assets/Ssalddel/Scenes/SimulationWorldShell.unity";
         public const string CatalogPath =
             "Assets/Ssalddel/Presentation/World/Catalogs/평창군법정동경관VisualCatalog.asset";
+        public const string RoleCharacterCatalogPath =
+            "Assets/Ssalddel/Presentation/World/Catalogs/평창군역할CharacterVisualCatalog.asset";
         private const string GeneratedRoot =
             "Assets/Ssalddel/Presentation/World/Generated/평창군법정동World";
         private const string VolumeProfilePath =
@@ -27,8 +29,7 @@ namespace Ssalddel.Unity.Editor
         private const string Town = "Assets/Synty/PolygonTown/Prefabs/";
         private const string City = "Assets/Synty/PolygonCity/Prefabs/";
         private const string Generic = "Assets/Synty/PolygonGeneric/Prefabs/";
-        private const string FarmPlayerPrefabPath =
-            "Assets/Synty/PolygonFarm/Prefabs/Characters/SM_Chr_Farmer_Male_01.prefab";
+        private const string Starter = "Assets/Synty/PolygonStarter/Prefabs/";
         private const string EvidenceRoot =
             "Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion";
 
@@ -56,6 +57,7 @@ namespace Ssalddel.Unity.Editor
             var renderingProfile = 평창군경관RenderingFixture.Create();
             var playerProfile = 평창군플레이어경관Fixture.Create();
             var catalog = EnsureCatalog();
+            var roleCharacterCatalog = EnsureRoleCharacterCatalog();
             var root = new GameObject("OfficialRegionProjectionRoot");
             root.transform.SetParent(worldMap.transform, false);
             var view = root.AddComponent<법정동WorldProjectionView>();
@@ -116,7 +118,8 @@ namespace Ssalddel.Unity.Editor
             BuildTitle(debugLayer, projection, scenicPlan);
             BuildSimulationVan(pipelineRoot, catalog);
             BuildEvidenceCameras(pipelineRoot);
-            BuildPlayerExplorer(pipelineRoot, playerProfile);
+            BuildRoleNpcGroup(pipelineRoot, roleCharacterCatalog);
+            BuildPlayerExplorer(pipelineRoot, playerProfile, roleCharacterCatalog);
             BuildGraphicsQualityPipeline(pipelineRoot, renderingProfile);
             var pipelineView = pipelineRoot.gameObject.AddComponent<공간WorldPipelineView>();
             pipelineView.Configure(spatialRecipe, compositionProfile, spatialManifest,
@@ -782,10 +785,217 @@ namespace Ssalddel.Unity.Editor
             firstPerson.gameObject.AddComponent<일인칭경관CameraController>();
         }
 
-        private static void BuildPlayerExplorer(
-            Transform parent, 플레이어경관Profile profile)
+        private static void BuildRoleNpcGroup(
+            Transform parent,
+            역할CharacterVisualCatalog catalog)
         {
-            if (!profile.Validate())
+            catalog.Validate();
+            var layer = Child(parent, "L6_역할Character_FarmHubTown_PresentationOnly");
+
+            BuildRoleNpc(layer, catalog,
+                "actor:sim:pyeongchang:farm:shipper-01", "화주",
+                "화주", WorldActorWorkflowContextCodes.FreightDelivery,
+                WorldActorRoleCodes.Shipper,
+                WorldActorAppearanceFamilyCodes.AdultB,
+                법정동WorldRoleCodes.Farm, 21.2f, 7.1f, 205f);
+
+            BuildRoleNpc(layer, catalog,
+                평창진부HubNpc업무행동Fixture.ManagerActorStableId, "Hub 관리자",
+                "창고관리자", WorldActorWorkflowContextCodes.Warehouse,
+                WorldActorRoleCodes.WarehouseOperator,
+                WorldActorAppearanceFamilyCodes.AdultB,
+                법정동WorldRoleCodes.Hub, 10.1f, 6.1f, 25f);
+            BuildRoleNpc(layer, catalog,
+                평창진부HubNpc업무행동Fixture.InboundOperatorActorStableId, "입고 검수 담당",
+                "창고관리자", WorldActorWorkflowContextCodes.Warehouse,
+                WorldActorRoleCodes.WarehouseOperator,
+                WorldActorAppearanceFamilyCodes.AdultA,
+                법정동WorldRoleCodes.Hub, 9.2f, 5.1f, 30f);
+            BuildRoleNpc(layer, catalog,
+                평창진부HubNpc업무행동Fixture.AssistantActorStableId, "물류 보조",
+                "창고관리자", WorldActorWorkflowContextCodes.Warehouse,
+                WorldActorRoleCodes.WarehouseOperator,
+                WorldActorAppearanceFamilyCodes.AdultA,
+                법정동WorldRoleCodes.Hub, 10.7f, 4.6f, 20f);
+            BuildRoleNpc(layer, catalog,
+                "actor:sim:pyeongchang:hub:transport-operator-01", "운송 운영자",
+                "보세운송사", WorldActorWorkflowContextCodes.FreightDelivery,
+                WorldActorRoleCodes.TransportOperator,
+                WorldActorAppearanceFamilyCodes.AdultB,
+                법정동WorldRoleCodes.Hub, 6.8f, 5.3f, 15f);
+            BuildRoleNpc(layer, catalog,
+                "actor:sim:pyeongchang:hub:freight-driver-01", "화물 배달 기사",
+                "용달기사", WorldActorWorkflowContextCodes.FreightDelivery,
+                WorldActorRoleCodes.FreightDeliveryDriver,
+                WorldActorAppearanceFamilyCodes.AdultA,
+                법정동WorldRoleCodes.Hub, 8.0f, 3.5f, 40f);
+
+            BuildRoleNpc(layer, catalog,
+                "actor:sim:pyeongchang:town:seller-01", "판매자",
+                "판매자", WorldActorWorkflowContextCodes.MarketOrder,
+                WorldActorRoleCodes.Seller,
+                WorldActorAppearanceFamilyCodes.AdultB,
+                법정동WorldRoleCodes.Town, -12.4f, -13.2f, 195f);
+            BuildRoleNpc(layer, catalog,
+                "actor:sim:pyeongchang:town:orderer-01", "주문자",
+                "orderer", WorldActorWorkflowContextCodes.MarketOrder,
+                WorldActorRoleCodes.Orderer,
+                WorldActorAppearanceFamilyCodes.AdultA,
+                법정동WorldRoleCodes.Town, -15.1f, -15.5f, 25f);
+            BuildRoleNpc(layer, catalog,
+                "actor:sim:pyeongchang:town:food-driver-01", "음식 배달 기사",
+                "배달기사", WorldActorWorkflowContextCodes.FoodDelivery,
+                WorldActorRoleCodes.FoodDeliveryDriver,
+                WorldActorAppearanceFamilyCodes.AdultB,
+                법정동WorldRoleCodes.Town, -9.7f, -12.1f, 210f);
+            BuildNpcWorkActionPresentation(layer);
+        }
+
+        private static void BuildNpcWorkActionPresentation(Transform layer)
+        {
+            var interactionPoint = Child(layer, "상호작용지점_진부Hub_입고검수");
+            const float x = 9.6f;
+            const float z = 5.7f;
+            interactionPoint.position = new Vector3(x, ScenarioHeight(x, z) + .06f, z);
+
+            var actorIds = new[]
+            {
+                평창진부HubNpc업무행동Fixture.ManagerActorStableId,
+                평창진부HubNpc업무행동Fixture.InboundOperatorActorStableId,
+                평창진부HubNpc업무행동Fixture.AssistantActorStableId,
+            };
+            var actorViews = UnityEngine.Object.FindObjectsByType<역할CharacterVisualInstanceView>(
+                    FindObjectsInactive.Include,
+                    FindObjectsSortMode.None)
+                .Where(value => actorIds.Contains(
+                    value.AppearanceProfile.ActorStableId,
+                    StringComparer.Ordinal))
+                .OrderBy(value => value.AppearanceProfile.ActorStableId, StringComparer.Ordinal)
+                .ToArray();
+            if (actorViews.Length != actorIds.Length)
+                throw new InvalidOperationException("NpcWorkActionActorViewsMissing");
+
+            var workViews = actorViews.Select(actorView =>
+            {
+                var adapter = actorView.GetComponent<공용AnimationAdapter>()
+                    ?? throw new InvalidOperationException("NpcWorkActionAnimationAdapterMissing");
+                var workView = actorView.gameObject.AddComponent<Npc업무행동View>();
+                workView.Configure(
+                    actorView.AppearanceProfile.ActorStableId,
+                    평창진부HubNpc업무행동Fixture.InteractionPointKey,
+                    interactionPoint,
+                    adapter);
+                return workView;
+            }).ToArray();
+            var presenter = layer.gameObject.AddComponent<Npc업무행동Presenter>();
+            presenter.Configure(
+                workViews,
+                new[] { 평창진부HubNpc업무행동Fixture.Create() });
+            if (!presenter.ValidateWiring())
+                throw new InvalidOperationException("NpcWorkActionPresenterWiringInvalid");
+        }
+
+        private static void BuildRoleNpc(
+            Transform parent,
+            역할CharacterVisualCatalog catalog,
+            string actorStableId,
+            string koreanRoleName,
+            string sourceRoleCode,
+            string workflowContextCode,
+            string actorRoleCode,
+            string appearanceFamilyCode,
+            string areaRoleCode,
+            float x,
+            float z,
+            float rotationY)
+        {
+            var appearance = Appearance(
+                actorStableId, appearanceFamilyCode, explicitlySelected: false);
+            var assignment = WorldCharacterAssignmentPolicy.Assign(
+                appearance,
+                actorRoleCode,
+                catalog.CatalogRevision,
+                catalog.AssignmentCandidates());
+            var entry = catalog.Resolve(assignment.VisualKey);
+            if (!entry.AllowedAreaRoleCodes.Contains(areaRoleCode))
+                throw new InvalidOperationException(
+                    "RoleCharacterAreaNotAllowed:" + actorRoleCode);
+
+            var actor = Child(parent, "역할Actor_" + koreanRoleName);
+            actor.position = new Vector3(x, ScenarioHeight(x, z) + .06f, z);
+            actor.rotation = Quaternion.Euler(0f, rotationY, 0f);
+            var visualRoot = Child(actor, "VisualRoot_역할Character");
+            var visual = PrefabUtility.InstantiatePrefab(
+                    entry.Prefab, visualRoot) as GameObject
+                ?? throw new InvalidOperationException(
+                    "RoleCharacterPrefabInstantiateFailed:" + assignment.VisualKey);
+            visual.name = "SyntyRoleCharacterVisual_" + koreanRoleName;
+            visual.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            var animator = visual.GetComponentInChildren<Animator>(true)
+                ?? throw new InvalidOperationException(
+                    "RoleCharacterAnimatorMissing:" + assignment.VisualKey);
+            animator.runtimeAnimatorController = null;
+
+            var animationEntry = new 공용AnimationCatalogEntry();
+            animationEntry.Configure(
+                entry.AnimationPackCode,
+                actorRoleCode,
+                "locomotion.idle.v1",
+                "locomotion.walk.v1",
+                공용AnimationSourceKindCodes.ProceduralFallback,
+                "humanoid.procedural-locomotion.v1",
+                entry.Prefab,
+                null,
+                null);
+            var animationAdapter = actor.gameObject.AddComponent<공용AnimationAdapter>();
+            animationAdapter.Configure(animationEntry, animator);
+            var instanceView = actor.gameObject.AddComponent<역할CharacterVisualInstanceView>();
+            instanceView.Configure(
+                appearance,
+                assignment,
+                areaRoleCode,
+                catalog,
+                visualRoot,
+                visual);
+            if (!animationAdapter.ValidateWiring() || !instanceView.ValidateWiring())
+                throw new InvalidOperationException(
+                    "RoleCharacterNpcWiringInvalid:" + actorRoleCode);
+            var switcher = actor.gameObject.AddComponent<역할CharacterVisualSwitcher>();
+            switcher.ConfigureExisting(
+                appearance,
+                sourceRoleCode,
+                workflowContextCode,
+                areaRoleCode,
+                catalog,
+                visualRoot,
+                visual,
+                animationAdapter,
+                instanceView);
+
+            var evidenceLabel = Child(actor, "역할표식_검증전용");
+            Label(evidenceLabel, "역할명", koreanRoleName,
+                new Vector3(0f, 2.25f, 0f), Color.white, .05f);
+            evidenceLabel.gameObject.SetActive(false);
+        }
+
+        private static WorldActorAppearanceProfile Appearance(
+            string actorStableId,
+            string familyCode,
+            bool explicitlySelected)
+            => new()
+            {
+                ActorStableId = actorStableId,
+                SelectedAppearanceFamilyCode = familyCode,
+                ExplicitlySelected = explicitlySelected,
+                PresentationOnly = true,
+            };
+
+        private static void BuildPlayerExplorer(
+            Transform parent,
+            플레이어경관Profile profile,
+            역할CharacterVisualCatalog roleCharacterCatalog)
+        {
+            if (!profile.Validate() || roleCharacterCatalog == null)
                 throw new InvalidOperationException("FarmPlayerProfileInvalid");
             var layer = Child(parent, "L10_플레이어경관탐색_PresentationOnly");
             var player = Child(layer, "LegalWorldFarmPlayer");
@@ -793,29 +1003,59 @@ namespace Ssalddel.Unity.Editor
                 18.5f, ScenarioHeight(18.5f, 5.8f) + .06f, 5.8f);
             player.gameObject.AddComponent<CharacterController>();
 
-            var visualRoot = Child(player, "VisualRoot_SyntyFarmer");
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(FarmPlayerPrefabPath)
-                ?? throw new InvalidOperationException(
-                    "FarmPlayerPrefabMissing:" + FarmPlayerPrefabPath);
-            var visual = PrefabUtility.InstantiatePrefab(prefab, visualRoot) as GameObject
+            var appearance = Appearance(
+                "actor:sim:pyeongchang:farm:farmer-player-01",
+                WorldActorAppearanceFamilyCodes.AdultA,
+                explicitlySelected: false);
+            var assignment = WorldCharacterAssignmentPolicy.Assign(
+                appearance,
+                WorldActorRoleCodes.FarmerProducer,
+                roleCharacterCatalog.CatalogRevision,
+                roleCharacterCatalog.AssignmentCandidates());
+            var roleEntry = roleCharacterCatalog.Resolve(assignment.VisualKey);
+            var visualRoot = Child(player, "VisualRoot_역할Character");
+            var visual = PrefabUtility.InstantiatePrefab(
+                    roleEntry.Prefab, visualRoot) as GameObject
                 ?? throw new InvalidOperationException("FarmPlayerPrefabInstantiateFailed");
-            visual.name = "SyntyFarmPlayerVisual";
+            visual.name = "SyntyRoleCharacterVisual_농부플레이어";
             visual.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             var animator = visual.GetComponentInChildren<Animator>(true)
                 ?? throw new InvalidOperationException("FarmPlayerAnimatorMissing");
+            animator.runtimeAnimatorController = null;
             var animationEntry = new 공용AnimationCatalogEntry();
             animationEntry.Configure(
-                월드CompositionPackCodes.Farm,
-                "farm.actor.player",
+                roleEntry.AnimationPackCode,
+                assignment.ActorRoleCode,
                 "locomotion.idle.v1",
                 "locomotion.walk.v1",
                 공용AnimationSourceKindCodes.ProceduralFallback,
                 "humanoid.procedural-locomotion.v1",
-                prefab,
+                roleEntry.Prefab,
                 null,
                 null);
             var animationAdapter = player.gameObject.AddComponent<공용AnimationAdapter>();
             animationAdapter.Configure(animationEntry, animator);
+            var instanceView = player.gameObject.AddComponent<역할CharacterVisualInstanceView>();
+            instanceView.Configure(
+                appearance,
+                assignment,
+                법정동WorldRoleCodes.Farm,
+                roleCharacterCatalog,
+                visualRoot,
+                visual);
+            if (!instanceView.ValidateWiring())
+                throw new InvalidOperationException("FarmPlayerRoleCharacterWiringInvalid");
+            var roleSwitcher = player.gameObject.AddComponent<역할CharacterVisualSwitcher>();
+            roleSwitcher.ConfigureExisting(
+                appearance,
+                "농부",
+                WorldActorWorkflowContextCodes.Farm,
+                법정동WorldRoleCodes.Farm,
+                roleCharacterCatalog,
+                visualRoot,
+                visual,
+                animationAdapter,
+                instanceView);
 
             var firstPersonPivot = Child(player, "FirstPersonPivot");
             firstPersonPivot.localPosition = Vector3.up * profile.FirstPersonEyeHeight;
@@ -1104,6 +1344,178 @@ namespace Ssalddel.Unity.Editor
             catalog.Validate();
             EditorUtility.SetDirty(catalog);
             return catalog;
+        }
+
+        private static 역할CharacterVisualCatalog EnsureRoleCharacterCatalog()
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(RoleCharacterCatalogPath)!);
+            var catalog = AssetDatabase.LoadAssetAtPath<역할CharacterVisualCatalog>(
+                RoleCharacterCatalogPath);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<역할CharacterVisualCatalog>();
+                AssetDatabase.CreateAsset(catalog, RoleCharacterCatalogPath);
+            }
+
+            var farmArea = new[] { 법정동WorldRoleCodes.Farm };
+            var hubArea = new[] { 법정동WorldRoleCodes.Hub };
+            var townArea = new[] { 법정동WorldRoleCodes.Town };
+            var allAreas = new[]
+            {
+                법정동WorldRoleCodes.Farm,
+                법정동WorldRoleCodes.Hub,
+                법정동WorldRoleCodes.Town,
+            };
+            var adultA = new[] { WorldActorAppearanceFamilyCodes.AdultA };
+            var adultB = new[] { WorldActorAppearanceFamilyCodes.AdultB };
+            var seniorA = new[] { WorldActorAppearanceFamilyCodes.AdultSeniorA };
+            var allFamilies = WorldActorAppearanceFamilyCodes.All.ToArray();
+            var farmer = new[] { WorldActorRoleCodes.FarmerProducer };
+            var business = new[]
+            {
+                WorldActorRoleCodes.Shipper,
+                WorldActorRoleCodes.TransportOperator,
+                WorldActorRoleCodes.WarehouseOperator,
+                WorldActorRoleCodes.Seller,
+            };
+            var logistics = new[]
+            {
+                WorldActorRoleCodes.WarehouseOperator,
+                WorldActorRoleCodes.FreightDeliveryDriver,
+            };
+            var community = new[]
+            {
+                WorldActorRoleCodes.FreightDeliveryDriver,
+                WorldActorRoleCodes.FoodDeliveryDriver,
+                WorldActorRoleCodes.Orderer,
+            };
+            var resident = new[]
+            {
+                WorldActorRoleCodes.Orderer,
+                WorldActorRoleCodes.FoodDeliveryDriver,
+            };
+            var seller = new[] { WorldActorRoleCodes.Seller };
+
+            catalog.Configure("role-character-catalog.pyeongchang.v1", new[]
+            {
+                RoleEntry(WorldCharacterVisualKeys.FarmWorkerA, "PolygonFarm",
+                    월드CompositionPackCodes.Farm,
+                    Farm + "Characters/SM_Chr_Farmer_Male_01.prefab",
+                    farmer, adultA, farmArea, 4),
+                RoleEntry(WorldCharacterVisualKeys.FarmWorkerB, "PolygonFarm",
+                    월드CompositionPackCodes.Farm,
+                    Farm + "Characters/SM_Chr_Farmer_Female_01.prefab",
+                    farmer, adultB, farmArea, 4),
+                RoleEntry(WorldCharacterVisualKeys.FarmWorkerSeniorA, "PolygonFarm",
+                    월드CompositionPackCodes.Farm,
+                    Farm + "Characters/SM_Chr_Farmer_Male_Old_01.prefab",
+                    farmer, seniorA, farmArea, 2),
+
+                RoleEntry(WorldCharacterVisualKeys.BusinessOperatorA, "PolygonCity",
+                    월드CompositionPackCodes.City,
+                    City + "Characters/Character_BusinessMan_Shirt.prefab",
+                    business, adultA, allAreas, 4),
+                RoleEntry(WorldCharacterVisualKeys.BusinessOperatorB, "PolygonCity",
+                    월드CompositionPackCodes.City,
+                    City + "Characters/Character_BusinessMan_Suit.prefab",
+                    business, adultA, allAreas, 2),
+                RoleEntry(WorldCharacterVisualKeys.BusinessOperatorC, "PolygonCity",
+                    월드CompositionPackCodes.City,
+                    City + "Characters/Character_BusinessWoman.prefab",
+                    business, adultB, allAreas, 4),
+
+                RoleEntry(WorldCharacterVisualKeys.LogisticsWorkerA, "PolygonGeneric",
+                    월드CompositionPackCodes.RegionalLogisticsHub,
+                    Generic + "Characters/SM_Gen_Chr_Jumpsuit_Male_01.prefab",
+                    logistics, adultA, hubArea, 4),
+                RoleEntry(WorldCharacterVisualKeys.LogisticsWorkerB, "PolygonGeneric",
+                    월드CompositionPackCodes.RegionalLogisticsHub,
+                    Generic + "Characters/SM_Gen_Chr_Jumpsuit_Female_01.prefab",
+                    logistics, adultB, hubArea, 4),
+
+                RoleEntry(WorldCharacterVisualKeys.CommunityCitizenA, "PolygonGeneric",
+                    월드CompositionPackCodes.Mixed,
+                    Generic + "Characters/SM_Gen_Chr_Street_Male_01.prefab",
+                    community, adultA, new[] { 법정동WorldRoleCodes.Hub, 법정동WorldRoleCodes.Town }, 3),
+                RoleEntry(WorldCharacterVisualKeys.CommunityCitizenB, "PolygonGeneric",
+                    월드CompositionPackCodes.Mixed,
+                    Generic + "Characters/SM_Gen_Chr_Street_Female_01.prefab",
+                    community, adultB, new[] { 법정동WorldRoleCodes.Hub, 법정동WorldRoleCodes.Town }, 3),
+                RoleEntry(WorldCharacterVisualKeys.CommunityCitizenC, "PolygonGeneric",
+                    월드CompositionPackCodes.Mixed,
+                    Generic + "Characters/SM_Gen_Chr_Street_Male_02.prefab",
+                    community, adultA, new[] { 법정동WorldRoleCodes.Hub, 법정동WorldRoleCodes.Town }, 2),
+                RoleEntry(WorldCharacterVisualKeys.CommunityCitizenD, "PolygonGeneric",
+                    월드CompositionPackCodes.Mixed,
+                    Generic + "Characters/SM_Gen_Chr_Street_Female_02.prefab",
+                    community, adultB, new[] { 법정동WorldRoleCodes.Hub, 법정동WorldRoleCodes.Town }, 2),
+
+                RoleEntry(WorldCharacterVisualKeys.TownResidentA, "PolygonTown",
+                    월드CompositionPackCodes.Town,
+                    Town + "Characters/SM_Chr_Father_01.prefab",
+                    resident, adultA, townArea, 3),
+                RoleEntry(WorldCharacterVisualKeys.TownResidentB, "PolygonTown",
+                    월드CompositionPackCodes.Town,
+                    Town + "Characters/SM_Chr_Mother_01.prefab",
+                    resident, adultB, townArea, 3),
+                RoleEntry(WorldCharacterVisualKeys.TownResidentC, "PolygonTown",
+                    월드CompositionPackCodes.Town,
+                    Town + "Characters/SM_Chr_Father_02.prefab",
+                    resident, adultA, townArea, 2),
+                RoleEntry(WorldCharacterVisualKeys.TownResidentD, "PolygonTown",
+                    월드CompositionPackCodes.Town,
+                    Town + "Characters/SM_Chr_Mother_02.prefab",
+                    resident, adultB, townArea, 2),
+                RoleEntry(WorldCharacterVisualKeys.TownSellerA, "PolygonTown",
+                    월드CompositionPackCodes.Town,
+                    Town + "Characters/SM_Chr_ShopKeeper_01.prefab",
+                    seller, adultB, townArea, 5),
+
+                RoleEntry(WorldCharacterVisualKeys.NeutralAdultA, "PolygonStarter",
+                    월드CompositionPackCodes.Mixed,
+                    Starter + "Characters/SM_Chr_Male_01.prefab",
+                    new[] { WorldActorRoleCodes.Unresolved }, allFamilies, allAreas, 1),
+            });
+            catalog.Validate();
+            EditorUtility.SetDirty(catalog);
+            return catalog;
+        }
+
+        private static 역할CharacterVisualCatalogEntry RoleEntry(
+            string visualKey,
+            string sourcePack,
+            string animationPackCode,
+            string prefabPath,
+            string[] roles,
+            string[] families,
+            string[] areas,
+            int weight)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath)
+                ?? throw new InvalidOperationException(
+                    "RoleCharacterPrefabMissing:" + prefabPath);
+            var skinnedMeshes = prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+            var meshFilters = prefab.GetComponentsInChildren<MeshFilter>(true);
+            var triangles = skinnedMeshes.Where(value => value.sharedMesh != null)
+                    .Sum(value => value.sharedMesh.triangles.Length / 3)
+                + meshFilters.Where(value => value.sharedMesh != null)
+                    .Sum(value => value.sharedMesh.triangles.Length / 3);
+            var renderers = prefab.GetComponentsInChildren<Renderer>(true);
+            var entry = new 역할CharacterVisualCatalogEntry();
+            entry.Configure(
+                visualKey,
+                sourcePack,
+                animationPackCode,
+                prefab,
+                roles,
+                families,
+                areas,
+                weight,
+                canBePlayer: true,
+                triangles,
+                renderers.Sum(value => value.sharedMaterials.Length),
+                prefab.GetComponentsInChildren<Animator>(true).Length);
+            return entry;
         }
 
         private static 법정동경관VisualCatalogEntry Entry(

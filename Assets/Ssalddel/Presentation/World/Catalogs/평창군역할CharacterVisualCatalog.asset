@@ -1,0 +1,342 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 562eda5097e869040a0655581294e8ae, type: 3}
+  m_Name: "\uD3C9\uCC3D\uAD70\uC5ED\uD560CharacterVisualCatalog"
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC5ED\uD560CharacterVisualCatalog"
+  catalogRevision: role-character-catalog.pyeongchang.v1
+  entries:
+  - visualKey: character.farm.worker.a
+    sourcePack: PolygonFarm
+    animationPackCode: farm
+    prefab: {fileID: 1160220439793846, guid: 3c3a8236be548bb4c892cf39a5abadfe, type: 3}
+    allowedActorRoleCodes:
+    - farmer-producer
+    appearanceFamilyCodes:
+    - adult-a
+    allowedAreaRoleCodes:
+    - Farm
+    weight: 4
+    playerEligible: 1
+    estimatedTriangles: 12616
+    materialSlotCount: 6
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.farm.worker.b
+    sourcePack: PolygonFarm
+    animationPackCode: farm
+    prefab: {fileID: 1019791486663424, guid: 827a26e9b261b7847ac6cc3df54f2677, type: 3}
+    allowedActorRoleCodes:
+    - farmer-producer
+    appearanceFamilyCodes:
+    - adult-b
+    allowedAreaRoleCodes:
+    - Farm
+    weight: 4
+    playerEligible: 1
+    estimatedTriangles: 12616
+    materialSlotCount: 6
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.farm.worker.senior-a
+    sourcePack: PolygonFarm
+    animationPackCode: farm
+    prefab: {fileID: 1350103588185370, guid: 6a71738add6483c4e8a1479556240d54, type: 3}
+    allowedActorRoleCodes:
+    - farmer-producer
+    appearanceFamilyCodes:
+    - adult-senior-a
+    allowedAreaRoleCodes:
+    - Farm
+    weight: 2
+    playerEligible: 1
+    estimatedTriangles: 12616
+    materialSlotCount: 6
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.business.operator.a
+    sourcePack: PolygonCity
+    animationPackCode: city
+    prefab: {fileID: 1109705922278564, guid: 7851e97aa32f5474f92b61e3e4988c1a, type: 3}
+    allowedActorRoleCodes:
+    - shipper
+    - transport-operator
+    - warehouse-operator
+    - seller
+    appearanceFamilyCodes:
+    - adult-a
+    allowedAreaRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    weight: 4
+    playerEligible: 1
+    estimatedTriangles: 17143
+    materialSlotCount: 9
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.business.operator.b
+    sourcePack: PolygonCity
+    animationPackCode: city
+    prefab: {fileID: 1784647339104494, guid: 1aeb5bfabdcdbcd4583e83139d952b1d, type: 3}
+    allowedActorRoleCodes:
+    - shipper
+    - transport-operator
+    - warehouse-operator
+    - seller
+    appearanceFamilyCodes:
+    - adult-a
+    allowedAreaRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    weight: 2
+    playerEligible: 1
+    estimatedTriangles: 17143
+    materialSlotCount: 9
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.business.operator.c
+    sourcePack: PolygonCity
+    animationPackCode: city
+    prefab: {fileID: 1441525330016004, guid: c0f44381dd01e904c87fad2431087f45, type: 3}
+    allowedActorRoleCodes:
+    - shipper
+    - transport-operator
+    - warehouse-operator
+    - seller
+    appearanceFamilyCodes:
+    - adult-b
+    allowedAreaRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    weight: 4
+    playerEligible: 1
+    estimatedTriangles: 17143
+    materialSlotCount: 9
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.logistics.worker.a
+    sourcePack: PolygonGeneric
+    animationPackCode: regional-logistics-hub
+    prefab: {fileID: 1237103786066752629, guid: 6b755f2212fb17d4f8d6ee004f322f2c, type: 3}
+    allowedActorRoleCodes:
+    - warehouse-operator
+    - freight-delivery-driver
+    appearanceFamilyCodes:
+    - adult-a
+    allowedAreaRoleCodes:
+    - Hub
+    weight: 4
+    playerEligible: 1
+    estimatedTriangles: 37818
+    materialSlotCount: 25
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.logistics.worker.b
+    sourcePack: PolygonGeneric
+    animationPackCode: regional-logistics-hub
+    prefab: {fileID: 3863946197356255772, guid: e19a6cb628a52034393bc3af10bf0a72, type: 3}
+    allowedActorRoleCodes:
+    - warehouse-operator
+    - freight-delivery-driver
+    appearanceFamilyCodes:
+    - adult-b
+    allowedAreaRoleCodes:
+    - Hub
+    weight: 4
+    playerEligible: 1
+    estimatedTriangles: 39607
+    materialSlotCount: 26
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.community.citizen.a
+    sourcePack: PolygonGeneric
+    animationPackCode: mixed
+    prefab: {fileID: 3989931881015276717, guid: 253e338a5c21f2d4691b62c2411dbf0d, type: 3}
+    allowedActorRoleCodes:
+    - freight-delivery-driver
+    - food-delivery-driver
+    - orderer
+    appearanceFamilyCodes:
+    - adult-a
+    allowedAreaRoleCodes:
+    - Hub
+    - Town
+    weight: 3
+    playerEligible: 1
+    estimatedTriangles: 35032
+    materialSlotCount: 24
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.community.citizen.b
+    sourcePack: PolygonGeneric
+    animationPackCode: mixed
+    prefab: {fileID: 3458756976290546274, guid: 7b5fb4afed2fb4d4f8a267687405b11c, type: 3}
+    allowedActorRoleCodes:
+    - freight-delivery-driver
+    - food-delivery-driver
+    - orderer
+    appearanceFamilyCodes:
+    - adult-b
+    allowedAreaRoleCodes:
+    - Hub
+    - Town
+    weight: 3
+    playerEligible: 1
+    estimatedTriangles: 35508
+    materialSlotCount: 24
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.community.citizen.c
+    sourcePack: PolygonGeneric
+    animationPackCode: mixed
+    prefab: {fileID: 2601170466289135297, guid: 0f895ab6fa2a7e9419ef17d25c18bf9c, type: 3}
+    allowedActorRoleCodes:
+    - freight-delivery-driver
+    - food-delivery-driver
+    - orderer
+    appearanceFamilyCodes:
+    - adult-a
+    allowedAreaRoleCodes:
+    - Hub
+    - Town
+    weight: 2
+    playerEligible: 1
+    estimatedTriangles: 35164
+    materialSlotCount: 25
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.community.citizen.d
+    sourcePack: PolygonGeneric
+    animationPackCode: mixed
+    prefab: {fileID: 9064580088405009711, guid: 2d9271186b9b6394698643d253e56181, type: 3}
+    allowedActorRoleCodes:
+    - freight-delivery-driver
+    - food-delivery-driver
+    - orderer
+    appearanceFamilyCodes:
+    - adult-b
+    allowedAreaRoleCodes:
+    - Hub
+    - Town
+    weight: 2
+    playerEligible: 1
+    estimatedTriangles: 35392
+    materialSlotCount: 24
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.town.resident.a
+    sourcePack: PolygonTown
+    animationPackCode: town
+    prefab: {fileID: 1529366667462550, guid: 35766b28d8e49b145a31be45abb3077c, type: 3}
+    allowedActorRoleCodes:
+    - orderer
+    - food-delivery-driver
+    appearanceFamilyCodes:
+    - adult-a
+    allowedAreaRoleCodes:
+    - Town
+    weight: 3
+    playerEligible: 1
+    estimatedTriangles: 16922
+    materialSlotCount: 9
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.town.resident.b
+    sourcePack: PolygonTown
+    animationPackCode: town
+    prefab: {fileID: 1032305250981868, guid: 0774b3aa9983d294e859db07a1f79702, type: 3}
+    allowedActorRoleCodes:
+    - orderer
+    - food-delivery-driver
+    appearanceFamilyCodes:
+    - adult-b
+    allowedAreaRoleCodes:
+    - Town
+    weight: 3
+    playerEligible: 1
+    estimatedTriangles: 16922
+    materialSlotCount: 9
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.town.resident.c
+    sourcePack: PolygonTown
+    animationPackCode: town
+    prefab: {fileID: 1211250381875678, guid: 7d4d82511439be645bea1229f6c97998, type: 3}
+    allowedActorRoleCodes:
+    - orderer
+    - food-delivery-driver
+    appearanceFamilyCodes:
+    - adult-a
+    allowedAreaRoleCodes:
+    - Town
+    weight: 2
+    playerEligible: 1
+    estimatedTriangles: 16922
+    materialSlotCount: 9
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.town.resident.d
+    sourcePack: PolygonTown
+    animationPackCode: town
+    prefab: {fileID: 1834479203084494, guid: 81984b095a0d9ba4fb19e7c0a3819ad6, type: 3}
+    allowedActorRoleCodes:
+    - orderer
+    - food-delivery-driver
+    appearanceFamilyCodes:
+    - adult-b
+    allowedAreaRoleCodes:
+    - Town
+    weight: 2
+    playerEligible: 1
+    estimatedTriangles: 16922
+    materialSlotCount: 9
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.town.seller.a
+    sourcePack: PolygonTown
+    animationPackCode: town
+    prefab: {fileID: 1038128334585484, guid: a92acd4090533d84bb62ba63b05c0db5, type: 3}
+    allowedActorRoleCodes:
+    - seller
+    appearanceFamilyCodes:
+    - adult-b
+    allowedAreaRoleCodes:
+    - Town
+    weight: 5
+    playerEligible: 1
+    estimatedTriangles: 16922
+    materialSlotCount: 9
+    animatorCount: 1
+    presentationOnly: 1
+  - visualKey: character.neutral.adult.a
+    sourcePack: PolygonStarter
+    animationPackCode: mixed
+    prefab: {fileID: 1045401375514670, guid: f11fc98cf1e8d5547a9b2ec85cc9c664, type: 3}
+    allowedActorRoleCodes:
+    - unresolved
+    appearanceFamilyCodes:
+    - adult-a
+    - adult-b
+    - adult-senior-a
+    - adult-neutral
+    allowedAreaRoleCodes:
+    - Farm
+    - Hub
+    - Town
+    weight: 1
+    playerEligible: 1
+    estimatedTriangles: 2521
+    materialSlotCount: 4
+    animatorCount: 1
+    presentationOnly: 1
