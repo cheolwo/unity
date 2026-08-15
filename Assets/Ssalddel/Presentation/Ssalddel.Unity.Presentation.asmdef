@@ -1,7 +1,7 @@
 {
   "name": "Ssalddel.Unity.Presentation",
   "rootNamespace": "Ssalddel.Unity.Presentation",
-  "references": ["Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Unity.UGUI", "Unity.InputSystem", "Unity.RenderPipelines.Core.Runtime"],
+  "references": ["Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Ssalddel.Unity.Application", "Unity.UGUI", "Unity.InputSystem", "Unity.RenderPipelines.Core.Runtime", "Unity.AI.Navigation"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

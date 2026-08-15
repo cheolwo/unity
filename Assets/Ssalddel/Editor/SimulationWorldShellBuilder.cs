@@ -1,13 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ssalddel.Unity.Presentation.World;
 using Ssalddel.Unity.Bootstrap;
 using Ssalddel.Unity.Presentation.Configuration;
 using Ssalddel.Unity.Runtime.World;
+using Ssalddel.Unity.Survival;
+using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
@@ -22,6 +26,10 @@ namespace Ssalddel.Unity.Editor
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/FarmCityEnvironmentCatalog.asset";
         public const string ExhibitionObjectCatalogPath =
             "Assets/Ssalddel/Presentation/ExhibitionObjects/통합전시관ObjectVisualCatalog.asset";
+        public const string FigmaMauiWarehouseUiThemePath =
+            "Assets/Ssalddel/Presentation/World/Catalogs/FigmaMauiWarehouseUiThemeCatalog.asset";
+        public const string TacticalCharacterVisualCatalogPath =
+            "Assets/Ssalddel/Presentation/World/Catalogs/평창군전술CharacterVisualCatalog.asset";
         public const string SceneStableId = "scene:simulation-world-shell";
         public const string PotatoHarvestBoxPlacementStableId =
             "scene-placement:simulation-world-shell.farm.potato-harvest-box.a";
@@ -37,6 +45,8 @@ namespace Ssalddel.Unity.Editor
             "scene-placement:simulation-world-shell.market.urban-market-shop.a";
         public const string GroupingCartTablePlacementStableId =
             "scene-placement:simulation-world-shell.town.grouping-cart-table.a";
+
+        private const float TacticalNavigationFloorThickness = .12f;
 
         [MenuItem("Ssalddel/WORLD-SHELL-0/Build Read Only Shell")]
         public static void BuildWorldShell()
@@ -81,6 +91,7 @@ namespace Ssalddel.Unity.Editor
             Build정착지상호작용(ui.Canvas, presenter, shellRuntimeRoot.transform);
             Build물류이동(ui.Canvas, presenter, shellRuntimeRoot.transform);
             Build턴마감(ui.Canvas, presenter, shellRuntimeRoot.transform);
+            Build진부Hub입고Ui(ui.Canvas, presenter, shellRuntimeRoot.transform);
 
             new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
             settlementRoot.SetActive(false);
@@ -124,6 +135,126 @@ namespace Ssalddel.Unity.Editor
             Selection.activeGameObject = settlementRoot;
             SceneView.RepaintAll();
             Debug.Log("SETTLEMENT-SCENE-0 built: " + ScenePath);
+        }
+
+        [MenuItem("Ssalddel/JINBU-INBOUND-UI-0/Build Figma MAUI Compatible UI")]
+        public static void Build진부Hub입고Ui()
+        {
+            OpenShellIfRequired();
+            var root = Required(RootName);
+            var runtimeRoot = Required(root.transform, "ShellRuntimeRoot");
+            var canvas = Required(Required(root.transform, "PersistentUI"), "SimulationWorldHud");
+            var oldPanel = canvas.Find("JinbuInboundPanel");
+            if (oldPanel != null) UnityEngine.Object.DestroyImmediate(oldPanel.gameObject);
+            var oldPresenter = runtimeRoot.GetComponent<진부Hub입고UiPresenter>();
+            if (oldPresenter != null) UnityEngine.Object.DestroyImmediate(oldPresenter);
+            var oldComposition = runtimeRoot.GetComponent<진부Hub입고UiSceneCompositionRoot>();
+            if (oldComposition != null) UnityEngine.Object.DestroyImmediate(oldComposition);
+            Build진부Hub입고Ui(canvas, FindPresenter(), runtimeRoot);
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException("JinbuInboundUiSceneSaveFailed");
+            AssetDatabase.SaveAssets();
+            Validate진부Hub입고UiOpenScene();
+            Debug.Log("JINBU-INBOUND-UI-0 built: " + ScenePath);
+        }
+
+        [MenuItem("Ssalddel/JINBU-INBOUND-UI-0/Validate Open Scene")]
+        public static void Validate진부Hub입고UiOpenScene()
+        {
+            var presenter = UnityEngine.Object.FindFirstObjectByType<진부Hub입고UiPresenter>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("JinbuInboundUiPresenterMissing");
+            presenter.ValidateWiring();
+            var composition = UnityEngine.Object.FindFirstObjectByType<진부Hub입고UiSceneCompositionRoot>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("JinbuInboundUiCompositionMissing");
+            if (!composition.서버기준사용중)
+                throw new InvalidOperationException("JinbuInboundUiServerAuthorityDisabled");
+            var panel = Required(Required(RootName).transform,
+                "PersistentUI/SimulationWorldHud/JinbuInboundPanel");
+            if (panel.GetComponentsInChildren<Button>(true).Length != 4)
+                throw new InvalidOperationException("JinbuInboundUiButtonCountInvalid");
+            var theme = AssetDatabase.LoadAssetAtPath<FigmaMauiWarehouseUiThemeCatalog>(
+                FigmaMauiWarehouseUiThemePath)
+                ?? throw new InvalidOperationException("JinbuInboundUiThemeMissing");
+            if (!theme.Supports(진부Hub입고UiCodes.SupportedDesignProfileRevision))
+                throw new InvalidOperationException("JinbuInboundUiThemeRevisionInvalid");
+            Debug.Log("JINBU-INBOUND-UI-0 validation passed");
+        }
+
+        [MenuItem("Ssalddel/통합 월드/기존 Scene에 모드 전환 UI 연결")]
+        public static void Build통합월드ModeNavigation()
+        {
+            OpenShellIfRequired();
+            var root = Required(RootName);
+            var runtimeRoot = Required(root.transform, "ShellRuntimeRoot");
+            var persistentUi = Required(root.transform, "PersistentUI");
+            var canvas = Required(persistentUi, "SimulationWorldHud");
+            var oldBar = canvas.Find("UnifiedWorldModeBar");
+            if (oldBar != null) UnityEngine.Object.DestroyImmediate(oldBar.gameObject);
+            var oldModeCanvas = persistentUi.Find("UnifiedWorldModeCanvas");
+            if (oldModeCanvas != null)
+                UnityEngine.Object.DestroyImmediate(oldModeCanvas.gameObject);
+            var oldPresenter = runtimeRoot.GetComponent<통합월드ModePresenter>();
+            if (oldPresenter != null) UnityEngine.Object.DestroyImmediate(oldPresenter);
+
+            var shell = FindPresenter();
+            var player = UnityEngine.Object.FindFirstObjectByType<플레이어경관Controller>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("UnifiedWorldPlayerMissing");
+            var inbound = UnityEngine.Object.FindFirstObjectByType<진부Hub입고UiPresenter>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("UnifiedWorldInboundUiMissing");
+            Build통합월드ModeNavigation(persistentUi, runtimeRoot, shell, player, inbound);
+
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException("UnifiedWorldModeSceneSaveFailed");
+            AssetDatabase.SaveAssets();
+            Debug.Log("UNIFIED-WORLD-1: 기존 SimulationWorldShell에 통합 모드 전환 UI를 연결했습니다.");
+        }
+
+        [MenuItem("Ssalddel/FARM-TACTICAL-SQUAD-0/Build Formation Movement")]
+        public static void Build전술분대이동()
+        {
+            OpenShellIfRequired();
+            var root = Required(RootName);
+            var runtimeRoot = Required(root.transform, "ShellRuntimeRoot");
+            var player = root.GetComponentInChildren<플레이어경관Controller>(true)
+                ?? throw new InvalidOperationException("TacticalSquadPlayerMissing");
+            Build농장경영시점(runtimeRoot, player);
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException("TacticalSquadSceneSaveFailed");
+            AssetDatabase.SaveAssets();
+            Validate전술분대이동OpenScene();
+            Debug.Log("FARM-TACTICAL-SQUAD-0 built: " + ScenePath);
+        }
+
+        [MenuItem("Ssalddel/FARM-TACTICAL-SQUAD-0/Validate Open Scene")]
+        public static void Validate전술분대이동OpenScene()
+        {
+            var presenter = UnityEngine.Object.FindFirstObjectByType<전술분대Presenter>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("TacticalSquadPresenterMissing");
+            if (!presenter.ValidateWiring() || presenter.Squads.Count != 2
+                || presenter.Squads.Sum(value => value.Members.Count) != 12
+                || presenter.Squads.Any(value => value.NavigationAgent == null
+                    || !value.PresentationOnly))
+                throw new InvalidOperationException("TacticalSquadSceneWiringInvalid");
+            var catalog = AssetDatabase.LoadAssetAtPath<전술CharacterVisualCatalog>(
+                TacticalCharacterVisualCatalogPath)
+                ?? throw new InvalidOperationException("TacticalCharacterCatalogMissing");
+            catalog.Validate();
+            var combat = UnityEngine.Object.FindFirstObjectByType<전투시점Controller>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("TacticalCombatControllerMissing");
+            if (combat.TacticalSquads != presenter || !combat.PresentationOnly)
+                throw new InvalidOperationException("TacticalCombatSquadBridgeInvalid");
         }
 
         [MenuItem("Ssalddel/WORLD-SHELL-0/Build Shell And Settlement")]
@@ -877,6 +1008,400 @@ namespace Ssalddel.Unity.Editor
                 ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");
             var composition = runtimeRoot.gameObject.AddComponent<턴마감SceneCompositionRoot>();
             composition.Configure(settings, shell, presenter, true);
+        }
+
+        private static void Build진부Hub입고Ui(
+            Transform canvas,
+            SimulationWorldShellPresenter shell,
+            Transform runtimeRoot)
+        {
+            var theme = EnsureFigmaMauiWarehouseUiTheme();
+            var panel = Panel(canvas, "JinbuInboundPanel",
+                new Vector2(-22f, 22f), new Vector2(560f, 820f), new Vector2(1f, 0f));
+            var panelSurface = panel.GetComponent<Image>();
+            panelSurface.color = theme.Background;
+            var accent = Panel(panel.transform, "WarehouseRoleAccent",
+                Vector2.zero, new Vector2(560f, 7f), new Vector2(0f, 1f));
+            accent.GetComponent<Image>().color = theme.WarehouseAccent;
+
+            var context = Text(panel.transform, "ContextText", new Vector2(22f, -18f),
+                new Vector2(390f, 24f), 14, TextAnchor.UpperLeft, theme.Muted);
+            var badge = Panel(panel.transform, "StateBadge",
+                new Vector2(418f, -14f), new Vector2(120f, 30f), new Vector2(0f, 1f));
+            var state = Text(badge.transform, "StateText", Vector2.zero,
+                new Vector2(120f, 30f), 14, TextAnchor.MiddleCenter, Color.white);
+            state.rectTransform.anchorMin = Vector2.zero;
+            state.rectTransform.anchorMax = Vector2.one;
+            state.rectTransform.pivot = new Vector2(.5f, .5f);
+            state.rectTransform.anchoredPosition = Vector2.zero;
+            state.rectTransform.sizeDelta = Vector2.zero;
+
+            var title = Text(panel.transform, "TitleText", new Vector2(22f, -62f),
+                new Vector2(516f, 42f), 25, TextAnchor.UpperLeft, theme.Text);
+            var summaryCard = Panel(panel.transform, "SummaryCard",
+                new Vector2(22f, -112f), new Vector2(516f, 102f), new Vector2(0f, 1f));
+            summaryCard.GetComponent<Image>().color = theme.Surface;
+            var summary = Text(summaryCard.transform, "SummaryText", new Vector2(18f, -16f),
+                new Vector2(480f, 70f), 18, TextAnchor.UpperLeft, theme.Text);
+            var workflow = Text(panel.transform, "WorkflowText", new Vector2(22f, -228f),
+                new Vector2(516f, 32f), 15, TextAnchor.MiddleLeft, theme.WarehouseAccent);
+
+            var detailCard = Panel(panel.transform, "DetailCard",
+                new Vector2(22f, -270f), new Vector2(516f, 226f), new Vector2(0f, 1f));
+            detailCard.GetComponent<Image>().color = theme.Surface;
+            var detail = Text(detailCard.transform, "DetailText", new Vector2(18f, -14f),
+                new Vector2(480f, 198f), 15, TextAnchor.UpperLeft, theme.Text);
+            var previewCard = Panel(panel.transform, "PreviewConfirmCard",
+                new Vector2(22f, -510f), new Vector2(516f, 114f), new Vector2(0f, 1f));
+            previewCard.GetComponent<Image>().color = theme.WarehouseAccentSoft;
+            var preview = Text(previewCard.transform, "PreviewText", new Vector2(16f, -12f),
+                new Vector2(484f, 90f), 14, TextAnchor.UpperLeft, theme.Text);
+
+            var stale = Panel(panel.transform, "StaleBanner",
+                new Vector2(22f, -636f), new Vector2(516f, 42f), new Vector2(0f, 1f));
+            stale.GetComponent<Image>().color = new Color(.42f, .22f, .08f, .96f);
+            var staleText = Text(stale.transform, "StaleText", new Vector2(12f, -6f),
+                new Vector2(492f, 30f), 13, TextAnchor.MiddleLeft, Color.white);
+
+            var previewButton = Button(panel.transform, "PreviewButton", "입고 검수 미리보기",
+                new Vector2(22f, -690f), new Vector2(242f, 46f), theme.Preview);
+            var confirmButton = Button(panel.transform, "ConfirmButton", "입고 검수 확정",
+                new Vector2(276f, -690f), new Vector2(262f, 46f), theme.WarehouseAccent);
+            var tickButton = Button(panel.transform, "TickButton", "WorldTick +1",
+                new Vector2(22f, -746f), new Vector2(242f, 42f), theme.Success);
+            var refreshButton = Button(panel.transform, "RefreshButton", "상태 다시 불러오기",
+                new Vector2(276f, -746f), new Vector2(262f, 42f), theme.Muted);
+            var boundary = Text(panel.transform, "BoundaryText", new Vector2(22f, -794f),
+                new Vector2(516f, 22f), 12, TextAnchor.UpperLeft, theme.Muted);
+
+            var presenter = runtimeRoot.gameObject.AddComponent<진부Hub입고UiPresenter>();
+            presenter.Configure(shell, theme, panel, panelSurface, accent.GetComponent<Image>(),
+                context, badge.GetComponent<Image>(), state, title, summary, workflow, detail,
+                preview, boundary, stale, staleText, previewButton, confirmButton, tickButton,
+                refreshButton, "district:logistics");
+            var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
+                "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
+                ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");
+            var composition = runtimeRoot.gameObject.AddComponent<진부Hub입고UiSceneCompositionRoot>();
+            composition.Configure(settings, shell, presenter, true);
+            stale.SetActive(false);
+            panel.SetActive(false);
+        }
+
+        private static void Build통합월드ModeNavigation(
+            Transform persistentUi,
+            Transform runtimeRoot,
+            SimulationWorldShellPresenter shell,
+            플레이어경관Controller player,
+            진부Hub입고UiPresenter inbound)
+        {
+            var canvas = new GameObject("UnifiedWorldModeCanvas",
+                typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            canvas.transform.SetParent(persistentUi, false);
+            var canvasComponent = canvas.GetComponent<Canvas>();
+            canvasComponent.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvasComponent.sortingOrder = 200;
+            var scaler = canvas.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1600f, 900f);
+
+            var bar = Panel(canvas.transform, "UnifiedWorldModeBar",
+                new Vector2(306f, -16f), new Vector2(340f, 52f), new Vector2(0f, 1f));
+            bar.GetComponent<Image>().color = new Color(.04f, .055f, .06f, .94f);
+            var world = Button(bar.transform, "WorldOverviewButton", "월드",
+                new Vector2(8f, -8f), new Vector2(76f, 36f), Rgb(.94f, .42f, .05f));
+            var firstPerson = Button(bar.transform, "FarmFirstPersonButton", "농장 1인칭",
+                new Vector2(90f, -8f), new Vector2(78f, 36f), Rgb(.15f, .19f, .20f));
+            var tactical = Button(bar.transform, "FarmTacticalButton", "농장 경영",
+                new Vector2(174f, -8f), new Vector2(74f, 36f), Rgb(.15f, .19f, .20f));
+            var inboundButton = Button(bar.transform, "JinbuInboundButton", "진부 입고",
+                new Vector2(254f, -8f), new Vector2(78f, 36f), Rgb(.15f, .19f, .20f));
+            foreach (var label in bar.GetComponentsInChildren<Text>(true))
+                label.fontSize = 12;
+
+            Build농장경영시점(runtimeRoot, player);
+            var presenter = runtimeRoot.gameObject.AddComponent<통합월드ModePresenter>();
+            presenter.Configure(
+                shell, player, inbound, world, firstPerson, tactical, inboundButton);
+        }
+
+        private static void Build농장경영시점(
+            Transform runtimeRoot,
+            플레이어경관Controller player)
+        {
+            var previous = runtimeRoot.GetComponent<농장경영시점Controller>();
+            if (previous != null) UnityEngine.Object.DestroyImmediate(previous);
+
+            var shellRoot = Required(RootName).transform;
+            var farm = Required(shellRoot,
+                "SettlementInteriorRoot/Districts/FarmDistrict");
+            foreach (var oldHighlight in Enumerable.Range(0, farm.childCount)
+                         .Select(index => farm.GetChild(index))
+                         .Where(value => value.name.StartsWith(
+                             "FarmManagementHighlight_", StringComparison.Ordinal))
+                         .ToArray())
+                UnityEngine.Object.DestroyImmediate(oldHighlight.gameObject);
+
+            var targets = new List<농장경영선택대상View>();
+            for (var row = 0; row < 2; row++)
+            for (var column = 0; column < 5; column++)
+            {
+                var plot = Required(farm, $"FarmPlot_{row}_{column}");
+                var oldView = plot.GetComponent<농장경영선택대상View>();
+                if (plot.GetComponent<Collider>() == null)
+                    plot.gameObject.AddComponent<BoxCollider>();
+                var highlight = Primitive(farm,
+                    $"FarmManagementHighlight_{row}_{column}",
+                    PrimitiveType.Cylinder,
+                    plot.localPosition + Vector3.up * .24f,
+                    new Vector3(plot.localScale.x * .54f, .025f,
+                        plot.localScale.z * .54f),
+                    new Color(1f, .54f, .08f, 1f));
+                highlight.gameObject.SetActive(false);
+                var view = oldView
+                    ?? plot.gameObject.AddComponent<농장경영선택대상View>();
+                view.Configure(
+                    $"farm-plot:pyeongchang:{row}:{column}",
+                    $"감자밭 {row + 1}-{column + 1}",
+                    농장경영대상종류Codes.Plot,
+                    농장경영작업Codes.All,
+                    highlight.gameObject);
+                targets.Add(view);
+            }
+
+            var harvestLot = Required(farm, "HarvestLot_Potato_001");
+            var oldHarvestView = harvestLot.GetComponent<농장경영선택대상View>();
+            if (harvestLot.GetComponent<Collider>() == null)
+                harvestLot.gameObject.AddComponent<BoxCollider>();
+            var harvestHighlight = Primitive(farm,
+                "FarmManagementHighlight_HarvestLot",
+                PrimitiveType.Cylinder,
+                harvestLot.localPosition + Vector3.up * 1.08f,
+                new Vector3(1.7f, .025f, 1.7f),
+                new Color(.1f, .82f, .72f, 1f));
+            harvestHighlight.gameObject.SetActive(false);
+            var harvestView = oldHarvestView
+                ?? harvestLot.gameObject.AddComponent<농장경영선택대상View>();
+            harvestView.Configure(
+                "farm-harvest-lot:pyeongchang:potato:001",
+                "감자 수확 마당",
+                농장경영대상종류Codes.Facility,
+                new[] { 농장경영작업Codes.Harvest },
+                harvestHighlight.gameObject);
+            targets.Add(harvestView);
+
+            var management = runtimeRoot.gameObject
+                .AddComponent<농장경영시점Controller>();
+            management.Configure(player, targets);
+            player.ConfigureFarmManagement(management);
+
+            var previousCombat = runtimeRoot.GetComponent<전투시점Controller>();
+            if (previousCombat != null) UnityEngine.Object.DestroyImmediate(previousCombat);
+            var combat = runtimeRoot.gameObject.AddComponent<전투시점Controller>();
+            combat.Configure(player);
+            var tacticalSquads = Build전술분대Views(runtimeRoot);
+            combat.ConfigureTacticalSquads(tacticalSquads);
+            player.ConfigureCombat(combat);
+        }
+
+        private static 전술분대Presenter Build전술분대Views(Transform runtimeRoot)
+        {
+            var previous = runtimeRoot.GetComponent<전술분대Presenter>();
+            if (previous != null) UnityEngine.Object.DestroyImmediate(previous);
+            var shellRoot = Required(RootName).transform;
+            var farm = Required(shellRoot,
+                "SettlementInteriorRoot/Districts/FarmDistrict");
+            var oldRoot = farm.Find("TacticalBattleRoot");
+            if (oldRoot != null) UnityEngine.Object.DestroyImmediate(oldRoot.gameObject);
+
+            var battleRoot = Child(farm, "TacticalBattleRoot");
+            var navigationRoot = Child(battleRoot, "NavigationRoot");
+            var districtSurface = Required(farm, "DistrictSurface")
+                .GetComponent<Renderer>();
+            var groundTopLocalY = navigationRoot.InverseTransformPoint(
+                new Vector3(navigationRoot.position.x,
+                    districtSurface.bounds.max.y,
+                    navigationRoot.position.z)).y;
+            var floor = Primitive(navigationRoot, "TacticalWalkableFloor",
+                PrimitiveType.Cube,
+                new Vector3(0f,
+                    groundTopLocalY - TacticalNavigationFloorThickness * .5f,
+                    2f),
+                new Vector3(26f, TacticalNavigationFloorThickness, 26f),
+                Color.clear);
+            floor.gameObject.layer = 31; // 전술 NavMesh 전용 비공개 레이어
+            floor.gameObject.AddComponent<BoxCollider>();
+            var floorRenderer = floor.GetComponent<Renderer>();
+            floorRenderer.shadowCastingMode =
+                UnityEngine.Rendering.ShadowCastingMode.Off;
+            floorRenderer.receiveShadows = false;
+            var surface = navigationRoot.gameObject.AddComponent<NavMeshSurface>();
+            surface.collectObjects = CollectObjects.Children;
+            surface.layerMask = 1 << floor.gameObject.layer;
+            surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+            surface.BuildNavMesh();
+            // NavMesh 생성에는 Renderer가 필요하지만 저장 Scene에서는
+            // 실제 지형을 덮지 않도록 계산 직후 완전히 숨긴다.
+            floorRenderer.enabled = false;
+
+            var anchors = Child(battleRoot, "PositionAnchors");
+            var alliedInner = TacticalAnchor(anchors, "Allied_InnerFarm",
+                new Vector3(-2.2f, groundTopLocalY, -6.5f));
+            var alliedPerimeter = TacticalAnchor(anchors, "Allied_Perimeter",
+                new Vector3(-1.4f, groundTopLocalY, 1.5f));
+            var alliedForward = TacticalAnchor(anchors, "Allied_Forward",
+                new Vector3(-.9f, groundTopLocalY, 5.8f));
+            var hostileInner = TacticalAnchor(anchors, "Hostile_InnerFarm",
+                new Vector3(2.4f, groundTopLocalY, 12.5f));
+            var hostilePerimeter = TacticalAnchor(anchors, "Hostile_Perimeter",
+                new Vector3(1.8f, groundTopLocalY, 10.2f));
+            var hostileForward = TacticalAnchor(anchors, "Hostile_Forward",
+                new Vector3(1.2f, groundTopLocalY, 7.8f));
+
+            var catalog = EnsureTacticalCharacterVisualCatalog();
+            var allied = BuildTacticalSquad(battleRoot, catalog,
+                FarmCombatPresentationCodes.Allied, alliedInner,
+                alliedPerimeter, alliedForward, 3.4f);
+            var hostile = BuildTacticalSquad(battleRoot, catalog,
+                FarmCombatPresentationCodes.Hostile, hostileInner,
+                hostilePerimeter, hostileForward, 2.2f);
+            var presenter = runtimeRoot.gameObject.AddComponent<전술분대Presenter>();
+            presenter.Configure(farm.gameObject, battleRoot.gameObject, surface,
+                new[] { allied, hostile });
+            battleRoot.gameObject.SetActive(false);
+            return presenter;
+        }
+
+        private static 전술분대대형Controller BuildTacticalSquad(
+            Transform parent,
+            전술CharacterVisualCatalog catalog,
+            string sideCode,
+            Transform innerFarm,
+            Transform perimeter,
+            Transform forward,
+            float speed)
+        {
+            var root = Child(parent, sideCode + "SquadRoot");
+            root.position = perimeter.position;
+            var agent = root.gameObject.AddComponent<NavMeshAgent>();
+            agent.radius = .62f;
+            agent.height = 1.8f;
+            agent.speed = speed;
+            agent.acceleration = 14f;
+            agent.angularSpeed = 540f;
+            agent.stoppingDistance = .12f;
+            agent.autoBraking = true;
+            agent.updateRotation = false;
+            if (NavMesh.SamplePosition(root.position, out var hit, 2f,
+                    NavMesh.AllAreas))
+                agent.Warp(hit.position);
+
+            var members = new List<전술분대원View>();
+            for (var index = 0; index < 6; index++)
+            {
+                var stableId = "tactical-squad:fixture:"
+                    + sideCode.ToLowerInvariant() + ":member:"
+                    + (index + 1).ToString("D2");
+                var memberRoot = Child(root, "Member_" + (index + 1).ToString("D2"));
+                memberRoot.localPosition = 전술분대대형Controller.CalculateSlot(
+                    FarmCombatPresentationCodes.LineFormation, index);
+                var entry = catalog.Resolve(sideCode, stableId);
+                var visual = UnityEngine.Object.Instantiate(entry.Prefab, memberRoot);
+                visual.name = "VisualRoot_" + entry.VisualKey;
+                visual.transform.SetLocalPositionAndRotation(
+                    Vector3.zero, Quaternion.identity);
+                캐릭터지면정렬Utility.AlignFeetToGround(
+                    visual.transform, memberRoot);
+                var animator = visual.GetComponentInChildren<Animator>(true)
+                    ?? throw new InvalidOperationException(
+                        "TacticalCharacterAnimatorMissing:" + entry.VisualKey);
+                var animationEntry = new 공용AnimationCatalogEntry();
+                animationEntry.Configure(entry.AnimationPackCode,
+                    "tactical-unit", "locomotion.idle.v1",
+                    "locomotion.walk.v1",
+                    공용AnimationSourceKindCodes.ProceduralFallback,
+                    "humanoid.procedural-locomotion.v1", entry.Prefab,
+                    null, null);
+                var adapter = memberRoot.gameObject.AddComponent<공용AnimationAdapter>();
+                adapter.Configure(animationEntry, animator);
+                var view = memberRoot.gameObject.AddComponent<전술분대원View>();
+                view.Configure(stableId, index, adapter);
+                members.Add(view);
+            }
+            var controller = root.gameObject.AddComponent<전술분대대형Controller>();
+            controller.Configure(sideCode, innerFarm, perimeter, forward,
+                agent, members.ToArray());
+            return controller;
+        }
+
+        private static Transform TacticalAnchor(Transform parent,
+            string name, Vector3 localPosition)
+        {
+            var anchor = Child(parent, name);
+            anchor.localPosition = localPosition;
+            return anchor;
+        }
+
+        private static 전술CharacterVisualCatalog EnsureTacticalCharacterVisualCatalog()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<전술CharacterVisualCatalog>(
+                TacticalCharacterVisualCatalogPath);
+            if (catalog == null)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(
+                    TacticalCharacterVisualCatalogPath)!);
+                catalog = ScriptableObject.CreateInstance<전술CharacterVisualCatalog>();
+                AssetDatabase.CreateAsset(catalog, TacticalCharacterVisualCatalogPath);
+            }
+            전술CharacterVisualCatalogEntry Entry(string key, string side,
+                string pack, string prefabPath, int weight)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath)
+                    ?? throw new InvalidOperationException(
+                        "TacticalCharacterPrefabMissing:" + prefabPath);
+                var entry = new 전술CharacterVisualCatalogEntry();
+                entry.Configure(key, side, pack, prefab, weight);
+                return entry;
+            }
+            catalog.Configure("pyeongchang-tactical-character.r1", new[]
+            {
+                Entry("character.tactical.allied.farmer-male",
+                    FarmCombatPresentationCodes.Allied,
+                    월드CompositionPackCodes.Farm,
+                    "Assets/Synty/PolygonFarm/Prefabs/Characters/SM_Chr_Farmer_Male_01.prefab", 2),
+                Entry("character.tactical.allied.farmer-female",
+                    FarmCombatPresentationCodes.Allied,
+                    월드CompositionPackCodes.Farm,
+                    "Assets/Synty/PolygonFarm/Prefabs/Characters/SM_Chr_Farmer_Female_01.prefab", 2),
+                Entry("character.tactical.allied.farmer-senior",
+                    FarmCombatPresentationCodes.Allied,
+                    월드CompositionPackCodes.Farm,
+                    "Assets/Synty/PolygonFarm/Prefabs/Characters/SM_Chr_Farmer_Male_Old_01.prefab", 1),
+                Entry("character.tactical.hostile.charred",
+                    FarmCombatPresentationCodes.Hostile,
+                    월드CompositionPackCodes.Mixed,
+                    "Assets/Synty/PolygonGeneric/Prefabs/Characters/SM_Gen_Chr_Charred_01.prefab", 3),
+                Entry("character.tactical.hostile.skeleton",
+                    FarmCombatPresentationCodes.Hostile,
+                    월드CompositionPackCodes.Mixed,
+                    "Assets/Synty/PolygonGeneric/Prefabs/Characters/SM_Gen_Chr_Skeleton_01.prefab", 1),
+            });
+            catalog.Validate();
+            EditorUtility.SetDirty(catalog);
+            AssetDatabase.SaveAssets();
+            return catalog;
+        }
+
+        private static FigmaMauiWarehouseUiThemeCatalog EnsureFigmaMauiWarehouseUiTheme()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<FigmaMauiWarehouseUiThemeCatalog>(
+                FigmaMauiWarehouseUiThemePath);
+            if (catalog != null) return catalog;
+            Directory.CreateDirectory(Path.GetDirectoryName(FigmaMauiWarehouseUiThemePath)!);
+            catalog = ScriptableObject.CreateInstance<FigmaMauiWarehouseUiThemeCatalog>();
+            AssetDatabase.CreateAsset(catalog, FigmaMauiWarehouseUiThemePath);
+            AssetDatabase.SaveAssets();
+            return catalog;
         }
 
         private static void BuildSettlementTerrain(Transform parent)

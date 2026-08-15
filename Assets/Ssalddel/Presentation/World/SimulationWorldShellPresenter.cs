@@ -112,6 +112,22 @@ namespace Ssalddel.Unity.Presentation.World
             ApplyPresentation(SettlementFocusAnchorId);
         }
 
+        /// <summary>
+        /// 상태 원장의 관찰 단계는 바꾸지 않고 통합 World 안의 표현 초점만 이동합니다.
+        /// Farm 1인칭·전술 시점과 Hub 정보판이 같은 WorldRoot를 공유할 때 사용합니다.
+        /// </summary>
+        public void FocusWorldPresentation(string focusAnchorId)
+        {
+            if (string.IsNullOrWhiteSpace(focusAnchorId))
+                throw new ArgumentException("SimulationWorldPresentationFocusMissing",
+                    nameof(focusAnchorId));
+            worldMapRoot.SetActive(true);
+            settlementInteriorRoot.SetActive(false);
+            cameraRig.Focus(focusAnchorId);
+            cameraRig.ApplyNowForTests();
+            PresentationChanged?.Invoke();
+        }
+
         public void NavigateTo(SimulationWorldNavigationTargetView target)
         {
             if (target == null) throw new ArgumentNullException(nameof(target));
