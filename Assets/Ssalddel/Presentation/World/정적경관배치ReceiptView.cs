@@ -10,6 +10,9 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private string overrideHashSha256 = string.Empty;
         [SerializeField] private string mergedPlanHashSha256 = string.Empty;
         [SerializeField] private string visualCatalogRevision = string.Empty;
+        [SerializeField] private string renderingProfileStableId = string.Empty;
+        [SerializeField] private string renderingProfileRevision = string.Empty;
+        [SerializeField] private string renderingProfileHashSha256 = string.Empty;
         [SerializeField] private int placementCount;
         [SerializeField] private bool presentationOnly = true;
 
@@ -18,6 +21,9 @@ namespace Ssalddel.Unity.Presentation.World
         public string OverrideHashSha256 => overrideHashSha256;
         public string MergedPlanHashSha256 => mergedPlanHashSha256;
         public string VisualCatalogRevision => visualCatalogRevision;
+        public string RenderingProfileStableId => renderingProfileStableId;
+        public string RenderingProfileRevision => renderingProfileRevision;
+        public string RenderingProfileHashSha256 => renderingProfileHashSha256;
         public int PlacementCount => placementCount;
         public bool PresentationOnly => presentationOnly;
 
@@ -27,6 +33,9 @@ namespace Ssalddel.Unity.Presentation.World
             string overrideHash,
             string mergedHash,
             string catalogRevision,
+            string profileStableId,
+            string profileRevision,
+            string profileHash,
             int count)
         {
             planStableId = stableId ?? string.Empty;
@@ -34,6 +43,9 @@ namespace Ssalddel.Unity.Presentation.World
             overrideHashSha256 = overrideHash ?? string.Empty;
             mergedPlanHashSha256 = mergedHash ?? string.Empty;
             visualCatalogRevision = catalogRevision ?? string.Empty;
+            renderingProfileStableId = profileStableId ?? string.Empty;
+            renderingProfileRevision = profileRevision ?? string.Empty;
+            renderingProfileHashSha256 = profileHash ?? string.Empty;
             placementCount = count;
             presentationOnly = true;
         }
@@ -44,6 +56,9 @@ namespace Ssalddel.Unity.Presentation.World
             && overrideHashSha256.Length == 64
             && mergedPlanHashSha256.Length == 64
             && !string.IsNullOrWhiteSpace(visualCatalogRevision)
+            && !string.IsNullOrWhiteSpace(renderingProfileStableId)
+            && !string.IsNullOrWhiteSpace(renderingProfileRevision)
+            && renderingProfileHashSha256.Length == 64
             && placementCount >= 0
             && presentationOnly;
     }

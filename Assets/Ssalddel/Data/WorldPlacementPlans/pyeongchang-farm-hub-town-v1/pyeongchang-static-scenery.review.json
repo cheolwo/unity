@@ -1,14 +1,17 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "reviewStableId": "world-placement-review:pyeongchang-farm-hub-town-v1",
   "briefStableId": "world-placement-brief:pyeongchang-farm-hub-town-v1",
-  "briefRevision": "pyeongchang-static-scenery-brief.v3",
-  "briefHashSha256": "",
+  "briefRevision": "pyeongchang-static-scenery-brief.v5",
+  "briefHashSha256": "9c8618d90bb82b1bb5c590d91cfe736b1ad4b2717c741665af8c67a605bb8c66",
   "planStableId": "world-placement:pyeongchang-farm-hub-town-v1",
-  "basePlanHashSha256": "",
-  "overrideHashSha256": "",
-  "mergedPlanHashSha256": "",
-  "reviewStateCode": "Draft",
-  "reviewedAtUtc": "",
-  "reviewNote": ""
+  "basePlanHashSha256": "4ac3a4e6e82be38e03edb01e7d917e3fe2969ace8ad88b32adcd264ca09ed68e",
+  "overrideHashSha256": "54198396a1d35852f3d3607cb695323cdaa186d0138f417093fa6289d69d35ce",
+  "mergedPlanHashSha256": "54261a3cf942f97afadec44679f64b7fa6d8d2885701d63963b58bf5eb07a7b5",
+  "renderingProfileStableId": "rendering-profile:sim:pyeongchang:rural-clear-late-morning.v2",
+  "renderingProfileRevision": "landscape-quality-pass.v2",
+  "renderingProfileHashSha256": "78f511ad16562f78779cfd8ea460842ea3496a4a837f00260da02c1cc730d1e6",
+  "reviewStateCode": "ApprovedForSceneApply",
+  "reviewedAtUtc": "2026-08-16T05:31:21.5946682+00:00",
+  "reviewNote": "감자 작물을 각 밭고랑 Renderer 경계 안에 두 개씩 배치하고 동일 방향으로 정렬함"
 }

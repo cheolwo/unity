@@ -33,6 +33,9 @@ namespace Ssalddel.Unity.Editor
         public string CityGuideHashSha256 = string.Empty;
         public string FourPackGuideBundleHashSha256 = string.Empty;
         public string CompositionCatalogRevision = string.Empty;
+        public string RenderingProfileStableId = string.Empty;
+        public string RenderingProfileRevision = string.Empty;
+        public string RenderingProfileHashSha256 = string.Empty;
     }
 
     [Serializable]
@@ -82,6 +85,7 @@ namespace Ssalddel.Unity.Editor
             "## 영역별 구성",
             "## 네 팩 배치 기준",
             "## PolygonNature 숲 경관 적용",
+            "## 조명과 명암",
             "## 필수 요소",
             "## 금지 요소",
             "## 성능과 LOD",
@@ -118,6 +122,14 @@ namespace Ssalddel.Unity.Editor
             var brief = LoadBriefMetadata();
             if (!File.Exists(ReviewReceiptPath))
                 WriteReceipt(CreateDraftReceipt(brief));
+            else
+            {
+                var existing = JsonConvert.DeserializeObject<정적경관배치ReviewReceiptData>(
+                    File.ReadAllText(ReviewReceiptPath), JsonSettings);
+                if (existing != null && existing.SchemaVersion < 2
+                    && existing.ReviewStateCode == 정적경관배치ReviewStateCodes.Draft)
+                    WriteReceipt(CreateDraftReceipt(brief));
+            }
             AssetDatabase.Refresh();
         }
 
@@ -155,21 +167,35 @@ namespace Ssalddel.Unity.Editor
                     values, "fourPackGuideBundleHashSha256"),
                 CompositionCatalogRevision = Require(
                     values, "compositionCatalogRevision"),
+                RenderingProfileStableId = Require(
+                    values, "renderingProfileStableId"),
+                RenderingProfileRevision = Require(
+                    values, "renderingProfileRevision"),
+                RenderingProfileHashSha256 = Require(
+                    values, "renderingProfileHashSha256"),
             };
-            if (metadata.BriefSchemaVersion != 3)
+            if (metadata.BriefSchemaVersion != 4)
                 throw new InvalidOperationException(
                     "StaticSceneryPlacementBriefSchemaUnsupported:" + metadata.BriefSchemaVersion);
             if (!IsSha256(metadata.NatureGuideHashSha256)
                 || !IsSha256(metadata.FarmGuideHashSha256)
                 || !IsSha256(metadata.TownGuideHashSha256)
                 || !IsSha256(metadata.CityGuideHashSha256)
-                || !IsSha256(metadata.FourPackGuideBundleHashSha256))
+                || !IsSha256(metadata.FourPackGuideBundleHashSha256)
+                || !IsSha256(metadata.RenderingProfileHashSha256))
                 throw new InvalidOperationException(
                     "StaticSceneryFourPackGuideHashInvalid");
             if (metadata.CompositionCatalogRevision
                 != 정적경관배치PlanPipeline.CompositionCatalogRevision)
                 throw new InvalidOperationException(
                     "StaticSceneryCompositionCatalogReferenceMismatch");
+            var renderingProfile = 평창군경관RenderingFixture.Create();
+            if (metadata.RenderingProfileStableId != renderingProfile.ProfileStableId
+                || metadata.RenderingProfileRevision != renderingProfile.RuleRevision
+                || !SameHash(metadata.RenderingProfileHashSha256,
+                    경관RenderingProfileHash.Compute(renderingProfile)))
+                throw new InvalidOperationException(
+                    "StaticSceneryRenderingProfileReferenceMismatch");
 
             ValidateGuideReference(
                 metadata.NatureGuideStableId, metadata.NatureGuideRevision,
@@ -336,7 +362,11 @@ namespace Ssalddel.Unity.Editor
         {
             var brief = LoadBriefMetadata();
             if (brief.AreaSetStableId != basePlan.AreaSetStableId
-                || brief.PlanStableId != basePlan.PlanStableId)
+                || brief.PlanStableId != basePlan.PlanStableId
+                || brief.RenderingProfileStableId != basePlan.RenderingProfileStableId
+                || brief.RenderingProfileRevision != basePlan.RenderingProfileRevision
+                || !SameHash(brief.RenderingProfileHashSha256,
+                    basePlan.RenderingProfileHashSha256))
                 throw new InvalidOperationException("StaticSceneryPlacementBriefPlanMismatch");
             return Evaluate(
                 brief,
@@ -363,6 +393,13 @@ namespace Ssalddel.Unity.Editor
             if (!SameHash(receipt.BasePlanHashSha256, baseHash)) reasons.Add("BasePlanHash");
             if (!SameHash(receipt.OverrideHashSha256, overrideHash)) reasons.Add("OverrideHash");
             if (!SameHash(receipt.MergedPlanHashSha256, mergedHash)) reasons.Add("MergedPlanHash");
+            if (receipt.RenderingProfileStableId != brief.RenderingProfileStableId)
+                reasons.Add("RenderingProfileStableId");
+            if (receipt.RenderingProfileRevision != brief.RenderingProfileRevision)
+                reasons.Add("RenderingProfileRevision");
+            if (!SameHash(receipt.RenderingProfileHashSha256,
+                    brief.RenderingProfileHashSha256))
+                reasons.Add("RenderingProfileHash");
             var matches = reasons.Count == 0;
             var effective = receipt.ReviewStateCode;
             if (!matches && effective != 정적경관배치ReviewStateCodes.Draft)
@@ -391,7 +428,11 @@ namespace Ssalddel.Unity.Editor
             var mergedPlan = 정적경관배치PlanMerger.Merge(basePlan, overridePlan);
             var brief = LoadBriefMetadata();
             if (brief.AreaSetStableId != basePlan.AreaSetStableId
-                || brief.PlanStableId != basePlan.PlanStableId)
+                || brief.PlanStableId != basePlan.PlanStableId
+                || brief.RenderingProfileStableId != basePlan.RenderingProfileStableId
+                || brief.RenderingProfileRevision != basePlan.RenderingProfileRevision
+                || !SameHash(brief.RenderingProfileHashSha256,
+                    basePlan.RenderingProfileHashSha256))
                 throw new InvalidOperationException("StaticSceneryPlacementBriefPlanMismatch");
             var receipt = new 정적경관배치ReviewReceiptData
             {
@@ -403,6 +444,9 @@ namespace Ssalddel.Unity.Editor
                 BasePlanHashSha256 = 정적경관배치PlanHash.Compute(basePlan),
                 OverrideHashSha256 = 정적경관배치PlanPipeline.ComputeOverrideHash(overridePlan),
                 MergedPlanHashSha256 = 정적경관배치PlanHash.Compute(mergedPlan),
+                RenderingProfileStableId = brief.RenderingProfileStableId,
+                RenderingProfileRevision = brief.RenderingProfileRevision,
+                RenderingProfileHashSha256 = brief.RenderingProfileHashSha256,
                 ReviewStateCode = reviewStateCode,
                 ReviewedAtUtc = DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture),
                 ReviewNote = reviewNote?.Trim() ?? string.Empty,
@@ -449,16 +493,22 @@ namespace Ssalddel.Unity.Editor
             BriefStableId = brief.BriefStableId,
             BriefRevision = brief.BriefRevision,
             PlanStableId = brief.PlanStableId,
+            RenderingProfileStableId = brief.RenderingProfileStableId,
+            RenderingProfileRevision = brief.RenderingProfileRevision,
+            RenderingProfileHashSha256 = brief.RenderingProfileHashSha256,
             ReviewStateCode = 정적경관배치ReviewStateCodes.Draft,
         };
 
         private static void ValidateReceipt(정적경관배치ReviewReceiptData receipt)
         {
-            if (receipt.SchemaVersion != 1
+            if (receipt.SchemaVersion != 2
                 || string.IsNullOrWhiteSpace(receipt.ReviewStableId)
                 || string.IsNullOrWhiteSpace(receipt.BriefStableId)
                 || string.IsNullOrWhiteSpace(receipt.BriefRevision)
                 || string.IsNullOrWhiteSpace(receipt.PlanStableId)
+                || string.IsNullOrWhiteSpace(receipt.RenderingProfileStableId)
+                || string.IsNullOrWhiteSpace(receipt.RenderingProfileRevision)
+                || !IsSha256(receipt.RenderingProfileHashSha256)
                 || !정적경관배치ReviewStateCodes.IsPersistedState(receipt.ReviewStateCode))
                 throw new InvalidOperationException("StaticSceneryReviewReceiptInvalid");
             if (receipt.ReviewStateCode == 정적경관배치ReviewStateCodes.Draft) return;
@@ -547,10 +597,11 @@ namespace Ssalddel.Unity.Editor
             var farmGuide = LoadFarmGuideMetadata();
             var townGuide = LoadTownGuideMetadata();
             var cityGuide = LoadCityGuideMetadata();
+            var renderingProfile = 평창군경관RenderingFixture.Create();
             return $@"---
-briefSchemaVersion: 3
+briefSchemaVersion: 4
 briefStableId: world-placement-brief:pyeongchang-farm-hub-town-v1
-briefRevision: pyeongchang-static-scenery-brief.v4
+briefRevision: pyeongchang-static-scenery-brief.v5
 areaSetStableId: {plan.AreaSetStableId}
 planStableId: {plan.PlanStableId}
 natureGuideStableId: {natureGuide.GuideStableId}
@@ -567,6 +618,9 @@ cityGuideRevision: {cityGuide.GuideRevision}
 cityGuideHashSha256: {ComputeCityGuideHash()}
 fourPackGuideBundleHashSha256: {ComputeFourPackGuideBundleHash()}
 compositionCatalogRevision: {정적경관배치PlanPipeline.CompositionCatalogRevision}
+renderingProfileStableId: {renderingProfile.ProfileStableId}
+renderingProfileRevision: {renderingProfile.RuleRevision}
+renderingProfileHashSha256: {경관RenderingProfileHash.Compute(renderingProfile)}
 ---
 
 # 평창 Farm·Hub·Town 정적 경관 배치 기획서
@@ -599,6 +653,13 @@ compositionCatalogRevision: {정적경관배치PlanPipeline.CompositionCatalogRe
 - 농장과 경작지 경계는 낮은 숲 가장자리와 드문 개별 수목으로 연결한다.
 - 회랑·Hub·Town은 이동과 업무 시야를 막지 않는 완충 수목만 사용한다.
 - 실제 수계 마스크가 연결되기 전에는 수변 완충지와 개울 회랑을 배치하지 않는다.
+
+## 조명과 명암
+
+- PC·봄·평화 상태의 맑은 늦은 오전 Rendering Profile을 기준으로 사용한다.
+- 태양·환경광·안개·URP 후처리와 그림자 Cascade는 Profile 값에서 함께 적용한다.
+- 수관과 큰 바위만 그림자를 만들고 하층 식생은 수신 전용, 원경 능선과 FX는 그림자를 끈다.
+- Rendering Profile 식별자·개정·hash가 달라지면 기존 Scene 적용 승인은 오래된 상태가 된다.
 
 ## 필수 요소
 

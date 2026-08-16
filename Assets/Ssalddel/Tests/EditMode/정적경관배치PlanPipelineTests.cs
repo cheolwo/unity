@@ -14,15 +14,15 @@ namespace Ssalddel.Unity.Tests.EditMode
     public sealed class 정적경관배치PlanPipelineTests
     {
         [Test]
-        public void 평창기본계획은_구획변환과의미키로_137개정적경관을선언한다()
+        public void 평창기본계획은_여덟구획과Nature치환_조명Profile을함께선언한다()
         {
             var plan = 정적경관배치PlanPipeline.LoadMergedPlan();
 
-            Assert.That(plan.SchemaVersion, Is.EqualTo(2));
+            Assert.That(plan.SchemaVersion, Is.EqualTo(3));
             Assert.That(plan.PlanStableId,
                 Is.EqualTo("world-placement:pyeongchang-farm-hub-town-v1"));
-            Assert.That(plan.PlanRevision, Is.EqualTo("pyeongchang-static-scenery.v3"));
-            Assert.That(plan.Placements, Has.Length.EqualTo(137));
+            Assert.That(plan.PlanRevision, Is.EqualTo("pyeongchang-static-scenery.v4"));
+            Assert.That(plan.Placements.Length, Is.GreaterThan(100));
             Assert.That(plan.ContainerTransforms, Has.Length.EqualTo(8));
             Assert.That(plan.ContainerTransforms.Select(item => item.ContainerStableId),
                 Is.EquivalentTo(plan.Placements.Select(item => item.TargetContainerStableId)
@@ -33,20 +33,56 @@ namespace Ssalddel.Unity.Tests.EditMode
                 item.TargetContainerStableId == 정적경관배치ContainerStableIds.ScenicRoot));
             Assert.That(plan.Placements.Count(item =>
                 item.TargetContainerStableId == 정적경관배치ContainerStableIds.FarmSouthWest),
-                Is.EqualTo(3));
+                Is.EqualTo(10));
             Assert.That(plan.Placements.Count(item =>
                 item.TargetContainerStableId == 정적경관배치ContainerStableIds.JinbuHub),
-                Is.EqualTo(3));
+                Is.EqualTo(8));
             Assert.That(plan.Placements.Count(item =>
                 item.TargetContainerStableId == 정적경관배치ContainerStableIds.PyeongchangTown),
-                Is.EqualTo(4));
+                Is.EqualTo(13));
             Assert.That(plan.Placements.Count(item =>
                 item.AssetReferenceKindCode
-                == 정적경관배치AssetReferenceKindCodes.CompositionKey), Is.EqualTo(15));
+                == 정적경관배치AssetReferenceKindCodes.CompositionKey), Is.EqualTo(34));
+            Assert.That(plan.Placements.Count(item =>
+                item.AssetReferenceKindCode
+                == 정적경관배치AssetReferenceKindCodes.CompositionKey
+                && item.AssetKey.StartsWith("nature:", StringComparison.Ordinal)),
+                Is.EqualTo(24));
+            Assert.That(plan.Placements, Has.None.Matches<정적경관배치ItemData>(item =>
+                item.AssetKey.StartsWith("nature:수변 완충지", StringComparison.Ordinal)
+                || item.AssetKey.StartsWith("nature:개울 회랑", StringComparison.Ordinal)));
+            var renderingProfile = 평창군경관RenderingFixture.Create();
+            Assert.That(plan.RenderingProfileStableId,
+                Is.EqualTo(renderingProfile.ProfileStableId));
+            Assert.That(plan.RenderingProfileRevision,
+                Is.EqualTo(renderingProfile.RuleRevision));
+            Assert.That(plan.RenderingProfileHashSha256,
+                Is.EqualTo(경관RenderingProfileHash.Compute(renderingProfile)));
             Assert.That(plan.Placements, Has.None.Matches<정적경관배치ItemData>(item =>
                 item.AssetKey.Contains("Assets/") || item.AssetKey.Contains(".prefab")
                 || item.AssetKey.Contains("\\")));
             Assert.That(정적경관배치PlanHash.Compute(plan), Has.Length.EqualTo(64));
+        }
+
+        [Test]
+        public void 대관령감자작물은_밭고랑안쪽격자와같은방향으로배치된다()
+        {
+            var plan = 정적경관배치PlanPipeline.LoadMergedPlan();
+            var crops = plan.Placements.Where(item => item.Enabled
+                    && item.TargetContainerStableId
+                    == 정적경관배치ContainerStableIds.FarmSouthEast
+                    && item.AssetKey == 법정동경관VisualKeys.Potato)
+                .OrderBy(item => item.PlacementStableId, StringComparer.Ordinal)
+                .ToArray();
+
+            Assert.That(crops, Has.Length.EqualTo(24));
+            Assert.That(crops, Has.All.Matches<정적경관배치ItemData>(item =>
+                Mathf.Abs(Mathf.DeltaAngle(item.RotationY, 8f)) < .001f));
+
+            var report = 정적경관배치PlanPipeline.ValidateAndStage();
+            Assert.That(report.Issues, Has.None.Matches<정적경관배치ValidationIssueData>(
+                item => item.IssueCode == "CropOutsideSoilRowBounds"
+                    || item.IssueCode == "CropRowRotationMismatch"));
         }
 
         [Test]
@@ -165,7 +201,9 @@ namespace Ssalddel.Unity.Tests.EditMode
 
             Assert.That(report.ErrorCount, Is.Zero);
             Assert.That(report.CanStage, Is.True);
-            Assert.That(report.EnabledPlacementCount, Is.EqualTo(137));
+            Assert.That(report.EnabledPlacementCount,
+                Is.EqualTo(정적경관배치PlanPipeline.LoadMergedPlan().Placements
+                    .Count(item => item.Enabled)));
             Assert.That(report.StagingPrefabPaths, Has.Length.EqualTo(8));
             Assert.That(report.StagingPrefabPaths, Has.None.EndsWith(
                 "pyeongchang-scenic-root.prefab"));
@@ -190,6 +228,8 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Assert.That(receipt!.ValidateWiring(), Is.True, path);
                 Assert.That(receipt.MergedPlanHashSha256,
                     Is.EqualTo(report.MergedPlanHashSha256), path);
+                Assert.That(receipt.RenderingProfileHashSha256,
+                    Is.EqualTo(report.RenderingProfileHashSha256), path);
                 var instances = prefab.GetComponentsInChildren<정적경관배치InstanceView>(true);
                 Assert.That(instances, Has.All.Matches<정적경관배치InstanceView>(
                     item => item.ValidateWiring()));
@@ -223,7 +263,7 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Is.EqualTo("world-placement:pyeongchang-farm-hub-town-v1"));
             Assert.That(metadata.AreaSetStableId,
                 Is.EqualTo("pyeongchang-farm-hub-town-v1"));
-            Assert.That(metadata.BriefSchemaVersion, Is.EqualTo(3));
+            Assert.That(metadata.BriefSchemaVersion, Is.EqualTo(4));
             Assert.That(metadata.NatureGuideStableId,
                 Is.EqualTo("landscape-guide:polygon-nature-forest"));
             Assert.That(metadata.NatureGuideHashSha256,
@@ -238,6 +278,13 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Is.EqualTo(정적경관배치ReviewService.ComputeFourPackGuideBundleHash()));
             Assert.That(metadata.CompositionCatalogRevision,
                 Is.EqualTo(정적경관배치PlanPipeline.CompositionCatalogRevision));
+            var renderingProfile = 평창군경관RenderingFixture.Create();
+            Assert.That(metadata.RenderingProfileStableId,
+                Is.EqualTo(renderingProfile.ProfileStableId));
+            Assert.That(metadata.RenderingProfileRevision,
+                Is.EqualTo(renderingProfile.RuleRevision));
+            Assert.That(metadata.RenderingProfileHashSha256,
+                Is.EqualTo(경관RenderingProfileHash.Compute(renderingProfile)));
             Assert.That(
                 정적경관배치PlanHash.Sha256(
                     정적경관배치ReviewService.NormalizeBrief(lf)),
@@ -309,6 +356,9 @@ namespace Ssalddel.Unity.Tests.EditMode
                 BasePlanHashSha256 = baseHash,
                 OverrideHashSha256 = overrideHash,
                 MergedPlanHashSha256 = mergedHash,
+                RenderingProfileStableId = brief.RenderingProfileStableId,
+                RenderingProfileRevision = brief.RenderingProfileRevision,
+                RenderingProfileHashSha256 = brief.RenderingProfileHashSha256,
                 ReviewStateCode = 정적경관배치ReviewStateCodes.ApprovedForSceneApply,
                 ReviewedAtUtc = DateTimeOffset.UtcNow.ToString("O"),
             };
@@ -319,6 +369,9 @@ namespace Ssalddel.Unity.Tests.EditMode
                 brief, briefHash, receipt, baseHash, new string('a', 64), mergedHash);
             var guideStale = 정적경관배치ReviewService.Evaluate(
                 brief, new string('b', 64), receipt, baseHash, overrideHash, mergedHash);
+            receipt.RenderingProfileHashSha256 = new string('c', 64);
+            var profileStale = 정적경관배치ReviewService.Evaluate(
+                brief, briefHash, receipt, baseHash, overrideHash, mergedHash);
 
             Assert.That(approved.IsApprovedForSceneApply, Is.True);
             Assert.That(stale.IsApprovedForSceneApply, Is.False);
@@ -329,6 +382,9 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(guideStale.EffectiveReviewStateCode,
                 Is.EqualTo(정적경관배치ReviewStateCodes.Stale));
             Assert.That(guideStale.MismatchReason, Does.Contain("BriefHash"));
+            Assert.That(profileStale.IsApprovedForSceneApply, Is.False);
+            Assert.That(profileStale.MismatchReason,
+                Does.Contain("RenderingProfileHash"));
         }
 
         [Test]
@@ -365,6 +421,77 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(UnityEngine.Object.FindObjectsByType<GameObject>(
                 FindObjectsInactive.Include, FindObjectsSortMode.None).Length,
                 Is.EqualTo(objectCount));
+        }
+
+        [Test]
+        public void 통합Scene경관Scaffold는_기존타일을보존하고_여덟Anchor를멱등복구한다()
+        {
+            var completion = new GameObject(
+                "CompletionArea_대관령면Farm_1km_L2_2x2").transform;
+            var corridor = new GameObject(
+                "L5_FarmHubTown이동회랑_SimulationRoute").transform;
+            var scenic = new GameObject("L4_L7_Synty경관_PresentationOnly").transform;
+            try
+            {
+                foreach (var name in new[]
+                         {
+                             "Tile_kr5186_l2_700_1144_농장마당_Reference",
+                             "Tile_kr5186_l2_701_1144_감자경작지",
+                             "Tile_kr5186_l2_700_1145_산림전이",
+                             "Tile_kr5186_l2_701_1145_출발회랑",
+                         })
+                    new GameObject(name).transform.SetParent(completion, false);
+
+                var first = 정적경관배치PlanPipeline.EnsureAnchorsForSceneLayout(
+                    completion, corridor, scenic);
+                var second = 정적경관배치PlanPipeline.EnsureAnchorsForSceneLayout(
+                    completion, corridor, scenic);
+
+                Assert.That(first.Count, Is.EqualTo(8));
+                Assert.That(first, Has.All.Matches<정적경관배치AnchorView>(
+                    value => value.ValidateWiring()));
+                foreach (var value in first)
+                    Assert.That(second.Single(item =>
+                            item.ContainerStableId == value.ContainerStableId),
+                        Is.SameAs(value));
+                Assert.That(first.Select(value => value.ContainerStableId),
+                    Is.EquivalentTo(정적경관배치PlanPipeline.GetContainerInfos()
+                        .Select(value => value.StableId)));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(completion.gameObject);
+                UnityEngine.Object.DestroyImmediate(corridor.gameObject);
+                UnityEngine.Object.DestroyImmediate(scenic.gameObject);
+            }
+        }
+
+        [Test]
+        public void Scene적용은_이전정적경관만정리하고_관측창고Fixture와새배치를보존한다()
+        {
+            var legacy = new GameObject("scenic_sim_pyeongchang_farm-mountain-a");
+            var observed = new GameObject(
+                "scenic_sim_pyeongchang_l2-700-1145-observed-fixture-barn");
+            var generated = new GameObject("scenic_sim_pyeongchang_generated");
+            generated.AddComponent<정적경관배치InstanceView>();
+            try
+            {
+                Assert.That(
+                    정적경관배치PlanPipeline.IsLegacyStaticSceneryRoot(legacy.transform),
+                    Is.True);
+                Assert.That(
+                    정적경관배치PlanPipeline.IsLegacyStaticSceneryRoot(observed.transform),
+                    Is.False);
+                Assert.That(
+                    정적경관배치PlanPipeline.IsLegacyStaticSceneryRoot(generated.transform),
+                    Is.False);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(legacy);
+                UnityEngine.Object.DestroyImmediate(observed);
+                UnityEngine.Object.DestroyImmediate(generated);
+            }
         }
     }
 }

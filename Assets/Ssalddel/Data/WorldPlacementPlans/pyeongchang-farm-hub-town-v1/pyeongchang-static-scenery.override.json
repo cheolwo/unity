@@ -2,6 +2,34 @@
   "schemaVersion": 1,
   "overrideStableId": "world-placement-override:pyeongchang-farm-hub-town-v1",
   "basePlanStableId": "world-placement:pyeongchang-farm-hub-town-v1",
-  "expectedBasePlanHashSha256": "401b552c9f61e88eca0ebe57ab85eea17fe86139084928c8345d2a961b692353",
-  "changes": []
+  "expectedBasePlanHashSha256": "4ac3a4e6e82be38e03edb01e7d917e3fe2969ace8ad88b32adcd264ca09ed68e",
+  "changes": [
+    {
+      "operationCode": "Disable",
+      "placementStableId": "scenic:sim:pyeongchang:corridor-fence-2",
+      "expectedPlacementHashSha256": "40259352e9a5eddd6b6698c54364f040127eddd85039f484d3a63cbef21403e1"
+    },
+    {
+      "operationCode": "Modify",
+      "placementStableId": "scenic:sim:pyeongchang:farm-windmill",
+      "expectedPlacementHashSha256": "837e9d7a104052c1d46e675a224e8cd29f69b5eeeabd3324078cbbe1257fb0eb",
+      "adjustment": {
+        "position": {
+          "x": 22.0,
+          "z": 22.0
+        }
+      }
+    },
+    {
+      "operationCode": "Modify",
+      "placementStableId": "scenic:sim:pyeongchang:nature-hub-town-edge-east",
+      "expectedPlacementHashSha256": "87e58cf4877ac28f15fc15dc18bc2bc41bfe4238ccf8913ea311b106224eaa54",
+      "adjustment": {
+        "position": {
+          "x": 8.0,
+          "z": 15.0
+        }
+      }
+    }
+  ]
 }

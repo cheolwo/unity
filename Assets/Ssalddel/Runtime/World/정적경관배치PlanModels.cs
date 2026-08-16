@@ -128,13 +128,16 @@ namespace Ssalddel.Unity.Runtime.World
     [Serializable]
     public sealed class 정적경관배치PlanData
     {
-        public int SchemaVersion = 2;
+        public int SchemaVersion = 3;
         public string PlanStableId = string.Empty;
         public string PlanRevision = string.Empty;
         public 정적경관배치SourceData Source = new();
         public string AreaSetStableId = string.Empty;
         public string VisualCatalogRevision = string.Empty;
         public string CompositionCatalogRevision = string.Empty;
+        public string RenderingProfileStableId = string.Empty;
+        public string RenderingProfileRevision = string.Empty;
+        public string RenderingProfileHashSha256 = string.Empty;
         public int Seed;
         public 정적경관PerformanceBudgetData PerformanceBudget = new();
         public 정적경관배치ContainerTransformData[] ContainerTransforms =
@@ -189,7 +192,7 @@ namespace Ssalddel.Unity.Runtime.World
     [Serializable]
     public sealed class 정적경관배치ReviewReceiptData
     {
-        public int SchemaVersion = 1;
+        public int SchemaVersion = 2;
         public string ReviewStableId = string.Empty;
         public string BriefStableId = string.Empty;
         public string BriefRevision = string.Empty;
@@ -198,6 +201,9 @@ namespace Ssalddel.Unity.Runtime.World
         public string BasePlanHashSha256 = string.Empty;
         public string OverrideHashSha256 = string.Empty;
         public string MergedPlanHashSha256 = string.Empty;
+        public string RenderingProfileStableId = string.Empty;
+        public string RenderingProfileRevision = string.Empty;
+        public string RenderingProfileHashSha256 = string.Empty;
         public string ReviewStateCode = 정적경관배치ReviewStateCodes.Draft;
         public string ReviewedAtUtc = string.Empty;
         public string ReviewNote = string.Empty;
@@ -210,7 +216,7 @@ namespace Ssalddel.Unity.Runtime.World
         public static void Validate(정적경관배치PlanData plan)
         {
             if (plan == null) throw new ArgumentNullException(nameof(plan));
-            Require(plan.SchemaVersion == 2, "지원하지 않는 정적 경관 배치 계획 schema입니다.");
+            Require(plan.SchemaVersion == 3, "지원하지 않는 정적 경관 배치 계획 schema입니다.");
             RequireText(plan.PlanStableId, "배치 계획 식별자");
             RequireText(plan.PlanRevision, "배치 계획 개정");
             Require(plan.Source != null, "배치 계획 원본 정보가 필요합니다.");
@@ -223,6 +229,9 @@ namespace Ssalddel.Unity.Runtime.World
             RequireText(plan.AreaSetStableId, "AreaSet 식별자");
             RequireText(plan.VisualCatalogRevision, "시각 자산 대장 개정");
             RequireText(plan.CompositionCatalogRevision, "조합 대장 개정");
+            RequireText(plan.RenderingProfileStableId, "경관 Rendering Profile 식별자");
+            RequireText(plan.RenderingProfileRevision, "경관 Rendering Profile 개정");
+            RequireSha256(plan.RenderingProfileHashSha256, "경관 Rendering Profile hash");
             Require(plan.Seed != 0, "결정적 seed가 필요합니다.");
             Require(plan.PerformanceBudget != null, "성능 예산이 필요합니다.");
             RequireBudget(plan.PerformanceBudget);
@@ -459,6 +468,9 @@ namespace Ssalddel.Unity.Runtime.World
             AreaSetStableId = value.AreaSetStableId,
             VisualCatalogRevision = value.VisualCatalogRevision,
             CompositionCatalogRevision = value.CompositionCatalogRevision,
+            RenderingProfileStableId = value.RenderingProfileStableId,
+            RenderingProfileRevision = value.RenderingProfileRevision,
+            RenderingProfileHashSha256 = value.RenderingProfileHashSha256,
             Seed = value.Seed,
             PerformanceBudget = new 정적경관PerformanceBudgetData
             {
@@ -531,6 +543,8 @@ namespace Ssalddel.Unity.Runtime.World
                 plan.Source.OutputHashSha256.ToLowerInvariant(),
                 plan.Source.SpatialEvidenceStatusCode, plan.AreaSetStableId,
                 plan.VisualCatalogRevision, plan.CompositionCatalogRevision, plan.Seed,
+                plan.RenderingProfileStableId, plan.RenderingProfileRevision,
+                plan.RenderingProfileHashSha256.ToLowerInvariant(),
                 plan.PerformanceBudget.TriangleLimit,
                 plan.PerformanceBudget.MaterialSlotLimit,
                 plan.PerformanceBudget.DrawCallLimit,
