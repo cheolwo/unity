@@ -28,19 +28,24 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private Vector3 centerTileWorldPosition;
         [SerializeField] private float tileWorldSize = 24f;
         [SerializeField] private float markerWorldY = .16f;
+        [SerializeField, Min(.1f)] private float visualElevationExaggeration = 1.4f;
         [SerializeField] private int originTileX = 공간TileStreamingCodes.CenterX;
         [SerializeField] private int originTileY = 공간TileStreamingCodes.CenterY;
         [SerializeField] private bool presentationOnly = true;
+        [SerializeField] private 공간문법CompositionCatalog landscapeCompositionCatalog = null!;
 
         private readonly Dictionary<string, TileSlot> slots =
             new Dictionary<string, TileSlot>(StringComparer.Ordinal);
         private readonly Stack<TileSlot> pool = new Stack<TileSlot>();
         private I공간TileStreamRepository repository;
+        private I공간TileLandscapeCompositionRepository landscapeRepository;
+        private 공간문법LandscapeRuntimeAssembler landscapeAssembler;
         private 공간TileStreamRecipeData recipe;
         private CancellationTokenSource lifetime;
         private Material activeMaterial;
         private Material preparedMaterial;
         private Material unavailableMaterial;
+        private Material physicalTerrainMaterial;
         private int centerX = int.MinValue;
         private int centerY = int.MinValue;
         private int preparedCenterX = int.MinValue;
@@ -56,6 +61,10 @@ namespace Ssalddel.Unity.Presentation.World
             value.State == 공간Tile표현상태.WaitingForSpatialArtifact);
         public int OutsideCoverageCount => slots.Values.Count(value =>
             value.State == 공간Tile표현상태.OutsideCoverage);
+        public int ActualElevationTileCount => slots.Values.Count(value =>
+            value.PhysicalTerrainRoot != null && value.PhysicalTerrainRoot.activeSelf);
+        public int LandscapeCompositionTileCount => slots.Values.Count(value =>
+            value.LandscapeCompositionRoot != null && value.LandscapeCompositionRoot.activeSelf);
         public int CurrentCenterX => centerX;
         public int CurrentCenterY => centerY;
         public int PreparedCenterX => preparedCenterX;
@@ -107,6 +116,14 @@ namespace Ssalddel.Unity.Presentation.World
             movementDirection = Vector3.zero;
         }
 
+        public void ConfigureLandscapeAssembly(공간문법CompositionCatalog catalog)
+        {
+            landscapeCompositionCatalog = catalog;
+            landscapeAssembler = catalog == null
+                ? null
+                : new 공간문법LandscapeRuntimeAssembler(catalog, tileWorldSize);
+        }
+
         public async Task InitializeAsync(I공간TileStreamRepository streamRepository)
         {
             if (streamRepository == null) throw new ArgumentNullException(nameof(streamRepository));
@@ -115,6 +132,11 @@ namespace Ssalddel.Unity.Presentation.World
             lifetime?.Dispose();
             lifetime = new CancellationTokenSource();
             repository = streamRepository;
+            landscapeRepository = streamRepository as I공간TileLandscapeCompositionRepository;
+            landscapeAssembler = landscapeCompositionCatalog == null
+                ? null
+                : new 공간문법LandscapeRuntimeAssembler(
+                    landscapeCompositionCatalog, tileWorldSize);
             recipe = await repository.LoadRecipeAsync(
                 공간TileStreamingCodes.RecipeStableId, lifetime.Token);
             recipe.Validate();
@@ -195,6 +217,10 @@ namespace Ssalddel.Unity.Presentation.World
                     }
                     slot.IsActiveWindow = active.Contains(key);
                     slot.IsDetailWindow = detail.Contains(key);
+                    if (slot.PhysicalTerrainRoot != null)
+                        slot.PhysicalTerrainRoot.SetActive(slot.IsDetailWindow);
+                    if (slot.LandscapeCompositionRoot != null)
+                        slot.LandscapeCompositionRoot.SetActive(slot.IsDetailWindow);
                     if (slot.Manifest == null)
                         slot.State = 공간Tile표현상태.Preparing;
                     else if (!slot.Manifest.IsWaitingForSpatialArtifact
@@ -208,6 +234,8 @@ namespace Ssalddel.Unity.Presentation.World
                 }
 
                 await LoadInBatchesAsync(newSlots, lifetime.Token);
+                await LoadDetailArtifactsInBatchesAsync(lifetime.Token);
+                await LoadDetailLandscapeInBatchesAsync(lifetime.Token);
                 var centerKey = 공간TileWindowPlanner.TileKey(centerX, centerY);
                 if (slots.TryGetValue(centerKey, out var centerSlot)
                     && centerSlot.State != 공간Tile표현상태.OutsideCoverage)
@@ -275,6 +303,122 @@ namespace Ssalddel.Unity.Presentation.World
             if (batch.Count > 0) await Task.WhenAll(batch);
         }
 
+        private async Task LoadDetailArtifactsInBatchesAsync(CancellationToken cancellationToken)
+        {
+            var pending = slots.Values
+                .Where(slot => slot.IsDetailWindow
+                    && slot.Manifest != null
+                    && !slot.ArtifactLoadAttempted
+                    && slot.Manifest.Layers.Any(layer =>
+                        layer.LayerCode == 공간TileStreamingCodes.ElevationLayer
+                        && layer.StatusCode == 공간TileStreamingCodes.Available))
+                .OrderBy(slot => DistanceSquared(slot.TileKey, centerX, centerY))
+                .ThenBy(slot => slot.TileKey, StringComparer.Ordinal)
+                .ToArray();
+            var batch = new List<Task>(recipe.MaxConcurrentTileLoads);
+            foreach (var slot in pending)
+            {
+                batch.Add(LoadPhysicalElevationAsync(slot, slot.TileKey, cancellationToken));
+                if (batch.Count < recipe.MaxConcurrentTileLoads) continue;
+                await Task.WhenAll(batch);
+                batch.Clear();
+            }
+            if (batch.Count > 0) await Task.WhenAll(batch);
+        }
+
+        private async Task LoadPhysicalElevationAsync(
+            TileSlot slot,
+            string expectedKey,
+            CancellationToken cancellationToken)
+        {
+            slot.ArtifactLoadAttempted = true;
+            try
+            {
+                var payload = await repository.LoadArtifactContentAsync(
+                    expectedKey, 공간TileStreamingCodes.ElevationLayer, cancellationToken);
+                if (slot.TileKey != expectedKey) return;
+                ApplyPhysicalElevation(slot, payload);
+            }
+            catch (Exception exception)
+            {
+                if (slot.TileKey == expectedKey)
+                {
+                    slot.ArtifactLoadFailed = true;
+                    Debug.LogWarning("물리 표고 산출물 표현 실패 · " + expectedKey
+                                     + " · " + exception.Message, this);
+                }
+            }
+        }
+
+        private async Task LoadDetailLandscapeInBatchesAsync(
+            CancellationToken cancellationToken)
+        {
+            if (landscapeRepository == null || landscapeAssembler == null) return;
+            var pending = slots.Values
+                .Where(slot => slot.IsDetailWindow
+                    && slot.Manifest != null
+                    && !slot.Manifest.IsWaitingForSpatialArtifact
+                    && !slot.LandscapeLoadAttempted)
+                .OrderBy(slot => DistanceSquared(slot.TileKey, centerX, centerY))
+                .ThenBy(slot => slot.TileKey, StringComparer.Ordinal)
+                .ToArray();
+            var batch = new List<Task>(recipe.MaxConcurrentTileLoads);
+            foreach (var slot in pending)
+            {
+                batch.Add(LoadLandscapeCompositionAsync(
+                    slot, slot.TileKey, cancellationToken));
+                if (batch.Count < recipe.MaxConcurrentTileLoads) continue;
+                await Task.WhenAll(batch);
+                batch.Clear();
+            }
+            if (batch.Count > 0) await Task.WhenAll(batch);
+        }
+
+        private async Task LoadLandscapeCompositionAsync(
+            TileSlot slot,
+            string expectedKey,
+            CancellationToken cancellationToken)
+        {
+            slot.LandscapeLoadAttempted = true;
+            try
+            {
+                var data = await landscapeRepository.LoadLandscapeCompositionsAsync(
+                    expectedKey, cancellationToken);
+                if (slot.TileKey != expectedKey) return;
+                if (!data.CanAssemble)
+                {
+                    slot.LandscapeLoadAttempted = false;
+                    return;
+                }
+                var staging = landscapeAssembler.BuildStaging(data, slot.Root.transform);
+                if (slot.TileKey != expectedKey)
+                {
+                    Destroy(staging);
+                    return;
+                }
+                공간문법LandscapeRuntimeAssembler.CommitAtomic(
+                    ref slot.LandscapeCompositionRoot, staging);
+                slot.LandscapeGraphHashSha256 = data.GraphHashSha256;
+                slot.LandscapeLoadFailed = false;
+            }
+            catch (InvalidOperationException exception)
+                when (exception.Message.StartsWith(
+                    "WorldTileStreamRequestFailed:404", StringComparison.Ordinal))
+            {
+                if (slot.TileKey == expectedKey)
+                    slot.LandscapeLoadAttempted = false;
+            }
+            catch (Exception exception)
+            {
+                if (slot.TileKey == expectedKey)
+                {
+                    slot.LandscapeLoadFailed = true;
+                    Debug.LogWarning("경관 Graph 조립 실패 · " + expectedKey
+                                     + " · " + exception.Message, this);
+                }
+            }
+        }
+
         private async Task LoadSlotAsync(
             TileSlot slot, string expectedKey, CancellationToken cancellationToken)
         {
@@ -319,6 +463,12 @@ namespace Ssalddel.Unity.Presentation.World
             slots.Remove(key);
             slot.TileKey = string.Empty;
             slot.Manifest = null;
+            ClearPhysicalElevation(slot);
+            ClearLandscapeComposition(slot);
+            slot.ArtifactLoadAttempted = false;
+            slot.ArtifactLoadFailed = false;
+            slot.LandscapeLoadAttempted = false;
+            slot.LandscapeLoadFailed = false;
             slot.Root.SetActive(false);
             pool.Push(slot);
         }
@@ -351,6 +501,69 @@ namespace Ssalddel.Unity.Presentation.World
             slot.Boundary.SetPosition(1, new Vector3(-half, 0f, half));
             slot.Boundary.SetPosition(2, new Vector3(half, 0f, half));
             slot.Boundary.SetPosition(3, new Vector3(half, 0f, -half));
+        }
+
+        private void ApplyPhysicalElevation(
+            TileSlot slot,
+            공간TileArtifactPayloadData payload)
+        {
+            ClearPhysicalElevation(slot);
+            var mesh = 공간PhysicalElevationMeshBuilder.BuildCoreMesh(
+                payload,
+                slot.Manifest.HaloMeters,
+                recipe.TileSizeMeters,
+                tileWorldSize,
+                visualElevationExaggeration,
+                out slot.MinimumPhysicalElevationMeters,
+                out slot.MaximumPhysicalElevationMeters);
+            var terrain = new GameObject("PhysicalElevation_검증된DEM_PresentationOnly");
+            terrain.transform.SetParent(slot.Root.transform, false);
+            terrain.transform.localPosition = new Vector3(0f, -markerWorldY, 0f);
+            var filter = terrain.AddComponent<MeshFilter>();
+            filter.sharedMesh = mesh;
+            var renderer = terrain.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = PhysicalTerrainMaterial();
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            renderer.receiveShadows = true;
+            slot.PhysicalTerrainRoot = terrain;
+            slot.PhysicalTerrainMesh = mesh;
+            slot.ArtifactLoadFailed = false;
+        }
+
+        private static void ClearPhysicalElevation(TileSlot slot)
+        {
+            if (slot.PhysicalTerrainRoot != null) Destroy(slot.PhysicalTerrainRoot);
+            if (slot.PhysicalTerrainMesh != null) Destroy(slot.PhysicalTerrainMesh);
+            slot.PhysicalTerrainRoot = null;
+            slot.PhysicalTerrainMesh = null;
+            slot.MinimumPhysicalElevationMeters = 0f;
+            slot.MaximumPhysicalElevationMeters = 0f;
+        }
+
+        private static void ClearLandscapeComposition(TileSlot slot)
+        {
+            if (slot.LandscapeCompositionRoot != null)
+                Destroy(slot.LandscapeCompositionRoot);
+            slot.LandscapeCompositionRoot = null;
+            slot.LandscapeGraphHashSha256 = string.Empty;
+        }
+
+        private Material PhysicalTerrainMaterial()
+        {
+            if (physicalTerrainMaterial != null) return physicalTerrainMaterial;
+            var shader = Shader.Find("Universal Render Pipeline/Lit")
+                         ?? Shader.Find("Standard")
+                         ?? throw new InvalidOperationException("PhysicalTerrainShaderMissing");
+            physicalTerrainMaterial = new Material(shader)
+            {
+                name = "PhysicalTerrain_대관령저채도초지_PresentationOnly",
+                color = new Color(.31f, .48f, .24f, 1f),
+            };
+            if (physicalTerrainMaterial.HasProperty("_BaseColor"))
+                physicalTerrainMaterial.SetColor("_BaseColor", physicalTerrainMaterial.color);
+            if (physicalTerrainMaterial.HasProperty("_Smoothness"))
+                physicalTerrainMaterial.SetFloat("_Smoothness", .12f);
+            return physicalTerrainMaterial;
         }
 
         private void ApplyVisual(TileSlot slot)
@@ -457,6 +670,8 @@ namespace Ssalddel.Unity.Presentation.World
                 + $" · 활성 {ActiveTileCount}/{ActiveWindowCapacity}"
                 + $" · 준비 {PreparedTileCount}/{PrefetchWindowCapacity}\n"
                 + $"실제 DEM·배치 마스크 자료 대기 {WaitingTileCount} · 범위 밖 {OutsideCoverageCount}\n"
+                + $"검증된 DEM 지형 {ActualElevationTileCount} · "
+                + $"경관 Graph 조립 {LandscapeCompositionTileCount} · "
                 + $"동시 로드 {MaxConcurrentTileLoads} · 표현 전용 경계"
                 + $" · WorldTick {ObservedWorldTick} · 활동판 {ObservedActivityRevision}");
         }
@@ -480,6 +695,9 @@ namespace Ssalddel.Unity.Presentation.World
             if (activeMaterial != null) Destroy(activeMaterial);
             if (preparedMaterial != null) Destroy(preparedMaterial);
             if (unavailableMaterial != null) Destroy(unavailableMaterial);
+            if (physicalTerrainMaterial != null) Destroy(physicalTerrainMaterial);
+            foreach (var slot in slots.Values) ClearPhysicalElevation(slot);
+            foreach (var slot in slots.Values) ClearLandscapeComposition(slot);
         }
 
         private sealed class TileSlot
@@ -491,6 +709,16 @@ namespace Ssalddel.Unity.Presentation.World
             public 공간Tile표현상태 State;
             public bool IsDetailWindow;
             public bool IsActiveWindow;
+            public GameObject PhysicalTerrainRoot;
+            public Mesh PhysicalTerrainMesh;
+            public bool ArtifactLoadAttempted;
+            public bool ArtifactLoadFailed;
+            public float MinimumPhysicalElevationMeters;
+            public float MaximumPhysicalElevationMeters;
+            public GameObject LandscapeCompositionRoot;
+            public string LandscapeGraphHashSha256 = string.Empty;
+            public bool LandscapeLoadAttempted;
+            public bool LandscapeLoadFailed;
         }
     }
 }

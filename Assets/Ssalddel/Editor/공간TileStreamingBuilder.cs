@@ -93,6 +93,11 @@ namespace Ssalddel.Unity.Editor
                 player.transform.position,
                 24f,
                 .16f);
+            var landscapeCatalog = AssetDatabase.LoadAssetAtPath<공간문법CompositionCatalog>(
+                                       공간문법CompositionCatalogBuilder.CatalogPath)
+                                   ?? throw new InvalidOperationException(
+                                       "LandscapeGrammarCatalogMissing");
+            controller.ConfigureLandscapeAssembly(landscapeCatalog);
 
             var gate = root.AddComponent<공간안전이동Gate>();
             gate.Configure(controller, ~0, true);
@@ -126,7 +131,8 @@ namespace Ssalddel.Unity.Editor
             Selection.activeGameObject = root;
             Debug.Log(
                 "WORLD-STREAM-VISIBILITY-1: 3x3 활성·5x5 준비 타일, 안전 이동 경계, "
-                + "시야 기반 건물 프록시→Synty 상세 승격, 런타임 진단 트리를 연결했습니다.");
+                + "시야 기반 건물 프록시→Synty 상세 승격, 경관 Graph 원자적 조립, "
+                + "런타임 진단 트리를 연결했습니다.");
         }
 
         private static GameObject CreateDiagnosticPanel(Transform canvas, out Text treeText)

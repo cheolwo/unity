@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -92,6 +93,55 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public async Task ServerRepository는_공간산출물본문을내려받고_SHA256을다시검증한다()
+        {
+            var bytes = CreateElevationBytes();
+            var client = new BinaryArtifactApiClient(bytes);
+            var repository = new 공간TileStreamServerRepository(client);
+
+            var payload = await repository.LoadArtifactContentAsync(
+                "kr5186:l2:700:1145", 공간TileStreamingCodes.ElevationLayer,
+                CancellationToken.None);
+
+            Assert.That(payload.Bytes, Is.EqualTo(bytes));
+            Assert.That(payload.SampleWidth, Is.EqualTo(63));
+            Assert.That(client.LastRequest.ExpectsBinaryResponse, Is.True);
+            Assert.That(client.LastRequest.RelativePath, Does.EndWith("/content"));
+        }
+
+        [Test]
+        public void PhysicalElevationMesh는_Halo를제외한500m표본만_표현용높이로변환한다()
+        {
+            var bytes = CreateElevationBytes();
+            var payload = new 공간TileArtifactPayloadData
+            {
+                TileKey = "kr5186:l2:700:1145",
+                LayerCode = 공간TileStreamingCodes.ElevationLayer,
+                ArtifactHashSha256 = Hash(bytes),
+                ArtifactFormatCode = "height-f32-v1",
+                SampleWidth = 63,
+                SampleHeight = 63,
+                Bytes = bytes,
+            };
+
+            var mesh = 공간PhysicalElevationMeshBuilder.BuildCoreMesh(
+                payload, 60, 500, 24f, 1.4f, out var minimum, out var maximum);
+            try
+            {
+                Assert.That(mesh.vertexCount, Is.EqualTo(51 * 51));
+                Assert.That(mesh.triangles, Has.Length.EqualTo(50 * 50 * 6));
+                Assert.That(minimum, Is.EqualTo(912f));
+                Assert.That(maximum, Is.EqualTo(1012f));
+                Assert.That(mesh.bounds.min.y, Is.EqualTo(0f).Within(.0001f));
+                Assert.That(mesh.bounds.max.y, Is.GreaterThan(0f));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(mesh);
+            }
+        }
+
+        [Test]
         public async Task Controller는_경계전에9x9준비창을앞당기고_기존Slot을재사용한다()
         {
             var root = new GameObject("TileStreamingTestRoot");
@@ -128,6 +178,38 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Assert.That(controller.OutsideCoverageCount, Is.Zero);
                 Assert.That(visual.childCount, Is.EqualTo(childCount));
                 Assert.That(controller.ObservedActivityRevision, Is.Zero);
+                Assert.That(controller.PresentationOnly, Is.True);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
+        public async Task Controller는_상세범위의검증된DEM만_표현용Mesh로생성한다()
+        {
+            var root = new GameObject("PhysicalElevationStreamingTestRoot");
+            try
+            {
+                var target = new GameObject("Target").transform;
+                target.SetParent(root.transform);
+                var visual = new GameObject("Visual").transform;
+                visual.SetParent(root.transform);
+                var canvas = new GameObject("Canvas", typeof(Canvas));
+                canvas.transform.SetParent(root.transform);
+                var label = new GameObject("Label", typeof(RectTransform), typeof(Text))
+                    .GetComponent<Text>();
+                label.transform.SetParent(canvas.transform);
+                var controller = root.AddComponent<공간TileStreamingController>();
+                controller.Configure(target, visual, label, Vector3.zero, 24f);
+
+                await controller.InitializeAsync(new AvailableElevationRepository());
+
+                Assert.That(controller.ActualElevationTileCount, Is.EqualTo(1));
+                Assert.That(visual.GetComponentsInChildren<MeshFilter>(), Has.Length.EqualTo(1));
+                Assert.That(visual.GetComponentsInChildren<Collider>(), Is.Empty);
+                Assert.That(label.text, Does.Contain("검증된 DEM 지형 1"));
                 Assert.That(controller.PresentationOnly, Is.True);
             }
             finally
@@ -279,6 +361,147 @@ namespace Ssalddel.Unity.Tests.EditMode
                            + "\"evidenceKindCode\":\"Derived\"}",
                 });
             }
+        }
+
+        private sealed class BinaryArtifactApiClient : ISimulationRehearsalUnityApiClient
+        {
+            private readonly byte[] bytes;
+            private readonly string hash;
+
+            public BinaryArtifactApiClient(byte[] value)
+            {
+                bytes = value;
+                hash = Hash(value);
+            }
+
+            public UnityApiRequest LastRequest { get; private set; }
+
+            public Task<UnityApiResponse> SendAsync(
+                UnityApiRequest request, CancellationToken cancellationToken)
+            {
+                LastRequest = request;
+                if (request.ExpectsBinaryResponse)
+                    return Task.FromResult(new UnityApiResponse
+                    {
+                        StatusCode = 200,
+                        BodyBytes = bytes,
+                    });
+                return Task.FromResult(new UnityApiResponse
+                {
+                    StatusCode = 200,
+                    Body = "{\"tileKey\":\"kr5186:l2:700:1145\","
+                           + "\"layerCode\":\"elevation\",\"statusCode\":\"Available\","
+                           + "\"evidenceKindCode\":\"Observed\","
+                           + "\"sourceRevision\":\"Copernicus-DEM-GLO30-N37E128\","
+                           + "\"artifactHashSha256\":\"" + hash + "\","
+                           + "\"artifactRelativePath\":\"generated/elevation.bin\","
+                           + "\"artifactContentPath\":\"/api/simulation/v1/world-stream/tiles/kr5186:l2:700:1145/artifacts/elevation/content\","
+                           + "\"sourceHashSha256\":\"" + new string('b', 64) + "\","
+                           + "\"horizontalCrsCode\":\"EPSG:5186\",\"verticalDatumCode\":\"Unverified\","
+                           + "\"resolutionMeters\":30,\"noDataValue\":\"-32767\","
+                           + "\"artifactFormatCode\":\"height-f32-v1\",\"artifactByteLength\":" + bytes.Length + ","
+                           + "\"sampleWidth\":63,\"sampleHeight\":63,\"presentationOnly\":false}",
+                });
+            }
+        }
+
+        private sealed class AvailableElevationRepository : I공간TileStreamRepository
+        {
+            private readonly 대관령Farm공간TileStreamFixtureRepository fixture =
+                new 대관령Farm공간TileStreamFixtureRepository();
+            private readonly byte[] bytes = CreateElevationBytes();
+
+            public string SourceModeCode => 공간TileStreamingCodes.SimulationServer;
+
+            public Task<공간TileStreamRecipeData> LoadRecipeAsync(
+                string recipeStableId, CancellationToken cancellationToken)
+                => fixture.LoadRecipeAsync(recipeStableId, cancellationToken);
+
+            public async Task<공간TileStreamManifestData> LoadManifestAsync(
+                string tileKey, CancellationToken cancellationToken)
+            {
+                if (tileKey != "kr5186:l2:700:1145")
+                    return await fixture.LoadManifestAsync(tileKey, cancellationToken);
+                var value = new 공간TileStreamManifestData
+                {
+                    RecipeStableId = 공간TileStreamingCodes.RecipeStableId,
+                    TileKey = tileKey,
+                    TileLevel = 2,
+                    TileX = 700,
+                    TileY = 1145,
+                    HaloMeters = 60,
+                    ManifestRevision = "actual-artifact-test.r1",
+                    ManifestHashSha256 = new string('a', 64),
+                    Layers = new[]
+                    {
+                        new 공간TileStreamLayerData
+                        {
+                            LayerCode = 공간TileStreamingCodes.ElevationLayer,
+                            StatusCode = 공간TileStreamingCodes.Available,
+                            EvidenceKindCode = "Observed",
+                            SourceRevision = "Copernicus-DEM-GLO30-N37E128",
+                            ArtifactHashSha256 = Hash(bytes),
+                            ArtifactRelativePath = "generated/elevation.bin",
+                            ArtifactContentPath = "/api/simulation/v1/world-stream/tiles/kr5186:l2:700:1145/artifacts/elevation/content",
+                            SourceHashSha256 = new string('b', 64),
+                            HorizontalCrsCode = "EPSG:5186",
+                            VerticalDatumCode = "Unverified",
+                            ResolutionMeters = 30m,
+                            NoDataValue = "-32767",
+                            ArtifactFormatCode = "height-f32-v1",
+                            ArtifactByteLength = bytes.Length,
+                            SampleWidth = 63,
+                            SampleHeight = 63,
+                            PresentationOnly = false,
+                        },
+                    },
+                    IsOperationalState = false,
+                };
+                value.Validate();
+                return value;
+            }
+
+            public Task<공간TileActivityData> LoadActivitiesAsync(
+                string tileKey, CancellationToken cancellationToken)
+                => fixture.LoadActivitiesAsync(tileKey, cancellationToken);
+
+            public Task<공간TileObjectProjectionData> LoadObjectsAsync(
+                string tileKey, CancellationToken cancellationToken)
+                => fixture.LoadObjectsAsync(tileKey, cancellationToken);
+
+            public Task<공간TileArtifactPayloadData> LoadArtifactContentAsync(
+                string tileKey, string layerCode, CancellationToken cancellationToken)
+            {
+                var value = new 공간TileArtifactPayloadData
+                {
+                    TileKey = tileKey,
+                    LayerCode = layerCode,
+                    ArtifactHashSha256 = Hash(bytes),
+                    ArtifactFormatCode = "height-f32-v1",
+                    SampleWidth = 63,
+                    SampleHeight = 63,
+                    Bytes = bytes,
+                };
+                value.Validate();
+                return Task.FromResult(value);
+            }
+        }
+
+        private static byte[] CreateElevationBytes()
+        {
+            var values = new float[63 * 63];
+            for (var row = 0; row < 63; row++)
+            for (var column = 0; column < 63; column++)
+                values[row * 63 + column] = 900f + row + column;
+            var bytes = new byte[values.Length * sizeof(float)];
+            Buffer.BlockCopy(values, 0, bytes, 0, bytes.Length);
+            return bytes;
+        }
+
+        private static string Hash(byte[] bytes)
+        {
+            using var sha = SHA256.Create();
+            return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", string.Empty);
         }
     }
 }

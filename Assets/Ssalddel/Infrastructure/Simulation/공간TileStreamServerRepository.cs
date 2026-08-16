@@ -7,7 +7,9 @@ using Ssalddel.Unity.Runtime.World;
 
 namespace Ssalddel.Unity.Infrastructure.Simulation
 {
-    public sealed class 공간TileStreamServerRepository : I공간TileStreamRepository
+    public sealed class 공간TileStreamServerRepository : I공간TileStreamRepository,
+        I공간TileLandscapeCompositionRepository,
+        I공간AreaSetLandscapeGraphRepository
     {
         private const string BaseRoute = "api/simulation/v1/world-stream/";
         private readonly ISimulationRehearsalUnityApiClient apiClient;
@@ -45,6 +47,91 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         {
             var value = await GetAsync<공간TileObjectProjectionData>(
                 "tiles/" + Uri.EscapeDataString(tileKey) + "/objects", cancellationToken);
+            value.Validate();
+            return value;
+        }
+
+        public async Task<공간LandscapeCompositionTileData> LoadLandscapeCompositionsAsync(
+            string tileKey, CancellationToken cancellationToken)
+        {
+            var value = await GetAsync<공간LandscapeCompositionTileData>(
+                "tiles/" + Uri.EscapeDataString(tileKey) + "/landscape-compositions",
+                cancellationToken);
+            value.Validate();
+            return value;
+        }
+
+        public async Task<공간AreaSetDefinitionData> LoadAreaSetAsync(
+            string areaSetStableId,
+            CancellationToken cancellationToken)
+        {
+            var value = await GetAsync<공간AreaSetDefinitionData>(
+                "area-sets/" + Uri.EscapeDataString(areaSetStableId), cancellationToken);
+            value.Validate();
+            return value;
+        }
+
+        public async Task<공간LandscapeGraphIndexData> LoadGraphIndexAsync(
+            string areaSetStableId,
+            string centerTileKey,
+            int radiusTiles,
+            CancellationToken cancellationToken)
+        {
+            if (!공간TileWindowPlanner.TryParse(centerTileKey, out _, out _)
+                || radiusTiles < 0 || radiusTiles > 12)
+                throw new InvalidOperationException("WorldLandscapeGraphIndexRequestInvalid");
+            var value = await GetAsync<공간LandscapeGraphIndexData>(
+                "area-sets/" + Uri.EscapeDataString(areaSetStableId)
+                + "/landscape-graphs?tileKey=" + Uri.EscapeDataString(centerTileKey)
+                + "&radiusTiles=" + radiusTiles,
+                cancellationToken);
+            value.Validate();
+            return value;
+        }
+
+        public async Task<공간LandscapeGraphData> LoadGraphAsync(
+            string landscapeGraphStableId,
+            CancellationToken cancellationToken)
+        {
+            var value = await GetAsync<공간LandscapeGraphData>(
+                "landscape-graphs/" + Uri.EscapeDataString(landscapeGraphStableId),
+                cancellationToken);
+            value.Validate();
+            return value;
+        }
+
+        public async Task<공간TileArtifactPayloadData> LoadArtifactContentAsync(
+            string tileKey,
+            string layerCode,
+            CancellationToken cancellationToken)
+        {
+            var descriptor = await GetAsync<공간TileStreamLayerData>(
+                "tiles/" + Uri.EscapeDataString(tileKey)
+                + "/artifacts/" + Uri.EscapeDataString(layerCode), cancellationToken);
+            descriptor.Validate();
+            if (descriptor.StatusCode != 공간TileStreamingCodes.Available)
+                throw new InvalidOperationException("WorldTileStreamArtifactNotFound");
+            var response = await apiClient.SendAsync(new UnityApiRequest
+            {
+                Method = "GET",
+                RelativePath = descriptor.ArtifactContentPath.TrimStart('/'),
+                RequiresAuthentication = false,
+                ExpectsBinaryResponse = true,
+            }, cancellationToken);
+            if (!response.IsSuccess)
+                throw new InvalidOperationException(
+                    "WorldTileStreamArtifactContentFailed:"
+                    + response.StatusCode + ":" + response.ErrorCode);
+            var value = new 공간TileArtifactPayloadData
+            {
+                TileKey = tileKey,
+                LayerCode = layerCode,
+                ArtifactHashSha256 = descriptor.ArtifactHashSha256,
+                ArtifactFormatCode = descriptor.ArtifactFormatCode,
+                SampleWidth = descriptor.SampleWidth.GetValueOrDefault(),
+                SampleHeight = descriptor.SampleHeight.GetValueOrDefault(),
+                Bytes = response.BodyBytes,
+            };
             value.Validate();
             return value;
         }

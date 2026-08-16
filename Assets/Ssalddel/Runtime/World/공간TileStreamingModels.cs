@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +12,10 @@ namespace Ssalddel.Unity.Runtime.World
         public const string RecipeStableId =
             "world-stream:kr:51760:daegwallyeong-farm.v1";
         public const string WaitingForSpatialArtifact = "WaitingForSpatialArtifact";
+        public const string Available = "Available";
+        public const string ElevationLayer = "elevation";
+        public const string LandCoverLayer = "land-cover";
+        public const string PlacementMaskLayer = "placement-mask";
         public const string Fixture = "Fixture";
         public const string SimulationServer = "SimulationServer";
         public const string Scenario = "Scenario";
@@ -99,6 +104,17 @@ namespace Ssalddel.Unity.Runtime.World
         public string SourceRevision = string.Empty;
         public string ArtifactHashSha256;
         public string ArtifactRelativePath;
+        public string ArtifactContentPath;
+        public string SourceHashSha256;
+        public string SourceReferenceDate;
+        public string HorizontalCrsCode;
+        public string VerticalDatumCode;
+        public decimal? ResolutionMeters;
+        public string NoDataValue;
+        public string ArtifactFormatCode;
+        public long? ArtifactByteLength;
+        public int? SampleWidth;
+        public int? SampleHeight;
         public bool PresentationOnly;
 
         public void Validate()
@@ -111,8 +127,45 @@ namespace Ssalddel.Unity.Runtime.World
 
             if (StatusCode == 공간TileStreamingCodes.WaitingForSpatialArtifact
                 && (!string.IsNullOrWhiteSpace(ArtifactHashSha256)
-                    || !string.IsNullOrWhiteSpace(ArtifactRelativePath)))
+                    || !string.IsNullOrWhiteSpace(ArtifactRelativePath)
+                    || !string.IsNullOrWhiteSpace(ArtifactContentPath)))
                 throw new InvalidOperationException("WaitingSpatialArtifactMustNotInventLocation");
+            if (StatusCode == 공간TileStreamingCodes.Available
+                && (ArtifactHashSha256 == null || ArtifactHashSha256.Length != 64
+                    || SourceHashSha256 == null || SourceHashSha256.Length != 64
+                    || string.IsNullOrWhiteSpace(ArtifactContentPath)
+                    || Uri.TryCreate(ArtifactContentPath, UriKind.Absolute, out _)
+                    || ArtifactContentPath.Contains("..")
+                    || HorizontalCrsCode != "EPSG:5186"
+                    || string.IsNullOrWhiteSpace(ArtifactFormatCode)
+                    || ArtifactByteLength <= 0
+                    || SampleWidth <= 0 || SampleHeight <= 0))
+                throw new InvalidOperationException("AvailableSpatialArtifactInvalid");
+        }
+    }
+
+    public sealed class 공간TileArtifactPayloadData
+    {
+        public string TileKey = string.Empty;
+        public string LayerCode = string.Empty;
+        public string ArtifactHashSha256 = string.Empty;
+        public string ArtifactFormatCode = string.Empty;
+        public int SampleWidth;
+        public int SampleHeight;
+        public byte[] Bytes = Array.Empty<byte>();
+
+        public void Validate()
+        {
+            if (!공간TileWindowPlanner.TryParse(TileKey, out _, out _)
+                || string.IsNullOrWhiteSpace(LayerCode)
+                || ArtifactHashSha256 == null || ArtifactHashSha256.Length != 64
+                || string.IsNullOrWhiteSpace(ArtifactFormatCode)
+                || SampleWidth <= 0 || SampleHeight <= 0 || Bytes == null)
+                throw new InvalidOperationException("WorldTileArtifactPayloadInvalid");
+            using var sha = SHA256.Create();
+            var actual = BitConverter.ToString(sha.ComputeHash(Bytes)).Replace("-", string.Empty);
+            if (!actual.Equals(ArtifactHashSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("WorldTileArtifactPayloadHashMismatch");
         }
     }
 
@@ -200,6 +253,11 @@ namespace Ssalddel.Unity.Runtime.World
 
         Task<공간TileObjectProjectionData> LoadObjectsAsync(
             string tileKey, CancellationToken cancellationToken);
+
+        Task<공간TileArtifactPayloadData> LoadArtifactContentAsync(
+            string tileKey,
+            string layerCode,
+            CancellationToken cancellationToken);
     }
 
     public static class 공간TileWindowPlanner
@@ -257,7 +315,8 @@ namespace Ssalddel.Unity.Runtime.World
     /// <summary>
     /// 서버가 없는 Editor/PlayMode 검증용이다. 실제 지형을 만들지 않고 자료 대기 Manifest만 제공한다.
     /// </summary>
-    public sealed class 대관령Farm공간TileStreamFixtureRepository : I공간TileStreamRepository
+    public sealed class 대관령Farm공간TileStreamFixtureRepository : I공간TileStreamRepository,
+        I공간TileLandscapeCompositionRepository
     {
         private const string Hash =
             "9d6e927e758d8f22d19ca45fea98e1198ec42b7ba6c581fa1b97389710600e4e";
@@ -356,6 +415,47 @@ namespace Ssalddel.Unity.Runtime.World
                 PlacementRevision = "world-stream.object-placement.fixture.r1",
                 PlacementHashSha256 = Hash,
                 Objects = ScenarioObjects(tileKey),
+                PresentationOnly = true,
+                IsOperationalState = false,
+            };
+            value.Validate();
+            return Task.FromResult(value);
+        }
+
+        public Task<공간TileArtifactPayloadData> LoadArtifactContentAsync(
+            string tileKey,
+            string layerCode,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            throw new InvalidOperationException("WorldTileStreamArtifactNotFound");
+        }
+
+        public Task<공간LandscapeCompositionTileData> LoadLandscapeCompositionsAsync(
+            string tileKey, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!coverage.Contains(tileKey))
+                throw new InvalidOperationException("WorldTileStreamTileNotFound");
+            var value = new 공간LandscapeCompositionTileData
+            {
+                SchemaVersion = 공간LandscapeCompositionCodes.SchemaVersion,
+                TileKey = tileKey,
+                AreaSetStableId = "pyeongchang-farm-hub-town-v1",
+                GraphBuildStableId = "landscape-graph:pyeongchang-farm-hub-town-v1:" + tileKey,
+                GrammarRevision = 공간LandscapeCompositionCodes.GrammarRevision,
+                StatusCode = 공간LandscapeCompositionCodes.WaitingForSpatialArtifact,
+                Unresolved = new[]
+                {
+                    new 공간LandscapeUnresolvedData
+                    {
+                        UnresolvedStableId = "unresolved:" + tileKey + ":fixture",
+                        ReasonCode = 공간LandscapeCompositionCodes.WaitingForSpatialArtifact,
+                        RequiredSemanticCode = "spatial-layer-and-landscape-grammar",
+                        EvidenceKindCode = "Derived",
+                        Detail = "Fixture는 실제 공간 Graph를 꾸며내지 않습니다.",
+                    },
+                },
                 PresentationOnly = true,
                 IsOperationalState = false,
             };
