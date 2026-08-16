@@ -1,0 +1,509 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &499902861480544355
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 20874237575544338}
+  - component: {fileID: 3299828374264439142}
+  m_Layer: 0
+  m_Name: scenic_sim_pyeongchang_representative-town-shop
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &20874237575544338
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 499902861480544355}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3, y: 1.0063915, z: -4.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4721294260463655159}
+  m_Father: {fileID: 8849636125238112248}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3299828374264439142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 499902861480544355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9152a2d403024e0ca8178754413f0f35, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC815\uC801\uACBD\uAD00\uBC30\uCE58InstanceView"
+  placementStableId: scenic:sim:pyeongchang:representative-town-shop
+  targetContainerStableId: container:pyeongchang-eup:town
+  assetReferenceKindCode: CompositionKey
+  assetKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:B"
+  planHashSha256: 401b552c9f61e88eca0ebe57ab85eea17fe86139084928c8345d2a961b692353
+  presentationOnly: 1
+--- !u!1 &957158162505279022
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8849636125238112248}
+  - component: {fileID: 7916144572490075983}
+  m_Layer: 0
+  m_Name: pyeongchang-town
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8849636125238112248
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 957158162505279022}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2107405312211547511}
+  - {fileID: 4530699043191267548}
+  - {fileID: 9011712650213093950}
+  - {fileID: 20874237575544338}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7916144572490075983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 957158162505279022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f553a82d4424735bdfe7fa711939d3d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC815\uC801\uACBD\uAD00\uBC30\uCE58ReceiptView"
+  planStableId: world-placement:pyeongchang-farm-hub-town-v1
+  basePlanHashSha256: 401b552c9f61e88eca0ebe57ab85eea17fe86139084928c8345d2a961b692353
+  overrideHashSha256: cc989d5bbd7ae7cf82e17c102b85af7fab052a6e7686fb3b0fa40d874d561f3e
+  mergedPlanHashSha256: 401b552c9f61e88eca0ebe57ab85eea17fe86139084928c8345d2a961b692353
+  visualCatalogRevision: legal-dong-scenic-catalog.v2
+  placementCount: 4
+  presentationOnly: 1
+--- !u!1 &6816358760299580612
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4530699043191267548}
+  - component: {fileID: 8614786547375381985}
+  m_Layer: 0
+  m_Name: scenic_sim_pyeongchang_representative-town-delivery-parking
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4530699043191267548
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6816358760299580612}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.77114165, z: -25.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5433304474791063229}
+  m_Father: {fileID: 8849636125238112248}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8614786547375381985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6816358760299580612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9152a2d403024e0ca8178754413f0f35, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC815\uC801\uACBD\uAD00\uBC30\uCE58InstanceView"
+  placementStableId: scenic:sim:pyeongchang:representative-town-delivery-parking
+  targetContainerStableId: container:pyeongchang-eup:town
+  assetReferenceKindCode: CompositionKey
+  assetKey: "town:\uC18C\uD615 \uBC30\uB2EC\xB7\uC8FC\uCC28 \uACF5\uAC04:A"
+  planHashSha256: 401b552c9f61e88eca0ebe57ab85eea17fe86139084928c8345d2a961b692353
+  presentationOnly: 1
+--- !u!1 &8679885444532499136
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9011712650213093950}
+  - component: {fileID: 1464378937124197338}
+  m_Layer: 0
+  m_Name: scenic_sim_pyeongchang_representative-town-housing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9011712650213093950
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8679885444532499136}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -33, y: 0.7117823, z: -4.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8729652623877339560}
+  m_Father: {fileID: 8849636125238112248}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1464378937124197338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8679885444532499136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9152a2d403024e0ca8178754413f0f35, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC815\uC801\uACBD\uAD00\uBC30\uCE58InstanceView"
+  placementStableId: scenic:sim:pyeongchang:representative-town-housing
+  targetContainerStableId: container:pyeongchang-eup:town
+  assetReferenceKindCode: CompositionKey
+  assetKey: "town:\uC800\uCE35 \uC8FC\uD0DD \uBE14\uB85D:A"
+  planHashSha256: 401b552c9f61e88eca0ebe57ab85eea17fe86139084928c8345d2a961b692353
+  presentationOnly: 1
+--- !u!1 &8767736689705047278
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2107405312211547511}
+  - component: {fileID: 6597073759831395354}
+  m_Layer: 0
+  m_Name: scenic_sim_pyeongchang_representative-town-bus-stop
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2107405312211547511
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8767736689705047278}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -30, y: 0.4175935, z: -26.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6392521246829367294}
+  m_Father: {fileID: 8849636125238112248}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6597073759831395354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8767736689705047278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9152a2d403024e0ca8178754413f0f35, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC815\uC801\uACBD\uAD00\uBC30\uCE58InstanceView"
+  placementStableId: scenic:sim:pyeongchang:representative-town-bus-stop
+  targetContainerStableId: container:pyeongchang-eup:town
+  assetReferenceKindCode: CompositionKey
+  assetKey: "town:\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589 \uC27C\uD130:C"
+  planHashSha256: 401b552c9f61e88eca0ebe57ab85eea17fe86139084928c8345d2a961b692353
+  presentationOnly: 1
+--- !u!1001 &1929011616098024661
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4530699043191267548}
+    m_Modifications:
+    - target: {fileID: 2509349290075376514, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_Name
+      value: VisualRoot
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+--- !u!4 &5433304474791063229 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8541661556300761957, guid: 597ad4b51a831a24d802a3bc6303a245, type: 3}
+  m_PrefabInstance: {fileID: 1929011616098024661}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3052040862116638144
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 20874237575544338}
+    m_Modifications:
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6801073783283337043, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      propertyPath: m_Name
+      value: VisualRoot
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+--- !u!4 &4721294260463655159 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3339141828088388430, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+  m_PrefabInstance: {fileID: 3052040862116638144}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4462198943200896472
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2107405312211547511}
+    m_Modifications:
+    - target: {fileID: 6331473846698426294, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_Name
+      value: VisualRoot
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+--- !u!4 &6392521246829367294 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7303192044568717862, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+  m_PrefabInstance: {fileID: 4462198943200896472}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8057621227081925561
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 9011712650213093950}
+    m_Modifications:
+    - target: {fileID: 230705347284565194, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_Name
+      value: VisualRoot
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+--- !u!4 &8729652623877339560 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1654966347133516305, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+  m_PrefabInstance: {fileID: 8057621227081925561}
+  m_PrefabAsset: {fileID: 0}

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "overrideStableId": "world-placement-override:pyeongchang-farm-hub-town-v1",
+  "basePlanStableId": "world-placement:pyeongchang-farm-hub-town-v1",
+  "expectedBasePlanHashSha256": "401b552c9f61e88eca0ebe57ab85eea17fe86139084928c8345d2a961b692353",
+  "changes": []
+}

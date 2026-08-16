@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "reviewStableId": "world-placement-review:pyeongchang-farm-hub-town-v1",
+  "briefStableId": "world-placement-brief:pyeongchang-farm-hub-town-v1",
+  "briefRevision": "pyeongchang-static-scenery-brief.v3",
+  "briefHashSha256": "",
+  "planStableId": "world-placement:pyeongchang-farm-hub-town-v1",
+  "basePlanHashSha256": "",
+  "overrideHashSha256": "",
+  "mergedPlanHashSha256": "",
+  "reviewStateCode": "Draft",
+  "reviewedAtUtc": "",
+  "reviewNote": ""
+}
