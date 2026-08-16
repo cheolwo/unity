@@ -12,7 +12,7 @@ namespace Ssalddel.Unity.Editor
 {
     public static class 팩경관CompositionSetBuilder
     {
-        public const string CatalogRevision = "pyeongchang-four-pack-composition.v1";
+        public const string CatalogRevision = "pyeongchang-four-pack-composition.v2";
         public const string CatalogPath =
             "Assets/Ssalddel/Presentation/World/Catalogs/평창FarmTownCity경관CompositionCatalog.asset";
         public const string PrefabRoot =

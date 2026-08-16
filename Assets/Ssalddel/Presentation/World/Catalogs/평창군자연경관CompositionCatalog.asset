@@ -37,6 +37,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 180
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 3334
     materialSlotCount: 7
     colliderCount: 3
@@ -68,6 +69,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 180
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 2519
     materialSlotCount: 6
     colliderCount: 3
@@ -99,6 +101,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 180
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 14510
     materialSlotCount: 7
     colliderCount: 3
@@ -131,6 +134,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 220
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 3638
     materialSlotCount: 10
     colliderCount: 3
@@ -163,6 +167,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 220
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 2932
     materialSlotCount: 9
     colliderCount: 4
@@ -195,6 +200,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 220
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 2894
     materialSlotCount: 11
     colliderCount: 3
@@ -226,6 +232,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 200
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 3892
     materialSlotCount: 9
     colliderCount: 3
@@ -257,6 +264,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 200
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 1824
     materialSlotCount: 6
     colliderCount: 4
@@ -288,6 +296,7 @@ MonoBehaviour:
     minimumViewDistance: 8
     maximumViewDistance: 200
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 14428
     materialSlotCount: 7
     colliderCount: 3
@@ -320,6 +329,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 100
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 782
     materialSlotCount: 4
     colliderCount: 2
@@ -352,6 +362,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 100
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 766
     materialSlotCount: 4
     colliderCount: 2
@@ -384,6 +395,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 100
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 426
     materialSlotCount: 4
     colliderCount: 2
@@ -416,6 +428,7 @@ MonoBehaviour:
     minimumViewDistance: 5
     maximumViewDistance: 180
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 2978
     materialSlotCount: 4
     colliderCount: 3
@@ -448,6 +461,7 @@ MonoBehaviour:
     minimumViewDistance: 5
     maximumViewDistance: 180
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 3634
     materialSlotCount: 7
     colliderCount: 4
@@ -480,6 +494,7 @@ MonoBehaviour:
     minimumViewDistance: 5
     maximumViewDistance: 180
     gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
     triangleCount: 3504
     materialSlotCount: 5
     colliderCount: 3
@@ -513,6 +528,7 @@ MonoBehaviour:
     minimumViewDistance: 70
     maximumViewDistance: 900
     gpuBudgetTierCode: overview
+    shadowPolicyCode: disabled
     triangleCount: 3297
     materialSlotCount: 4
     colliderCount: 3
@@ -546,6 +562,7 @@ MonoBehaviour:
     minimumViewDistance: 70
     maximumViewDistance: 900
     gpuBudgetTierCode: overview
+    shadowPolicyCode: disabled
     triangleCount: 3232
     materialSlotCount: 4
     colliderCount: 3
@@ -579,6 +596,7 @@ MonoBehaviour:
     minimumViewDistance: 70
     maximumViewDistance: 900
     gpuBudgetTierCode: overview
+    shadowPolicyCode: disabled
     triangleCount: 3393
     materialSlotCount: 4
     colliderCount: 3
@@ -611,6 +629,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 80
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 1032
     materialSlotCount: 6
     colliderCount: 0
@@ -643,6 +662,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 80
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 638
     materialSlotCount: 6
     colliderCount: 0
@@ -675,6 +695,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 80
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 1568
     materialSlotCount: 6
     colliderCount: 0
@@ -707,6 +728,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 140
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 360
     materialSlotCount: 5
     colliderCount: 1
@@ -739,6 +761,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 140
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 402
     materialSlotCount: 5
     colliderCount: 1
@@ -771,6 +794,7 @@ MonoBehaviour:
     minimumViewDistance: 0
     maximumViewDistance: 140
     gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
     triangleCount: 728
     materialSlotCount: 4
     colliderCount: 1

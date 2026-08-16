@@ -105,6 +105,18 @@ namespace Ssalddel.Unity.Presentation.World
         };
     }
 
+    public static class 자연경관ShadowPolicyCodes
+    {
+        public const string CastReceive = "cast-receive";
+        public const string ReceiveOnly = "receive-only";
+        public const string Disabled = "disabled";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            CastReceive, ReceiveOnly, Disabled,
+        };
+    }
+
     [Serializable]
     public sealed class 자연경관CompositionCatalogEntry
     {
@@ -125,6 +137,7 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private float minimumViewDistance;
         [SerializeField] private float maximumViewDistance = 100f;
         [SerializeField] private string gpuBudgetTierCode = string.Empty;
+        [SerializeField] private string shadowPolicyCode = string.Empty;
         [SerializeField] private int triangleCount;
         [SerializeField] private int materialSlotCount;
         [SerializeField] private int colliderCount;
@@ -150,6 +163,7 @@ namespace Ssalddel.Unity.Presentation.World
         public float MinimumViewDistance => minimumViewDistance;
         public float MaximumViewDistance => maximumViewDistance;
         public string GpuBudgetTierCode => gpuBudgetTierCode;
+        public string ShadowPolicyCode => shadowPolicyCode;
         public int TriangleCount => triangleCount;
         public int MaterialSlotCount => materialSlotCount;
         public int ColliderCount => colliderCount;
@@ -177,7 +191,8 @@ namespace Ssalddel.Unity.Presentation.World
             string[] shaderCodes,
             float minViewDistance,
             float maxViewDistance,
-            string budgetTierCode)
+            string budgetTierCode,
+            string rendererShadowPolicyCode)
         {
             setName = name;
             variantCode = variant;
@@ -196,6 +211,7 @@ namespace Ssalddel.Unity.Presentation.World
             minimumViewDistance = minViewDistance;
             maximumViewDistance = maxViewDistance;
             gpuBudgetTierCode = budgetTierCode ?? string.Empty;
+            shadowPolicyCode = rendererShadowPolicyCode ?? string.Empty;
             presentationOnly = true;
 
             triangleCount = sourcePrefab.GetComponentsInChildren<MeshFilter>(true)
@@ -238,12 +254,17 @@ namespace Ssalddel.Unity.Presentation.World
                 && maximumViewDistance > minimumViewDistance
                 && 자연경관GpuBudgetTierCodes.All.Contains(
                     gpuBudgetTierCode, StringComparer.Ordinal)
+                && 자연경관ShadowPolicyCodes.All.Contains(
+                    shadowPolicyCode, StringComparer.Ordinal)
                 && triangleCount >= 0 && materialSlotCount > 0
                 && colliderCount >= 0 && particleSystemCount >= 0
                 && animatorCount >= 0 && lodGroupCount >= 0
                 && presentationOnly
                 && prefab.TryGetComponent<자연경관CompositionSetView>(out var view)
                 && view != null && view.ValidateWiring()
+                && prefab.TryGetComponent<자연경관ShadowPolicyView>(out var shadowView)
+                && shadowView != null && shadowView.ValidateWiring()
+                && shadowView.ShadowPolicyCode == shadowPolicyCode
                 && view.SetName == setName && view.VariantCode == variantCode;
     }
 

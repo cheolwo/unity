@@ -1,10 +1,10 @@
 ---
 guideSchemaVersion: 1
 guideStableId: landscape-guide:polygon-town-local-center
-guideRevision: polygon-town-local-center-guide.v1
+guideRevision: polygon-town-local-center-guide.v2
 sourcePackCode: town
 visualCatalogRevision: legal-dong-scenic-catalog.v2
-compositionCatalogRevision: pyeongchang-four-pack-composition.v1
+compositionCatalogRevision: pyeongchang-four-pack-composition.v2
 presentationOnly: true
 ---
 

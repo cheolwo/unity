@@ -14,6 +14,11 @@ namespace Ssalddel.Unity.Presentation.World
 
         public string ProfileStableId => profile.ProfileStableId;
         public string RuleRevision => profile.RuleRevision;
+        public string ProfileHashSha256 => profile == null
+            ? string.Empty
+            : 경관RenderingProfileHash.Compute(profile);
+        public float ShadowDistance => profile.ShadowDistance;
+        public int ShadowCascadeCount => profile.ShadowCascadeCount;
         public bool PresentationOnly => profile.PresentationOnly;
 
         public void Configure(
@@ -31,6 +36,7 @@ namespace Ssalddel.Unity.Presentation.World
                 && globalVolume.profile != null
                 && firstPersonCamera != null
                 && playerCamera != null
+                && ProfileHashSha256.Length == 64
                 && PresentationOnly;
     }
 }

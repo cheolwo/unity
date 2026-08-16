@@ -1,10 +1,10 @@
 ---
 guideSchemaVersion: 1
 guideStableId: landscape-guide:polygon-farm-rural
-guideRevision: polygon-farm-rural-guide.v1
+guideRevision: polygon-farm-rural-guide.v2
 sourcePackCode: farm
 visualCatalogRevision: legal-dong-scenic-catalog.v2
-compositionCatalogRevision: pyeongchang-four-pack-composition.v1
+compositionCatalogRevision: pyeongchang-four-pack-composition.v2
 presentationOnly: true
 ---
 

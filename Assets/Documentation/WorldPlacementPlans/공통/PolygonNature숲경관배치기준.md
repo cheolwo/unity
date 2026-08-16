@@ -1,10 +1,10 @@
 ---
 guideSchemaVersion: 1
 guideStableId: landscape-guide:polygon-nature-forest
-guideRevision: polygon-nature-forest-guide.v2
+guideRevision: polygon-nature-forest-guide.v3
 sourcePackCode: nature
 visualCatalogRevision: legal-dong-scenic-catalog.v2
-compositionCatalogRevision: pyeongchang-four-pack-composition.v1
+compositionCatalogRevision: pyeongchang-four-pack-composition.v2
 presentationOnly: true
 ---
 
@@ -38,16 +38,16 @@ presentationOnly: true
 
 ## 구성 세트 기준
 
-| 구성 세트 | 역할 | 허용 토지피복 | 물리 경사 | 수계 근거 | 거리·예산 단계 | HLOD |
-| --- | --- | --- | ---: | --- | --- | --- |
-| 활엽수림 군집 | 수관 | 산림 | 0~35도 | 불필요 | 8~180m·Region | 가능 |
-| 침엽수림 군집 | 수관 | 산림 | 0~45도 | 불필요 | 8~220m·Region | 가능 |
-| 혼효림 군집 | 수관 | 산림 | 0~40도 | 불필요 | 8~200m·Region | 가능 |
-| 수변 완충지 | 수변 경계 | 수계 | 0~12도 | 필수 | 0~100m·Task | 불가 |
-| 바위 절개지 | 지형 전환 | 기타 나지 | 15~70도 | 불필요 | 5~180m·Region | 가능 |
-| 산 능선 | 원경 | 산림·기타 나지 | 0~90도 | 불필요 | 70~900m·Overview | 가능 |
-| 숲 가장자리 | 하층 식생 | 산림·경작지 | 0~35도 | 불필요 | 0~80m·Task | 불가 |
-| 개울 회랑 | 수변 경계 | 수계 | 0~10도 | 필수 | 0~140m·Task | 불가 |
+| 구성 세트 | 역할 | 허용 토지피복 | 물리 경사 | 수계 근거 | 거리·예산 단계 | HLOD | 그림자 정책 |
+| --- | --- | --- | ---: | --- | --- | --- | --- |
+| 활엽수림 군집 | 수관 | 산림 | 0~35도 | 불필요 | 8~180m·Region | 가능 | 수관 생성·세부 수신 |
+| 침엽수림 군집 | 수관 | 산림 | 0~45도 | 불필요 | 8~220m·Region | 가능 | 수관 생성·세부 수신 |
+| 혼효림 군집 | 수관 | 산림 | 0~40도 | 불필요 | 8~200m·Region | 가능 | 수관 생성·세부 수신 |
+| 수변 완충지 | 수변 경계 | 수계 | 0~12도 | 필수 | 0~100m·Task | 불가 | 수신 전용 |
+| 바위 절개지 | 지형 전환 | 기타 나지 | 15~70도 | 불필요 | 5~180m·Region | 가능 | 생성·수신 |
+| 산 능선 | 원경 | 산림·기타 나지 | 0~90도 | 불필요 | 70~900m·Overview | 가능 | 동적 그림자 끔 |
+| 숲 가장자리 | 하층 식생 | 산림·경작지 | 0~35도 | 불필요 | 0~80m·Task | 불가 | 수신 전용 |
+| 개울 회랑 | 수변 경계 | 수계 | 0~10도 | 필수 | 0~140m·Task | 불가 | 수신 전용 |
 
 경사와 수계 판정은 `PhysicalElevation`과 공간 마스크를 사용한다. Unity 높이 과장, 계절 색조, 카메라 거리는 배치 가능 여부를 바꾸지 않는다.
 
@@ -59,6 +59,8 @@ presentationOnly: true
 - 수관 내부의 보이지 않는 개별 나무보다 군집의 외곽선과 빈 공간을 우선한다.
 - Triangle, Material Slot, Draw Call, Shadow Caster, Collider, Animator 예산이 80%에 접근하면 Scene 적용 전에 검토한다.
 - 충돌체는 플레이어 이동이나 상호작용에 필요한 큰 나무·바위에만 유지하고 장식 식생에는 기본적으로 두지 않는다.
+- PC 기준 동적 그림자는 80m에서 끝내고 네 단계 Cascade를 사용한다. 45m 이후는 HLOD 대표 Renderer만 그림자를 만드는 후속 bake 대상으로 남긴다.
+- `DetailRoot`는 그림자를 받기만 하고 `FxRoot`와 원경 능선은 동적 그림자를 만들지 않는다.
 
 ## 계절과 사건
 

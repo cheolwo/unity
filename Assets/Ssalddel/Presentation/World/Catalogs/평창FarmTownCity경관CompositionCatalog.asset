@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52473989e7a37bd4090d407d30d106ac, type: 3}
   m_Name: "\uD3C9\uCC3DFarmTownCity\uACBD\uAD00CompositionCatalog"
   m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uD329\uACBD\uAD00CompositionCatalog"
-  catalogRevision: pyeongchang-four-pack-composition.v1
+  catalogRevision: pyeongchang-four-pack-composition.v2
   entries:
   - descriptor:
       compositionKey: "city:Town\u2013Hub \uC804\uD658 \uACBD\uAD00:A"

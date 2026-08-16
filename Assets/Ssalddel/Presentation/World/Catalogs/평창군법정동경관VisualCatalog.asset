@@ -66,7 +66,7 @@ MonoBehaviour:
     estimatedTriangles: 3334
     materialSlotCount: 7
     estimatedDrawCalls: 7
-    shadowCasterCount: 6
+    shadowCasterCount: 4
     colliderCount: 3
     animatorCount: 0
     clusterAllowed: 1
@@ -748,7 +748,7 @@ MonoBehaviour:
     estimatedTriangles: 3892
     materialSlotCount: 9
     estimatedDrawCalls: 9
-    shadowCasterCount: 6
+    shadowCasterCount: 5
     colliderCount: 3
     animatorCount: 0
     clusterAllowed: 1

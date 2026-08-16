@@ -138,6 +138,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3978704514342096957}
   - component: {fileID: 1535444495965416666}
+  - component: {fileID: 2041529423305396615}
   m_Layer: 0
   m_Name: "\uCE68\uC5FD\uC218\uB9BC\uAD70\uC9D1_C"
   m_TagString: Untagged
@@ -174,7 +175,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7bd7b78633a6446a88bf618294eabeb0, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC790\uC5F0\uACBD\uAD00CompositionSetView"
   setName: "\uCE68\uC5FD\uC218\uB9BC \uAD70\uC9D1"
   variantCode: C
@@ -183,6 +184,26 @@ MonoBehaviour:
   detailRoot: {fileID: 9120077767682876071}
   fxRoot: {fileID: 7860396301147869032}
   footprint: {x: 12, y: 12}
+  presentationOnly: 1
+--- !u!114 &2041529423305396615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6172028977436498312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f98fecf61ec73c4ea2f733d85bdbd8d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC790\uC5F0\uACBD\uAD00ShadowPolicyView"
+  shadowPolicyCode: cast-receive
+  environmentRoot: {fileID: 691626349045626197}
+  occlusionRoot: {fileID: 3070047449625281127}
+  detailRoot: {fileID: 9120077767682876071}
+  fxRoot: {fileID: 7860396301147869032}
+  castingRendererCount: 5
+  receiveOnlyRendererCount: 2
   presentationOnly: 1
 --- !u!1001 &3114220801910853913
 PrefabInstance:
@@ -246,6 +267,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4031051372955858, guid: 4ac1d639b5994b345bdc22dd8e415a06, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 23305259366435156, guid: 4ac1d639b5994b345bdc22dd8e415a06, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 23539593579895052, guid: 4ac1d639b5994b345bdc22dd8e415a06, type: 3}
+      propertyPath: m_CastShadows
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

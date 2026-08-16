@@ -37,7 +37,8 @@ namespace Ssalddel.Unity.Editor
                     rule.RequiresWaterMask, 자연경관SeasonCodes.All.ToArray(),
                     new[] { 자연경관MoodCodes.Peaceful }, rule.MotionPolicyCode,
                     rule.ShaderFeatureCodes, rule.MinimumViewDistance,
-                    rule.MaximumViewDistance, rule.GpuBudgetTierCode);
+                    rule.MaximumViewDistance, rule.GpuBudgetTierCode,
+                    rule.ShadowPolicyCode);
                 entries.Add(entry);
             }
 
@@ -92,9 +93,16 @@ namespace Ssalddel.Unity.Editor
                 var view = root.AddComponent<자연경관CompositionSetView>();
                 view.Configure(setName, variant, environment, occlusion, detail,
                     fx, Footprint(setName));
+                var shadowPolicy = root.AddComponent<자연경관ShadowPolicyView>();
+                shadowPolicy.Configure(
+                    Rule(setName).ShadowPolicyCode,
+                    environment, occlusion, detail, fx);
                 if (!view.ValidateWiring())
                     throw new InvalidOperationException(
                         "NatureCompositionWiringInvalid:" + setName + ":" + variant);
+                if (!shadowPolicy.ValidateWiring())
+                    throw new InvalidOperationException(
+                        "NatureShadowPolicyWiringInvalid:" + setName + ":" + variant);
 
                 var path = PrefabPath(setName, variant);
                 var saved = PrefabUtility.SaveAsPrefabAsset(root, path)
@@ -295,34 +303,39 @@ namespace Ssalddel.Unity.Editor
                     new[] { 법정동LandCoverCodes.Forest }, 0f, 35f, false,
                     자연경관MotionPolicyCodes.VegetationWind,
                     new[] { 자연경관ShaderFeatureCodes.VegetationWind },
-                    8f, 180f, 자연경관GpuBudgetTierCodes.Region, true);
+                    8f, 180f, 자연경관GpuBudgetTierCodes.Region, true,
+                    자연경관ShadowPolicyCodes.CastReceive);
             if (setName == 자연경관SetNames.침엽수림군집)
                 return new SetRule(자연경관RoleCodes.Canopy,
                     new[] { 법정동LandCoverCodes.Forest }, 0f, 45f, false,
                     자연경관MotionPolicyCodes.VegetationWind,
                     new[] { 자연경관ShaderFeatureCodes.VegetationWind,
                         자연경관ShaderFeatureCodes.MossSnow },
-                    8f, 220f, 자연경관GpuBudgetTierCodes.Region, true);
+                    8f, 220f, 자연경관GpuBudgetTierCodes.Region, true,
+                    자연경관ShadowPolicyCodes.CastReceive);
             if (setName == 자연경관SetNames.혼효림군집)
                 return new SetRule(자연경관RoleCodes.Canopy,
                     new[] { 법정동LandCoverCodes.Forest }, 0f, 40f, false,
                     자연경관MotionPolicyCodes.VegetationWind,
                     new[] { 자연경관ShaderFeatureCodes.VegetationWind },
-                    8f, 200f, 자연경관GpuBudgetTierCodes.Region, true);
+                    8f, 200f, 자연경관GpuBudgetTierCodes.Region, true,
+                    자연경관ShadowPolicyCodes.CastReceive);
             if (setName == 자연경관SetNames.수변완충지)
                 return new SetRule(자연경관RoleCodes.WaterEdge,
                     new[] { 법정동LandCoverCodes.Water }, 0f, 12f, true,
                     자연경관MotionPolicyCodes.VegetationWind,
                     new[] { 자연경관ShaderFeatureCodes.VegetationWind,
                         자연경관ShaderFeatureCodes.Water },
-                    0f, 100f, 자연경관GpuBudgetTierCodes.Task, false);
+                    0f, 100f, 자연경관GpuBudgetTierCodes.Task, false,
+                    자연경관ShadowPolicyCodes.ReceiveOnly);
             if (setName == 자연경관SetNames.바위절개지)
                 return new SetRule(자연경관RoleCodes.TerrainTransition,
                     new[] { 법정동LandCoverCodes.BareGround }, 15f, 70f, false,
                     자연경관MotionPolicyCodes.Static,
                     new[] { 자연경관ShaderFeatureCodes.MossSnow,
                         자연경관ShaderFeatureCodes.TerrainNormal },
-                    5f, 180f, 자연경관GpuBudgetTierCodes.Region, true);
+                    5f, 180f, 자연경관GpuBudgetTierCodes.Region, true,
+                    자연경관ShadowPolicyCodes.CastReceive);
             if (setName == 자연경관SetNames.산능선)
                 // 원경 실루엣 보강용이므로 배치 지점 경사로 DEM을 대체하지 않습니다.
                 return new SetRule(자연경관RoleCodes.Backdrop,
@@ -331,21 +344,24 @@ namespace Ssalddel.Unity.Editor
                     자연경관MotionPolicyCodes.Static,
                     new[] { 자연경관ShaderFeatureCodes.MossSnow,
                         자연경관ShaderFeatureCodes.TerrainNormal },
-                    70f, 900f, 자연경관GpuBudgetTierCodes.Overview, true);
+                    70f, 900f, 자연경관GpuBudgetTierCodes.Overview, true,
+                    자연경관ShadowPolicyCodes.Disabled);
             if (setName == 자연경관SetNames.숲가장자리)
                 return new SetRule(자연경관RoleCodes.Understory,
                     new[] { 법정동LandCoverCodes.Forest,
                         법정동LandCoverCodes.Cropland }, 0f, 35f, false,
                     자연경관MotionPolicyCodes.VegetationWind,
                     new[] { 자연경관ShaderFeatureCodes.VegetationWind },
-                    0f, 80f, 자연경관GpuBudgetTierCodes.Task, false);
+                    0f, 80f, 자연경관GpuBudgetTierCodes.Task, false,
+                    자연경관ShadowPolicyCodes.ReceiveOnly);
             if (setName == 자연경관SetNames.개울회랑)
                 return new SetRule(자연경관RoleCodes.WaterEdge,
                     new[] { 법정동LandCoverCodes.Water }, 0f, 10f, true,
                     자연경관MotionPolicyCodes.WaterSurface,
                     new[] { 자연경관ShaderFeatureCodes.Water,
                         자연경관ShaderFeatureCodes.VegetationWind },
-                    0f, 140f, 자연경관GpuBudgetTierCodes.Task, false);
+                    0f, 140f, 자연경관GpuBudgetTierCodes.Task, false,
+                    자연경관ShadowPolicyCodes.ReceiveOnly);
             throw new InvalidOperationException("NatureCompositionRuleMissing:" + setName);
         }
 
@@ -408,7 +424,8 @@ namespace Ssalddel.Unity.Editor
                 float minimumViewDistance,
                 float maximumViewDistance,
                 string gpuBudgetTierCode,
-                bool hlodEligible)
+                bool hlodEligible,
+                string shadowPolicyCode)
             {
                 RoleCode = roleCode;
                 LandCoverCodes = landCoverCodes;
@@ -421,6 +438,7 @@ namespace Ssalddel.Unity.Editor
                 MaximumViewDistance = maximumViewDistance;
                 GpuBudgetTierCode = gpuBudgetTierCode;
                 HlodEligible = hlodEligible;
+                ShadowPolicyCode = shadowPolicyCode;
             }
 
             public string RoleCode { get; }
@@ -434,6 +452,7 @@ namespace Ssalddel.Unity.Editor
             public float MaximumViewDistance { get; }
             public string GpuBudgetTierCode { get; }
             public bool HlodEligible { get; }
+            public string ShadowPolicyCode { get; }
         }
     }
 }

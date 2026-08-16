@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1685018220856586582}
   - component: {fileID: 8679892327658222923}
+  - component: {fileID: 9020146009984277547}
   m_Layer: 0
   m_Name: "\uAC1C\uC6B8\uD68C\uB791_C"
   m_TagString: Untagged
@@ -46,7 +47,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7bd7b78633a6446a88bf618294eabeb0, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC790\uC5F0\uACBD\uAD00CompositionSetView"
   setName: "\uAC1C\uC6B8 \uD68C\uB791"
   variantCode: C
@@ -55,6 +56,26 @@ MonoBehaviour:
   detailRoot: {fileID: 968388809397877611}
   fxRoot: {fileID: 6882303669117277940}
   footprint: {x: 14, y: 7}
+  presentationOnly: 1
+--- !u!114 &9020146009984277547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2645403337545550289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f98fecf61ec73c4ea2f733d85bdbd8d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC790\uC5F0\uACBD\uAD00ShadowPolicyView"
+  shadowPolicyCode: receive-only
+  environmentRoot: {fileID: 8710495222203042235}
+  occlusionRoot: {fileID: 4131190282836923895}
+  detailRoot: {fileID: 968388809397877611}
+  fxRoot: {fileID: 6882303669117277940}
+  castingRendererCount: 0
+  receiveOnlyRendererCount: 3
   presentationOnly: 1
 --- !u!1 &5088241491013712126
 GameObject:
@@ -322,6 +343,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23311433635830680, guid: 373ac020d10c6b74e91bfe01a3eb0ae2, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -396,6 +421,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23055005552026272, guid: 52316e3e78c11ac4db135f7d117875ce, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -468,6 +497,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4592108662704944, guid: 0cf4a00378953af4789117036429a8c6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 23232349256732072, guid: 0cf4a00378953af4789117036429a8c6, type: 3}
+      propertyPath: m_CastShadows
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -41,6 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8751838757793167897}
   - component: {fileID: 7725279746468283847}
+  - component: {fileID: 3945006523705070128}
   m_Layer: 0
   m_Name: "\uD63C\uD6A8\uB9BC\uAD70\uC9D1_C"
   m_TagString: Untagged
@@ -77,7 +78,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7bd7b78633a6446a88bf618294eabeb0, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC790\uC5F0\uACBD\uAD00CompositionSetView"
   setName: "\uD63C\uD6A8\uB9BC \uAD70\uC9D1"
   variantCode: C
@@ -86,6 +87,26 @@ MonoBehaviour:
   detailRoot: {fileID: 4301871535954106423}
   fxRoot: {fileID: 8705171680515782281}
   footprint: {x: 12, y: 12}
+  presentationOnly: 1
+--- !u!114 &3945006523705070128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376734424663736105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f98fecf61ec73c4ea2f733d85bdbd8d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uC790\uC5F0\uACBD\uAD00ShadowPolicyView"
+  shadowPolicyCode: cast-receive
+  environmentRoot: {fileID: 8193376643847775849}
+  occlusionRoot: {fileID: 3489888724320100224}
+  detailRoot: {fileID: 4301871535954106423}
+  fxRoot: {fileID: 8705171680515782281}
+  castingRendererCount: 4
+  receiveOnlyRendererCount: 1
   presentationOnly: 1
 --- !u!1 &1381205117382119704
 GameObject:
@@ -320,6 +341,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4387668440234660, guid: 5bd70a33951586a43a423d1366da97c0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 23740498721990942, guid: 5bd70a33951586a43a423d1366da97c0, type: 3}
+      propertyPath: m_CastShadows
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
