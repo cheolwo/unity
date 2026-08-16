@@ -97,12 +97,22 @@ namespace Ssalddel.Unity.Tests.EditMode
 
             Assert.That(value.Validate(), Is.True);
             Assert.That(value.ProfileStableId,
-                Is.EqualTo("rendering-profile:sim:pyeongchang:rural-clear-day.v1"));
-            Assert.That(value.RuleRevision, Is.EqualTo("landscape-quality-pass.v1"));
+                Is.EqualTo(
+                    "rendering-profile:sim:pyeongchang:rural-clear-late-morning.v2"));
+            Assert.That(value.RuleRevision, Is.EqualTo("landscape-quality-pass.v2"));
+            Assert.That(value.SunIntensity, Is.EqualTo(1.30f));
+            Assert.That(value.SunPitch, Is.EqualTo(42f));
+            Assert.That(value.SunYaw, Is.EqualTo(-32f));
+            Assert.That(value.ShadowDistance, Is.EqualTo(80f));
+            Assert.That(value.ShadowCascadeCount, Is.EqualTo(4));
+            Assert.That(value.ShadowCascade1, Is.LessThan(value.ShadowCascade2));
+            Assert.That(value.ShadowCascade2, Is.LessThan(value.ShadowCascade3));
+            Assert.That(value.AmbientOcclusionIntensity, Is.EqualTo(.35f));
             Assert.That(value.FirstPersonEyeHeight, Is.EqualTo(1.68f));
             Assert.That(value.FirstPersonFieldOfView, Is.EqualTo(62f));
             Assert.That(value.FogEndDistance, Is.GreaterThan(value.FogStartDistance));
             Assert.That(value.PresentationOnly, Is.True);
+            Assert.That(경관RenderingProfileHash.Compute(value), Has.Length.EqualTo(64));
         }
 
         [Test]

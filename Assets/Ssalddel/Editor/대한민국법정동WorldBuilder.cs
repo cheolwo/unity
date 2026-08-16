@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Ssalddel.Unity.Bootstrap;
+using Ssalddel.Unity.Presentation.Configuration;
 using Ssalddel.Unity.Presentation.World;
 using Ssalddel.Unity.Runtime.World;
 using UnityEditor;
@@ -121,15 +123,16 @@ namespace Ssalddel.Unity.Editor
             if (rejectedFinalVisuals > 0)
                 throw new InvalidOperationException(
                     "LegalDongScenicFinalPipelineBindingRejected:" + rejectedFinalVisuals);
-            BuildScenery(scenicLayer, referenceTileRoot, scenicPlan, catalog);
-            BuildFarmCompletionArea(completionAreaRoot, catalog);
-            BuildFarmHubCorridor(corridorLayer, catalog);
-            BuildHubTownCorridor(corridorLayer, catalog);
+            BuildFarmCompletionAreaScaffold(completionAreaRoot);
+            BuildStaticSceneryAreaAnchors(scenicLayer);
+            BuildStaticSceneryCorridorAnchors(corridorLayer);
             BuildTitle(debugLayer, projection, scenicPlan);
             BuildSimulationVan(pipelineRoot, catalog);
             BuildEvidenceCameras(pipelineRoot);
             BuildRoleNpcGroup(pipelineRoot, roleCharacterCatalog);
             BuildPlayerExplorer(pipelineRoot, playerProfile, roleCharacterCatalog);
+            Build대관령L2창고일인칭상호작용(
+                pipelineRoot, completionAreaRoot, catalog);
             BuildGraphicsQualityPipeline(pipelineRoot, renderingProfile);
             var pipelineView = pipelineRoot.gameObject.AddComponent<공간WorldPipelineView>();
             pipelineView.Configure(spatialRecipe, compositionProfile, spatialManifest,
@@ -148,6 +151,57 @@ namespace Ssalddel.Unity.Editor
             EditorSceneManager.SaveScene(scene);
             AssetDatabase.SaveAssets();
             Debug.Log("WORLD-COMPLETION-AREA-1: 대관령면 Farm 1km 경관 완결 영역을 L2 500m 2x2 구획으로 구성했습니다. WorldCover 위치와 Scenario 경관은 분리했고 Scene Mesh는 아직 ScenarioTerrainPreview입니다.");
+        }
+
+        [MenuItem("Ssalddel/WORLD-INVENTORY-UNITY-2 대관령 L2 창고 1인칭 상호작용 연결")]
+        public static void Build대관령L2창고일인칭상호작용()
+        {
+            var scene = EditorSceneManager.GetActiveScene();
+            if (scene.path != ScenePath)
+                scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            var pipelineRoot = GameObject.Find(
+                "SimulationWorldShell/WorldMapRoot/OfficialRegionProjectionRoot/"
+                + "SpatialPipeline_EPSG5186_TileAreaSet")?.transform
+                ?? throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseSpatialPipelineMissing");
+            var completionArea = pipelineRoot.Find(
+                "L4_L7_Synty경관_PresentationOnly/"
+                + "CompletionArea_대관령면Farm_1km_L2_2x2")
+                ?? throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseCompletionAreaMissing");
+            Build대관령L2창고일인칭상호작용(
+                pipelineRoot, completionArea, EnsureCatalog());
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseInteractionSceneSaveFailed");
+            AssetDatabase.SaveAssets();
+            Validate대관령L2창고일인칭상호작용OpenScene();
+            Debug.Log("WORLD-INVENTORY-UNITY-2: 대관령 L2 Barn Pallet의 1인칭 Preview·Confirm 연결을 저장했습니다.");
+        }
+
+        public static void Validate대관령L2창고일인칭상호작용OpenScene()
+        {
+            var target = UnityEngine.Object
+                .FindFirstObjectByType<대관령L2창고상호작용TargetView>(
+                    FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseInteractionTargetMissing");
+            var interaction = UnityEngine.Object
+                .FindFirstObjectByType<일인칭창고상호작용Controller>(
+                    FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseInteractionControllerMissing");
+            var composition = UnityEngine.Object
+                .FindFirstObjectByType<대관령L2창고아이템CompositionRoot>(
+                    FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseCompositionMissing");
+            if (!target.ValidateWiring() || !interaction.ValidateWiring()
+                || !target.PresentationOnly || !interaction.PresentationOnly
+                || composition == null)
+                throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseInteractionWiringInvalid");
         }
 
         [MenuItem("Ssalddel/WORLD-LEGAL-3 공간 Pipeline 배치 증거 캡처")]
@@ -478,9 +532,90 @@ namespace Ssalddel.Unity.Editor
             }
         }
 
+        /// <summary>
+        /// 지면·배치 Container·동적 계절 표현만 준비합니다.
+        /// 정적 Synty Prefab은 WORLD-PLAN-3에서 검증된 JSON 계획으로만 적용합니다.
+        /// </summary>
+        private static void BuildFarmCompletionAreaScaffold(Transform completionAreaRoot)
+        {
+            var natureCatalog = AssetDatabase
+                .LoadAssetAtPath<자연경관CompositionCatalog>(
+                    자연경관CompositionSetBuilder.CatalogPath)
+                ?? throw new InvalidOperationException(
+                    "PyeongchangNatureCompositionCatalogMissing");
+            natureCatalog.Validate();
+            var southWest = completionAreaRoot.Find(
+                    "ReferenceTile_대관령면_L2_500m_HandAuthored")
+                ?? throw new InvalidOperationException("FarmCompletionReferenceTileMissing");
+            southWest.name = "Tile_kr5186_l2_700_1144_농장마당_Reference";
+            var southEast = Child(completionAreaRoot,
+                "Tile_kr5186_l2_701_1144_감자경작지");
+            var northWest = Child(completionAreaRoot,
+                "Tile_kr5186_l2_700_1145_산림전이");
+            var northEast = Child(completionAreaRoot,
+                "Tile_kr5186_l2_701_1145_출발회랑");
+
+            정적경관배치PlanPipeline.ConfigureAnchor(
+                southWest, 정적경관배치ContainerStableIds.FarmSouthWest);
+            정적경관배치PlanPipeline.ConfigureAnchor(
+                southEast, 정적경관배치ContainerStableIds.FarmSouthEast);
+            정적경관배치PlanPipeline.ConfigureAnchor(
+                northWest, 정적경관배치ContainerStableIds.FarmNorthWest);
+            정적경관배치PlanPipeline.ConfigureAnchor(
+                northEast, 정적경관배치ContainerStableIds.FarmNorthEast);
+
+            CompletionGround(southWest, "농장마당지면", 16f, 7f,
+                new Color(.39f, .34f, .19f));
+            CompletionGround(southEast, "감자경작지지면", 26f, 7f,
+                new Color(.45f, .31f, .16f));
+            CompletionGround(northWest, "산림전이지면", 16f, 17f,
+                new Color(.20f, .33f, .17f));
+            CompletionGround(northEast, "출발회랑지면", 26f, 17f,
+                new Color(.30f, .37f, .19f));
+
+            BuildNatureSeasonAndEventPresentation(completionAreaRoot, natureCatalog);
+            var labels = Child(completionAreaRoot, "MapMode_완결영역구획Label");
+            Label(labels, "농장마당Label", "농장 마당\n700:1144",
+                new Vector3(16f, 1.2f, 7f), Color.white, .12f);
+            Label(labels, "경작지Label", "감자 경작지\n701:1144",
+                new Vector3(26f, 1.2f, 7f), Color.white, .12f);
+            Label(labels, "산림전이Label", "산림 전이\n700:1145",
+                new Vector3(16f, 1.2f, 17f), Color.white, .12f);
+            Label(labels, "출발회랑Label", "출발 회랑\n701:1145",
+                new Vector3(26f, 1.2f, 17f), Color.white, .12f);
+            labels.gameObject.SetActive(false);
+        }
+
+        private static void BuildStaticSceneryCorridorAnchors(Transform corridorLayer)
+        {
+            var farmHub = Child(corridorLayer, "StaticSceneryAnchor_FarmHubCorridor");
+            var hubTown = Child(corridorLayer, "StaticSceneryAnchor_HubTownCorridor");
+            정적경관배치PlanPipeline.ConfigureAnchor(
+                farmHub, 정적경관배치ContainerStableIds.FarmHubCorridor);
+            정적경관배치PlanPipeline.ConfigureAnchor(
+                hubTown, 정적경관배치ContainerStableIds.HubTownCorridor);
+        }
+
+        private static void BuildStaticSceneryAreaAnchors(Transform scenicLayer)
+        {
+            var areaAnchors = Child(scenicLayer, "StaticSceneryAreaAnchors_Hub_Town");
+            var jinbuHub = Child(areaAnchors, "StaticSceneryAnchor_진부Hub");
+            var pyeongchangTown = Child(areaAnchors, "StaticSceneryAnchor_평창읍Town");
+            정적경관배치PlanPipeline.ConfigureAnchor(
+                jinbuHub, 정적경관배치ContainerStableIds.JinbuHub);
+            정적경관배치PlanPipeline.ConfigureAnchor(
+                pyeongchangTown, 정적경관배치ContainerStableIds.PyeongchangTown);
+        }
+
         private static void BuildFarmCompletionArea(
             Transform completionAreaRoot, 법정동경관VisualCatalog catalog)
         {
+            var natureCatalog = AssetDatabase
+                .LoadAssetAtPath<자연경관CompositionCatalog>(
+                    자연경관CompositionSetBuilder.CatalogPath)
+                ?? throw new InvalidOperationException(
+                    "PyeongchangNatureCompositionCatalogMissing");
+            natureCatalog.Validate();
             var southWest = completionAreaRoot.Find(
                     "ReferenceTile_대관령면_L2_500m_HandAuthored")
                 ?? throw new InvalidOperationException("FarmCompletionReferenceTileMissing");
@@ -549,22 +684,71 @@ namespace Ssalddel.Unity.Editor
                     법정동LandCoverCodes.Cropland, 21.1f + index * 2.7f, 11.2f,
                     index * 37f, .55f + index * .03f, 2, 2);
 
-            // 북서쪽: 대형 숲 덩어리 뒤에 침엽수와 바위를 겹쳐 산림 전이를 만듭니다.
+            // 북서쪽: Nature를 평창 경관의 바탕층으로 사용하고 Farm은 생산 영역에 남깁니다.
             Place(northWest, "forest-mountain", 법정동경관VisualKeys.MountainSoft,
                 법정동LandCoverCodes.Forest, 13.2f, 20.5f, -18f, .32f, 0, 0);
+            Place(northWest, "forest-distant-mountain", 법정동경관VisualKeys.DistantMountain,
+                법정동LandCoverCodes.Forest, 18.8f, 22.4f, 12f, .22f, 0, 0);
             Place(northWest, "forest-cluster-a", 법정동경관VisualKeys.TreePatch,
                 법정동LandCoverCodes.Forest, 13.4f, 15.2f, 16f, .44f, 0, 0);
             Place(northWest, "forest-cluster-b", 법정동경관VisualKeys.TreePatch,
                 법정동LandCoverCodes.Forest, 18.1f, 18.6f, -24f, .40f, 0, 0);
+            Place(northWest, "forest-mixed-a", 법정동경관VisualKeys.MixedTreePatch,
+                법정동LandCoverCodes.Forest, 15.2f, 17.1f, 31f, .48f, 0, 1);
+            Place(northWest, "forest-mixed-b", 법정동경관VisualKeys.MixedTreePatch,
+                법정동LandCoverCodes.Forest, 19.1f, 14.4f, -17f, .42f, 0, 1);
             for (var index = 0; index < 9; index++)
                 Place(northWest, "conifer-" + index, 법정동경관VisualKeys.ConiferTree,
                     법정동LandCoverCodes.Forest, 11.7f + (index % 3) * 3.1f,
                     13.2f + (index / 3) * 2.8f, index * 29f,
                     .48f + (index % 3) * .06f, 1, 1);
+            for (var index = 0; index < 6; index++)
+                Place(northWest, "broadleaf-" + index, 법정동경관VisualKeys.BroadleafTree,
+                    법정동LandCoverCodes.Forest, 12.4f + (index % 3) * 3.2f,
+                    14.1f + (index / 3) * 4.1f, 17f + index * 43f,
+                    .46f + (index % 2) * .07f, 1, 1);
+            for (var index = 0; index < 5; index++)
+                Place(northWest, "understory-" + index, 법정동경관VisualKeys.Understory,
+                    법정동LandCoverCodes.Forest, 12.9f + index * 1.55f,
+                    12.9f + (index % 2) * 1.4f, index * 53f, .58f, 2, 2);
+            for (var index = 0; index < 4; index++)
+                Place(northWest, "forest-edge-" + index, 법정동경관VisualKeys.ForestEdge,
+                    법정동LandCoverCodes.Forest, 11.3f + index * 2.7f,
+                    11.6f, 90f, .52f, 2, 2);
             for (var index = 0; index < 4; index++)
                 Place(northWest, "forest-rock-" + index, 법정동경관VisualKeys.SmallRocks,
                     법정동LandCoverCodes.BareGround, 12.5f + index * 2.2f,
                     12.2f + (index % 2) * 1.1f, index * 41f, .45f, 1, 1);
+            Place(northWest, "forest-rock-wall", 법정동경관VisualKeys.RockWall,
+                법정동LandCoverCodes.BareGround, 19.4f, 19.8f, -34f, .28f, 1, 1);
+            Place(northWest, "forest-wind-leaves", 법정동경관VisualKeys.WindLeavesFx,
+                법정동LandCoverCodes.Forest, 16.1f, 17.4f, 0f, .7f, 2, 2);
+            PlaceNatureComposition(northWest, natureCatalog,
+                자연경관SetNames.활엽수림군집,
+                "forest-broadleaf-composition", "kr5186:l2:700:1145:broadleaf-01",
+                법정동LandCoverCodes.Forest, false,
+                11.7f, 19.4f, -16f, .38f, 24f);
+            PlaceNatureComposition(northWest, natureCatalog,
+                자연경관SetNames.침엽수림군집,
+                "forest-conifer-composition", "kr5186:l2:700:1145:conifer-01",
+                법정동LandCoverCodes.Forest, false,
+                20.2f, 17.7f, 29f, .36f, 32f);
+            PlaceNatureComposition(northWest, natureCatalog,
+                자연경관SetNames.혼효림군집,
+                "forest-mixed-composition", "kr5186:l2:700:1145:mixed-01",
+                법정동LandCoverCodes.Forest, false,
+                17.7f, 20.3f, 8f, .34f, 28f);
+            PlaceNatureComposition(northWest, natureCatalog,
+                자연경관SetNames.산능선,
+                "forest-mountain-ridge-composition",
+                "kr5186:l1:175:286:mountain-ridge-01",
+                법정동LandCoverCodes.Forest, false,
+                15.2f, 22.1f, -11f, .20f, 120f);
+            PlaceNatureComposition(northWest, natureCatalog,
+                자연경관SetNames.숲가장자리,
+                "forest-edge-composition", "kr5186:l2:700:1145:forest-edge-01",
+                법정동LandCoverCodes.Forest, false,
+                15.4f, 12.1f, 88f, .42f, 18f);
 
             // 북동쪽: Farm에서 Hub로 빠져나가는 굽은 회랑을 하나의 장면으로 읽게 합니다.
             var roadPoints = new[]
@@ -596,6 +780,9 @@ namespace Ssalddel.Unity.Editor
                     법정동LandCoverCodes.Corridor, 22f + index * 1.9f,
                     12.8f + index * 1.25f, 56f, .48f, 2, 2);
 
+            BuildNatureSeasonAndEventPresentation(
+                completionAreaRoot, natureCatalog);
+
             var labels = Child(completionAreaRoot, "MapMode_완결영역구획Label");
             Label(labels, "농장마당Label", "농장 마당\n700:1144",
                 new Vector3(16f, 1.2f, 7f), Color.white, .12f);
@@ -606,6 +793,260 @@ namespace Ssalddel.Unity.Editor
             Label(labels, "출발회랑Label", "출발 회랑\n701:1145",
                 new Vector3(26f, 1.2f, 17f), Color.white, .12f);
             labels.gameObject.SetActive(false);
+        }
+
+        private static void PlaceNatureComposition(
+            Transform parent,
+            자연경관CompositionCatalog catalog,
+            string setName,
+            string stableName,
+            string worldSlotStableKey,
+            string landCoverCode,
+            bool hasWaterMask,
+            float x,
+            float z,
+            float rotationY,
+            float scale,
+            float viewDistance)
+        {
+            var selector = new 자연경관CompositionSelector();
+            var variantCode = selector.ResolveVariant(
+                setName, worldSlotStableKey, 51760);
+            var entry = catalog.Resolve(setName, variantCode);
+            var slope = PhysicalSlopeDegrees(x, z);
+            if (!selector.CanPlace(entry, landCoverCode, slope, hasWaterMask,
+                    자연경관SeasonCodes.Spring, 자연경관MoodCodes.Peaceful,
+                    viewDistance))
+                throw new InvalidOperationException(
+                    "NatureCompositionPlacementRejected:" + worldSlotStableKey);
+            var instance = PrefabUtility.InstantiatePrefab(entry.Prefab, parent) as GameObject
+                ?? throw new InvalidOperationException(
+                    "NatureCompositionPlacementFailed:" + entry.CompositionKey);
+            instance.name = stableName + "-" + variantCode.ToLowerInvariant();
+            instance.transform.localPosition = new Vector3(x, ScenarioHeight(x, z), z);
+            instance.transform.localRotation = Quaternion.Euler(0f, rotationY, 0f);
+            instance.transform.localScale = Vector3.one * scale;
+            if (!instance.TryGetComponent<자연경관CompositionSetView>(out var view)
+                || view == null || !view.ValidateWiring() || !view.PresentationOnly)
+                throw new InvalidOperationException(
+                    "NatureCompositionPlacementWiringInvalid:" + entry.CompositionKey);
+        }
+
+        private static void BuildNatureSeasonAndEventPresentation(
+            Transform completionAreaRoot,
+            자연경관CompositionCatalog natureCatalog)
+        {
+            var seasonRoot = Child(completionAreaRoot,
+                "NatureSeasonPresentation_PresentationOnly");
+            var seasonDefinitions = new[]
+            {
+                (자연경관SeasonCodes.Spring,
+                    "FX/FX_Butterlies_Particle_01_MultiColour.prefab"),
+                (자연경관SeasonCodes.Summer,
+                    "FX/FX_SunBeams_Particle_01.prefab"),
+                (자연경관SeasonCodes.Autumn,
+                    "FX/FX_Leaves_Orange_01.prefab"),
+                (자연경관SeasonCodes.Winter,
+                    "FX/FX_Snow_01.prefab"),
+            };
+            var seasonBindings = new 자연경관SeasonFxBinding[seasonDefinitions.Length];
+            for (var index = 0; index < seasonDefinitions.Length; index++)
+            {
+                var definition = seasonDefinitions[index];
+                var sourcePath = Nature + definition.Item2;
+                var source = AssetDatabase.LoadAssetAtPath<GameObject>(sourcePath)
+                    ?? throw new InvalidOperationException(
+                        "NatureSeasonFxMissing:" + sourcePath);
+                var instance = PrefabUtility.InstantiatePrefab(source, seasonRoot) as GameObject
+                    ?? throw new InvalidOperationException(
+                        "NatureSeasonFxInstantiateFailed:" + sourcePath);
+                instance.name = "SeasonFx_" + definition.Item1;
+                instance.transform.localPosition = new Vector3(
+                    16f, ScenarioHeight(16f, 17f) + 1f, 17f);
+                instance.transform.localScale = Vector3.one * .7f;
+                var binding = new 자연경관SeasonFxBinding();
+                binding.Configure(definition.Item1, instance);
+                seasonBindings[index] = binding;
+            }
+
+            var seasonController = seasonRoot.gameObject
+                .AddComponent<자연경관SeasonPresentationController>();
+            seasonController.Configure(completionAreaRoot, seasonBindings,
+                자연경관SeasonCodes.Spring);
+            if (!seasonController.ValidateWiring())
+                throw new InvalidOperationException(
+                    "NatureSeasonPresentationWiringInvalid");
+
+            var eventCatalog = AssetDatabase
+                .LoadAssetAtPath<자연경관EventOverlayCatalog>(
+                    자연경관EventOverlayBuilder.CatalogPath)
+                ?? throw new InvalidOperationException(
+                    "NatureEventOverlayCatalogMissing");
+            eventCatalog.Validate();
+            var eventRoot = Child(completionAreaRoot,
+                "NatureEventOverlayRoot_PresentationOnly_Inactive");
+            for (var index = 0; index < eventCatalog.Entries.Count; index++)
+            {
+                var entry = eventCatalog.Entries[index];
+                var instance = PrefabUtility.InstantiatePrefab(
+                    entry.Prefab, eventRoot) as GameObject
+                    ?? throw new InvalidOperationException(
+                        "NatureEventOverlayPlacementFailed:"
+                        + entry.PresentationKey);
+                instance.name = "EventOverlay_" + entry.OverlayName.Replace(" ", string.Empty);
+                var x = 13.5f + (index % 3) * 2.5f;
+                var z = 15f + (index / 3) * 2.8f;
+                instance.transform.localPosition = new Vector3(
+                    x, ScenarioHeight(x, z), z);
+                instance.transform.localScale = Vector3.one * .42f;
+                instance.SetActive(false);
+            }
+
+            var eventController = eventRoot.gameObject
+                .AddComponent<자연경관EventOverlayController>();
+            eventController.Configure(eventRoot, eventCatalog);
+            if (!eventController.ValidateWiring()
+                || eventController.ActiveOverlayCount != 0)
+                throw new InvalidOperationException(
+                    "NatureEventOverlayWiringInvalid");
+
+            // 수계 근거가 없는 대관령 Farm 기준 영역에는 개울 회랑을 배치하지 않는다.
+            // 생성 대장만 준비하고 실제 Water mask가 있는 Area에서 선택한다.
+            var streamCandidate = natureCatalog.Resolve(
+                자연경관SetNames.개울회랑, 월드CompositionVariantCodes.A);
+            if (!streamCandidate.RequiresWaterMask)
+                throw new InvalidOperationException(
+                    "NatureStreamCompositionMustRequireWaterMask");
+        }
+
+        private static void Build대관령L2창고일인칭상호작용(
+            Transform pipelineRoot,
+            Transform completionAreaRoot,
+            법정동경관VisualCatalog catalog)
+        {
+            var tile = completionAreaRoot.Find(
+                    "Tile_kr5186_l2_700_1145_산림전이")
+                ?? throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseL2TileMissing");
+            var old = tile.Find("ScenarioWarehouseInteraction_ObservedFixture");
+            if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
+            var oldBarn = tile.Find(
+                "scenic_sim_pyeongchang_l2-700-1145-observed-fixture-barn");
+            if (oldBarn != null) UnityEngine.Object.DestroyImmediate(oldBarn.gameObject);
+
+            Visual(tile, catalog, new 법정동경관PlacementData
+            {
+                PlacementStableId =
+                    "scenic:sim:pyeongchang:l2-700-1145-observed-fixture-barn",
+                RegionStableId = 평창군법정동WorldFixture.FarmRegionStableId,
+                VisualKey = 법정동경관VisualKeys.Barn,
+                LandCoverCode = 법정동LandCoverCodes.Cropland,
+                RegionRoleCode = 법정동WorldRoleCodes.Farm,
+                LocalX = 15.4f,
+                LocalZ = 16.4f,
+                RotationY = 180f,
+                Scale = .32f,
+                DensityTier = 0,
+                LodGroup = 1,
+            });
+
+            var root = Child(tile, "ScenarioWarehouseInteraction_ObservedFixture");
+            root.position = new Vector3(15.4f,
+                ScenarioHeight(15.4f, 13.25f), 13.25f);
+            var platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            platform.name = "Pallet_표현전용";
+            platform.transform.SetParent(root, false);
+            platform.transform.localPosition = new Vector3(0f, .1f, 0f);
+            platform.transform.localScale = new Vector3(1.8f, .2f, 1.2f);
+            platform.GetComponent<Renderer>().sharedMaterial = EnsureMaterial(
+                "대관령L2창고Pallet", new Color(.34f, .20f, .09f), .02f);
+            UnityEngine.Object.DestroyImmediate(platform.GetComponent<Collider>());
+
+            var positions = new[]
+            {
+                new Vector3(-.48f, .48f, 0f),
+                new Vector3(.02f, .48f, 0f),
+                new Vector3(.28f, .93f, 0f),
+            };
+            var boxes = new GameObject[positions.Length];
+            for (var index = 0; index < positions.Length; index++)
+            {
+                var box = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                box.name = "감자상자_서버수량표현_" + (index + 1);
+                box.transform.SetParent(root, false);
+                box.transform.localPosition = positions[index];
+                box.transform.localScale = new Vector3(.44f, .54f, .44f);
+                box.GetComponent<Renderer>().sharedMaterial = EnsureMaterial(
+                    "대관령L2감자상자", new Color(.57f, .36f, .16f), .04f);
+                UnityEngine.Object.DestroyImmediate(box.GetComponent<Collider>());
+                boxes[index] = box;
+            }
+
+            var volume = Child(root, "InteractionVolume");
+            // 지형 경사로 Pallet과 플레이어 눈높이가 달라도 정면 시선이
+            // 상호작용 면을 안정적으로 통과하도록 세로 범위만 넉넉히 둔다.
+            volume.localPosition = new Vector3(0f, 1.7f, 0f);
+            var collider = volume.gameObject.AddComponent<BoxCollider>();
+            collider.size = new Vector3(2f, 4f, 1.45f);
+            var highlight = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            highlight.name = "시선선택강조_PresentationOnly";
+            highlight.transform.SetParent(root, false);
+            highlight.transform.localPosition = new Vector3(0f, .025f, 0f);
+            highlight.transform.localScale = new Vector3(1.15f, .025f, 1.15f);
+            highlight.GetComponent<Renderer>().sharedMaterial = EnsureMaterial(
+                "대관령L2창고시선강조", new Color(1f, .62f, .08f), .1f);
+            UnityEngine.Object.DestroyImmediate(highlight.GetComponent<Collider>());
+            highlight.SetActive(false);
+
+            var target = root.gameObject
+                .AddComponent<대관령L2창고상호작용TargetView>();
+            target.Configure(collider, highlight, boxes);
+            var player = pipelineRoot.GetComponentInChildren<플레이어경관Controller>(true)
+                ?? throw new InvalidOperationException(
+                    "DaegwallyeongWarehousePlayerMissing");
+            // 첫 1인칭 수직 단위는 창고 진입로에서 시작해 시선만으로
+            // Pallet을 바로 발견할 수 있게 한다. 서버 위치 사실은 바꾸지 않는다.
+            player.SetPresentationStartPose(new Vector3(15.4f,
+                ScenarioHeight(15.4f, 10.25f) + .06f, 10.25f), 0f);
+            var shell = UnityEngine.Object
+                .FindFirstObjectByType<SimulationWorldShellPresenter>(
+                    FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseShellMissing");
+            var oldPresenter = pipelineRoot
+                .GetComponent<대관령L2창고아이템Presenter>();
+            if (oldPresenter != null) UnityEngine.Object.DestroyImmediate(oldPresenter);
+            var oldComposition = pipelineRoot
+                .GetComponent<대관령L2창고아이템CompositionRoot>();
+            if (oldComposition != null) UnityEngine.Object.DestroyImmediate(oldComposition);
+            var oldInteraction = player.GetComponent<일인칭창고상호작용Controller>();
+            if (oldInteraction != null) UnityEngine.Object.DestroyImmediate(oldInteraction);
+
+            var presenter = pipelineRoot.gameObject
+                .AddComponent<대관령L2창고아이템Presenter>();
+            var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
+                "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset");
+            var composition = pipelineRoot.gameObject
+                .AddComponent<대관령L2창고아이템CompositionRoot>();
+            // 저장 Scene 검증은 결정적 Simulation Fixture를 사용한다.
+            // 같은 조립점의 서버 기준 모드는 실제 Session이 준비된 실행에서만 켠다.
+            composition.Configure(settings, shell, presenter, false);
+            var interaction = player.gameObject
+                .AddComponent<일인칭창고상호작용Controller>();
+            interaction.Configure(player, player.FirstPersonCamera,
+                presenter, target, 4f);
+
+            // Configure 메서드의 직접 필드 대입도 Binary Scene에 확실히
+            // 기록되도록 새 조립 객체를 명시적으로 dirty 처리한다.
+            EditorUtility.SetDirty(player);
+            EditorUtility.SetDirty(target);
+            EditorUtility.SetDirty(presenter);
+            EditorUtility.SetDirty(composition);
+            EditorUtility.SetDirty(interaction);
+
+            if (!target.ValidateWiring() || !interaction.ValidateWiring())
+                throw new InvalidOperationException(
+                    "DaegwallyeongWarehouseInteractionBuildInvalid");
         }
 
         private static void CompletionGround(
@@ -1193,28 +1634,41 @@ namespace Ssalddel.Unity.Editor
                 light = lightRoot.AddComponent<Light>();
             }
             light.type = LightType.Directional;
-            light.color = new Color(1f, .88f, .70f);
+            light.color = new Color(
+                profile.SunColorR, profile.SunColorG, profile.SunColorB);
             light.intensity = profile.SunIntensity;
             light.shadows = LightShadows.Soft;
-            light.shadowStrength = .86f;
-            light.shadowBias = .035f;
-            light.shadowNormalBias = .26f;
+            light.shadowStrength = profile.ShadowStrength;
+            light.shadowBias = profile.ShadowBias;
+            light.shadowNormalBias = profile.ShadowNormalBias;
             light.transform.rotation = Quaternion.Euler(
                 profile.SunPitch, profile.SunYaw, 0f);
 
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(.54f, .67f, .78f);
-            RenderSettings.ambientEquatorColor = new Color(.42f, .47f, .40f);
-            RenderSettings.ambientGroundColor = new Color(.19f, .20f, .16f);
-            RenderSettings.ambientIntensity = .92f;
+            RenderSettings.ambientSkyColor = new Color(
+                profile.AmbientSkyR, profile.AmbientSkyG, profile.AmbientSkyB);
+            RenderSettings.ambientEquatorColor = new Color(
+                profile.AmbientEquatorR,
+                profile.AmbientEquatorG,
+                profile.AmbientEquatorB);
+            RenderSettings.ambientGroundColor = new Color(
+                profile.AmbientGroundR,
+                profile.AmbientGroundG,
+                profile.AmbientGroundB);
+            RenderSettings.ambientIntensity = profile.AmbientIntensity;
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = new Color(.56f, .67f, .72f);
+            RenderSettings.fogColor = new Color(
+                profile.FogColorR, profile.FogColorG, profile.FogColorB);
             RenderSettings.fogStartDistance = profile.FogStartDistance;
             RenderSettings.fogEndDistance = profile.FogEndDistance;
             RenderSettings.skybox = EnsureSkyboxMaterial();
             QualitySettings.shadowDistance = profile.ShadowDistance;
-            QualitySettings.shadowCascades = 4;
+            QualitySettings.shadowCascades = profile.ShadowCascadeCount;
+            QualitySettings.shadowCascade4Split = new Vector3(
+                profile.ShadowCascade1,
+                profile.ShadowCascade2,
+                profile.ShadowCascade3);
             QualitySettings.shadowResolution = UnityEngine.ShadowResolution.VeryHigh;
 
             var volumeRoot = Child(root, "GlobalVolume_농촌맑은낮");
@@ -1249,17 +1703,18 @@ namespace Ssalddel.Unity.Editor
             color.postExposure.Override(source.PostExposure);
             color.contrast.Override(source.Contrast);
             color.saturation.Override(source.Saturation);
-            color.colorFilter.Override(new Color(1f, .96f, .88f));
+            color.colorFilter.Override(new Color(
+                source.ColorFilterR, source.ColorFilterG, source.ColorFilterB));
             var bloom = GetOrAdd<Bloom>(profile);
-            bloom.threshold.Override(1.05f);
+            bloom.threshold.Override(source.BloomThreshold);
             bloom.intensity.Override(source.BloomIntensity);
-            bloom.scatter.Override(.55f);
+            bloom.scatter.Override(source.BloomScatter);
             var vignette = GetOrAdd<Vignette>(profile);
             vignette.intensity.Override(source.VignetteIntensity);
-            vignette.smoothness.Override(.32f);
+            vignette.smoothness.Override(source.VignetteSmoothness);
             var whiteBalance = GetOrAdd<WhiteBalance>(profile);
-            whiteBalance.temperature.Override(4f);
-            whiteBalance.tint.Override(-2f);
+            whiteBalance.temperature.Override(source.WhiteBalanceTemperature);
+            whiteBalance.tint.Override(source.WhiteBalanceTint);
             var tonemapping = GetOrAdd<Tonemapping>(profile);
             tonemapping.mode.Override(TonemappingMode.Neutral);
             foreach (var component in profile.components)

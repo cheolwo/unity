@@ -15,19 +15,26 @@ namespace Ssalddel.Unity.Presentation.World
     {
         [SerializeField] private 플레이어경관Controller player = null!;
         [SerializeField] private 전술분대Presenter tacticalSquads = null!;
+        [SerializeField] private 전투입력Adapter input = null!;
         [SerializeField] private bool presentationOnly = true;
 
         private readonly FarmCombatPresentationMapper _mapper = new();
         private readonly FarmTacticalOrderPresentationMapper _tacticalMapper = new();
         private FarmCombatPresentationFrame? _activeFrame;
         private FarmTacticalOrderPresentationFrame? _tacticalFrame;
-        private float _beatStartedAt;
+        private readonly FarmCombatBeatClock _beatClock = new();
+        private FarmCombatStateApiModel? _latestState;
+        private string _actorStableId = string.Empty;
+        private string _inputPhaseCode = FarmCombatPresentationCodes.Ready;
+        private string _lastAuthorityErrorCode = string.Empty;
+        private string _lastPresentedReactionStableId = string.Empty;
         private long _observedWorldRevision;
         private int _commandSequence;
         private bool _reactionSubmitted;
 
         public event Action<FarmCombatReactionCommandDraft> ReactionCommandPrepared
             = delegate { };
+        public event Action<string> CombatEntryRequested = delegate { };
         public event Action<FarmTacticalOrderPresentationFrame>
             TacticalViewTransitionSuggested = delegate { };
         public event Action<FarmTacticalOrderPreviewDraft>
@@ -47,13 +54,35 @@ namespace Ssalddel.Unity.Presentation.World
         public FarmTacticalOrderConfirmDraft? LastTacticalConfirm { get; private set; }
         public bool PresentationOnly => presentationOnly;
         public 전술분대Presenter TacticalSquads => tacticalSquads;
+        public string InputPhaseCode => _inputPhaseCode;
+        public string LastAuthorityErrorCode => _lastAuthorityErrorCode;
+        public bool LocksPlayerMovement
+            => _activeFrame != null
+                || _inputPhaseCode == FarmCombatPresentationCodes.Entering
+                || _inputPhaseCode == FarmCombatPresentationCodes.Submitting;
+
+        private void Awake()
+        {
+            input ??= GetComponent<전투입력Adapter>();
+            player ??= FindFirstObjectByType<플레이어경관Controller>(
+                FindObjectsInactive.Include);
+        }
 
         public void Configure(플레이어경관Controller value)
         {
             player = value;
+            input = GetComponent<전투입력Adapter>()
+                ?? gameObject.AddComponent<전투입력Adapter>();
             presentationOnly = true;
             if (!ValidateWiring())
                 throw new ArgumentException("FarmCombatViewWiringInvalid");
+        }
+
+        public void ConfigureInput(전투입력Adapter value)
+        {
+            input = value;
+            if (input == null || !input.ValidateWiring())
+                throw new ArgumentException("FarmCombatInputWiringInvalid");
         }
 
         public void ConfigureTacticalSquads(전술분대Presenter value)
@@ -64,13 +93,20 @@ namespace Ssalddel.Unity.Presentation.World
         }
 
         public bool ValidateWiring()
-            => player != null && player.PresentationOnly && presentationOnly;
+            => player != null && player.PresentationOnly
+                && input != null && input.ValidateWiring()
+                && presentationOnly;
 
         public void ApplyServerState(
             FarmCombatStateApiModel state,
             string actorStableId)
         {
             if (state == null) throw new ArgumentNullException(nameof(state));
+            if (!state.SimulationOnly || state.IsOperationalState)
+                throw new InvalidOperationException("FarmCombatAuthorityBoundaryInvalid");
+            _latestState = state;
+            _actorStableId = actorStableId ?? string.Empty;
+            _lastAuthorityErrorCode = string.Empty;
             if (tacticalSquads != null
                 && tacticalSquads.TryApplyServerState(state, out var movement)
                 && movement != null)
@@ -80,6 +116,7 @@ namespace Ssalddel.Unity.Presentation.World
                     && value.StateCode == FarmCombatPresentationCodes.Active);
             if (!hasActiveBeat)
             {
+                PresentLatestReaction(state, actorStableId);
                 ClearActiveBeat();
                 var hasOpenTacticalWindow = state.Tactical != null
                     && (state.Tactical.OrderWindows
@@ -89,6 +126,7 @@ namespace Ssalddel.Unity.Presentation.World
                 if (hasOpenTacticalWindow)
                 {
                     _tacticalFrame = _tacticalMapper.Map(state, actorStableId);
+                    _inputPhaseCode = FarmCombatPresentationCodes.Resolved;
                     _observedWorldRevision = state.WorldRevision;
                     LastTacticalPreview = null;
                     LastTacticalConfirm = null;
@@ -97,46 +135,87 @@ namespace Ssalddel.Unity.Presentation.World
                 else
                 {
                     ClearTacticalOrderWindow();
+                    _inputPhaseCode = HasReadyEngagement(state)
+                        ? FarmCombatPresentationCodes.Ready
+                        : FarmCombatPresentationCodes.Resolved;
                 }
                 return;
             }
 
             ClearTacticalOrderWindow();
-            _activeFrame = _mapper.Map(state, actorStableId);
+            var activeFrame = _mapper.Map(state, actorStableId);
+            var newBeat = _beatClock.Observe(activeFrame.BeatStableId,
+                Time.realtimeSinceStartupAsDouble * 1000d);
+            _activeFrame = activeFrame;
             _observedWorldRevision = state.WorldRevision;
-            _beatStartedAt = Time.unscaledTime;
-            _reactionSubmitted = false;
-            LastPreparedCommand = null;
-            player.EnterCombatMode(_activeFrame.PerspectiveCode);
+            if (newBeat || _inputPhaseCode == FarmCombatPresentationCodes.Failed)
+            {
+                _reactionSubmitted = false;
+                LastPreparedCommand = null;
+                _inputPhaseCode = FarmCombatPresentationCodes.Telegraph;
+            }
+            if (newBeat) player.EnterCombatMode(_activeFrame.PerspectiveCode);
         }
 
-        public bool TryHandleCombatInput(Mouse? mouse)
+        public bool TryHandleCombatInput()
         {
-            if (_activeFrame == null) return false;
-            if (_reactionSubmitted || mouse == null || player.IsCameraTransitioning)
+            if (input == null) return false;
+            var frame = input.ReadFrame();
+            if (frame.PointerOverUi && frame.HasAction) return true;
+
+            if (_activeFrame == null)
+            {
+                if (_inputPhaseCode != FarmCombatPresentationCodes.Ready
+                    || !frame.AttackPressed) return LocksPlayerMovement;
+                var encounter = (_latestState?.Engagements
+                    ?? Array.Empty<FarmCombatEngagementApiModel>())
+                    .FirstOrDefault(value => value.StateCode
+                        == FarmCombatPresentationCodes.AwaitingCombat);
+                if (encounter == null) return false;
+                _inputPhaseCode = FarmCombatPresentationCodes.Entering;
+                player.ApplyCombatAnimation(공용AnimationIntentCodes.Attack);
+                CombatEntryRequested(encounter.EncounterStableId);
+                return true;
+            }
+
+            if (_reactionSubmitted || player.IsCameraTransitioning)
                 return true;
 
             string? actionCode = null;
-            if (mouse.leftButton.wasPressedThisFrame)
+            if (frame.AttackPressed)
                 actionCode = FarmCombatPresentationCodes.Counter;
-            else if (mouse.rightButton.wasPressedThisFrame)
+            else if (frame.DefendPressed)
                 actionCode = FarmCombatPresentationCodes.Guard;
             if (actionCode == null) return true;
 
-            var elapsedMs = Mathf.Clamp(
-                Mathf.RoundToInt((Time.unscaledTime - _beatStartedAt) * 1000f),
-                0, 1600);
+            var elapsedMs = _beatClock.ElapsedMilliseconds(
+                Time.realtimeSinceStartupAsDouble * 1000d, 1600);
             var command = FarmCombatReactionCommandFactory.Create(
                 _activeFrame,
                 _observedWorldRevision,
                 "command:unity:combat-reaction:"
-                    + (++_commandSequence).ToString(),
+                    + _activeFrame.BeatStableId + ":" + actionCode,
                 actionCode,
                 elapsedMs);
             LastPreparedCommand = command;
             _reactionSubmitted = true;
+            _inputPhaseCode = FarmCombatPresentationCodes.Submitting;
+            player.ApplyCombatAnimation(actionCode == FarmCombatPresentationCodes.Guard
+                ? 공용AnimationIntentCodes.Guard
+                : 공용AnimationIntentCodes.Attack);
             ReactionCommandPrepared(command);
             return true;
+        }
+
+        public void SetAuthorityFailure(string errorCode)
+        {
+            _lastAuthorityErrorCode = string.IsNullOrWhiteSpace(errorCode)
+                ? "FarmCombatAuthorityRequestFailed"
+                : errorCode.Trim();
+            _inputPhaseCode = FarmCombatPresentationCodes.Failed;
+            _reactionSubmitted = false;
+            if (player != null)
+                player.ApplyCombatAnimation(공용AnimationIntentCodes.Idle);
         }
 
         public bool TryHandleTacticalViewInput(Keyboard? keyboard)
@@ -191,6 +270,7 @@ namespace Ssalddel.Unity.Presentation.World
         public void ClearActiveBeat()
         {
             _activeFrame = null;
+            _beatClock.Clear();
             _reactionSubmitted = false;
             LastPreparedCommand = null;
         }
@@ -201,5 +281,59 @@ namespace Ssalddel.Unity.Presentation.World
             LastTacticalPreview = null;
             LastTacticalConfirm = null;
         }
+
+        private static bool HasReadyEngagement(FarmCombatStateApiModel state)
+            => (state.Engagements ?? Array.Empty<FarmCombatEngagementApiModel>())
+                .Any(value => value.StateCode
+                    == FarmCombatPresentationCodes.AwaitingCombat);
+
+        private void PresentLatestReaction(
+            FarmCombatStateApiModel state,
+            string actorStableId)
+        {
+            var reaction = (state.Reactions
+                    ?? Array.Empty<FarmCombatReactionApiModel>())
+                .LastOrDefault(value => value.ActorStableId == actorStableId);
+            if (reaction == null || reaction.ReactionStableId
+                == _lastPresentedReactionStableId) return;
+            _lastPresentedReactionStableId = reaction.ReactionStableId;
+            player.ApplyCombatAnimation(reaction.ActorDamageUnits > 0m
+                ? 공용AnimationIntentCodes.Stagger
+                : 공용AnimationIntentCodes.Idle);
+        }
+
+        private void OnGUI()
+        {
+            if (_latestState == null
+                || (_inputPhaseCode == FarmCombatPresentationCodes.Resolved
+                    && !HasReadyEngagement(_latestState)
+                    && _tacticalFrame == null)) return;
+            var center = Screen.width * .5f;
+            GUI.color = new Color(.025f, .035f, .04f, .9f);
+            GUI.DrawTexture(new Rect(center - 185f, 24f, 370f, 82f),
+                Texture2D.whiteTexture);
+            GUI.color = Color.white;
+            GUI.Label(new Rect(center - 168f, 34f, 336f, 22f),
+                "1인칭 전투 · " + KoreanPhase(_inputPhaseCode));
+            GUI.Label(new Rect(center - 168f, 58f, 336f, 22f),
+                _activeFrame == null
+                    ? "좌클릭 공격: 서버 전투 진입"
+                    : "좌클릭 반격 · 우클릭 방어");
+            GUI.Label(new Rect(center - 168f, 80f, 336f, 20f),
+                string.IsNullOrWhiteSpace(_lastAuthorityErrorCode)
+                    ? "피해·등급·전술 효과는 서버가 판정합니다."
+                    : "동기화 필요: " + _lastAuthorityErrorCode);
+        }
+
+        private static string KoreanPhase(string value)
+            => value switch
+            {
+                FarmCombatPresentationCodes.Ready => "전투 준비",
+                FarmCombatPresentationCodes.Entering => "전투 진입 중",
+                FarmCombatPresentationCodes.Telegraph => "공격 전조",
+                FarmCombatPresentationCodes.Submitting => "판정 요청 중",
+                FarmCombatPresentationCodes.Failed => "서버 재동기화 필요",
+                _ => "전투 결과",
+            };
     }
 }

@@ -128,6 +128,66 @@ namespace Ssalddel.Unity.Presentation.World
         public 농장경영작업초안? CurrentDraft { get; private set; }
         public string RuleRevision => PlayerActivityViewPolicyCatalog.RuleRevision;
 
+        private void Awake()
+        {
+            player ??= FindFirstObjectByType<플레이어경관Controller>(
+                FindObjectsInactive.Include);
+            RepairMissingCanonicalFarmTargets();
+            targets = (targets ?? Array.Empty<농장경영선택대상View>())
+                .Concat(FindObjectsByType<농장경영선택대상View>(
+                    FindObjectsInactive.Include))
+                .Where(value => value != null && value.ValidateWiring())
+                .Distinct()
+                .ToArray();
+        }
+
+        private void RepairMissingCanonicalFarmTargets()
+        {
+            var farm = FindObjectsByType<Transform>(FindObjectsInactive.Include)
+                .FirstOrDefault(value => value.name == "FarmDistrict"
+                    && value.parent != null && value.parent.name == "Districts");
+            if (farm == null) return;
+
+            var repaired = new List<농장경영선택대상View>();
+            for (var row = 0; row < 2; row++)
+            for (var column = 0; column < 5; column++)
+            {
+                var plot = farm.Find($"FarmPlot_{row}_{column}");
+                var highlight = farm.Find($"FarmManagementHighlight_{row}_{column}");
+                if (plot == null || highlight == null) continue;
+                var view = plot.GetComponent<농장경영선택대상View>()
+                    ?? plot.gameObject.AddComponent<농장경영선택대상View>();
+                view.Configure(
+                    $"farm-plot:pyeongchang:{row}:{column}",
+                    $"감자밭 {row + 1}-{column + 1}",
+                    농장경영대상종류Codes.Plot,
+                    농장경영작업Codes.All,
+                    highlight.gameObject);
+                repaired.Add(view);
+            }
+
+            var harvestLot = farm.Find("HarvestLot_Potato_001");
+            var harvestHighlight = farm.Find("FarmManagementHighlight_HarvestLot");
+            if (harvestLot != null && harvestHighlight != null)
+            {
+                var view = harvestLot.GetComponent<농장경영선택대상View>()
+                    ?? harvestLot.gameObject.AddComponent<농장경영선택대상View>();
+                view.Configure(
+                    "farm-harvest-lot:pyeongchang:potato:001",
+                    "감자 수확 마당",
+                    농장경영대상종류Codes.Facility,
+                    new[] { 농장경영작업Codes.Harvest },
+                    harvestHighlight.gameObject);
+                repaired.Add(view);
+            }
+
+            targets = (targets ?? Array.Empty<농장경영선택대상View>())
+                .Concat(repaired)
+                .Where(value => value != null)
+                .Distinct()
+                .ToArray();
+        }
+
         public void Configure(
             플레이어경관Controller playerController,
             IEnumerable<농장경영선택대상View> selectableTargets)
@@ -142,13 +202,22 @@ namespace Ssalddel.Unity.Presentation.World
         }
 
         public bool ValidateWiring()
-            => player != null
+        {
+            RepairMissingCanonicalFarmTargets();
+            targets = (targets ?? Array.Empty<농장경영선택대상View>())
+                .Concat(FindObjectsByType<농장경영선택대상View>(
+                    FindObjectsInactive.Include))
+                .Where(value => value != null && value.ValidateWiring())
+                .Distinct()
+                .ToArray();
+            return player != null
                 && player.PresentationOnly
                 && targets.Length > 0
                 && targets.All(value => value != null && value.ValidateWiring())
                 && targets.Select(value => value.StableId)
                     .Distinct(StringComparer.Ordinal).Count() == targets.Length
                 && presentationOnly;
+        }
 
         public void SetActive(bool active)
         {

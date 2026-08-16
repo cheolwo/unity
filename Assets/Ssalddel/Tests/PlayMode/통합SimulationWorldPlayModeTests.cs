@@ -3,6 +3,8 @@ using NUnit.Framework;
 using Ssalddel.Unity.Bootstrap;
 using Ssalddel.Unity.Presentation.World;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
@@ -81,6 +83,52 @@ namespace Ssalddel.Unity.Tests.PlayMode
             Assert.That(inbound.ContextVisible, Is.False);
             Assert.That(shell.WorldTick, Is.EqualTo(tick));
             Assert.That(shell.WorldRevision, Is.EqualTo(revision));
+        }
+
+        [UnityTest]
+        public IEnumerator 저장Scene은_F2_W_F3입력으로_시점과플레이어위치를바꾼다()
+        {
+            void RemoveLiveServerCompositions(Scene loadedScene, LoadSceneMode mode)
+            {
+                foreach (var value in Object.FindObjectsByType<턴마감SceneCompositionRoot>(
+                             FindObjectsInactive.Include))
+                    Object.DestroyImmediate(value);
+                foreach (var value in Object.FindObjectsByType<진부Hub입고UiSceneCompositionRoot>(
+                             FindObjectsInactive.Include))
+                    Object.DestroyImmediate(value);
+                foreach (var value in Object.FindObjectsByType<농장전투CompositionRoot>(
+                             FindObjectsInactive.Include))
+                    Object.DestroyImmediate(value);
+            }
+
+            SceneManager.sceneLoaded += RemoveLiveServerCompositions;
+            yield return SceneManager.LoadSceneAsync("SimulationWorldShell", LoadSceneMode.Single);
+            SceneManager.sceneLoaded -= RemoveLiveServerCompositions;
+
+            var player = Object.FindAnyObjectByType<플레이어경관Controller>(
+                FindObjectsInactive.Include);
+            Assert.That(player, Is.Not.Null);
+            var keyboard = Keyboard.current ?? InputSystem.AddDevice<Keyboard>();
+
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.F2));
+            yield return null;
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+            yield return WaitForCameraTransition(player);
+            Assert.That(player.CurrentMode, Is.EqualTo(플레이어시점Mode.FirstPerson));
+
+            var before = player.transform.position;
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W));
+            for (var index = 0; index < 8; index++) yield return null;
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+            yield return null;
+            Assert.That(Vector3.Distance(before, player.transform.position),
+                Is.GreaterThan(.01f));
+
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.F3));
+            yield return null;
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+            yield return WaitForCameraTransition(player);
+            Assert.That(player.CurrentMode, Is.EqualTo(플레이어시점Mode.ThirdPerson));
         }
 
         private static Button RequiredButton(GameObject bar, string name)

@@ -43,6 +43,8 @@ namespace Ssalddel.Unity.Presentation.World
                 ? tarotHighlighter.HighlightedObjectStableIds
                 : Array.Empty<string>();
 
+        public bool ContextVisible => panel != null && panel.activeSelf;
+
         public void Configure(
             SimulationWorldShellPresenter worldShell, GameObject surface, Text title,
             Text card, Text status, Button noCard, Button fool, Button chariot, Button culture,
@@ -96,9 +98,16 @@ namespace Ssalddel.Unity.Presentation.World
         public async Task InitializeAsync(I턴마감AuthorityClient client)
         {
             ValidateWiring();
+            SetContextVisible(false);
             SetAuthority(client);
             BindListeners();
             await LoadAsync();
+            SetContextVisible(true);
+        }
+
+        public void SetContextVisible(bool visible)
+        {
+            if (panel != null) panel.SetActive(visible);
         }
 
         public async Task LoadAsync()

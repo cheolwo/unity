@@ -52,6 +52,8 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void Awake()
         {
+            player ??= FindFirstObjectByType<플레이어경관Controller>(
+                FindObjectsInactive.Include);
             ValidateWiring();
             BindListeners();
             ApplyButtonState();

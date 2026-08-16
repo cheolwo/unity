@@ -13,6 +13,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
@@ -30,6 +31,7 @@ namespace Ssalddel.Unity.Editor
             "Assets/Ssalddel/Presentation/World/Catalogs/FigmaMauiWarehouseUiThemeCatalog.asset";
         public const string TacticalCharacterVisualCatalogPath =
             "Assets/Ssalddel/Presentation/World/Catalogs/평창군전술CharacterVisualCatalog.asset";
+        public const string InputActionAssetPath = "Assets/InputSystem_Actions.inputactions";
         public const string SceneStableId = "scene:simulation-world-shell";
         public const string PotatoHarvestBoxPlacementStableId =
             "scene-placement:simulation-world-shell.farm.potato-harvest-box.a";
@@ -1008,6 +1010,7 @@ namespace Ssalddel.Unity.Editor
                 ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");
             var composition = runtimeRoot.gameObject.AddComponent<턴마감SceneCompositionRoot>();
             composition.Configure(settings, shell, presenter, true);
+            presenter.SetContextVisible(false);
         }
 
         private static void Build진부Hub입고Ui(
@@ -1147,7 +1150,8 @@ namespace Ssalddel.Unity.Editor
             for (var column = 0; column < 5; column++)
             {
                 var plot = Required(farm, $"FarmPlot_{row}_{column}");
-                var oldView = plot.GetComponent<농장경영선택대상View>();
+                foreach (var oldView in plot.GetComponents<농장경영선택대상View>())
+                    UnityEngine.Object.DestroyImmediate(oldView);
                 if (plot.GetComponent<Collider>() == null)
                     plot.gameObject.AddComponent<BoxCollider>();
                 var highlight = Primitive(farm,
@@ -1158,19 +1162,21 @@ namespace Ssalddel.Unity.Editor
                         plot.localScale.z * .54f),
                     new Color(1f, .54f, .08f, 1f));
                 highlight.gameObject.SetActive(false);
-                var view = oldView
-                    ?? plot.gameObject.AddComponent<농장경영선택대상View>();
+                var view = plot.gameObject.AddComponent<농장경영선택대상View>();
                 view.Configure(
                     $"farm-plot:pyeongchang:{row}:{column}",
                     $"감자밭 {row + 1}-{column + 1}",
                     농장경영대상종류Codes.Plot,
                     농장경영작업Codes.All,
                     highlight.gameObject);
+                EditorUtility.SetDirty(view);
                 targets.Add(view);
             }
 
             var harvestLot = Required(farm, "HarvestLot_Potato_001");
-            var oldHarvestView = harvestLot.GetComponent<농장경영선택대상View>();
+            foreach (var oldHarvestView in harvestLot
+                         .GetComponents<농장경영선택대상View>())
+                UnityEngine.Object.DestroyImmediate(oldHarvestView);
             if (harvestLot.GetComponent<Collider>() == null)
                 harvestLot.gameObject.AddComponent<BoxCollider>();
             var harvestHighlight = Primitive(farm,
@@ -1180,14 +1186,15 @@ namespace Ssalddel.Unity.Editor
                 new Vector3(1.7f, .025f, 1.7f),
                 new Color(.1f, .82f, .72f, 1f));
             harvestHighlight.gameObject.SetActive(false);
-            var harvestView = oldHarvestView
-                ?? harvestLot.gameObject.AddComponent<농장경영선택대상View>();
+            var harvestView = harvestLot.gameObject
+                .AddComponent<농장경영선택대상View>();
             harvestView.Configure(
                 "farm-harvest-lot:pyeongchang:potato:001",
                 "감자 수확 마당",
                 농장경영대상종류Codes.Facility,
                 new[] { 농장경영작업Codes.Harvest },
                 harvestHighlight.gameObject);
+            EditorUtility.SetDirty(harvestView);
             targets.Add(harvestView);
 
             var management = runtimeRoot.gameObject
@@ -1199,9 +1206,28 @@ namespace Ssalddel.Unity.Editor
             if (previousCombat != null) UnityEngine.Object.DestroyImmediate(previousCombat);
             var combat = runtimeRoot.gameObject.AddComponent<전투시점Controller>();
             combat.Configure(player);
+            var combatInput = runtimeRoot.GetComponent<전투입력Adapter>()
+                ?? runtimeRoot.gameObject.AddComponent<전투입력Adapter>();
+            var inputActions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
+                InputActionAssetPath)
+                ?? throw new InvalidOperationException("FarmCombatInputActionsMissing");
+            combatInput.Configure(inputActions);
+            combat.ConfigureInput(combatInput);
             var tacticalSquads = Build전술분대Views(runtimeRoot);
             combat.ConfigureTacticalSquads(tacticalSquads);
             player.ConfigureCombat(combat);
+
+            var previousComposition = runtimeRoot
+                .GetComponent<농장전투CompositionRoot>();
+            if (previousComposition != null)
+                UnityEngine.Object.DestroyImmediate(previousComposition);
+            var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
+                "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
+                ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");
+            var composition = runtimeRoot.gameObject
+                .AddComponent<농장전투CompositionRoot>();
+            composition.Configure(settings, FindPresenter(), player, combat,
+                "actor:sim:player-survivor", true);
         }
 
         private static 전술분대Presenter Build전술분대Views(Transform runtimeRoot)

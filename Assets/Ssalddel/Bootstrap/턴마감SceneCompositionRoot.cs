@@ -54,6 +54,7 @@ namespace Ssalddel.Unity.Bootstrap
             }
             catch (Exception exception)
             {
+                presenter?.SetContextVisible(false);
                 Debug.LogException(exception, this);
             }
         }

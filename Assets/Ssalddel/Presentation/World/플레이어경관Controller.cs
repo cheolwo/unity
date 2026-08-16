@@ -192,6 +192,20 @@ namespace Ssalddel.Unity.Presentation.World
         public void ConfigureMovementGate(공간안전이동Gate value)
             => movementGate = value;
 
+        /// <summary>
+        /// 저장 Scene의 수직 단위가 시작 위치와 바라보는 방향을 함께 고정할 때 사용한다.
+        /// 서버 위치나 시뮬레이션 상태는 변경하지 않는 표현 전용 초기 자세다.
+        /// </summary>
+        public void SetPresentationStartPose(Vector3 position, float yaw)
+        {
+            transform.position = position;
+            transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+            _yaw = yaw;
+            _pitch = profile.InitialPitch;
+            _tacticalFocus = position;
+            ApplyLookRotation();
+        }
+
         public void ConfigureFarmManagement(농장경영시점Controller value)
         {
             farmManagement = value;
@@ -214,6 +228,10 @@ namespace Ssalddel.Unity.Presentation.World
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
+            farmManagement ??= FindFirstObjectByType<농장경영시점Controller>(
+                FindObjectsInactive.Include);
+            combat ??= FindFirstObjectByType<전투시점Controller>(
+                FindObjectsInactive.Include);
             if (profile != null && profile.Validate() && thirdPersonPivot != null)
             {
                 _yaw = thirdPersonPivot.eulerAngles.y;
@@ -231,10 +249,10 @@ namespace Ssalddel.Unity.Presentation.World
             if (!presentationOnly) return;
             if (IsCameraTransitioning) TickCameraTransition(Time.unscaledDeltaTime);
             if (Keyboard.current == null) return;
-            if (combat != null && combat.HasActiveBeat)
+            if (combat != null)
             {
-                combat.TryHandleCombatInput(Mouse.current);
-                return;
+                var combatInputHandled = combat.TryHandleCombatInput();
+                if (combat.LocksPlayerMovement || combatInputHandled) return;
             }
             if (combat != null
                 && combat.TryHandleTacticalViewInput(Keyboard.current))
@@ -479,6 +497,14 @@ namespace Ssalddel.Unity.Presentation.World
                                 nameof(perspectiveCode));
             ApplyActivityViewDecision(_activityViewPolicies.Resolve(
                 PlayerActivityCodes.Combat, viewMode));
+        }
+
+        public void ApplyCombatAnimation(string intentCode)
+        {
+            if (animationAdapter == null)
+                throw new System.InvalidOperationException(
+                    "FarmCombatAnimationAdapterMissing");
+            animationAdapter.ApplyIntent(intentCode);
         }
 
         public void EnterFirstPersonMode()

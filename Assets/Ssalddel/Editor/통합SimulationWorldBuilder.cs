@@ -31,6 +31,7 @@ namespace Ssalddel.Unity.Editor
             var scene = EditorSceneManager.GetActiveScene();
             if (scene.path != ShellScenePath)
                 EditorSceneManager.OpenScene(ShellScenePath, OpenSceneMode.Single);
+            대한민국법정동WorldBuilder.Build대관령L2창고일인칭상호작용();
             SimulationWorldShellBuilder.Build통합월드ModeNavigation();
             SetCanonicalBuildEntry();
             ValidateOpenScene();
@@ -48,6 +49,8 @@ namespace Ssalddel.Unity.Editor
                 ?? throw new InvalidOperationException("UnifiedWorldPlayerMissing");
             if (!player.ValidateWiring() || !player.PresentationOnly)
                 throw new InvalidOperationException("UnifiedWorldPlayerInvalid");
+            대한민국법정동WorldBuilder
+                .Validate대관령L2창고일인칭상호작용OpenScene();
             var inbound = UnityEngine.Object.FindFirstObjectByType<진부Hub입고UiPresenter>(
                 FindObjectsInactive.Include)
                 ?? throw new InvalidOperationException("UnifiedWorldInboundUiMissing");
