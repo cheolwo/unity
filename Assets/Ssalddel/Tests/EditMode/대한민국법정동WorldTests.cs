@@ -122,7 +122,7 @@ namespace Ssalddel.Unity.Tests.EditMode
 
             Assert.That(value.Validate(), Is.True);
             Assert.That(value.ProfileStableId,
-                Is.EqualTo("player-profile:sim:pyeongchang:farm-explorer.v1"));
+                Is.EqualTo("player-profile:sim:pyeongchang:world-explorer.v2"));
             Assert.That(value.WalkSpeed, Is.EqualTo(3.6f));
             Assert.That(value.RunMultiplier, Is.EqualTo(1.7f));
             Assert.That(value.CameraDistance, Is.EqualTo(15.5f));
@@ -135,8 +135,16 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(value.FirstPersonEyeHeight, Is.EqualTo(1.68f));
             Assert.That(value.FirstPersonFieldOfView, Is.EqualTo(64f));
             Assert.That(value.ClickMoveStopDistance, Is.EqualTo(.18f));
-            Assert.That(value.MaximumX, Is.GreaterThan(value.MinimumX));
-            Assert.That(value.MaximumZ, Is.GreaterThan(value.MinimumZ));
+            var projection = 평창군법정동WorldFixture.Create();
+            var boundaryPoints = projection.Nodes
+                .SelectMany(node => node.BoundaryPoints)
+                .ToArray();
+            Assert.That(boundaryPoints.All(point =>
+                point.X >= value.MinimumX && point.X <= value.MaximumX), Is.True);
+            Assert.That(boundaryPoints.All(point =>
+                point.Z >= value.MinimumZ && point.Z <= value.MaximumZ), Is.True);
+            Assert.That(value.MinimumX, Is.LessThan(10.5f));
+            Assert.That(value.MinimumZ, Is.LessThan(2.5f));
             Assert.That(value.PresentationOnly, Is.True);
         }
     }

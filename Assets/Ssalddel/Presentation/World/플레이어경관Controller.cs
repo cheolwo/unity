@@ -101,6 +101,7 @@ namespace Ssalddel.Unity.Presentation.World
         public string CurrentMovementIntent => animationAdapter == null
             ? string.Empty : animationAdapter.CurrentIntentCode;
         public bool MovementBlockedByStreaming { get; private set; }
+        public bool HasMovementSafetyGate => movementGate != null;
         public string CurrentActivityCode => _currentActivityCode;
         public PlayerActivityViewDecision CurrentViewDecision
             => _currentViewDecision ?? _activityViewPolicies.Resolve(
@@ -191,6 +192,32 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void ConfigureMovementGate(공간안전이동Gate value)
             => movementGate = value;
+
+        /// <summary>
+        /// 저장 Scene의 플레이어 입력·카메라 배선은 유지하면서 보행 가능한 월드 범위만 갱신합니다.
+        /// 서버 위치, WorldTick과 업무 개정 번호에는 관여하지 않습니다.
+        /// </summary>
+        public void ConfigureTraversalProfile(플레이어경관Profile value)
+        {
+            if (value == null || !value.Validate())
+                throw new System.ArgumentException("PlayerTraversalProfileInvalid");
+            profile = value;
+            _characterController ??= GetComponent<CharacterController>();
+            _characterController.height = profile.CapsuleHeight;
+            _characterController.radius = profile.CapsuleRadius;
+            _characterController.center = Vector3.up * (profile.CapsuleHeight * .5f);
+            _characterController.stepOffset = .28f;
+            _characterController.slopeLimit = 42f;
+            _tacticalDistance = Mathf.Clamp(
+                _tacticalDistance <= 0f ? profile.CameraDistance : _tacticalDistance,
+                profile.TacticalMinimumDistance,
+                profile.TacticalMaximumDistance);
+            ClampToTraversalBounds();
+            _tacticalFocus = new Vector3(
+                Mathf.Clamp(_tacticalFocus.x, profile.MinimumX, profile.MaximumX),
+                _tacticalFocus.y,
+                Mathf.Clamp(_tacticalFocus.z, profile.MinimumZ, profile.MaximumZ));
+        }
 
         /// <summary>
         /// 저장 Scene의 수직 단위가 시작 위치와 바라보는 방향을 함께 고정할 때 사용한다.
@@ -419,10 +446,7 @@ namespace Ssalddel.Unity.Presentation.World
             }
             _characterController.Move(
                 horizontalMovement + Vector3.up * (_verticalVelocity * deltaTime));
-            var position = transform.position;
-            position.x = Mathf.Clamp(position.x, profile.MinimumX, profile.MaximumX);
-            position.z = Mathf.Clamp(position.z, profile.MinimumZ, profile.MaximumZ);
-            transform.position = position;
+            ClampToTraversalBounds();
 
             if (isMoving)
             {
@@ -441,6 +465,14 @@ namespace Ssalddel.Unity.Presentation.World
                     visualRoot.localPosition, _visualBasePosition, 10f * deltaTime);
                 animationAdapter.ApplyLocomotion(false, false);
             }
+        }
+
+        private void ClampToTraversalBounds()
+        {
+            var position = transform.position;
+            position.x = Mathf.Clamp(position.x, profile.MinimumX, profile.MaximumX);
+            position.z = Mathf.Clamp(position.z, profile.MinimumZ, profile.MaximumZ);
+            transform.position = position;
         }
 
         private void LateUpdate()

@@ -266,11 +266,16 @@ namespace Ssalddel.Unity.Runtime.World
 
     public static class 평창군플레이어경관Fixture
     {
+        public const float WorldMinimumX = -30.5f;
+        public const float WorldMaximumX = 30.5f;
+        public const float WorldMinimumZ = -22.5f;
+        public const float WorldMaximumZ = 22.5f;
+
         public static 플레이어경관Profile Create()
         {
             var value = new 플레이어경관Profile
             {
-                ProfileStableId = "player-profile:sim:pyeongchang:farm-explorer.v1",
+                ProfileStableId = "player-profile:sim:pyeongchang:world-explorer.v2",
                 WalkSpeed = 3.6f,
                 RunMultiplier = 1.7f,
                 CapsuleHeight = 1.78f,
@@ -289,10 +294,10 @@ namespace Ssalddel.Unity.Runtime.World
                 ClickMoveStopDistance = .18f,
                 InitialPitch = 2f,
                 LookSensitivity = .09f,
-                MinimumX = 10.5f,
-                MaximumX = 31.5f,
-                MinimumZ = 2.5f,
-                MaximumZ = 22f,
+                MinimumX = WorldMinimumX,
+                MaximumX = WorldMaximumX,
+                MinimumZ = WorldMinimumZ,
+                MaximumZ = WorldMaximumZ,
             };
             if (!value.Validate())
                 throw new InvalidOperationException("PlayerLandscapeProfileInvalid");
