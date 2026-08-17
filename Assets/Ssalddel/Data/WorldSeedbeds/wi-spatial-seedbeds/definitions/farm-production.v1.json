@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-seedbed.v1",
+  "stableId": "wi-spatial-seedbed:farm-production.v1",
+  "revision": 1,
+  "title": "농장 생산 공간 모판",
+  "summary": "밭갈기부터 수확까지 같은 생산구획에서 수행하고 수확물을 작업마당으로 인계하는 위치 독립 공간 모판이다.",
+  "authoredDocument": "authored/farm-production.v1.md",
+  "includedWiIds": ["WI-FARM-01", "WI-FARM-02", "WI-FARM-03", "WI-FARM-04"],
+  "internalSpaces": [
+    {
+      "spaceCode": "production-plot",
+      "spatialRoleCode": "FarmProductionPlot",
+      "capabilityCodes": [
+        "Spatial.WorkerAccessible",
+        "Spatial.TillingWorkArea",
+        "Spatial.CropProduction",
+        "Spatial.SowingWorkArea",
+        "Spatial.WaterAccessible",
+        "Spatial.CropCareWorkArea",
+        "Spatial.CargoAccessible",
+        "Spatial.HarvestWorkArea"
+      ],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "farm:감자밭 두렁:A",
+        "farm:감자밭 두렁:B",
+        "farm:감자밭 두렁:C"
+      ]
+    }
+  ],
+  "wiBindings": [
+    { "worldInteractionId": "WI-FARM-01", "internalSpaceCode": "production-plot" },
+    { "worldInteractionId": "WI-FARM-02", "internalSpaceCode": "production-plot" },
+    { "worldInteractionId": "WI-FARM-03", "internalSpaceCode": "production-plot" },
+    { "worldInteractionId": "WI-FARM-04", "internalSpaceCode": "production-plot" }
+  ],
+  "internalRelations": [],
+  "externalConnectorStubs": [
+    {
+      "stubCode": "harvest-handoff",
+      "internalSpaceCode": "production-plot",
+      "connectorTypeCode": "cargo-handoff",
+      "flowDirectionCode": "Output",
+      "adjacentWorldInteractionId": "WI-FARM-05"
+    }
+  ],
+  "transformConstraint": {
+    "allowedRotationCodes": ["0", "90", "180", "270"],
+    "scaleModeCode": "Uniform",
+    "minimumWidthMeters": 14,
+    "minimumDepthMeters": 12,
+    "preferredWidthMeters": 28,
+    "preferredDepthMeters": 24,
+    "maximumWidthMeters": 56,
+    "maximumDepthMeters": 48
+  },
+  "reviewStatusCode": "ApprovedForSimulation",
+  "evidenceRefs": ["decision:D-152", "wi-catalog:simulation-world-interactions.r3"],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

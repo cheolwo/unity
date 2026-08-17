@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-seedbed-catalog.v1",
+  "revision": "simulation-world-interaction-spatial-seedbeds.r1",
+  "worldInteractionCatalogRevision": "simulation-world-interactions.r3",
+  "landscapeGrammarRevision": "pyeongchang-landscape-grammar.v1",
+  "definitionRefs": [
+    "definitions/farm-production.v1.json",
+    "definitions/farm-work-yard.v1.json",
+    "definitions/farm-loading-gate.v1.json",
+    "definitions/farm-hub-corridor.v1.json",
+    "definitions/hub-receiving-storage.v1.json"
+  ],
+  "presentationOnly": true
+}

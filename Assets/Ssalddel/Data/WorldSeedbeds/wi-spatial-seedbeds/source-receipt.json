@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "wi-spatial-seedbed-unity-source-receipt.v1",
+  "sourceProject": "Hongdal",
+  "sourceRelativeRoot": "eng/world-seedbeds/wi-spatial-seedbeds",
+  "catalogRevision": "simulation-world-interaction-spatial-seedbeds.r1",
+  "files": [
+    {
+      "relativePath": "catalog.json",
+      "sha256": "9415b11a0cc9298ba4e6cb8cf1cba7c0bdcf6310ff70c65f44f83a03cd98018d"
+    },
+    {
+      "relativePath": "definitions/farm-production.v1.json",
+      "sha256": "a790c5d5e8f54799706711543088d670b777cfb197b097340adde11586eb3fc9"
+    },
+    {
+      "relativePath": "definitions/farm-work-yard.v1.json",
+      "sha256": "e65fecc7b6516e9cf67bcddaab5780e28e7200cad8ca054f132a1ac54f2dd319"
+    },
+    {
+      "relativePath": "definitions/farm-loading-gate.v1.json",
+      "sha256": "1de1f33e068b2c476ae79ad20e0ede2d15108f5876c70c14ef50587f7a4d23d7"
+    },
+    {
+      "relativePath": "definitions/farm-hub-corridor.v1.json",
+      "sha256": "3a4a71e3f0a3eea45995b0d5d55a54b76ed2ead876ff7c61485a421b8896867b"
+    },
+    {
+      "relativePath": "definitions/hub-receiving-storage.v1.json",
+      "sha256": "50a94f49af796ccf082c6e00b778e01815e04efab39f79bf1d29fdc8fc6a67cb"
+    }
+  ],
+  "presentationOnly": true
+}

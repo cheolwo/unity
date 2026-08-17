@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-seedbed.v1",
+  "stableId": "wi-spatial-seedbed:farm-loading-gate.v1",
+  "revision": 1,
+  "title": "농장 상차·Gate 공간 모판",
+  "summary": "포장 화물을 차량에 상차하고 Farm Gate를 통해 외부 회랑으로 넘기는 위치 독립 공간 모판이다.",
+  "authoredDocument": "authored/farm-loading-gate.v1.md",
+  "includedWiIds": ["WI-LOG-01", "WI-LOG-02"],
+  "internalSpaces": [
+    {
+      "spaceCode": "loading-area",
+      "spatialRoleCode": "FarmLoadingBay",
+      "capabilityCodes": ["Spatial.WorkerAccessible", "Spatial.CargoAccessible", "Spatial.VehicleAccessible", "Spatial.LoadingWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "farm:농산물 집하·직판장:A", "farm:농산물 집하·직판장:B", "farm:농산물 집하·직판장:C"
+      ]
+    },
+    {
+      "spaceCode": "farm-gate",
+      "spatialRoleCode": "FarmGate",
+      "capabilityCodes": ["Spatial.CargoAccessible", "Spatial.VehicleAccessible"],
+      "baseCapacities": [],
+      "allowedLandscapeCompositionKeys": [
+        "transition:Farm–Hub 전환:A", "transition:Farm–Hub 전환:B", "transition:Farm–Hub 전환:C"
+      ]
+    }
+  ],
+  "wiBindings": [
+    { "worldInteractionId": "WI-LOG-01", "internalSpaceCode": "loading-area" },
+    { "worldInteractionId": "WI-LOG-02", "internalSpaceCode": "farm-gate" }
+  ],
+  "internalRelations": [
+    { "relationCode": "VehicleAccess", "fromSpaceCode": "loading-area", "toSpaceCode": "farm-gate", "connectorTypeCode": "vehicle" }
+  ],
+  "externalConnectorStubs": [
+    { "stubCode": "packed-cargo-input", "internalSpaceCode": "loading-area", "connectorTypeCode": "cargo-handoff", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-FARM-06" },
+    { "stubCode": "farm-hub-output", "internalSpaceCode": "farm-gate", "connectorTypeCode": "farm-road", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-LOG-03" }
+  ],
+  "transformConstraint": {
+    "allowedRotationCodes": ["0", "90", "180", "270"],
+    "scaleModeCode": "Uniform",
+    "minimumWidthMeters": 16,
+    "minimumDepthMeters": 12,
+    "preferredWidthMeters": 28,
+    "preferredDepthMeters": 18,
+    "maximumWidthMeters": 42,
+    "maximumDepthMeters": 30
+  },
+  "reviewStatusCode": "ApprovedForSimulation",
+  "evidenceRefs": ["decision:D-152", "wi-catalog:simulation-world-interactions.r3"],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

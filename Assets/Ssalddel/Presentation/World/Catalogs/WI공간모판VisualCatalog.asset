@@ -1,0 +1,477 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c188d3fafcb97648947f3d714d5e323, type: 3}
+  m_Name: "WI\uACF5\uAC04\uBAA8\uD310VisualCatalog"
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.WI\uACF5\uAC04\uBAA8\uD310VisualCatalog"
+  sourceCatalogRevision: simulation-world-interaction-spatial-seedbeds.r1
+  sourceCatalogHashSha256: 9415b11a0cc9298ba4e6cb8cf1cba7c0bdcf6310ff70c65f44f83a03cd98018d
+  worldInteractionCatalogRevision: simulation-world-interactions.r3
+  landscapeGrammarRevision: pyeongchang-landscape-grammar.v1
+  unityCompositionCatalogRevision: pyeongchang-landscape-grammar.v1
+  unityCompositionCatalogHashSha256: d7187e262d51e4297844f77166233ef335de4daf3b0244f7de84e92f4c1c8d2f
+  syntyBindingRevision: pyeongchang-synty-landscape-binding.v1
+  syntyBindingHashSha256: 6cc1cc3bcc8f45b6e4025631e4f76e59605aa190ede5a60a5c797a777ee1a119
+  entries:
+  - stableId: wi-spatial-seedbed:farm-production.v1
+    revision: 1
+    title: "\uB18D\uC7A5 \uC0DD\uC0B0 \uACF5\uAC04 \uBAA8\uD310"
+    summary: "\uBC2D\uAC08\uAE30\uBD80\uD130 \uC218\uD655\uAE4C\uC9C0 \uAC19\uC740
+      \uC0DD\uC0B0\uAD6C\uD68D\uC5D0\uC11C \uC218\uD589\uD558\uACE0 \uC218\uD655\uBB3C\uC744
+      \uC791\uC5C5\uB9C8\uB2F9\uC73C\uB85C \uC778\uACC4\uD558\uB294 \uC704\uCE58
+      \uB3C5\uB9BD \uACF5\uAC04 \uBAA8\uD310\uC774\uB2E4."
+    includedWiIds:
+    - WI-FARM-01
+    - WI-FARM-02
+    - WI-FARM-03
+    - WI-FARM-04
+    spaces:
+    - spaceCode: production-plot
+      spatialRoleCode: FarmProductionPlot
+      capabilityCodes:
+      - Spatial.WorkerAccessible
+      - Spatial.TillingWorkArea
+      - Spatial.CropProduction
+      - Spatial.SowingWorkArea
+      - Spatial.WaterAccessible
+      - Spatial.CropCareWorkArea
+      - Spatial.CargoAccessible
+      - Spatial.HarvestWorkArea
+      capacities:
+      - capacityCode: WorkArea
+        quantity: 1
+        unitCode: slot
+      candidates:
+      - compositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:A"
+        sourceCompositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:A"
+        topologyCode: area
+        nativeFootprintMeters: {x: 14, y: 12}
+        prefab: {fileID: 5429054574127294816, guid: bd8d560d0a4dcb447a34f753a7ab1ba0, type: 3}
+      - compositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:B"
+        sourceCompositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:B"
+        topologyCode: area
+        nativeFootprintMeters: {x: 14, y: 12}
+        prefab: {fileID: 6413268302580439435, guid: 6d1d29a4f33829f4aacbd3c985d1a03e, type: 3}
+      - compositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:C"
+        sourceCompositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:C"
+        topologyCode: area
+        nativeFootprintMeters: {x: 14, y: 12}
+        prefab: {fileID: 3696574056345039905, guid: 2734ece489d1e0b489a531bd32006e45, type: 3}
+    relations: []
+    connectorStubs:
+    - stubCode: harvest-handoff
+      internalSpaceCode: production-plot
+      connectorTypeCode: cargo-handoff
+      flowDirectionCode: Output
+      adjacentWorldInteractionId: WI-FARM-05
+    minimumSizeMeters: {x: 14, y: 12}
+    preferredSizeMeters: {x: 28, y: 24}
+    maximumSizeMeters: {x: 56, y: 48}
+    sourceDefinitionHashSha256: a790c5d5e8f54799706711543088d670b777cfb197b097340adde11586eb3fc9
+  - stableId: wi-spatial-seedbed:farm-work-yard.v1
+    revision: 1
+    title: "\uB18D\uC7A5 \uC791\uC5C5\uB9C8\uB2F9 \uACF5\uAC04 \uBAA8\uD310"
+    summary: "\uC218\uD655\uBB3C \uC9D1\uD558\uC640 \uD3EC\uC7A5\uC744 \uC11C\uB85C
+      \uB2E4\uB978 \uC791\uC5C5 \uC601\uC5ED\uC73C\uB85C \uC218\uD589\uD558\uACE0
+      \uC0C1\uCC28\uC601\uC5ED\uC73C\uB85C \uC778\uACC4\uD558\uB294 \uC704\uCE58
+      \uB3C5\uB9BD \uACF5\uAC04 \uBAA8\uD310\uC774\uB2E4."
+    includedWiIds:
+    - WI-FARM-05
+    - WI-FARM-06
+    spaces:
+    - spaceCode: collection-area
+      spatialRoleCode: FarmWorkYardCollection
+      capabilityCodes:
+      - Spatial.WorkerAccessible
+      - Spatial.CargoAccessible
+      - Spatial.CollectionWorkArea
+      capacities:
+      - capacityCode: WorkArea
+        quantity: 1
+        unitCode: slot
+      candidates:
+      - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:A"
+        sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 20, y: 18}
+        prefab: {fileID: 6847503479151602550, guid: 6414d7a141f19df49bc9b5784ef0ee73, type: 3}
+      - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:B"
+        sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 20, y: 18}
+        prefab: {fileID: 679910196460361079, guid: 9907822b5d1d7314ca730f4d03d70559, type: 3}
+      - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:C"
+        sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 20, y: 18}
+        prefab: {fileID: 324182925690009948, guid: 16a6a20a94e8b8546ae928d93b7f6b0e, type: 3}
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:A"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 4168583767720606273, guid: 2da8e1c9dc5705d4e9334162248a79de, type: 3}
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:B"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 7915017653574340055, guid: 3bcdf1c36d932694a857b9e94b185288, type: 3}
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:C"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 2003651536560686893, guid: 2dd3905e1e3fcae439e16e05d83edc8a, type: 3}
+    - spaceCode: packing-area
+      spatialRoleCode: FarmWorkYardPacking
+      capabilityCodes:
+      - Spatial.WorkerAccessible
+      - Spatial.CargoAccessible
+      - Spatial.PackingWorkArea
+      capacities:
+      - capacityCode: WorkArea
+        quantity: 1
+        unitCode: slot
+      candidates:
+      - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:A"
+        sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 20, y: 18}
+        prefab: {fileID: 6847503479151602550, guid: 6414d7a141f19df49bc9b5784ef0ee73, type: 3}
+      - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:B"
+        sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 20, y: 18}
+        prefab: {fileID: 679910196460361079, guid: 9907822b5d1d7314ca730f4d03d70559, type: 3}
+      - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:C"
+        sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 20, y: 18}
+        prefab: {fileID: 324182925690009948, guid: 16a6a20a94e8b8546ae928d93b7f6b0e, type: 3}
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:A"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 4168583767720606273, guid: 2da8e1c9dc5705d4e9334162248a79de, type: 3}
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:B"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 7915017653574340055, guid: 3bcdf1c36d932694a857b9e94b185288, type: 3}
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:C"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 2003651536560686893, guid: 2dd3905e1e3fcae439e16e05d83edc8a, type: 3}
+    relations:
+    - relationCode: WorkFlow
+      fromSpaceCode: collection-area
+      toSpaceCode: packing-area
+      connectorTypeCode: cargo-handoff
+    connectorStubs:
+    - stubCode: production-input
+      internalSpaceCode: collection-area
+      connectorTypeCode: cargo-handoff
+      flowDirectionCode: Input
+      adjacentWorldInteractionId: WI-FARM-04
+    - stubCode: loading-output
+      internalSpaceCode: packing-area
+      connectorTypeCode: cargo-handoff
+      flowDirectionCode: Output
+      adjacentWorldInteractionId: WI-LOG-01
+    minimumSizeMeters: {x: 16, y: 12}
+    preferredSizeMeters: {x: 24, y: 18}
+    maximumSizeMeters: {x: 36, y: 30}
+    sourceDefinitionHashSha256: e65fecc7b6516e9cf67bcddaab5780e28e7200cad8ca054f132a1ac54f2dd319
+  - stableId: wi-spatial-seedbed:farm-loading-gate.v1
+    revision: 1
+    title: "\uB18D\uC7A5 \uC0C1\uCC28\xB7Gate \uACF5\uAC04 \uBAA8\uD310"
+    summary: "\uD3EC\uC7A5 \uD654\uBB3C\uC744 \uCC28\uB7C9\uC5D0 \uC0C1\uCC28\uD558\uACE0
+      Farm Gate\uB97C \uD1B5\uD574 \uC678\uBD80 \uD68C\uB791\uC73C\uB85C \uB118\uAE30\uB294
+      \uC704\uCE58 \uB3C5\uB9BD \uACF5\uAC04 \uBAA8\uD310\uC774\uB2E4."
+    includedWiIds:
+    - WI-LOG-01
+    - WI-LOG-02
+    spaces:
+    - spaceCode: loading-area
+      spatialRoleCode: FarmLoadingBay
+      capabilityCodes:
+      - Spatial.WorkerAccessible
+      - Spatial.CargoAccessible
+      - Spatial.VehicleAccessible
+      - Spatial.LoadingWorkArea
+      capacities:
+      - capacityCode: WorkArea
+        quantity: 1
+        unitCode: slot
+      candidates:
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:A"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 4168583767720606273, guid: 2da8e1c9dc5705d4e9334162248a79de, type: 3}
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:B"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 7915017653574340055, guid: 3bcdf1c36d932694a857b9e94b185288, type: 3}
+      - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:C"
+        sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 16, y: 12}
+        prefab: {fileID: 2003651536560686893, guid: 2dd3905e1e3fcae439e16e05d83edc8a, type: 3}
+    - spaceCode: farm-gate
+      spatialRoleCode: FarmGate
+      capabilityCodes:
+      - Spatial.CargoAccessible
+      - Spatial.VehicleAccessible
+      capacities: []
+      candidates:
+      - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:A"
+        sourceCompositionKey: "farm:\uB18D\uC7A5-\uD5C8\uBE0C \uB18D\uC7A5\uCD9C\uAD6C:A"
+        topologyCode: transition
+        nativeFootprintMeters: {x: 20, y: 10}
+        prefab: {fileID: 360257582641257329, guid: bfe56fb6be2ab0b48b32f43e45aa5b68, type: 3}
+      - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:B"
+        sourceCompositionKey: "regional-logistics-hub:\uB18D\uC7A5-\uD5C8\uBE0C \uD5C8\uBE0C\uC785\uAD6C:A"
+        topologyCode: transition
+        nativeFootprintMeters: {x: 20, y: 10}
+        prefab: {fileID: 8192083856577100260, guid: 949360908297a4040891228265f4f75a, type: 3}
+      - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:C"
+        sourceCompositionKey: "farm:\uB18D\uC7A5-\uD5C8\uBE0C \uB18D\uC7A5\uCD9C\uAD6C:A"
+        topologyCode: transition
+        nativeFootprintMeters: {x: 20, y: 10}
+        prefab: {fileID: 360257582641257329, guid: bfe56fb6be2ab0b48b32f43e45aa5b68, type: 3}
+    relations:
+    - relationCode: VehicleAccess
+      fromSpaceCode: loading-area
+      toSpaceCode: farm-gate
+      connectorTypeCode: vehicle
+    connectorStubs:
+    - stubCode: packed-cargo-input
+      internalSpaceCode: loading-area
+      connectorTypeCode: cargo-handoff
+      flowDirectionCode: Input
+      adjacentWorldInteractionId: WI-FARM-06
+    - stubCode: farm-hub-output
+      internalSpaceCode: farm-gate
+      connectorTypeCode: farm-road
+      flowDirectionCode: Output
+      adjacentWorldInteractionId: WI-LOG-03
+    minimumSizeMeters: {x: 16, y: 12}
+    preferredSizeMeters: {x: 28, y: 18}
+    maximumSizeMeters: {x: 42, y: 30}
+    sourceDefinitionHashSha256: 1de1f33e068b2c476ae79ad20e0ede2d15108f5876c70c14ef50587f7a4d23d7
+  - stableId: wi-spatial-seedbed:farm-hub-corridor.v1
+    revision: 1
+    title: "Farm\u2013Hub \uD654\uBB3C\uD68C\uB791 \uACF5\uAC04 \uBAA8\uD310"
+    summary: "Farm Gate\uC640 Hub Gate \uC0AC\uC774\uC5D0\uC11C \uD654\uBB3C\uC774
+      \uC774\uB3D9\uD560 \uC218 \uC788\uC74C\uC744 \uC815\uC758\uD558\uB418 \uC2E4\uC81C
+      \uB3C4\uB85C \uD615\uC0C1\uC740 \uACB0\uC815\uD558\uC9C0 \uC54A\uB294 \uACF5\uAC04
+      \uBAA8\uD310\uC774\uB2E4."
+    includedWiIds:
+    - WI-LOG-03
+    spaces:
+    - spaceCode: cargo-transit-corridor
+      spatialRoleCode: CargoTransitCorridor
+      capabilityCodes:
+      - Spatial.CargoRoute
+      - Spatial.VehicleAccessible
+      capacities: []
+      candidates:
+      - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:A"
+        sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:A"
+        topologyCode: linear
+        nativeFootprintMeters: {x: 11.910614, y: 11.910614}
+        prefab: {fileID: 4175572192850512129, guid: c4ae765f342a5bc45bc46dda8cdfdb1e, type: 3}
+      - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:B"
+        sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:A"
+        topologyCode: linear
+        nativeFootprintMeters: {x: 11.910614, y: 11.910614}
+        prefab: {fileID: 4175572192850512129, guid: c4ae765f342a5bc45bc46dda8cdfdb1e, type: 3}
+      - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:C"
+        sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:A"
+        topologyCode: linear
+        nativeFootprintMeters: {x: 11.910614, y: 11.910614}
+        prefab: {fileID: 4175572192850512129, guid: c4ae765f342a5bc45bc46dda8cdfdb1e, type: 3}
+      - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uACE1\uC120:A"
+        sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+        topologyCode: linear
+        nativeFootprintMeters: {x: 11.910614, y: 11.910614}
+        prefab: {fileID: 1076617699600691859, guid: 87eb8e022c5722547bf998fb7f564459, type: 3}
+      - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uACE1\uC120:B"
+        sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+        topologyCode: linear
+        nativeFootprintMeters: {x: 11.910614, y: 11.910614}
+        prefab: {fileID: 1076617699600691859, guid: 87eb8e022c5722547bf998fb7f564459, type: 3}
+      - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uACE1\uC120:C"
+        sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+        topologyCode: linear
+        nativeFootprintMeters: {x: 11.910614, y: 11.910614}
+        prefab: {fileID: 1076617699600691859, guid: 87eb8e022c5722547bf998fb7f564459, type: 3}
+      - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:A"
+        sourceCompositionKey: "farm:\uB18D\uC7A5-\uD5C8\uBE0C \uB18D\uC7A5\uCD9C\uAD6C:A"
+        topologyCode: transition
+        nativeFootprintMeters: {x: 20, y: 10}
+        prefab: {fileID: 360257582641257329, guid: bfe56fb6be2ab0b48b32f43e45aa5b68, type: 3}
+      - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:B"
+        sourceCompositionKey: "regional-logistics-hub:\uB18D\uC7A5-\uD5C8\uBE0C \uD5C8\uBE0C\uC785\uAD6C:A"
+        topologyCode: transition
+        nativeFootprintMeters: {x: 20, y: 10}
+        prefab: {fileID: 8192083856577100260, guid: 949360908297a4040891228265f4f75a, type: 3}
+      - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:C"
+        sourceCompositionKey: "farm:\uB18D\uC7A5-\uD5C8\uBE0C \uB18D\uC7A5\uCD9C\uAD6C:A"
+        topologyCode: transition
+        nativeFootprintMeters: {x: 20, y: 10}
+        prefab: {fileID: 360257582641257329, guid: bfe56fb6be2ab0b48b32f43e45aa5b68, type: 3}
+    relations: []
+    connectorStubs:
+    - stubCode: farm-side-input
+      internalSpaceCode: cargo-transit-corridor
+      connectorTypeCode: farm-road
+      flowDirectionCode: Input
+      adjacentWorldInteractionId: WI-LOG-02
+    - stubCode: hub-side-output
+      internalSpaceCode: cargo-transit-corridor
+      connectorTypeCode: vehicle
+      flowDirectionCode: Output
+      adjacentWorldInteractionId: WI-LOG-04
+    minimumSizeMeters: {x: 12, y: 12}
+    preferredSizeMeters: {x: 36, y: 12}
+    maximumSizeMeters: {x: 120, y: 24}
+    sourceDefinitionHashSha256: 3a4a71e3f0a3eea45995b0d5d55a54b76ed2ead876ff7c61485a421b8896867b
+  - stableId: wi-spatial-seedbed:hub-receiving-storage.v1
+    revision: 1
+    title: "Hub \uC785\uACE0\xB7\uBCF4\uAD00 \uACF5\uAC04 \uBAA8\uD310"
+    summary: "Hub \uB3C4\uCC29 \uD654\uBB3C\uC758 \uD558\uCC28\xB7\uC778\uC218\xB7\uC785\uACE0\uAC80\uC218\xB7\uCC3D\uACE0
+      \uC801\uC7AC\uB97C \uC704\uCE58 \uB3C5\uB9BD \uB0B4\uBD80 \uD750\uB984\uC73C\uB85C
+      \uC5F0\uACB0\uD558\uB294 \uACF5\uAC04 \uBAA8\uD310\uC774\uB2E4."
+    includedWiIds:
+    - WI-LOG-04
+    - WI-LOG-05
+    - WI-001
+    - WI-002
+    spaces:
+    - spaceCode: unloading-area
+      spatialRoleCode: HubUnloadingArea
+      capabilityCodes:
+      - Spatial.UnloadingWorkArea
+      - Spatial.CargoAccessible
+      - Spatial.WorkerAccessible
+      capacities:
+      - capacityCode: WorkArea
+        quantity: 1
+        unitCode: slot
+      candidates:
+      - compositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:A"
+        sourceCompositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 28, y: 22}
+        prefab: {fileID: 5871688212106977410, guid: 98b2ef7f9bf57384087081f4e9bf6af2, type: 3}
+      - compositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:B"
+        sourceCompositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 28, y: 22}
+        prefab: {fileID: 7443388059328483129, guid: 1e809117f60daee42a30bcd23d0c1751, type: 3}
+      - compositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:C"
+        sourceCompositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 28, y: 22}
+        prefab: {fileID: 9121473698119990671, guid: 5805aca6edb7b5143825e5b953bde11f, type: 3}
+      - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:A"
+        sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 20}
+        prefab: {fileID: 1628514304672814049, guid: c141a864d4d45894a8d500c453fc7f9f, type: 3}
+      - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:B"
+        sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 20}
+        prefab: {fileID: 452728479631527319, guid: e19aa842ec931a94a92283706145809c, type: 3}
+      - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:C"
+        sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 20}
+        prefab: {fileID: 1217726175355491868, guid: 90b27e19121c9ca4aaee5ed9881cafd6, type: 3}
+    - spaceCode: inspection-area
+      spatialRoleCode: HubInspectionArea
+      capabilityCodes:
+      - Spatial.InspectionWorkArea
+      - Spatial.CargoAccessible
+      - Spatial.WorkerAccessible
+      capacities:
+      - capacityCode: WorkArea
+        quantity: 1
+        unitCode: slot
+      candidates:
+      - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:A"
+        sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 20}
+        prefab: {fileID: 1628514304672814049, guid: c141a864d4d45894a8d500c453fc7f9f, type: 3}
+      - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:B"
+        sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 20}
+        prefab: {fileID: 452728479631527319, guid: e19aa842ec931a94a92283706145809c, type: 3}
+      - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:C"
+        sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 20}
+        prefab: {fileID: 1217726175355491868, guid: 90b27e19121c9ca4aaee5ed9881cafd6, type: 3}
+    - spaceCode: storage-area
+      spatialRoleCode: HubStorageArea
+      capabilityCodes:
+      - Spatial.Storage
+      - Spatial.CargoAccessible
+      - Spatial.WorkerAccessible
+      - Spatial.LoadingWorkArea
+      capacities:
+      - capacityCode: StorageCapacity
+        quantity: 10000
+        unitCode: KGM
+      - capacityCode: WorkArea
+        quantity: 1
+        unitCode: slot
+      candidates:
+      - compositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:A"
+        sourceCompositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:A"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 18}
+        prefab: {fileID: 2267020094846660802, guid: e901fa46bde8d9e449f9391fb1c92012, type: 3}
+      - compositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:B"
+        sourceCompositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:B"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 18}
+        prefab: {fileID: 8612038533779071499, guid: 7311fc7f6c706c1498f28939ad277a45, type: 3}
+      - compositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:C"
+        sourceCompositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:C"
+        topologyCode: landmark
+        nativeFootprintMeters: {x: 24, y: 18}
+        prefab: {fileID: 5226762277380714504, guid: 7bfbd6e76d1bd2a4da515e136ea7835d, type: 3}
+    relations:
+    - relationCode: CargoHandoff
+      fromSpaceCode: unloading-area
+      toSpaceCode: inspection-area
+      connectorTypeCode: cargo-handoff
+    - relationCode: WarehouseHandoff
+      fromSpaceCode: inspection-area
+      toSpaceCode: storage-area
+      connectorTypeCode: cargo-handoff
+    connectorStubs:
+    - stubCode: farm-hub-input
+      internalSpaceCode: unloading-area
+      connectorTypeCode: vehicle
+      flowDirectionCode: Input
+      adjacentWorldInteractionId: WI-LOG-03
+    minimumSizeMeters: {x: 24, y: 18}
+    preferredSizeMeters: {x: 48, y: 36}
+    maximumSizeMeters: {x: 96, y: 72}
+    sourceDefinitionHashSha256: 50a94f49af796ccf082c6e00b778e01815e04efab39f79bf1d29fdc8fc6a67cb
+  presentationOnly: 1

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-seedbed.v1",
+  "stableId": "wi-spatial-seedbed:farm-work-yard.v1",
+  "revision": 1,
+  "title": "농장 작업마당 공간 모판",
+  "summary": "수확물 집하와 포장을 서로 다른 작업 영역으로 수행하고 상차영역으로 인계하는 위치 독립 공간 모판이다.",
+  "authoredDocument": "authored/farm-work-yard.v1.md",
+  "includedWiIds": ["WI-FARM-05", "WI-FARM-06"],
+  "internalSpaces": [
+    {
+      "spaceCode": "collection-area",
+      "spatialRoleCode": "FarmWorkYardCollection",
+      "capabilityCodes": ["Spatial.WorkerAccessible", "Spatial.CargoAccessible", "Spatial.CollectionWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "farm:헛간 작업마당:A", "farm:헛간 작업마당:B", "farm:헛간 작업마당:C",
+        "farm:농산물 집하·직판장:A", "farm:농산물 집하·직판장:B", "farm:농산물 집하·직판장:C"
+      ]
+    },
+    {
+      "spaceCode": "packing-area",
+      "spatialRoleCode": "FarmWorkYardPacking",
+      "capabilityCodes": ["Spatial.WorkerAccessible", "Spatial.CargoAccessible", "Spatial.PackingWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "farm:헛간 작업마당:A", "farm:헛간 작업마당:B", "farm:헛간 작업마당:C",
+        "farm:농산물 집하·직판장:A", "farm:농산물 집하·직판장:B", "farm:농산물 집하·직판장:C"
+      ]
+    }
+  ],
+  "wiBindings": [
+    { "worldInteractionId": "WI-FARM-05", "internalSpaceCode": "collection-area" },
+    { "worldInteractionId": "WI-FARM-06", "internalSpaceCode": "packing-area" }
+  ],
+  "internalRelations": [
+    { "relationCode": "WorkFlow", "fromSpaceCode": "collection-area", "toSpaceCode": "packing-area", "connectorTypeCode": "cargo-handoff" }
+  ],
+  "externalConnectorStubs": [
+    { "stubCode": "production-input", "internalSpaceCode": "collection-area", "connectorTypeCode": "cargo-handoff", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-FARM-04" },
+    { "stubCode": "loading-output", "internalSpaceCode": "packing-area", "connectorTypeCode": "cargo-handoff", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-LOG-01" }
+  ],
+  "transformConstraint": {
+    "allowedRotationCodes": ["0", "90", "180", "270"],
+    "scaleModeCode": "Uniform",
+    "minimumWidthMeters": 16,
+    "minimumDepthMeters": 12,
+    "preferredWidthMeters": 24,
+    "preferredDepthMeters": 18,
+    "maximumWidthMeters": 36,
+    "maximumDepthMeters": 30
+  },
+  "reviewStatusCode": "ApprovedForSimulation",
+  "evidenceRefs": ["decision:D-152", "wi-catalog:simulation-world-interactions.r3"],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

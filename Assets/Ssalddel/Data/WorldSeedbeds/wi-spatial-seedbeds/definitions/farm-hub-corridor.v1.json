@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-seedbed.v1",
+  "stableId": "wi-spatial-seedbed:farm-hub-corridor.v1",
+  "revision": 1,
+  "title": "Farm–Hub 화물회랑 공간 모판",
+  "summary": "Farm Gate와 Hub Gate 사이에서 화물이 이동할 수 있음을 정의하되 실제 도로 형상은 결정하지 않는 공간 모판이다.",
+  "authoredDocument": "authored/farm-hub-corridor.v1.md",
+  "includedWiIds": ["WI-LOG-03"],
+  "internalSpaces": [
+    {
+      "spaceCode": "cargo-transit-corridor",
+      "spatialRoleCode": "CargoTransitCorridor",
+      "capabilityCodes": ["Spatial.CargoRoute", "Spatial.VehicleAccessible"],
+      "baseCapacities": [],
+      "allowedLandscapeCompositionKeys": [
+        "network:농촌도로 직선:A", "network:농촌도로 직선:B", "network:농촌도로 직선:C",
+        "network:농촌도로 곡선:A", "network:농촌도로 곡선:B", "network:농촌도로 곡선:C",
+        "transition:Farm–Hub 전환:A", "transition:Farm–Hub 전환:B", "transition:Farm–Hub 전환:C"
+      ]
+    }
+  ],
+  "wiBindings": [
+    { "worldInteractionId": "WI-LOG-03", "internalSpaceCode": "cargo-transit-corridor" }
+  ],
+  "internalRelations": [],
+  "externalConnectorStubs": [
+    { "stubCode": "farm-side-input", "internalSpaceCode": "cargo-transit-corridor", "connectorTypeCode": "farm-road", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-LOG-02" },
+    { "stubCode": "hub-side-output", "internalSpaceCode": "cargo-transit-corridor", "connectorTypeCode": "vehicle", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-LOG-04" }
+  ],
+  "transformConstraint": {
+    "allowedRotationCodes": ["0", "90", "180", "270"],
+    "scaleModeCode": "Uniform",
+    "minimumWidthMeters": 12,
+    "minimumDepthMeters": 12,
+    "preferredWidthMeters": 36,
+    "preferredDepthMeters": 12,
+    "maximumWidthMeters": 120,
+    "maximumDepthMeters": 24
+  },
+  "reviewStatusCode": "ApprovedForSimulation",
+  "evidenceRefs": ["decision:D-152", "wi-catalog:simulation-world-interactions.r3"],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

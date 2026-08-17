@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-seedbed.v1",
+  "stableId": "wi-spatial-seedbed:hub-receiving-storage.v1",
+  "revision": 1,
+  "title": "Hub 입고·보관 공간 모판",
+  "summary": "Hub 도착 화물의 하차·인수·입고검수·창고 적재를 위치 독립 내부 흐름으로 연결하는 공간 모판이다.",
+  "authoredDocument": "authored/hub-receiving-storage.v1.md",
+  "includedWiIds": ["WI-LOG-04", "WI-LOG-05", "WI-001", "WI-002"],
+  "internalSpaces": [
+    {
+      "spaceCode": "unloading-area",
+      "spatialRoleCode": "HubUnloadingArea",
+      "capabilityCodes": ["Spatial.UnloadingWorkArea", "Spatial.CargoAccessible", "Spatial.WorkerAccessible"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "city:물류 Station 진입부:A", "city:물류 Station 진입부:B", "city:물류 Station 진입부:C",
+        "city:상하차 Dock:A", "city:상하차 Dock:B", "city:상하차 Dock:C"
+      ]
+    },
+    {
+      "spaceCode": "inspection-area",
+      "spatialRoleCode": "HubInspectionArea",
+      "capabilityCodes": ["Spatial.InspectionWorkArea", "Spatial.CargoAccessible", "Spatial.WorkerAccessible"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "city:상하차 Dock:A", "city:상하차 Dock:B", "city:상하차 Dock:C"
+      ]
+    },
+    {
+      "spaceCode": "storage-area",
+      "spatialRoleCode": "HubStorageArea",
+      "capabilityCodes": ["Spatial.Storage", "Spatial.CargoAccessible", "Spatial.WorkerAccessible", "Spatial.LoadingWorkArea"],
+      "baseCapacities": [
+        { "capacityCode": "StorageCapacity", "quantity": 10000, "unitCode": "KGM" },
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "city:화물 대기 야드:A", "city:화물 대기 야드:B", "city:화물 대기 야드:C"
+      ]
+    }
+  ],
+  "wiBindings": [
+    { "worldInteractionId": "WI-LOG-04", "internalSpaceCode": "unloading-area" },
+    { "worldInteractionId": "WI-LOG-05", "internalSpaceCode": "inspection-area" },
+    { "worldInteractionId": "WI-001", "internalSpaceCode": "inspection-area" },
+    { "worldInteractionId": "WI-002", "internalSpaceCode": "storage-area" }
+  ],
+  "internalRelations": [
+    { "relationCode": "CargoHandoff", "fromSpaceCode": "unloading-area", "toSpaceCode": "inspection-area", "connectorTypeCode": "cargo-handoff" },
+    { "relationCode": "WarehouseHandoff", "fromSpaceCode": "inspection-area", "toSpaceCode": "storage-area", "connectorTypeCode": "cargo-handoff" }
+  ],
+  "externalConnectorStubs": [
+    { "stubCode": "farm-hub-input", "internalSpaceCode": "unloading-area", "connectorTypeCode": "vehicle", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-LOG-03" }
+  ],
+  "transformConstraint": {
+    "allowedRotationCodes": ["0", "90", "180", "270"],
+    "scaleModeCode": "Uniform",
+    "minimumWidthMeters": 24,
+    "minimumDepthMeters": 18,
+    "preferredWidthMeters": 48,
+    "preferredDepthMeters": 36,
+    "maximumWidthMeters": 96,
+    "maximumDepthMeters": 72
+  },
+  "reviewStatusCode": "ApprovedForSimulation",
+  "evidenceRefs": ["decision:D-152", "wi-catalog:simulation-world-interactions.r3"],
+  "presentationOnly": true,
+  "isOperationalState": false
+}
