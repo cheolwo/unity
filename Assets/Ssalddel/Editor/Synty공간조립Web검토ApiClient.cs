@@ -80,10 +80,10 @@ namespace Ssalddel.Unity.Editor
                 throw new InvalidOperationException("CaptureReceiptCountMismatch");
             var requestBody = new BatchRequest
             {
-                SchemaVersion = Synty공간조립Web검토CapturePipeline.BatchSchemaVersion,
+                SchemaVersion = bundle.SchemaVersion,
                 BatchStableId = bundle.BatchStableId,
                 BatchRevision = "capture-" + bundle.CaptureBundleHash[..16],
-                Title = "회복 발전소 A Normal · Web 시각 검토 1카드",
+                Title = bundle.BatchTitle,
                 GeneratedAtUtc = bundle.CapturedAtUtc,
                 Items = new List<BatchItem>
                 {
@@ -91,21 +91,30 @@ namespace Ssalddel.Unity.Editor
                     {
                         ExpectedRevision = bundle.ExpectedReviewItemRevision,
                         ReviewItemStableId = bundle.ReviewItemStableId,
-                        CompositionStableId = Synty공간조립Web검토CapturePipeline.CompositionStableId,
-                        DisplayName = "회복 발전소 A · Normal",
-                        H1StableId = Synty공간조립Web검토CapturePipeline.H1StableId,
-                        H2StableId = Synty공간조립Web검토CapturePipeline.H2StableId,
-                        H3StableId = Synty공간조립Web검토CapturePipeline.H3StableId,
-                        VariantCode = "A",
-                        StateProfileCode = "Normal",
+                        CompositionStableId = bundle.CompositionStableId,
+                        DisplayName = bundle.DisplayName,
+                        H1StableId = bundle.H1StableId,
+                        H2StableId = bundle.H2StableId,
+                        H3StableId = bundle.H3StableId,
+                        H4StableId = bundle.H4StableId,
+                        ReviewTargetLevelCode = bundle.ReviewTargetLevelCode,
+                        ReviewTargetStableId = bundle.ReviewTargetStableId,
+                        CaptureProfileCode = bundle.CaptureProfileCode,
+                        VariantCode = bundle.VariantCode,
+                        StateProfileCode = bundle.StateProfileCode,
                         CompositionInputHash = bundle.SourceCompositionHash,
                         PlanHash = bundle.PlanHash,
-                        RenderingProfileId = Synty공간조립Web검토CapturePipeline.RenderingProfileId,
-                        RenderingProfileRevision = Synty공간조립Web검토CapturePipeline.RenderingProfileRevision,
+                        RenderingProfileId = bundle.RenderingProfileId,
+                        RenderingProfileRevision = bundle.RenderingProfileRevision,
                         RenderingProfileHash = bundle.RenderingProfileHash,
                         ParentCaptureBundleHash = bundle.ParentCaptureBundleHash,
                         CaptureBundleHash = bundle.CaptureBundleHash,
-                        PackUsages = PackUsages(),
+                        PackUsages = bundle.PackUsages.Select(value => new PackUsage
+                        {
+                            PackCode = value.PackCode,
+                            UsagePercent = value.UsagePercent,
+                            RoleCode = value.RoleCode,
+                        }).ToList(),
                         Captures = bundle.Captures.Select((capture, index) =>
                             ToCapture(bundle, capture, receipts[index])).ToList(),
                     },
@@ -163,16 +172,6 @@ namespace Ssalddel.Unity.Editor
             };
         }
 
-        private static List<PackUsage> PackUsages()
-            => new()
-            {
-                new() { PackCode = "Construction", UsagePercent = 35, RoleCode = "StructureAndRecovery" },
-                new() { PackCode = "Nature", UsagePercent = 20, RoleCode = "RecoveryAtmosphere" },
-                new() { PackCode = "Farm", UsagePercent = 20, RoleCode = "ProductionAndPower" },
-                new() { PackCode = "Town", UsagePercent = 10, RoleCode = "RestAndLifeTrace" },
-                new() { PackCode = "City", UsagePercent = 15, RoleCode = "Infrastructure" },
-            };
-
         private static MultipartFormDataSection Field(string name, string value)
             => new(name, value ?? string.Empty, Encoding.UTF8, "text/plain");
 
@@ -225,6 +224,10 @@ namespace Ssalddel.Unity.Editor
             public string H1StableId;
             public string H2StableId;
             public string H3StableId;
+            public string H4StableId;
+            public string ReviewTargetLevelCode;
+            public string ReviewTargetStableId;
+            public string CaptureProfileCode;
             public string VariantCode;
             public string StateProfileCode;
             public string CompositionInputHash;

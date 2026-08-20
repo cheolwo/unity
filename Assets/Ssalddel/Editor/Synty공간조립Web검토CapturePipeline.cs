@@ -169,7 +169,20 @@ namespace Ssalddel.Unity.Editor
                 {
                     SchemaVersion = BatchSchemaVersion,
                     BatchStableId = BatchStableId,
+                    BatchTitle = "회복 발전소 A Normal · Web 시각 검토 1카드",
                     ReviewItemStableId = ReviewItemStableId,
+                    CompositionStableId = CompositionStableId,
+                    DisplayName = "회복 발전소 A · Normal",
+                    H1StableId = H1StableId,
+                    H2StableId = H2StableId,
+                    H3StableId = H3StableId,
+                    ReviewTargetLevelCode = "H1",
+                    ReviewTargetStableId = H1StableId,
+                    CaptureProfileCode = "H1PlaceFourViews",
+                    VariantCode = "A",
+                    StateProfileCode = "Normal",
+                    RenderingProfileId = RenderingProfileId,
+                    RenderingProfileRevision = RenderingProfileRevision,
                     SourceCompositionHash = SourceCompositionHash,
                     PlanHash = Sha256(PlanRevision),
                     RenderingProfileHash = RenderingProfileHash,
@@ -178,6 +191,7 @@ namespace Ssalddel.Unity.Editor
                     ExpectedReviewItemRevision = expectedReviewItemRevision,
                     CapturedAtUtc = capturedAtUtc.ToString("O", CultureInfo.InvariantCulture),
                     OutputFolder = outputFolder,
+                    PackUsages = DefaultPackUsages(),
                     Captures = captures,
                 };
                 File.WriteAllText(
@@ -219,6 +233,25 @@ namespace Ssalddel.Unity.Editor
                 receipts.Add(await api.UploadCaptureAsync(bundle, capture));
             await api.RegisterBatchAsync(bundle, receipts);
         }
+
+        internal static async Task UploadAndRegisterBundleAsync(SyntyWeb검토CaptureBundle bundle)
+        {
+            var api = CreateApiClient();
+            var receipts = new List<SyntyWeb검토UploadResponse>(bundle.Captures.Count);
+            foreach (var capture in bundle.Captures)
+                receipts.Add(await api.UploadCaptureAsync(bundle, capture));
+            await api.RegisterBatchAsync(bundle, receipts);
+        }
+
+        private static List<SyntyWeb검토PackUsage> DefaultPackUsages()
+            => new()
+            {
+                new() { PackCode = "Construction", UsagePercent = 35, RoleCode = "StructureAndRecovery" },
+                new() { PackCode = "Nature", UsagePercent = 20, RoleCode = "RecoveryAtmosphere" },
+                new() { PackCode = "Farm", UsagePercent = 20, RoleCode = "ProductionAndPower" },
+                new() { PackCode = "Town", UsagePercent = 10, RoleCode = "RestAndLifeTrace" },
+                new() { PackCode = "City", UsagePercent = 15, RoleCode = "Infrastructure" },
+            };
 
         private static Synty공간조립Web검토ApiClient CreateApiClient()
         {

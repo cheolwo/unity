@@ -7,11 +7,99 @@ namespace Ssalddel.Unity.Presentation.World
 {
     public static class SyntyPackInventoryCodes
     {
+        public const string Nature = "nature";
         public const string Farm = "farm";
         public const string Town = "town";
         public const string City = "city";
+        public const string Construction = "construction";
 
-        public static IReadOnlyList<string> All { get; } = new[] { Farm, Town, City };
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            Nature, Farm, Town, City, Construction,
+        };
+
+        public static bool IsKnown(string value) =>
+            All.Contains(value, StringComparer.Ordinal);
+    }
+
+    public static class SyntyPackNormalizedCategoryCodes
+    {
+        public const string Buildings = "Buildings";
+        public const string Characters = "Characters";
+        public const string Environments = "Environments";
+        public const string Fx = "FX";
+        public const string Generic = "Generic";
+        public const string Items = "Items";
+        public const string Plants = "Plants";
+        public const string Props = "Props";
+        public const string Rocks = "Rocks";
+        public const string Terrain = "Terrain";
+        public const string Trees = "Trees";
+        public const string Tools = "Tools";
+        public const string Vehicles = "Vehicles";
+        public const string ManualReview = "ManualReview";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            Buildings, Characters, Environments, Fx, Generic, Items, Plants,
+            Props, Rocks, Terrain, Trees, Tools, Vehicles, ManualReview,
+        };
+
+        public static bool IsKnown(string value) =>
+            All.Contains(value, StringComparer.Ordinal);
+    }
+
+    public static class SyntyAssetUsageTrackCodes
+    {
+        public const string SpatialBase = "spatial-base";
+        public const string FunctionalProp = "functional-prop";
+        public const string Actor = "actor";
+        public const string Vehicle = "vehicle";
+        public const string ToolOrItem = "tool-or-item";
+        public const string StateFx = "state-fx";
+        public const string ManualReview = "manual-review";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            SpatialBase, FunctionalProp, Actor, Vehicle, ToolOrItem, StateFx,
+            ManualReview,
+        };
+
+        public static bool IsKnown(string value) =>
+            All.Contains(value, StringComparer.Ordinal);
+    }
+
+    public static class SyntyAssetClassificationStateCodes
+    {
+        public const string AutoClassified = "auto-classified";
+        public const string NeedsHumanReview = "needs-human-review";
+        public const string Planned = "planned";
+        public const string SeedbedVerified = "seedbed-verified";
+        public const string RuntimeVerified = "runtime-verified";
+        public const string Reserved = "reserved";
+        public const string Excluded = "excluded";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            AutoClassified, NeedsHumanReview, Planned, SeedbedVerified,
+            RuntimeVerified, Reserved, Excluded,
+        };
+
+        public static bool IsKnown(string value) =>
+            All.Contains(value, StringComparer.Ordinal);
+    }
+
+    public static class SyntyAssetPlannedAreaCodes
+    {
+        public const string NatureHome = "nature-home";
+        public const string Farm = "farm";
+        public const string Town = "town";
+        public const string CityHub = "city-hub";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            NatureHome, Farm, Town, CityHub,
+        };
 
         public static bool IsKnown(string value) =>
             All.Contains(value, StringComparer.Ordinal);
@@ -47,6 +135,11 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private string packCode = string.Empty;
         [SerializeField] private string categoryCode = string.Empty;
         [SerializeField] private string assetUseKindCode = string.Empty;
+        [SerializeField] private string normalizedCategoryCode = string.Empty;
+        [SerializeField] private string assetFamilyId = string.Empty;
+        [SerializeField] private string primaryUsageTrackCode = string.Empty;
+        [SerializeField] private string classificationStateCode = string.Empty;
+        [SerializeField] private string[] plannedAreaCodes = Array.Empty<string>();
         [SerializeField] private GameObject prefab = null!;
         [SerializeField] private Bounds localBounds;
         [SerializeField] private long triangleCount;
@@ -63,6 +156,11 @@ namespace Ssalddel.Unity.Presentation.World
         public string PackCode => packCode;
         public string CategoryCode => categoryCode;
         public string AssetUseKindCode => assetUseKindCode;
+        public string NormalizedCategoryCode => normalizedCategoryCode;
+        public string AssetFamilyId => assetFamilyId;
+        public string PrimaryUsageTrackCode => primaryUsageTrackCode;
+        public string ClassificationStateCode => classificationStateCode;
+        public IReadOnlyList<string> PlannedAreaCodes => plannedAreaCodes;
         public GameObject Prefab => prefab;
         public Bounds LocalBounds => localBounds;
         public long TriangleCount => triangleCount;
@@ -80,6 +178,11 @@ namespace Ssalddel.Unity.Presentation.World
             string sourcePackCode,
             string sourceCategoryCode,
             string useKindCode,
+            string normalizedCategory,
+            string familyId,
+            string usageTrackCode,
+            string classificationState,
+            string[] targetAreaCodes,
             GameObject sourcePrefab,
             Bounds bounds,
             long triangles,
@@ -95,6 +198,11 @@ namespace Ssalddel.Unity.Presentation.World
             packCode = sourcePackCode ?? string.Empty;
             categoryCode = sourceCategoryCode ?? string.Empty;
             assetUseKindCode = useKindCode ?? string.Empty;
+            normalizedCategoryCode = normalizedCategory ?? string.Empty;
+            assetFamilyId = familyId ?? string.Empty;
+            primaryUsageTrackCode = usageTrackCode ?? string.Empty;
+            classificationStateCode = classificationState ?? string.Empty;
+            plannedAreaCodes = targetAreaCodes ?? Array.Empty<string>();
             prefab = sourcePrefab;
             localBounds = bounds;
             triangleCount = triangles;
@@ -115,6 +223,17 @@ namespace Ssalddel.Unity.Presentation.World
             && SyntyPackInventoryCodes.IsKnown(packCode)
             && !string.IsNullOrWhiteSpace(categoryCode)
             && SyntyPackAssetUseKindCodes.IsKnown(assetUseKindCode)
+            && SyntyPackNormalizedCategoryCodes.IsKnown(normalizedCategoryCode)
+            && !string.IsNullOrWhiteSpace(assetFamilyId)
+            && !assetFamilyId.Contains("/", StringComparison.Ordinal)
+            && !assetFamilyId.Contains("\\", StringComparison.Ordinal)
+            && SyntyAssetUsageTrackCodes.IsKnown(primaryUsageTrackCode)
+            && SyntyAssetClassificationStateCodes.IsKnown(classificationStateCode)
+            && plannedAreaCodes != null
+            && plannedAreaCodes.Length > 0
+            && plannedAreaCodes.All(SyntyAssetPlannedAreaCodes.IsKnown)
+            && plannedAreaCodes.Distinct(StringComparer.Ordinal).Count()
+                == plannedAreaCodes.Length
             && prefab != null
             && IsFinite(localBounds.center)
             && IsFinite(localBounds.size)

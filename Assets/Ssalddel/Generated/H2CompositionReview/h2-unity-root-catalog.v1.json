@@ -1,0 +1,86 @@
+{
+    "SchemaVersion": "synty-h2-unity-root-catalog.v1",
+    "RecipeRevision": "simulation-world-h2-composition-recipes.r4",
+    "RecipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+    "Items": [
+        {
+            "H2StableId": "h2-candidate:farm-incident-containment",
+            "DisplayName": "농장 사건 점검·격리 블록",
+            "RecipeId": "h2-composition:farm-incident-containment.r1",
+            "RecipeRevision": "simulation-world-h2-composition-recipes.r4",
+            "RecipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+            "PrefabPath": "Assets/Ssalddel/Generated/H2CompositionReview/farm-incident-containment.prefab",
+            "ChildH1StableIds": [
+                "h1-stock:farm-exposure-inspection",
+                "h1-stock:farm-incident-quarantine",
+                "h1-stock:farm-weather-protection"
+            ]
+        },
+        {
+            "H2StableId": "h2-candidate:farm-loss-restoration-handoff",
+            "DisplayName": "농장 손실 회복·복원 인계 블록",
+            "RecipeId": "h2-composition:farm-loss-restoration-handoff.r1",
+            "RecipeRevision": "simulation-world-h2-composition-recipes.r4",
+            "RecipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+            "PrefabPath": "Assets/Ssalddel/Generated/H2CompositionReview/farm-loss-restoration-handoff.prefab",
+            "ChildH1StableIds": [
+                "h1-stock:farm-incident-quarantine",
+                "h1-stock:farm-loss-recovery",
+                "h1-stock:farm-restoration-supply"
+            ]
+        },
+        {
+            "H2StableId": "h2-candidate:nature-restoration-recovery",
+            "DisplayName": "자연 복원·안전 회복 블록",
+            "RecipeId": "h2-composition:nature-restoration-recovery.r1",
+            "RecipeRevision": "simulation-world-h2-composition-recipes.r4",
+            "RecipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+            "PrefabPath": "Assets/Ssalddel/Generated/H2CompositionReview/nature-restoration-recovery.prefab",
+            "ChildH1StableIds": [
+                "h1-stock:nature-restoration-site",
+                "h1-stock:nature-safe-recovery-camp"
+            ]
+        },
+        {
+            "H2StableId": "h2-candidate:nature-threat-response",
+            "DisplayName": "자연 위협 추적·대피 블록",
+            "RecipeId": "h2-composition:nature-threat-response.r1",
+            "RecipeRevision": "simulation-world-h2-composition-recipes.r4",
+            "RecipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+            "PrefabPath": "Assets/Ssalddel/Generated/H2CompositionReview/nature-threat-response.prefab",
+            "ChildH1StableIds": [
+                "h1-stock:nature-threat-watch",
+                "h1-stock:nature-incident-trace",
+                "h1-stock:nature-emergency-retreat"
+            ]
+        },
+        {
+            "H2StableId": "h2-candidate:town-contamination-control",
+            "DisplayName": "생활권 오염 점검·정화 블록",
+            "RecipeId": "h2-composition:town-contamination-control.r1",
+            "RecipeRevision": "simulation-world-h2-composition-recipes.r4",
+            "RecipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+            "PrefabPath": "Assets/Ssalddel/Generated/H2CompositionReview/town-contamination-control.prefab",
+            "ChildH1StableIds": [
+                "h1-stock:town-contamination-inspection",
+                "h1-stock:town-contamination-quarantine",
+                "h1-stock:town-cleanup-transfer"
+            ]
+        },
+        {
+            "H2StableId": "h2-candidate:town-recall-relief",
+            "DisplayName": "생활권 회수 안내·자연권 구호 블록",
+            "RecipeId": "h2-composition:town-recall-relief.r1",
+            "RecipeRevision": "simulation-world-h2-composition-recipes.r4",
+            "RecipeSha256": "524ee67ecb702e1e5e19b467f2f235e4a08e25729fb7090cef90266d04ed08e8",
+            "PrefabPath": "Assets/Ssalddel/Generated/H2CompositionReview/town-recall-relief.prefab",
+            "ChildH1StableIds": [
+                "h1-stock:town-recall-service",
+                "h1-stock:town-neighborhood-service",
+                "h1-stock:town-nature-relief"
+            ]
+        }
+    ],
+    "AuthorityBoundary": "LocationIndependentPresentationReviewOnly",
+    "PresentationOnly": true
+}

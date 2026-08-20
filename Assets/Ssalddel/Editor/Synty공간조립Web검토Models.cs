@@ -8,7 +8,21 @@ namespace Ssalddel.Unity.Editor
     {
         public string SchemaVersion;
         public string BatchStableId;
+        public string BatchTitle;
         public string ReviewItemStableId;
+        public string CompositionStableId;
+        public string DisplayName;
+        public string H1StableId;
+        public string H2StableId;
+        public string H3StableId;
+        public string H4StableId;
+        public string ReviewTargetLevelCode;
+        public string ReviewTargetStableId;
+        public string CaptureProfileCode;
+        public string VariantCode;
+        public string StateProfileCode;
+        public string RenderingProfileId;
+        public string RenderingProfileRevision;
         public string SourceCompositionHash;
         public string PlanHash;
         public string RenderingProfileHash;
@@ -17,7 +31,16 @@ namespace Ssalddel.Unity.Editor
         public long ExpectedReviewItemRevision;
         public string CapturedAtUtc;
         public string OutputFolder;
+        public List<SyntyWeb검토PackUsage> PackUsages = new();
         public List<SyntyWeb검토LocalCapture> Captures = new();
+    }
+
+    [Serializable]
+    public sealed class SyntyWeb검토PackUsage
+    {
+        public string PackCode;
+        public int UsagePercent;
+        public string RoleCode;
     }
 
     [Serializable]
