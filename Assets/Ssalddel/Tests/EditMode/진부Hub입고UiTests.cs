@@ -65,7 +65,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             var api = new StubApiClient(new[]
             {
                 Ok(JsonUtility.ToJson(ready)),
-                Ok("{\"Decision\":{\"BlockReasonCodes\":[]},\"TaskPlan\":{\"TaskStableId\":\"task:inspection\",\"DurationTicks\":2}}"),
+                Ok("{\"Decision\":{\"BlockReasonCodes\":[]},\"TaskPlan\":{\"TaskStableId\":\"task:inspection\",\"DurationTicks\":2},\"SpatialInteraction\":{\"SelectedSpatialStableId\":\"spatial:scenario:pyeongchang:jinbu-hub:inspection\",\"EvidenceKindCode\":\"Scenario\"}}"),
                 Ok("{}"),
                 Ok(JsonUtility.ToJson(working)),
             });
@@ -78,6 +78,10 @@ namespace Ssalddel.Unity.Tests.EditMode
                 loaded, loaded.Action("Confirm"), CancellationToken.None);
 
             Assert.That(preview.CanConfirm, Is.True);
+            Assert.That(preview.SpatialStableId,
+                Is.EqualTo("spatial:scenario:pyeongchang:jinbu-hub:inspection"));
+            Assert.That(진부Hub입고Ui표시문구.공간근거(preview.SpatialEvidenceKindCode),
+                Is.EqualTo("시나리오 공간 근거"));
             Assert.That(confirmed.StateCode, Is.EqualTo(진부Hub입고UiCodes.InProgress));
             Assert.That(api.Requests, Has.Count.EqualTo(4));
             Assert.That(api.Requests[0].RelativePath,
@@ -86,6 +90,17 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(api.Requests[2].RelativePath, Does.EndWith("/freight-receipts/confirm"));
             Assert.That(api.Requests[2].JsonBody, Does.Contain("\"ExpectedRevision\":11"));
             Assert.That(api.Requests[3].Method, Is.EqualTo("GET"));
+        }
+
+        [Test]
+        public void 공간상호작용차단코드는_사람이읽는한글로표시한다()
+        {
+            Assert.That(진부Hub입고Ui표시문구.공간차단사유(
+                    "SimulationSpatialCapacityInsufficient"),
+                Is.EqualTo("공간 용량이 부족합니다"));
+            Assert.That(진부Hub입고Ui표시문구.공간차단사유(
+                    "SimulationSpatialReservationConflict"),
+                Is.EqualTo("다른 작업이 공간을 예약 중입니다"));
         }
 
         [Test]

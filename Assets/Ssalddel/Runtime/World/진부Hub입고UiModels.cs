@@ -124,8 +124,41 @@ namespace Ssalddel.Unity.Runtime.World
         public string ActorStableId { get; set; } = string.Empty;
         public int DurationTicks { get; set; }
         public string TaskStableId { get; set; } = string.Empty;
+        public string SpatialStableId { get; set; } = string.Empty;
+        public string SpatialEvidenceKindCode { get; set; } = string.Empty;
         public string[] BlockReasonCodes { get; set; } = Array.Empty<string>();
         public bool CanConfirm => BlockReasonCodes.Length == 0;
+    }
+
+    public static class 진부Hub입고Ui표시문구
+    {
+        public static string 공간근거(string evidenceKindCode)
+            => evidenceKindCode == "Scenario"
+                ? "시나리오 공간 근거"
+                : evidenceKindCode == "LandscapeGraph"
+                    ? "경관 그래프 공간 근거"
+                    : string.IsNullOrWhiteSpace(evidenceKindCode)
+                        ? "공간 근거 미확인"
+                        : evidenceKindCode;
+
+        public static string 공간차단사유(string blockReasonCode)
+        {
+            switch (blockReasonCode)
+            {
+                case "SimulationSpatialDefinitionUnavailable":
+                    return "사용할 공간 정의가 없습니다";
+                case "SimulationSpatialCapabilityMissing":
+                    return "필요한 공간 능력이 없습니다";
+                case "SimulationSpatialCapacityInsufficient":
+                    return "공간 용량이 부족합니다";
+                case "SimulationSpatialAccessUnavailable":
+                    return "현재 공간에 접근할 수 없습니다";
+                case "SimulationSpatialReservationConflict":
+                    return "다른 작업이 공간을 예약 중입니다";
+                default:
+                    return blockReasonCode;
+            }
+        }
     }
 
     public interface I진부Hub입고UiAuthorityClient

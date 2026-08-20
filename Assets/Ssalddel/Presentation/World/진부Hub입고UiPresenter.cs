@@ -255,8 +255,13 @@ namespace Ssalddel.Unity.Presentation.World
                   + "\n대상  " + preview.TargetStableId
                   + "\n담당  " + preview.ActorStableId
                   + " · 예상 " + preview.DurationTicks + " Tick"
+                  + (string.IsNullOrWhiteSpace(preview.SpatialStableId)
+                      ? string.Empty
+                      : "\n공간  " + preview.SpatialStableId
+                        + " · " + 진부Hub입고Ui표시문구.공간근거(preview.SpatialEvidenceKindCode))
                   + (preview.CanConfirm ? "\n확정 전에는 상태가 변경되지 않습니다."
-                      : "\n차단  " + string.Join(", ", preview.BlockReasonCodes));
+                      : "\n차단  " + string.Join(", ", Array.ConvertAll(
+                          preview.BlockReasonCodes, 진부Hub입고Ui표시문구.공간차단사유)));
 
             staleBanner.SetActive(coordinator.IsStale || !profileCompatible);
             staleText.text = coordinator.IsStale

@@ -67,6 +67,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 ActorStableId = invocation.ActorStableId,
                 DurationTicks = wire.TaskPlan?.DurationTicks ?? invocation.DurationTicks,
                 TaskStableId = wire.TaskPlan?.TaskStableId ?? string.Empty,
+                SpatialStableId = wire.SpatialInteraction?.SelectedSpatialStableId ?? string.Empty,
+                SpatialEvidenceKindCode = wire.SpatialInteraction?.EvidenceKindCode ?? string.Empty,
                 BlockReasonCodes = wire.Decision?.BlockReasonCodes ?? Array.Empty<string>(),
             };
             if (preview.BlockReasonCodes.Any(string.IsNullOrWhiteSpace))
@@ -206,6 +208,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         {
             public DecisionWire Decision;
             public TaskPlanWire TaskPlan;
+            public SpatialInteractionWire SpatialInteraction;
         }
 
         [Serializable]
@@ -219,6 +222,13 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         {
             public string TaskStableId = string.Empty;
             public int DurationTicks;
+        }
+
+        [Serializable]
+        private sealed class SpatialInteractionWire
+        {
+            public string SelectedSpatialStableId = string.Empty;
+            public string EvidenceKindCode = string.Empty;
         }
     }
 }
