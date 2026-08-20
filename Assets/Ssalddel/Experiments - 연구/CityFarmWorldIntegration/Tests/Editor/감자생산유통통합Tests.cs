@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using NUnit.Framework;
+using Ssalddel.Unity.Presentation.World;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -72,6 +73,10 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor.Tests
             Assert.That(presenter.ValidateDemonstrationWiring(), Is.True);
             Assert.That(presenter.GetComponentsInChildren<감자생산유통단계Button>(true).Length,
                 Is.EqualTo(6));
+            var cameraRig = UnityEngine.Object.FindFirstObjectByType<DioramaTopDownCameraRig>();
+            Assert.That(cameraRig, Is.Not.Null);
+            Assert.That(cameraRig!.PrototypeInputEnabled, Is.True,
+                "통합 Scene의 Play Mode에서는 WASD와 Mouse Wheel 탐색이 켜져야 합니다.");
             presenter.SelectStage(5);
             Assert.That(presenter.CurrentStageLabel, Is.EqualTo("도시 도착"));
             Assert.That(presenter.ActiveStageCanvasCount(), Is.EqualTo(1));

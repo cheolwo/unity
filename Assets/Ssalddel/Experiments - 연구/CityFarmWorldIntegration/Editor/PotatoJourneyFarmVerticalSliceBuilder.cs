@@ -241,7 +241,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                     LevelCode = DioramaCameraFocusLevelCodes.Object,
                     Anchor = focus,
                 },
-            }, "camera-focus:object.potato-journey", false);
+            }, "camera-focus:object.potato-journey", true);
             rig.ConfigureComposition(49f, 72f, 42f, 31f, 35f, 31f, 28f, 90f);
             rig.ApplyNowForTests();
             camera.backgroundColor = new Color(.56f, .66f, .65f);

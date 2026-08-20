@@ -67547,7 +67547,7 @@ MonoBehaviour:
     LevelCode: Object
     Anchor: {fileID: 2099835088}
   initialFocusAnchorId: camera-focus:object.potato-journey
-  enablePrototypeInput: 0
+  enablePrototypeInput: 1
   pitch: 49
   maxDistance: 90
   worldDistance: 72
