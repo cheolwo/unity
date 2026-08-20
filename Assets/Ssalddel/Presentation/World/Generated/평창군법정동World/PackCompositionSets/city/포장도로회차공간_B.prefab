@@ -302,7 +302,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed5cac9d5c7885e4bbd6c6315d53f696, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uD329\uACBD\uAD00CompositionSetView"
   descriptor:
     compositionKey: "city:\uD3EC\uC7A5\uB3C4\uB85C\xB7\uD68C\uCC28 \uACF5\uAC04:B"

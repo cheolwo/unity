@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "overrideStableId": "world-placement-override:pyeongchang-farm-hub-town-v1",
   "basePlanStableId": "world-placement:pyeongchang-farm-hub-town-v1",
-  "expectedBasePlanHashSha256": "4ac3a4e6e82be38e03edb01e7d917e3fe2969ace8ad88b32adcd264ca09ed68e",
+  "expectedBasePlanHashSha256": "c95a85fe87421274f3930dd444f03ca8ff7553151bd5913c89f7113d0cc8b7f7",
   "changes": [
     {
       "operationCode": "Disable",

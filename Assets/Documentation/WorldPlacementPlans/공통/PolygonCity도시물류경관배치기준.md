@@ -1,10 +1,10 @@
 ---
 guideSchemaVersion: 1
 guideStableId: landscape-guide:polygon-city-logistics
-guideRevision: polygon-city-logistics-guide.v2
+guideRevision: polygon-city-logistics-guide.v3
 sourcePackCode: city
 visualCatalogRevision: legal-dong-scenic-catalog.v2
-compositionCatalogRevision: pyeongchang-four-pack-composition.v2
+compositionCatalogRevision: pyeongchang-four-pack-composition.v3
 presentationOnly: true
 ---
 

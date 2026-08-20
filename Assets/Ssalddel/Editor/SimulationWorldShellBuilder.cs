@@ -21,7 +21,7 @@ namespace Ssalddel.Unity.Editor
 {
     public static class SimulationWorldShellBuilder
     {
-        public const string ScenePath = "Assets/Ssalddel/Scenes/SimulationWorldShell.unity";
+        public const string ScenePath = 통합WorldScenePolicy.CanonicalScenePath;
         public const string RootName = "SimulationWorldShell";
         public const string EnvironmentCatalogPath =
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/FarmCityEnvironmentCatalog.asset";
@@ -102,6 +102,7 @@ namespace Ssalddel.Unity.Editor
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath)!);
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
                 throw new InvalidOperationException("SimulationWorldShellSceneSaveFailed");
+            통합WorldScenePolicy.ApplyCanonicalBuildSettings();
             AssetDatabase.SaveAssets();
             ValidateWorldShellOpenScene();
             Selection.activeGameObject = root;
@@ -1201,6 +1202,24 @@ namespace Ssalddel.Unity.Editor
                 .AddComponent<농장경영시점Controller>();
             management.Configure(player, targets);
             player.ConfigureFarmManagement(management);
+
+            var previousDailyPresenter = runtimeRoot.GetComponent<오늘작업계획Presenter>();
+            if (previousDailyPresenter != null)
+                UnityEngine.Object.DestroyImmediate(previousDailyPresenter);
+            var previousDailyComposition = runtimeRoot
+                .GetComponent<오늘작업계획SceneCompositionRoot>();
+            if (previousDailyComposition != null)
+                UnityEngine.Object.DestroyImmediate(previousDailyComposition);
+            var dailyPresenter = runtimeRoot.gameObject
+                .AddComponent<오늘작업계획Presenter>();
+            dailyPresenter.Configure(management, player,
+                runtimeRoot.GetComponent<턴마감Presenter>());
+            var dailySettings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
+                "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
+                ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");
+            var dailyComposition = runtimeRoot.gameObject
+                .AddComponent<오늘작업계획SceneCompositionRoot>();
+            dailyComposition.Configure(dailySettings, dailyPresenter, true);
 
             var previousCombat = runtimeRoot.GetComponent<전투시점Controller>();
             if (previousCombat != null) UnityEngine.Object.DestroyImmediate(previousCombat);

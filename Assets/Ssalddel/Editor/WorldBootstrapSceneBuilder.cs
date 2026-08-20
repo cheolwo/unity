@@ -12,7 +12,7 @@ namespace Ssalddel.Unity.Editor
 {
     public static class WorldBootstrapSceneBuilder
     {
-        [MenuItem("Ssalddel/Build World Bootstrap Scene")]
+        [MenuItem("Ssalddel/실험·참고 Scene/WorldBootstrap 참고 Scene 재생성")]
         public static void Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -70,7 +70,7 @@ namespace Ssalddel.Unity.Editor
             const string scenePath = "Assets/Ssalddel/Scenes/WorldBootstrapScene.unity";
             System.IO.Directory.CreateDirectory("Assets/Ssalddel/Scenes");
             EditorSceneManager.SaveScene(scene, scenePath);
-            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(scenePath, true) };
+            통합WorldScenePolicy.ApplyCanonicalBuildSettings();
             AssetDatabase.SaveAssets();
         }
 

@@ -1,10 +1,10 @@
 ---
 guideSchemaVersion: 1
 guideStableId: landscape-guide:polygon-nature-forest
-guideRevision: polygon-nature-forest-guide.v3
+guideRevision: polygon-nature-forest-guide.v4
 sourcePackCode: nature
 visualCatalogRevision: legal-dong-scenic-catalog.v2
-compositionCatalogRevision: pyeongchang-four-pack-composition.v2
+compositionCatalogRevision: pyeongchang-four-pack-composition.v3
 presentationOnly: true
 ---
 

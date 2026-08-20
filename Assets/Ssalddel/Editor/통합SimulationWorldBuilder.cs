@@ -10,9 +10,7 @@ namespace Ssalddel.Unity.Editor
 {
     public static class 통합SimulationWorldBuilder
     {
-        private const string ShellScenePath = SimulationWorldShellBuilder.ScenePath;
-        private const string BootstrapScenePath =
-            "Assets/Ssalddel/Scenes/WorldBootstrapScene.unity";
+        private const string ShellScenePath = 통합WorldScenePolicy.CanonicalScenePath;
 
         [MenuItem("Ssalddel/통합 월드/전체 재생성")]
         public static void BuildAll()
@@ -20,7 +18,7 @@ namespace Ssalddel.Unity.Editor
             SimulationWorldShellBuilder.BuildWorldShell();
             대한민국법정동WorldBuilder.Build();
             SimulationWorldShellBuilder.Build통합월드ModeNavigation();
-            SetCanonicalBuildEntry();
+            통합WorldScenePolicy.ApplyCanonicalBuildSettings();
             ValidateOpenScene();
             Debug.Log("UNIFIED-WORLD-1: Farm·1인칭·전술·Hub UI 통합 World 재생성을 완료했습니다.");
         }
@@ -33,7 +31,7 @@ namespace Ssalddel.Unity.Editor
                 EditorSceneManager.OpenScene(ShellScenePath, OpenSceneMode.Single);
             대한민국법정동WorldBuilder.Build대관령L2창고일인칭상호작용();
             SimulationWorldShellBuilder.Build통합월드ModeNavigation();
-            SetCanonicalBuildEntry();
+            통합WorldScenePolicy.ApplyCanonicalBuildSettings();
             ValidateOpenScene();
             Debug.Log("UNIFIED-WORLD-1: 기존 통합 Scene을 단일 플레이 진입점으로 정리했습니다.");
         }
@@ -79,27 +77,8 @@ namespace Ssalddel.Unity.Editor
             var enabledScenes = EditorBuildSettings.scenes.Where(value => value.enabled).ToArray();
             if (enabledScenes.Length != 1 || enabledScenes[0].path != ShellScenePath)
                 throw new InvalidOperationException("UnifiedWorldBuildEntryInvalid");
+            통합WorldScenePolicy.ValidateCanonicalPolicy();
             Debug.Log("UNIFIED-WORLD-1 validation passed");
-        }
-
-        private static void SetCanonicalBuildEntry()
-        {
-            var existing = EditorBuildSettings.scenes.ToList();
-            var paths = existing.Select(value => value.path)
-                .Where(value => !string.IsNullOrWhiteSpace(value))
-                .Distinct(StringComparer.Ordinal)
-                .ToList();
-            if (!paths.Contains(ShellScenePath, StringComparer.Ordinal))
-                paths.Add(ShellScenePath);
-            if (!paths.Contains(BootstrapScenePath, StringComparer.Ordinal))
-                paths.Add(BootstrapScenePath);
-
-            EditorBuildSettings.scenes = paths
-                .OrderBy(value => value == ShellScenePath ? 0 : 1)
-                .Select(value => new EditorBuildSettingsScene(
-                    value, value == ShellScenePath))
-                .ToArray();
-            AssetDatabase.SaveAssets();
         }
     }
 }

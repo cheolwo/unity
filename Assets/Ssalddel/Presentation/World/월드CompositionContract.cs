@@ -14,6 +14,8 @@ namespace Ssalddel.Unity.Presentation.World
         public const string City = "city";
         public const string RegionalLogisticsHub = "regional-logistics-hub";
         public const string Mixed = "mixed";
+        public const string Network = "network";
+        public const string Transition = "transition";
 
         public static IReadOnlyList<string> All { get; } = new[]
         {
@@ -23,6 +25,8 @@ namespace Ssalddel.Unity.Presentation.World
             City,
             RegionalLogisticsHub,
             Mixed,
+            Network,
+            Transition,
         };
 
         public static bool IsKnown(string value)
@@ -104,12 +108,26 @@ namespace Ssalddel.Unity.Presentation.World
         public const string Pedestrian = "pedestrian";
         public const string Vehicle = "vehicle";
         public const string FarmMachine = "farm-machine";
+        public const string FieldContinuation = "field-continuation";
+        public const string Irrigation = "irrigation";
+        public const string ForestPath = "forest-path";
+        public const string FarmRoad = "farm-road";
+        public const string TownRoad = "town-road";
+        public const string CityRoad = "city-road";
+        public const string BuildingFront = "building-front";
 
         public static IReadOnlyList<string> All { get; } = new[]
         {
             Pedestrian,
             Vehicle,
             FarmMachine,
+            FieldContinuation,
+            Irrigation,
+            ForestPath,
+            FarmRoad,
+            TownRoad,
+            CityRoad,
+            BuildingFront,
         };
 
         public static bool IsKnown(string value)

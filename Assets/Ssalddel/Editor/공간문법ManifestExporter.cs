@@ -13,6 +13,8 @@ namespace Ssalddel.Unity.Editor
     {
         public const string ManifestPath =
             "Assets/Ssalddel/Data/WorldSeedbeds/pyeongchang-landscape-grammar.v1.json";
+        public const string NeutralManifestPath =
+            "Assets/Ssalddel/Data/WorldSeedbeds/pyeongchang-landscape-grammar.v2.json";
         public const string ExternalOutputEnvironmentVariable =
             "SSALDDEL_LANDSCAPE_GRAMMAR_OUTPUT";
 

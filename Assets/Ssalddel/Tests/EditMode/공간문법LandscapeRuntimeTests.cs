@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using NUnit.Framework;
 using Ssalddel.Unity.Editor;
 using Ssalddel.Unity.Infrastructure.Simulation;
@@ -25,6 +26,125 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(catalog.BuildSafeCatalogHashSha256(),
                 Is.EqualTo(header.catalogHashSha256).IgnoreCase);
             Assert.That(catalog.Entries.Count, Is.EqualTo(156));
+        }
+
+        [Test]
+        public void 중립문법V2Hash는_Synty자산지표를제외하고_서버Manifest와일치한다()
+        {
+            var catalog = LoadCatalog();
+            var json = File.ReadAllText(공간문법ManifestExporter.NeutralManifestPath);
+            var header = JsonUtility.FromJson<ManifestHeader>(json);
+
+            Assert.That(catalog.BuildNeutralGrammarHashSha256(),
+                Is.EqualTo(header.catalogHashSha256).IgnoreCase);
+            Assert.That(json, Does.Not.Contain("sourceCompositionKey"));
+            Assert.That(json, Does.Not.Contain("triangleCount"));
+        }
+
+        [Test]
+        public void SyntyBinding은_Primary가사용불가하면_우선순위Fallback을선택한다()
+        {
+            var grammar = LoadCatalog();
+            var source = grammar.Entries[0];
+            var primary = new 공간문법SyntyBindingCandidate();
+            primary.Configure(공간문법SyntyBindingCodes.Primary, 0,
+                source.SourceCompositionKey, source.Prefab,
+                source.InternalGeneration.DetailGeneratorRevision);
+            var slowerFallback = new 공간문법SyntyBindingCandidate();
+            slowerFallback.Configure(공간문법SyntyBindingCodes.Fallback, 20,
+                "fixture:fallback:slow", source.Prefab, "fixture-detail.v1");
+            var preferredFallback = new 공간문법SyntyBindingCandidate();
+            preferredFallback.Configure(공간문법SyntyBindingCodes.Fallback, 10,
+                "fixture:fallback:preferred", source.Prefab, "fixture-detail.v1");
+            var replacement = new 공간문법SyntyBindingEntry();
+            replacement.Configure(source.CompositionKey,
+                new[] { primary, slowerFallback, preferredFallback });
+
+            var entries = grammar.Entries.Select(value =>
+            {
+                if (value.CompositionKey == source.CompositionKey) return replacement;
+                var candidate = new 공간문법SyntyBindingCandidate();
+                candidate.Configure(공간문법SyntyBindingCodes.Primary, 0,
+                    value.SourceCompositionKey, value.Prefab,
+                    value.InternalGeneration.DetailGeneratorRevision);
+                var entry = new 공간문법SyntyBindingEntry();
+                entry.Configure(value.CompositionKey, new[] { candidate });
+                return entry;
+            }).ToArray();
+            var receipt = new 공간문법SyntyInventoryReceipt();
+            receipt.Configure("fixture-inventory.v1", new string('b', 64));
+            var binding = ScriptableObject.CreateInstance<공간문법SyntyBindingCatalog>();
+            try
+            {
+                binding.Configure(
+                    공간문법SyntyBindingCodes.BindingRevision,
+                    공간문법CompositionCatalog.NeutralGrammarRevision,
+                    grammar.BuildNeutralGrammarHashSha256(),
+                    new[] { receipt }, entries);
+
+                var resolved = binding.Resolve(source.CompositionKey,
+                    value => !value.IsPrimary);
+
+                Assert.That(resolved.FallbackUsed, Is.True);
+                Assert.That(resolved.Candidate.SourceCompositionKey,
+                    Is.EqualTo("fixture:fallback:preferred"));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(binding);
+            }
+        }
+
+        [Test]
+        public void 생성된SyntyBinding대장은_156개Primary와_중립문법영수증을가진다()
+        {
+            var grammar = LoadCatalog();
+            var binding = AssetDatabase.LoadAssetAtPath<공간문법SyntyBindingCatalog>(
+                공간문법SyntyBindingCatalogBuilder.CatalogPath);
+
+            Assert.That(binding, Is.Not.Null);
+            binding.Validate();
+            Assert.That(binding.Entries.Count, Is.EqualTo(156));
+            Assert.That(binding.Entries.All(value =>
+                value.Candidates.Count(candidate => candidate.IsPrimary) == 1), Is.True);
+            Assert.That(binding.TargetGrammarHashSha256,
+                Is.EqualTo(grammar.BuildNeutralGrammarHashSha256()).IgnoreCase);
+            Assert.That(binding.SourceCatalogs.Count, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void 중립문법V2Graph조립은_Binding선택영수증을_배치View에남긴다()
+        {
+            var grammar = LoadCatalog();
+            var binding = AssetDatabase.LoadAssetAtPath<공간문법SyntyBindingCatalog>(
+                공간문법SyntyBindingCatalogBuilder.CatalogPath);
+            Assert.That(binding, Is.Not.Null);
+            var entry = grammar.Entries[0];
+            var data = AvailableData(grammar, entry);
+            data.GrammarRevision = 공간문법CompositionCatalog.NeutralGrammarRevision;
+            data.GrammarHashSha256 = grammar.BuildNeutralGrammarHashSha256();
+            var tileRoot = new GameObject("TileRoot");
+            try
+            {
+                var assembler = new 공간문법LandscapeRuntimeAssembler(
+                    grammar, binding, 24f);
+
+                var staging = assembler.BuildStaging(data, tileRoot.transform);
+                var view = staging.GetComponentInChildren<공간문법PlacementInstanceView>(true);
+
+                Assert.That(view.GrammarRevision,
+                    Is.EqualTo(공간문법CompositionCatalog.NeutralGrammarRevision));
+                Assert.That(view.BindingRevision,
+                    Is.EqualTo(공간문법SyntyBindingCodes.BindingRevision));
+                Assert.That(view.BindingHashSha256, Has.Length.EqualTo(64));
+                Assert.That(view.SelectedSourceCompositionKey,
+                    Is.EqualTo(entry.SourceCompositionKey));
+                Assert.That(view.FallbackUsed, Is.False);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(tileRoot);
+            }
         }
 
         [Test]

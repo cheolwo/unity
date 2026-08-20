@@ -8,9 +8,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Ssalddel/Scenes/SimulationWorldShell.unity
     guid: 6cc69e402dfe1b042be3d56ff34a6d8b
-  - enabled: 0
-    path: Assets/Ssalddel/Scenes/WorldBootstrapScene.unity
-    guid: bdc5c4fca6137894995210df51abe3ec
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

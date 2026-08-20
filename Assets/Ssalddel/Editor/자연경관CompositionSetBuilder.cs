@@ -260,8 +260,68 @@ namespace Ssalddel.Unity.Editor
                         : Sources(
                             Environment("Terrain/SM_River_Plane_WaterFall_01"),
                             Occlusion("Terrain/SM_Terrain_RiverSide_Corner_02"),
-                            Detail("Plants/SM_Plant_Lillypad_Large_01"),
-                            Fx("FX/FX_Waterfall_Foam_01"));
+                        Detail("Plants/SM_Plant_Lillypad_Large_01"),
+                        Fx("FX/FX_Waterfall_Foam_01"));
+            if (setName == 자연경관SetNames.초지야생화)
+                return variant == 월드CompositionVariantCodes.A
+                    ? Sources(Environment("Terrain/SM_Terrain_GrassEdge_01"),
+                        Occlusion("Plants/SM_Plant_Grass_05"),
+                        Detail("Plants/SM_Plant_Flowers_01"),
+                        Detail("Plants/SM_Plant_FlowerPatch_01"))
+                    : variant == 월드CompositionVariantCodes.B
+                        ? Sources(Environment("Terrain/SM_Terrain_GrassEdge_02"),
+                            Occlusion("Plants/SM_Plant_Grass_04"),
+                            Detail("Plants/SM_Plant_Flowers_01"),
+                            Detail("Plants/SM_Plant_Bush_01"))
+                        : Sources(Environment("Terrain/SM_Terrain_GrassEdge_03"),
+                            Occlusion("Plants/SM_Plant_Grass_03"),
+                            Detail("Plants/SM_Plant_FlowerPatch_01"),
+                            Detail("Rocks/SM_Rock_Small_01"));
+            if (setName == 자연경관SetNames.숲빈터고사목)
+                return variant == 월드CompositionVariantCodes.A
+                    ? Sources(Environment("Trees/SM_Tree_Log_01"),
+                        Occlusion("Trees/SM_Tree_Dead_01"),
+                        Detail("Trees/SM_Tree_Stump_01"),
+                        Detail("Plants/SM_Plant_Fern_01"))
+                    : variant == 월드CompositionVariantCodes.B
+                        ? Sources(Environment("Trees/SM_Tree_Log_02"),
+                            Occlusion("Trees/SM_Tree_Dead_02"),
+                            Detail("Trees/SM_Tree_Stump_02"),
+                            Detail("Plants/SM_Plant_Mushrooms_01"))
+                        : Sources(Environment("Trees/SM_Tree_Log_01"),
+                            Occlusion("Trees/SM_Tree_Dead_03"),
+                            Detail("Trees/SM_Tree_Stump_03"),
+                            Detail("Plants/SM_Plant_Undergrowth_01"));
+            if (setName == 자연경관SetNames.산길바위길목)
+                return variant == 월드CompositionVariantCodes.A
+                    ? Sources(Environment("Terrain/SM_Terrain_GrassEdge_Roots_01"),
+                        Occlusion("Rocks/SM_Rock_Pile_01"),
+                        Detail("Rocks/SM_Rock_Small_01"),
+                        Detail("Plants/SM_Plant_Grass_01"))
+                    : variant == 월드CompositionVariantCodes.B
+                        ? Sources(Environment("Terrain/SM_Terrain_GrassEdge_Roots_02"),
+                            Occlusion("Rocks/SM_Rock_Pile_03"),
+                            Detail("Rocks/SM_Rock_02"),
+                            Detail("Plants/SM_Plant_Fern_02"))
+                        : Sources(Environment("Rocks/SM_Rock_Wall_01"),
+                            Occlusion("Rocks/SM_Rock_Pile_Curved_01"),
+                            Detail("Rocks/SM_Rock_Small_02"),
+                            Detail("Trees/SM_Tree_Pine_Small_01"));
+            if (setName == 자연경관SetNames.고지대노출지)
+                return variant == 월드CompositionVariantCodes.A
+                    ? Sources(Environment("Terrain/SM_Terrain_Mountain_01"),
+                        Occlusion("Rocks/SM_Rock_Cluster_Large_01"),
+                        Detail("Trees/SM_Tree_Pine_Small_01"),
+                        Detail("Plants/SM_Plant_Grass_01"))
+                    : variant == 월드CompositionVariantCodes.B
+                        ? Sources(Environment("Terrain/SM_Terrain_Mountain_02"),
+                            Occlusion("Rocks/SM_Rock_Cluster_Large_03"),
+                            Detail("Trees/SM_Tree_Pine_Small_02"),
+                            Detail("Plants/SM_Plant_Grass_03"))
+                        : Sources(Environment("Terrain/SM_Terrain_Mountain_03"),
+                            Occlusion("Rocks/SM_Rock_Cluster_Large_05"),
+                            Detail("Trees/SM_Tree_PolyPine_03"),
+                            Detail("Rocks/SM_Rock_Small_02"));
             throw new InvalidOperationException("NatureCompositionSetUnknown:" + setName);
         }
 
@@ -286,12 +346,16 @@ namespace Ssalddel.Unity.Editor
         private static Vector2 Footprint(string setName)
             => setName == 자연경관SetNames.산능선
                 ? new Vector2(36f, 18f)
+                : setName == 자연경관SetNames.고지대노출지
+                    ? new Vector2(24f, 16f)
                 : setName == 자연경관SetNames.개울회랑
                     ? new Vector2(14f, 7f)
                     : setName == 자연경관SetNames.수변완충지
                 ? new Vector2(10f, 6f)
                 : setName == 자연경관SetNames.바위절개지
                     ? new Vector2(10f, 5f)
+                    : setName == 자연경관SetNames.산길바위길목
+                        ? new Vector2(14f, 8f)
                     : setName == 자연경관SetNames.숲가장자리
                         ? new Vector2(12f, 6f)
                     : new Vector2(12f, 12f);
@@ -362,6 +426,41 @@ namespace Ssalddel.Unity.Editor
                         자연경관ShaderFeatureCodes.VegetationWind },
                     0f, 140f, 자연경관GpuBudgetTierCodes.Task, false,
                     자연경관ShadowPolicyCodes.ReceiveOnly);
+            if (setName == 자연경관SetNames.초지야생화)
+                return new SetRule(자연경관RoleCodes.Understory,
+                    new[] { 법정동LandCoverCodes.Cropland,
+                        법정동LandCoverCodes.BareGround }, 0f, 25f, false,
+                    자연경관MotionPolicyCodes.VegetationWind,
+                    new[] { 자연경관ShaderFeatureCodes.VegetationWind },
+                    0f, 100f, 자연경관GpuBudgetTierCodes.Task, false,
+                    자연경관ShadowPolicyCodes.ReceiveOnly);
+            if (setName == 자연경관SetNames.숲빈터고사목)
+                return new SetRule(자연경관RoleCodes.Understory,
+                    new[] { 법정동LandCoverCodes.Forest }, 0f, 35f, false,
+                    자연경관MotionPolicyCodes.VegetationWind,
+                    new[] { 자연경관ShaderFeatureCodes.VegetationWind,
+                        자연경관ShaderFeatureCodes.MossSnow },
+                    0f, 120f, 자연경관GpuBudgetTierCodes.Task, false,
+                    자연경관ShadowPolicyCodes.CastReceive);
+            if (setName == 자연경관SetNames.산길바위길목)
+                return new SetRule(자연경관RoleCodes.TerrainTransition,
+                    new[] { 법정동LandCoverCodes.Forest,
+                        법정동LandCoverCodes.BareGround,
+                        법정동LandCoverCodes.Corridor }, 5f, 55f, false,
+                    자연경관MotionPolicyCodes.Static,
+                    new[] { 자연경관ShaderFeatureCodes.TerrainNormal,
+                        자연경관ShaderFeatureCodes.MossSnow },
+                    4f, 160f, 자연경관GpuBudgetTierCodes.Region, true,
+                    자연경관ShadowPolicyCodes.CastReceive);
+            if (setName == 자연경관SetNames.고지대노출지)
+                return new SetRule(자연경관RoleCodes.Backdrop,
+                    new[] { 법정동LandCoverCodes.Forest,
+                        법정동LandCoverCodes.BareGround }, 20f, 90f, false,
+                    자연경관MotionPolicyCodes.Static,
+                    new[] { 자연경관ShaderFeatureCodes.TerrainNormal,
+                        자연경관ShaderFeatureCodes.MossSnow },
+                    35f, 600f, 자연경관GpuBudgetTierCodes.Overview, true,
+                    자연경관ShadowPolicyCodes.Disabled);
             throw new InvalidOperationException("NatureCompositionRuleMissing:" + setName);
         }
 

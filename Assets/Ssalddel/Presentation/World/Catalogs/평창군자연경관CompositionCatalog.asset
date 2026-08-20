@@ -802,3 +802,408 @@ MonoBehaviour:
     animatorCount: 1
     lodGroupCount: 0
     presentationOnly: 1
+  - setName: "\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654"
+    variantCode: A
+    prefab: {fileID: 6385805593521792753, guid: 9eb05398272063f49821de4f058b1e6d, type: 3}
+    footprint: {x: 12, y: 12}
+    hlodEligible: 0
+    natureRoleCode: understory
+    allowedLandCoverCodes:
+    - Cropland
+    - BareGround
+    minimumSlopeDegrees: 0
+    maximumSlopeDegrees: 25
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: vegetation-wind
+    shaderFeatureCodes:
+    - vegetation-wind
+    minimumViewDistance: 0
+    maximumViewDistance: 100
+    gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
+    triangleCount: 981
+    materialSlotCount: 4
+    colliderCount: 1
+    particleSystemCount: 0
+    animatorCount: 0
+    lodGroupCount: 0
+    presentationOnly: 1
+  - setName: "\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654"
+    variantCode: B
+    prefab: {fileID: 2703259919159498134, guid: 38ad9ba60da3e7b44a2ec915418cfd7f, type: 3}
+    footprint: {x: 12, y: 12}
+    hlodEligible: 0
+    natureRoleCode: understory
+    allowedLandCoverCodes:
+    - Cropland
+    - BareGround
+    minimumSlopeDegrees: 0
+    maximumSlopeDegrees: 25
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: vegetation-wind
+    shaderFeatureCodes:
+    - vegetation-wind
+    minimumViewDistance: 0
+    maximumViewDistance: 100
+    gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
+    triangleCount: 1065
+    materialSlotCount: 4
+    colliderCount: 1
+    particleSystemCount: 0
+    animatorCount: 0
+    lodGroupCount: 0
+    presentationOnly: 1
+  - setName: "\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654"
+    variantCode: C
+    prefab: {fileID: 1642797751481094912, guid: 1d3174c614d15184c983ab12986cb3ac, type: 3}
+    footprint: {x: 12, y: 12}
+    hlodEligible: 0
+    natureRoleCode: understory
+    allowedLandCoverCodes:
+    - Cropland
+    - BareGround
+    minimumSlopeDegrees: 0
+    maximumSlopeDegrees: 25
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: vegetation-wind
+    shaderFeatureCodes:
+    - vegetation-wind
+    minimumViewDistance: 0
+    maximumViewDistance: 100
+    gpuBudgetTierCode: task
+    shadowPolicyCode: receive-only
+    triangleCount: 1073
+    materialSlotCount: 4
+    colliderCount: 2
+    particleSystemCount: 0
+    animatorCount: 1
+    lodGroupCount: 0
+    presentationOnly: 1
+  - setName: "\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9"
+    variantCode: A
+    prefab: {fileID: 7988339573312412597, guid: e0abc6039606dc549a3ede603fd9b3b7, type: 3}
+    footprint: {x: 12, y: 12}
+    hlodEligible: 0
+    natureRoleCode: understory
+    allowedLandCoverCodes:
+    - Forest
+    minimumSlopeDegrees: 0
+    maximumSlopeDegrees: 35
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: vegetation-wind
+    shaderFeatureCodes:
+    - vegetation-wind
+    - moss-snow
+    minimumViewDistance: 0
+    maximumViewDistance: 120
+    gpuBudgetTierCode: task
+    shadowPolicyCode: cast-receive
+    triangleCount: 1418
+    materialSlotCount: 6
+    colliderCount: 2
+    particleSystemCount: 0
+    animatorCount: 0
+    lodGroupCount: 1
+    presentationOnly: 1
+  - setName: "\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9"
+    variantCode: B
+    prefab: {fileID: 7600649430742113416, guid: cf894b398c3b62f4f85086a144dd243c, type: 3}
+    footprint: {x: 12, y: 12}
+    hlodEligible: 0
+    natureRoleCode: understory
+    allowedLandCoverCodes:
+    - Forest
+    minimumSlopeDegrees: 0
+    maximumSlopeDegrees: 35
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: vegetation-wind
+    shaderFeatureCodes:
+    - vegetation-wind
+    - moss-snow
+    minimumViewDistance: 0
+    maximumViewDistance: 120
+    gpuBudgetTierCode: task
+    shadowPolicyCode: cast-receive
+    triangleCount: 1670
+    materialSlotCount: 6
+    colliderCount: 2
+    particleSystemCount: 0
+    animatorCount: 0
+    lodGroupCount: 1
+    presentationOnly: 1
+  - setName: "\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9"
+    variantCode: C
+    prefab: {fileID: 3605200719296344792, guid: 8bc12fc1cc9e8754f97d12eef73cec17, type: 3}
+    footprint: {x: 12, y: 12}
+    hlodEligible: 0
+    natureRoleCode: understory
+    allowedLandCoverCodes:
+    - Forest
+    minimumSlopeDegrees: 0
+    maximumSlopeDegrees: 35
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: vegetation-wind
+    shaderFeatureCodes:
+    - vegetation-wind
+    - moss-snow
+    minimumViewDistance: 0
+    maximumViewDistance: 120
+    gpuBudgetTierCode: task
+    shadowPolicyCode: cast-receive
+    triangleCount: 1368
+    materialSlotCount: 7
+    colliderCount: 2
+    particleSystemCount: 0
+    animatorCount: 0
+    lodGroupCount: 2
+    presentationOnly: 1
+  - setName: "\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9"
+    variantCode: A
+    prefab: {fileID: 946801071510529005, guid: cbd8c63a11a8c5542966e8c4c01792db, type: 3}
+    footprint: {x: 14, y: 8}
+    hlodEligible: 1
+    natureRoleCode: terrain-transition
+    allowedLandCoverCodes:
+    - Forest
+    - BareGround
+    - Corridor
+    minimumSlopeDegrees: 5
+    maximumSlopeDegrees: 55
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: static
+    shaderFeatureCodes:
+    - terrain-normal
+    - moss-snow
+    minimumViewDistance: 4
+    maximumViewDistance: 160
+    gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
+    triangleCount: 1680
+    materialSlotCount: 4
+    colliderCount: 2
+    particleSystemCount: 0
+    animatorCount: 0
+    lodGroupCount: 0
+    presentationOnly: 1
+  - setName: "\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9"
+    variantCode: B
+    prefab: {fileID: 7249944687013173397, guid: cc7797ed358ee4e4894fd021edadfeb5, type: 3}
+    footprint: {x: 14, y: 8}
+    hlodEligible: 1
+    natureRoleCode: terrain-transition
+    allowedLandCoverCodes:
+    - Forest
+    - BareGround
+    - Corridor
+    minimumSlopeDegrees: 5
+    maximumSlopeDegrees: 55
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: static
+    shaderFeatureCodes:
+    - terrain-normal
+    - moss-snow
+    minimumViewDistance: 4
+    maximumViewDistance: 160
+    gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
+    triangleCount: 1438
+    materialSlotCount: 4
+    colliderCount: 2
+    particleSystemCount: 0
+    animatorCount: 0
+    lodGroupCount: 0
+    presentationOnly: 1
+  - setName: "\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9"
+    variantCode: C
+    prefab: {fileID: 2254836537947571103, guid: ebc9f2585c12f2c4eb156f41288b90c2, type: 3}
+    footprint: {x: 14, y: 8}
+    hlodEligible: 1
+    natureRoleCode: terrain-transition
+    allowedLandCoverCodes:
+    - Forest
+    - BareGround
+    - Corridor
+    minimumSlopeDegrees: 5
+    maximumSlopeDegrees: 55
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: static
+    shaderFeatureCodes:
+    - terrain-normal
+    - moss-snow
+    minimumViewDistance: 4
+    maximumViewDistance: 160
+    gpuBudgetTierCode: region
+    shadowPolicyCode: cast-receive
+    triangleCount: 2782
+    materialSlotCount: 7
+    colliderCount: 4
+    particleSystemCount: 0
+    animatorCount: 1
+    lodGroupCount: 1
+    presentationOnly: 1
+  - setName: "\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0"
+    variantCode: A
+    prefab: {fileID: 946007869048287374, guid: 83c789e408f916746bf240733feefbb6, type: 3}
+    footprint: {x: 24, y: 16}
+    hlodEligible: 1
+    natureRoleCode: backdrop
+    allowedLandCoverCodes:
+    - Forest
+    - BareGround
+    minimumSlopeDegrees: 20
+    maximumSlopeDegrees: 90
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: static
+    shaderFeatureCodes:
+    - terrain-normal
+    - moss-snow
+    minimumViewDistance: 35
+    maximumViewDistance: 600
+    gpuBudgetTierCode: overview
+    shadowPolicyCode: disabled
+    triangleCount: 2776
+    materialSlotCount: 7
+    colliderCount: 3
+    particleSystemCount: 0
+    animatorCount: 1
+    lodGroupCount: 1
+    presentationOnly: 1
+  - setName: "\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0"
+    variantCode: B
+    prefab: {fileID: 7792298987338376386, guid: 542b65f17daa95042b6f418d4e91275d, type: 3}
+    footprint: {x: 24, y: 16}
+    hlodEligible: 1
+    natureRoleCode: backdrop
+    allowedLandCoverCodes:
+    - Forest
+    - BareGround
+    minimumSlopeDegrees: 20
+    maximumSlopeDegrees: 90
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: static
+    shaderFeatureCodes:
+    - terrain-normal
+    - moss-snow
+    minimumViewDistance: 35
+    maximumViewDistance: 600
+    gpuBudgetTierCode: overview
+    shadowPolicyCode: disabled
+    triangleCount: 3103
+    materialSlotCount: 7
+    colliderCount: 3
+    particleSystemCount: 0
+    animatorCount: 1
+    lodGroupCount: 1
+    presentationOnly: 1
+  - setName: "\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0"
+    variantCode: C
+    prefab: {fileID: 6424588049698401027, guid: 93b54f03b578c944e943ce00a28d1d21, type: 3}
+    footprint: {x: 24, y: 16}
+    hlodEligible: 1
+    natureRoleCode: backdrop
+    allowedLandCoverCodes:
+    - Forest
+    - BareGround
+    minimumSlopeDegrees: 20
+    maximumSlopeDegrees: 90
+    requiresWaterMask: 0
+    allowedSeasonCodes:
+    - spring
+    - summer
+    - autumn
+    - winter
+    allowedMoodCodes:
+    - peaceful
+    motionPolicyCode: static
+    shaderFeatureCodes:
+    - terrain-normal
+    - moss-snow
+    minimumViewDistance: 35
+    maximumViewDistance: 600
+    gpuBudgetTierCode: overview
+    shadowPolicyCode: disabled
+    triangleCount: 2129
+    materialSlotCount: 4
+    colliderCount: 4
+    particleSystemCount: 0
+    animatorCount: 1
+    lodGroupCount: 0
+    presentationOnly: 1

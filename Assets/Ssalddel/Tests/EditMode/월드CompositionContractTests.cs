@@ -13,21 +13,22 @@ namespace Ssalddel.Unity.Tests.EditMode
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/농장풍경CompositionCatalog.asset";
 
         [Test]
-        public void 기존농장스물네Set는_공통Contract로손실없이적응된다()
+        public void 농장서른여섯Set는_공통Contract로손실없이적응된다()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<농장풍경CompositionCatalog>(FarmCatalogPath)
                 ?? throw new AssertionException("Farm composition catalog missing");
 
             var descriptors = 농장풍경CompositionAdapter.Adapt(catalog);
 
-            Assert.That(descriptors.Count, Is.EqualTo(24));
+            var expectedCount = 농장풍경SetNames.All.Count * 월드CompositionVariantCodes.All.Count;
+            Assert.That(descriptors.Count, Is.EqualTo(expectedCount));
             Assert.That(descriptors.All(value =>
                 value.PackCode == 월드CompositionPackCodes.Farm
                 && value.SourceKind == 월드CompositionSourceKinds.SyntyNestedPrefab
                 && value.HasEnvironmentRoot
                 && value.Validate()), Is.True);
             Assert.That(descriptors.Select(value => value.CompositionKey).Distinct().Count(),
-                Is.EqualTo(24));
+                Is.EqualTo(expectedCount));
         }
 
         [Test]

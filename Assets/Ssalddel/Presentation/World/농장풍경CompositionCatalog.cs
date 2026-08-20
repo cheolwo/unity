@@ -15,6 +15,10 @@ namespace Ssalddel.Unity.Presentation.World
         public const string 수확물집하장 = "수확물 집하장";
         public const string 농로교차로 = "농로 교차로";
         public const string 수목완충지 = "수목 완충지";
+        public const string 시설하우스단동 = "시설하우스 단동";
+        public const string 시설하우스병렬단지 = "시설하우스 병렬단지";
+        public const string 과수원블록 = "과수원 블록";
+        public const string 논필지농수로표현 = "논 필지·농수로 표현";
 
         public static IReadOnlyList<string> All { get; } = new[]
         {
@@ -26,6 +30,10 @@ namespace Ssalddel.Unity.Presentation.World
             수확물집하장,
             농로교차로,
             수목완충지,
+            시설하우스단동,
+            시설하우스병렬단지,
+            과수원블록,
+            논필지농수로표현,
         };
 
         public static bool IsKnown(string value)

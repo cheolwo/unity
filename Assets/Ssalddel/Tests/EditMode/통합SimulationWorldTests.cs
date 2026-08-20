@@ -95,9 +95,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             var enabled = EditorBuildSettings.scenes.Where(value => value.enabled).ToArray();
             Assert.That(enabled, Has.Length.EqualTo(1));
             Assert.That(enabled[0].path, Is.EqualTo(ScenePath));
-            Assert.That(EditorBuildSettings.scenes.Any(value =>
-                value.path.EndsWith("/WorldBootstrapScene.unity", StringComparison.Ordinal)
-                && !value.enabled), Is.True);
+            Assert.That(EditorBuildSettings.scenes, Has.Length.EqualTo(1));
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Ssalddel.Unity.Tests.EditMode
     public sealed class 팩경관CompositionCatalogTests
     {
         [Test]
-        public void FarmTownCity구성대장은_의미세트60개와_결정적변형을제공한다()
+        public void FarmTownCity혼합구성대장은_120개결정적변형을제공한다()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<팩경관CompositionCatalog>(
                 팩경관CompositionSetBuilder.CatalogPath);
@@ -19,16 +19,18 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.DoesNotThrow(catalog!.Validate);
             Assert.That(catalog.CatalogRevision,
                 Is.EqualTo(팩경관CompositionSetBuilder.CatalogRevision));
-            Assert.That(catalog.Entries.Count, Is.EqualTo(60));
+            Assert.That(catalog.Entries.Count, Is.EqualTo(120));
             Assert.That(catalog.Entries.Count(value =>
-                value.Descriptor.PackCode == 월드CompositionPackCodes.Farm), Is.EqualTo(24));
+                value.Descriptor.PackCode == 월드CompositionPackCodes.Farm), Is.EqualTo(36));
             Assert.That(catalog.Entries.Count(value =>
-                value.Descriptor.PackCode == 월드CompositionPackCodes.Town), Is.EqualTo(18));
+                value.Descriptor.PackCode == 월드CompositionPackCodes.Town), Is.EqualTo(36));
             Assert.That(catalog.Entries.Count(value =>
-                value.Descriptor.PackCode == 월드CompositionPackCodes.City), Is.EqualTo(18));
+                value.Descriptor.PackCode == 월드CompositionPackCodes.City), Is.EqualTo(36));
+            Assert.That(catalog.Entries.Count(value =>
+                value.Descriptor.PackCode == 월드CompositionPackCodes.Mixed), Is.EqualTo(12));
             var variantGroups = catalog.Entries.GroupBy(value =>
                 value.Descriptor.PackCode + "|" + value.Descriptor.SetName).ToArray();
-            Assert.That(variantGroups, Has.Length.EqualTo(20));
+            Assert.That(variantGroups, Has.Length.EqualTo(40));
             Assert.That(variantGroups.All(group =>
                 group.Select(value => value.Descriptor.VariantCode)
                     .OrderBy(value => value, StringComparer.Ordinal)

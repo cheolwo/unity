@@ -19,14 +19,15 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
-        public void 여덟경관Set은_A_B_C_세변형을가진다()
+        public void 열두경관Set은_A_B_C_세변형을가진다()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<자연경관CompositionCatalog>(
                 자연경관CompositionSetBuilder.CatalogPath);
 
             Assert.That(catalog, Is.Not.Null);
             Assert.DoesNotThrow(catalog!.Validate);
-            Assert.That(catalog.Entries.Count, Is.EqualTo(24));
+            Assert.That(catalog.Entries.Count,
+                Is.EqualTo(자연경관SetNames.All.Count * 월드CompositionVariantCodes.All.Count));
             foreach (var setName in 자연경관SetNames.All)
             {
                 var entries = catalog.Entries.Where(value => value.SetName == setName).ToArray();

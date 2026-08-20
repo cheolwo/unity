@@ -400,6 +400,7 @@ namespace Ssalddel.Unity.Presentation.World
     {
         public const int ExpectedEntryCount = 156;
         public const int ExpectedSetCount = 52;
+        public const string NeutralGrammarRevision = "pyeongchang-landscape-grammar.v2";
 
         [SerializeField] private string catalogRevision = string.Empty;
         [SerializeField] private 공간문법CompositionCatalogEntry[] entries =
@@ -458,6 +459,76 @@ namespace Ssalddel.Unity.Presentation.World
                     .Append(entry.InternalGeneration.DetailGeneratorRevision).Append('|')
                     .Append(entry.TriangleCount).Append('|')
                     .Append(entry.MaterialSlotCount).AppendLine();
+            }
+            using var sha = SHA256.Create();
+            return string.Concat(sha.ComputeHash(Encoding.UTF8.GetBytes(builder.ToString()))
+                .Select(value => value.ToString("x2")));
+        }
+
+        public string BuildNeutralGrammarHashSha256()
+        {
+            Validate();
+            var builder = new StringBuilder()
+                .Append(2).Append('|')
+                .Append(NeutralGrammarRevision).Append('|')
+                .Append('1').AppendLine();
+            foreach (var entry in entries.OrderBy(
+                         value => value.CompositionKey, StringComparer.Ordinal))
+            {
+                var connectors = entry.Descriptor.Connectors
+                    .OrderBy(value => value.ConnectorCode, StringComparer.Ordinal)
+                    .Select(value => string.Join(":",
+                        value.ConnectorCode,
+                        value.ConnectorKindCode,
+                        value.DirectionCode,
+                        value.RouteSignature,
+                        value.LocalPosition.x.ToString("R", CultureInfo.InvariantCulture),
+                        value.LocalPosition.y.ToString("R", CultureInfo.InvariantCulture),
+                        value.LocalPosition.z.ToString("R", CultureInfo.InvariantCulture),
+                        value.LocalYaw.ToString("R", CultureInfo.InvariantCulture),
+                        value.Width.ToString("R", CultureInfo.InvariantCulture),
+                        value.ExpansionSocket ? "1" : "0"));
+                builder.Append(entry.CompositionKey).Append('|')
+                    .Append(entry.Descriptor.SetName).Append('|')
+                    .Append(entry.Descriptor.VariantCode).Append('|')
+                    .Append(entry.Descriptor.PackCode).Append('|')
+                    .Append(entry.TopologyCode).Append('|')
+                    .Append(entry.AssemblyScaleCode).Append('|')
+                    .Append(entry.Descriptor.Footprint.x.ToString("R", CultureInfo.InvariantCulture)).Append('|')
+                    .Append(entry.Descriptor.Footprint.y.ToString("R", CultureInfo.InvariantCulture)).Append('|')
+                    .Append(entry.PaddingMeters.ToString("R", CultureInfo.InvariantCulture)).Append('|')
+                    .Append(entry.SlopeRange.x.ToString("R", CultureInfo.InvariantCulture)).Append('|')
+                    .Append(entry.SlopeRange.y.ToString("R", CultureInfo.InvariantCulture)).Append('|')
+                    .Append(entry.RequiresWaterMask ? '1' : '0').Append('|')
+                    .Append(string.Join(",", entry.EdgeProfiles
+                        .OrderBy(value => value.DirectionCode, StringComparer.Ordinal)
+                        .Select(value => value.DirectionCode + ":" + value.ProfileCode + ":"
+                            + (value.Required ? "1" : "0")))).Append('|')
+                    .Append(string.Join(",", connectors)).Append('|')
+                    .Append(entry.RepeatRules.AllowRepeat ? '1' : '0').Append('|')
+                    .Append(entry.RepeatRules.MaxConsecutive).Append('|')
+                    .Append(entry.RepeatRules.RecentWindowSize).Append('|')
+                    .Append(entry.RepeatRules.NeighborDiversityWeight.ToString("R", CultureInfo.InvariantCulture)).Append('|')
+                    .Append(string.Join(",", entry.RepeatRules.RotationCodes
+                        .OrderBy(value => value, StringComparer.Ordinal))).Append('|')
+                    .Append(entry.RepeatRules.MirrorAllowed ? '1' : '0').Append('|')
+                    .Append(string.Join(",", entry.AdjacencyRules.PreferredNeighborTopologyCodes
+                        .OrderBy(value => value, StringComparer.Ordinal))).Append('|')
+                    .Append(string.Join(",", entry.AdjacencyRules.AllowedNeighborTopologyCodes
+                        .OrderBy(value => value, StringComparer.Ordinal))).Append('|')
+                    .Append(string.Join(",", entry.AdjacencyRules.ForbiddenNeighborTopologyCodes
+                        .OrderBy(value => value, StringComparer.Ordinal))).Append('|')
+                    .Append(entry.ExpansionRules.CanTile ? '1' : '0').Append('|')
+                    .Append(entry.ExpansionRules.CanChain ? '1' : '0').Append('|')
+                    .Append(entry.ExpansionRules.CanTerminate ? '1' : '0').Append('|')
+                    .Append(string.Join(",", entry.ExpansionRules.TerminationCompositionKeys
+                        .OrderBy(value => value, StringComparer.Ordinal))).Append('|')
+                    .Append(entry.InternalGeneration.SeedVersion).Append('|')
+                    .Append(string.Join(",", entry.AllowedLandCoverCodes
+                        .OrderBy(value => value, StringComparer.Ordinal))).Append('|')
+                    .Append(string.Join(",", entry.AllowedRegionRoleCodes
+                        .OrderBy(value => value, StringComparer.Ordinal))).Append('|')
+                    .Append(entry.PresentationOnly ? '1' : '0').AppendLine();
             }
             using var sha = SHA256.Create();
             return string.Concat(sha.ComputeHash(Encoding.UTF8.GetBytes(builder.ToString()))

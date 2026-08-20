@@ -12,7 +12,7 @@ namespace Ssalddel.Unity.Editor
 {
     public static class 팩경관CompositionSetBuilder
     {
-        public const string CatalogRevision = "pyeongchang-four-pack-composition.v2";
+        public const string CatalogRevision = "pyeongchang-four-pack-composition.v3";
         public const string CatalogPath =
             "Assets/Ssalddel/Presentation/World/Catalogs/평창FarmTownCity경관CompositionCatalog.asset";
         public const string PrefabRoot =
@@ -20,6 +20,8 @@ namespace Ssalddel.Unity.Editor
 
         private const string TownRoot = "Assets/Synty/PolygonTown/Prefabs/";
         private const string CityRoot = "Assets/Synty/PolygonCity/Prefabs/";
+        private const string FarmRoot = "Assets/Synty/PolygonFarm/Prefabs/";
+        private const string NatureRoot = "Assets/Synty/PolygonNature/Prefabs/";
 
         [MenuItem("Ssalddel/World Placement/Farm·Town·City 경관 조합 대장 생성")]
         public static 팩경관CompositionCatalog Build()
@@ -110,7 +112,9 @@ namespace Ssalddel.Unity.Editor
             if (setName == 농장풍경SetNames.헛간작업마당
                 || setName == 농장풍경SetNames.농기계대기장
                 || setName == 농장풍경SetNames.농산물직판장
-                || setName == 농장풍경SetNames.수확물집하장)
+                || setName == 농장풍경SetNames.수확물집하장
+                || setName == 농장풍경SetNames.시설하우스단동
+                || setName == 농장풍경SetNames.시설하우스병렬단지)
                 return new RuleSet(
                     new[] { 법정동LandCoverCodes.Cropland, 법정동LandCoverCodes.Residential },
                     new Vector2(0f, 12f));
@@ -230,9 +234,151 @@ namespace Ssalddel.Unity.Editor
                     P(CityRoot + "Environments/SM_Env_Road_01.prefab", 0f, -6f),
                     P(CityRoot + "Props/SM_Prop_Sign_Bustop_01.prefab", -5f, -4f),
                     P(CityRoot + "Props/SM_Prop_Sign_Parking_01.prefab", 5f, -4f)));
+
+                AddTownExtensions(values, variant, number, shopNumber);
+                AddCityExtensions(values, variant, stationNumber, transitionShop);
+                AddMixedTransitions(values, variant, number, shopNumber);
             }
 
             return values.ToArray();
+        }
+
+        private static void AddTownExtensions(
+            ICollection<Definition> values,
+            string variant,
+            string houseNumber,
+            string shopNumber)
+        {
+            values.Add(D(월드CompositionPackCodes.Town, 타운경관SetNames.소도시도로직선,
+                variant, 24f, 12f,
+                new[] { 법정동LandCoverCodes.Corridor, 법정동LandCoverCodes.Residential },
+                new[] { 법정동WorldRoleCodes.Town },
+                P(TownRoot + "Environment/SM_Env_Road_01.prefab", 0f, 0f),
+                P(TownRoot + "Environment/SM_Env_Road_Crossing_01.prefab", -6f, 0f),
+                P(TownRoot + "Props/SM_Prop_Streetlamp_01.prefab", 6f, -3f)));
+            values.Add(D(월드CompositionPackCodes.Town, 타운경관SetNames.T자교차로,
+                variant, 24f, 24f,
+                new[] { 법정동LandCoverCodes.Corridor, 법정동LandCoverCodes.Residential },
+                new[] { 법정동WorldRoleCodes.Town },
+                P(TownRoot + "Environment/SM_Env_Road_01.prefab", 0f, 0f),
+                P(TownRoot + "Environment/SM_Env_Road_01.prefab", 0f, 6f, 90f),
+                P(TownRoot + "Props/SM_Prop_Sign_Stop_01.prefab", 6f, 6f)));
+            values.Add(D(월드CompositionPackCodes.Town, 타운경관SetNames.십자교차로,
+                variant, 26f, 26f,
+                new[] { 법정동LandCoverCodes.Corridor, 법정동LandCoverCodes.Residential },
+                new[] { 법정동WorldRoleCodes.Town },
+                P(TownRoot + "Environment/SM_Env_Road_01.prefab", 0f, 0f),
+                P(TownRoot + "Environment/SM_Env_Road_01.prefab", 0f, 0f, 90f),
+                P(TownRoot + "Environment/SM_Env_Road_Crossing_02.prefab", 0f, -6f)));
+            values.Add(D(월드CompositionPackCodes.Town, 타운경관SetNames.텃밭형단독주택,
+                variant, 24f, 20f,
+                new[] { 법정동LandCoverCodes.Residential, 법정동LandCoverCodes.Cropland },
+                new[] { 법정동WorldRoleCodes.Town, 법정동WorldRoleCodes.Farm },
+                P(TownRoot + "Buildings/Presets/SM_Bld_House_Preset_" + houseNumber + ".prefab", 0f, 3f),
+                P(TownRoot + "Environment/SM_Env_Gardenbox_Double_01.prefab", -6f, -5f),
+                P(TownRoot + "Environment/SM_Env_Fence_Wood_Gate_01.prefab", 6f, -4f)));
+            values.Add(D(월드CompositionPackCodes.Town, 타운경관SetNames.근린놀이터,
+                variant, 22f, 18f,
+                new[] { 법정동LandCoverCodes.Residential },
+                new[] { 법정동WorldRoleCodes.Town },
+                P(TownRoot + "Props/SM_Prop_Playground_Slide_01.prefab", -5f, 1f),
+                P(TownRoot + "Props/SM_Prop_Playground_Swing_01.prefab", 4f, 2f),
+                P(TownRoot + "Props/SM_Prop_ParkBench_01.prefab", 0f, -5f)));
+            values.Add(D(월드CompositionPackCodes.Town, 타운경관SetNames.생활공공광장,
+                variant, 24f, 20f,
+                new[] { 법정동LandCoverCodes.Residential },
+                new[] { 법정동WorldRoleCodes.Town },
+                P(TownRoot + "Props/SM_Prop_Fountain_01.prefab", 0f, 1f),
+                P(TownRoot + "Props/SM_Prop_ParkBench_01.prefab", -6f, -4f),
+                P(TownRoot + "Buildings/SM_Bld_Shop_" + shopNumber + ".prefab", 6f, 4f)));
+        }
+
+        private static void AddCityExtensions(
+            ICollection<Definition> values,
+            string variant,
+            string stationNumber,
+            string shopNumber)
+        {
+            values.Add(D(월드CompositionPackCodes.City, 도시물류경관SetNames.도시진입교차로,
+                variant, 30f, 30f,
+                new[] { 법정동LandCoverCodes.Corridor, 법정동LandCoverCodes.Logistics },
+                new[] { 법정동WorldRoleCodes.Hub, 법정동WorldRoleCodes.Town },
+                P(CityRoot + "Environments/SM_Env_Road_01.prefab", 0f, 0f),
+                P(CityRoot + "Environments/SM_Env_Road_02.prefab", 0f, 0f, 90f),
+                P(CityRoot + "Props/SM_Prop_Sign_Street_01.prefab", 7f, -7f)));
+            values.Add(D(월드CompositionPackCodes.City, 도시물류경관SetNames.도심마트앞마당,
+                variant, 28f, 22f,
+                new[] { 법정동LandCoverCodes.Residential, 법정동LandCoverCodes.Logistics },
+                new[] { 법정동WorldRoleCodes.Town, 법정동WorldRoleCodes.Hub },
+                P(CityRoot + "Buildings/SM_Bld_Shop_" + shopNumber + ".prefab", 0f, 4f),
+                P(CityRoot + "Environments/SM_Env_Road_ParkingLines_01.prefab", 0f, -6f),
+                P(CityRoot + "Props/SM_Prop_CardboardBox_01.prefab", 6f, -4f)));
+            values.Add(D(월드CompositionPackCodes.City, 도시물류경관SetNames.먹거리상점골목,
+                variant, 28f, 20f,
+                new[] { 법정동LandCoverCodes.Residential },
+                new[] { 법정동WorldRoleCodes.Town },
+                P(CityRoot + "Buildings/SM_Bld_Shop_" + shopNumber + ".prefab", -7f, 4f),
+                P(CityRoot + "Buildings/SM_Bld_Shop_0" + (variant == "C" ? "6" : "2") + ".prefab", 7f, 4f),
+                P(CityRoot + "Props/SM_Prop_ParkBench_01.prefab", 0f, -5f)));
+            values.Add(D(월드CompositionPackCodes.City, 도시물류경관SetNames.공동주택생활마당,
+                variant, 30f, 24f,
+                new[] { 법정동LandCoverCodes.Residential },
+                new[] { 법정동WorldRoleCodes.Town },
+                P(CityRoot + "Buildings/SM_Bld_Apartment_0" + (variant == "A" ? "1" : variant == "B" ? "2" : "3") + ".prefab", 0f, 5f),
+                P(CityRoot + "Props/SM_Prop_PicnicTable_01.prefab", -5f, -5f),
+                P(CityRoot + "Props/SM_Prop_ParkBench_01.prefab", 5f, -5f)));
+            values.Add(D(월드CompositionPackCodes.City, 도시물류경관SetNames.사무공공정보관앞,
+                variant, 30f, 24f,
+                new[] { 법정동LandCoverCodes.Residential, 법정동LandCoverCodes.Logistics },
+                new[] { 법정동WorldRoleCodes.Town, 법정동WorldRoleCodes.Hub },
+                P(CityRoot + "Buildings/SM_Bld_OfficeSquare_0" + (variant == "A" ? "1" : variant == "B" ? "2" : "3") + ".prefab", 0f, 5f),
+                P(CityRoot + "Props/SM_Prop_Sign_Street_02.prefab", -6f, -5f),
+                P(CityRoot + "Props/SM_Prop_ParkBench_01.prefab", 5f, -5f)));
+            values.Add(D(월드CompositionPackCodes.City, 도시물류경관SetNames.도시공원쉼터,
+                variant, 26f, 22f,
+                new[] { 법정동LandCoverCodes.Residential },
+                new[] { 법정동WorldRoleCodes.Town },
+                P(CityRoot + "Environments/SM_Env_Grass_01.prefab", 0f, 0f),
+                P(CityRoot + "Props/SM_Prop_PicnicTable_01.prefab", -5f, 0f),
+                P(CityRoot + "Props/SM_Prop_ParkBench_01.prefab", 5f, 0f),
+                P(CityRoot + "Buildings/SM_Bld_Station_" + stationNumber + ".prefab", 0f, 8f)));
+        }
+
+        private static void AddMixedTransitions(
+            ICollection<Definition> values,
+            string variant,
+            string houseNumber,
+            string shopNumber)
+        {
+            values.Add(D(월드CompositionPackCodes.Mixed, 혼합전환경관SetNames.NatureFarm,
+                variant, 26f, 18f,
+                new[] { 법정동LandCoverCodes.Forest, 법정동LandCoverCodes.Cropland },
+                new[] { 법정동WorldRoleCodes.Farm },
+                P(NatureRoot + "Trees/SM_Tree_Round_01.prefab", -7f, 2f),
+                P(FarmRoot + "Environments/SM_Env_Road_Dirt_Straight_01.prefab", 0f, -4f),
+                P(FarmRoot + "Props/SM_Prop_Fence_Wood_01.prefab", 7f, 2f)));
+            values.Add(D(월드CompositionPackCodes.Mixed, 혼합전환경관SetNames.FarmTown,
+                variant, 28f, 20f,
+                new[] { 법정동LandCoverCodes.Cropland, 법정동LandCoverCodes.Residential, 법정동LandCoverCodes.Corridor },
+                new[] { 법정동WorldRoleCodes.Farm, 법정동WorldRoleCodes.Town },
+                P(FarmRoot + "Buildings/SM_Bld_ProduceStand_01.prefab", -7f, 3f),
+                P(TownRoot + "Environment/SM_Env_Road_01.prefab", 0f, -5f),
+                P(TownRoot + "Buildings/Presets/SM_Bld_House_Preset_" + houseNumber + ".prefab", 7f, 3f)));
+            values.Add(D(월드CompositionPackCodes.Mixed, 혼합전환경관SetNames.FarmHub,
+                variant, 30f, 22f,
+                new[] { 법정동LandCoverCodes.Cropland, 법정동LandCoverCodes.Logistics, 법정동LandCoverCodes.Corridor },
+                new[] { 법정동WorldRoleCodes.Farm, 법정동WorldRoleCodes.Hub },
+                P(FarmRoot + "Buildings/SM_Bld_WaterTower_01.prefab", -8f, 4f),
+                P(CityRoot + "Environments/SM_Env_Road_01.prefab", 0f, -6f),
+                P(CityRoot + "Props/SM_Prop_Pallet_01.prefab", 7f, 1f),
+                P(CityRoot + "Props/SM_Prop_Cone_01.prefab", 8f, -4f)));
+            values.Add(D(월드CompositionPackCodes.Mixed, 혼합전환경관SetNames.TownCity,
+                variant, 30f, 22f,
+                new[] { 법정동LandCoverCodes.Residential, 법정동LandCoverCodes.Corridor },
+                new[] { 법정동WorldRoleCodes.Town, 법정동WorldRoleCodes.Hub },
+                P(TownRoot + "Buildings/SM_Bld_Shop_" + shopNumber + ".prefab", -7f, 4f),
+                P(CityRoot + "Environments/SM_Env_Road_01.prefab", 0f, -6f),
+                P(CityRoot + "Buildings/SM_Bld_Shop_" + shopNumber + ".prefab", 7f, 4f)));
         }
 
         private static Definition D(
@@ -254,7 +400,9 @@ namespace Ssalddel.Unity.Editor
                 setName,
                 variantCode,
                 packCode,
-                월드CompositionSourceKinds.SyntyNestedPrefab,
+                packCode == 월드CompositionPackCodes.Mixed
+                    ? 월드CompositionSourceKinds.Mixed
+                    : 월드CompositionSourceKinds.SyntyNestedPrefab,
                 footprint,
                 Vector2.one,
                 true,
@@ -272,6 +420,7 @@ namespace Ssalddel.Unity.Editor
             return new Definition(
                 descriptor, placements, landCovers, regionRoles,
                 packCode == 월드CompositionPackCodes.City
+                    || packCode == 월드CompositionPackCodes.Mixed
                     ? new Vector2(0f, 10f)
                     : new Vector2(0f, 15f));
         }
@@ -282,6 +431,7 @@ namespace Ssalddel.Unity.Editor
             Vector2 footprint)
         {
             var vehicle = packCode == 월드CompositionPackCodes.City
+                || packCode == 월드CompositionPackCodes.Mixed
                 || setName == 타운경관SetNames.버스정류장보행쉼터
                 || setName == 타운경관SetNames.소형배달주차공간;
             if (vehicle)

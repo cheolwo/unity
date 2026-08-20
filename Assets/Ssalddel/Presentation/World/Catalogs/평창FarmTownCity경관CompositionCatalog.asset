@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52473989e7a37bd4090d407d30d106ac, type: 3}
   m_Name: "\uD3C9\uCC3DFarmTownCity\uACBD\uAD00CompositionCatalog"
   m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uD329\uACBD\uAD00CompositionCatalog"
-  catalogRevision: pyeongchang-four-pack-composition.v2
+  catalogRevision: pyeongchang-four-pack-composition.v3
   entries:
   - descriptor:
       compositionKey: "city:Town\u2013Hub \uC804\uD658 \uACBD\uAD00:A"
@@ -172,6 +172,795 @@ MonoBehaviour:
     allowedRegionRoleCodes:
     - Town
     - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:A"
+      setName: "\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9"
+      variantCode: A
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -12}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 12}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 4531132964281557813, guid: 5f812de0e0e429f4cadd9e4ef55afa19, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:B"
+      setName: "\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9"
+      variantCode: B
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -12}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 12}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 6848907565013541335, guid: bf34fda2bfbae344d8d61f2db31dccb8, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:C"
+      setName: "\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9"
+      variantCode: C
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -12}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 12}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 1642399965244469317, guid: e8d3bf89d77c6ff418feac9510cb8ef1, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2DC \uACF5\uC6D0 \uC27C\uD130:A"
+      setName: "\uB3C4\uC2DC \uACF5\uC6D0 \uC27C\uD130"
+      variantCode: A
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 26, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 3757946877160624818, guid: 39ff0006de1d09d4da67829d781f627c, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2DC \uACF5\uC6D0 \uC27C\uD130:B"
+      setName: "\uB3C4\uC2DC \uACF5\uC6D0 \uC27C\uD130"
+      variantCode: B
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 26, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 152035196585208759, guid: 49d5e7bf515b78a40a5f3473ada9fdbd, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2DC \uACF5\uC6D0 \uC27C\uD130:C"
+      setName: "\uB3C4\uC2DC \uACF5\uC6D0 \uC27C\uD130"
+      variantCode: C
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 26, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2762169068709741692, guid: 15c919d95ae5b844fb1affacee20e9e9, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2DC \uC9C4\uC785 \uAD50\uCC28\uB85C:A"
+      setName: "\uB3C4\uC2DC \uC9C4\uC785 \uAD50\uCC28\uB85C"
+      variantCode: A
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 30}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -15}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 15}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -13}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -13}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2006458689375266915, guid: 13771f2e389514f468df89416a6c3928, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Logistics
+    allowedRegionRoleCodes:
+    - Hub
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2DC \uC9C4\uC785 \uAD50\uCC28\uB85C:B"
+      setName: "\uB3C4\uC2DC \uC9C4\uC785 \uAD50\uCC28\uB85C"
+      variantCode: B
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 30}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -15}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 15}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -13}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -13}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 3752336817655672186, guid: 5e675c457efd3bc4eb8d36b9fb6b7726, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Logistics
+    allowedRegionRoleCodes:
+    - Hub
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2DC \uC9C4\uC785 \uAD50\uCC28\uB85C:C"
+      setName: "\uB3C4\uC2DC \uC9C4\uC785 \uAD50\uCC28\uB85C"
+      variantCode: C
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 30}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -15}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 15}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -13}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -13}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2118584876488865357, guid: c0e74a1ba209f4d46be56869ccacfdea, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Logistics
+    allowedRegionRoleCodes:
+    - Hub
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:A"
+      setName: "\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9"
+      variantCode: A
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 28, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 4374312862134173286, guid: a6310906ab661b54f918014716d4c106, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Logistics
+    allowedRegionRoleCodes:
+    - Town
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:B"
+      setName: "\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9"
+      variantCode: B
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 28, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2603739789331585458, guid: 05e49c25dfcb81a43b6551e9ca846624, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Logistics
+    allowedRegionRoleCodes:
+    - Town
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:C"
+      setName: "\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9"
+      variantCode: C
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 28, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 1445911953672204662, guid: bbd66fa23c4774043ba4ffdaa7b708cb, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Logistics
+    allowedRegionRoleCodes:
+    - Town
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:A"
+      setName: "\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9"
+      variantCode: A
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 28, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -10}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 10}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2319571525984875384, guid: 3b52754bfef227947ae92d543b90accf, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:B"
+      setName: "\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9"
+      variantCode: B
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 28, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -10}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 10}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2646918418029229619, guid: a899f14b094360948916c1aa3ad7e60e, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:C"
+      setName: "\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9"
+      variantCode: C
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 28, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -10}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 10}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 309168474976399969, guid: da594d5a983837b46b2d1410d62ebd19, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
     slopeRange: {x: 0, y: 10}
     requiresWaterMask: 0
     clusterAllowed: 0
@@ -348,6 +1137,165 @@ MonoBehaviour:
     allowedLandCoverCodes:
     - Logistics
     allowedRegionRoleCodes:
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uC0AC\uBB34\xB7\uACF5\uACF5\uC815\uBCF4\uAD00 \uC55E:A"
+      setName: "\uC0AC\uBB34\xB7\uACF5\uACF5\uC815\uBCF4\uAD00 \uC55E"
+      variantCode: A
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -12}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 12}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 5850170662939479991, guid: 51b844b60ecbcf34182238d898e399a3, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Logistics
+    allowedRegionRoleCodes:
+    - Town
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uC0AC\uBB34\xB7\uACF5\uACF5\uC815\uBCF4\uAD00 \uC55E:B"
+      setName: "\uC0AC\uBB34\xB7\uACF5\uACF5\uC815\uBCF4\uAD00 \uC55E"
+      variantCode: B
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -12}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 12}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 5023714863830510532, guid: 71263d1a558db5f48b5d3291a6efb4b5, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Logistics
+    allowedRegionRoleCodes:
+    - Town
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "city:\uC0AC\uBB34\xB7\uACF5\uACF5\uC815\uBCF4\uAD00 \uC55E:C"
+      setName: "\uC0AC\uBB34\xB7\uACF5\uACF5\uC815\uBCF4\uAD00 \uC55E"
+      variantCode: C
+      packCode: city
+      sourceKind: synty-nested-prefab
+      footprint: {x: 30, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: city.vehicle.local
+        localPosition: {x: 0, y: 0, z: -12}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: city.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 12}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 8792632470012526884, guid: 83b96b832f100f940bdde168aab4cffc, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Logistics
+    allowedRegionRoleCodes:
+    - Town
     - Hub
     slopeRange: {x: 0, y: 10}
     requiresWaterMask: 0
@@ -1122,6 +2070,168 @@ MonoBehaviour:
     clusterAllowed: 0
     presentationOnly: 1
   - descriptor:
+      compositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:A"
+      setName: "\uACFC\uC218\uC6D0 \uBE14\uB85D"
+      variantCode: A
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 4675952326127042086, guid: 9a43a7da06849dd469b885054a18a56e, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 18}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:B"
+      setName: "\uACFC\uC218\uC6D0 \uBE14\uB85D"
+      variantCode: B
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 7671316172690548491, guid: 75daf610119bc6d44a1a72ceb0b74ff3, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 18}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:C"
+      setName: "\uACFC\uC218\uC6D0 \uBE14\uB85D"
+      variantCode: C
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 8983998874456125455, guid: 31ecd41b9150b254daec2d6f160e4a5a, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 18}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:A"
+      setName: "\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604"
+      variantCode: A
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 3369988508421097724, guid: 83d3f0dc758ce1f41a451a48d39b0fc0, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 18}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:B"
+      setName: "\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604"
+      variantCode: B
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 916560098623201582, guid: b9e4b0f767a8bab40a8a19df9ec00828, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 18}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:C"
+      setName: "\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604"
+      variantCode: C
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 3827931053796836049, guid: 90e22fe405d070d44aa0deaaffd62076, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 18}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
       compositionKey: "farm:\uB18D\uAE30\uACC4 \uB300\uAE30\uC7A5:A"
       setName: "\uB18D\uAE30\uACC4 \uB300\uAE30\uC7A5"
       variantCode: A
@@ -1638,6 +2748,174 @@ MonoBehaviour:
     clusterAllowed: 0
     presentationOnly: 1
   - descriptor:
+      compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:A"
+      setName: "\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9"
+      variantCode: A
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 18, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 1488889061014601022, guid: f10333310e07b1443a270cdc8bb4d169, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 12}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:B"
+      setName: "\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9"
+      variantCode: B
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 18, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 318810327587798258, guid: b6eb76c74a5255e4182d289d8f79abc0, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 12}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:C"
+      setName: "\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9"
+      variantCode: C
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 18, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 3387294850392652383, guid: f016a40d2a8442047bb68ef93c7219be, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 12}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:A"
+      setName: "\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0"
+      variantCode: A
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 38, y: 28}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 6248815174168493256, guid: 06aa53277ffb88a4d95d31d0cfcb94c6, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 12}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:B"
+      setName: "\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0"
+      variantCode: B
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 38, y: 28}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 4285946280247197964, guid: eadd54e876c14a04ea4008f1a85867c6, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 12}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:C"
+      setName: "\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0"
+      variantCode: C
+      packCode: farm
+      sourceKind: synty-nested-prefab
+      footprint: {x: 38, y: 28}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: none
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors: []
+      sockets: []
+    prefab: {fileID: 5972715633120988662, guid: a9b411b2143b6f44faa1411872afac60, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 12}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
       compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:A"
       setName: "\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9"
       variantCode: A
@@ -1839,6 +3117,966 @@ MonoBehaviour:
     clusterAllowed: 0
     presentationOnly: 1
   - descriptor:
+      compositionKey: "mixed:Farm\u2013Hub \uC804\uD658:A"
+      setName: "Farm\u2013Hub \uC804\uD658"
+      variantCode: A
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 30, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 3109718772104138432, guid: 894a28d469a3a7046af2a8f5a6b68a8f, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Logistics
+    - Corridor
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Farm\u2013Hub \uC804\uD658:B"
+      setName: "Farm\u2013Hub \uC804\uD658"
+      variantCode: B
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 30, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 8230771944790897331, guid: a7747ee9852856e45909c377f5ff6655, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Logistics
+    - Corridor
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Farm\u2013Hub \uC804\uD658:C"
+      setName: "Farm\u2013Hub \uC804\uD658"
+      variantCode: C
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 30, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 3217757094713992640, guid: 0cd5fdc500a602d42ab9bfd74bdd6d78, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Logistics
+    - Corridor
+    allowedRegionRoleCodes:
+    - Farm
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Farm\u2013Town \uC804\uD658:A"
+      setName: "Farm\u2013Town \uC804\uD658"
+      variantCode: A
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 28, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -10}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 10}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 6088502185499839170, guid: a6a755847703f30479262c64fa587cd7, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    - Corridor
+    allowedRegionRoleCodes:
+    - Farm
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Farm\u2013Town \uC804\uD658:B"
+      setName: "Farm\u2013Town \uC804\uD658"
+      variantCode: B
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 28, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -10}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 10}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2450751532497036465, guid: c021a536dda1bde42973fa9061400eb0, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    - Corridor
+    allowedRegionRoleCodes:
+    - Farm
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Farm\u2013Town \uC804\uD658:C"
+      setName: "Farm\u2013Town \uC804\uD658"
+      variantCode: C
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 28, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -10}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 10}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 3494151596157337777, guid: c0e0e91e65e52d24a8cbbf0f37830597, type: 3}
+    allowedLandCoverCodes:
+    - Cropland
+    - Residential
+    - Corridor
+    allowedRegionRoleCodes:
+    - Farm
+    - Town
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Nature\u2013Farm \uC804\uD658:A"
+      setName: "Nature\u2013Farm \uC804\uD658"
+      variantCode: A
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 26, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -9}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 9}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 7769175053753300723, guid: 057c4979f94645040b091ea8078960b8, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Nature\u2013Farm \uC804\uD658:B"
+      setName: "Nature\u2013Farm \uC804\uD658"
+      variantCode: B
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 26, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -9}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 9}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 3898130449471572841, guid: 8333a092e035f314bad20cd2c689293b, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Nature\u2013Farm \uC804\uD658:C"
+      setName: "Nature\u2013Farm \uC804\uD658"
+      variantCode: C
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 26, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -9}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 9}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 4575630130629688599, guid: 546abbf6d4f765744a5ce82072e2d9a2, type: 3}
+    allowedLandCoverCodes:
+    - Forest
+    - Cropland
+    allowedRegionRoleCodes:
+    - Farm
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Town\u2013City \uC804\uD658:A"
+      setName: "Town\u2013City \uC804\uD658"
+      variantCode: A
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 30, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 3520822709330747447, guid: 8d07b9e7ebefbb445937b6deb7c73470, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Corridor
+    allowedRegionRoleCodes:
+    - Town
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Town\u2013City \uC804\uD658:B"
+      setName: "Town\u2013City \uC804\uD658"
+      variantCode: B
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 30, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 4093493475073164482, guid: 6d1aac164fdcab74795cd6b14312663c, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Corridor
+    allowedRegionRoleCodes:
+    - Town
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "mixed:Town\u2013City \uC804\uD658:C"
+      setName: "Town\u2013City \uC804\uD658"
+      variantCode: C
+      packCode: mixed
+      sourceKind: mixed
+      footprint: {x: 30, y: 22}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: vehicle-south
+        directionCode: south
+        connectorKindCode: vehicle
+        routeSignature: mixed.vehicle.local
+        localPosition: {x: 0, y: 0, z: -11}
+        localYaw: 180
+        width: 4
+        expansionSocket: 1
+      - connectorCode: pedestrian-north
+        directionCode: north
+        connectorKindCode: pedestrian
+        routeSignature: mixed.pedestrian.local
+        localPosition: {x: 0, y: 0, z: 11}
+        localYaw: 0
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -9}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 6674193888592782617, guid: 11add98419b0ea5448ae2f666093804a, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Corridor
+    allowedRegionRoleCodes:
+    - Town
+    - Hub
+    slopeRange: {x: 0, y: 10}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:T\uC790 \uAD50\uCC28\uB85C:A"
+      setName: "T\uC790 \uAD50\uCC28\uB85C"
+      variantCode: A
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 1280255504245960075, guid: 12850c67bf1e3ce4eaf46a845636f85d, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:T\uC790 \uAD50\uCC28\uB85C:B"
+      setName: "T\uC790 \uAD50\uCC28\uB85C"
+      variantCode: B
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 6888005895865921092, guid: 704a896a17eac4345970171c118787ff, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:T\uC790 \uAD50\uCC28\uB85C:C"
+      setName: "T\uC790 \uAD50\uCC28\uB85C"
+      variantCode: C
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 24}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -10}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 5644836408438262255, guid: 24ae9a37ee5fd324986fadb340a708b4, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:A"
+      setName: "\uADFC\uB9B0 \uB180\uC774\uD130"
+      variantCode: A
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 22, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -11, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 11, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 4641059118441090361, guid: 568c7bf6c8ac94c4fafc6d44d376ea91, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:B"
+      setName: "\uADFC\uB9B0 \uB180\uC774\uD130"
+      variantCode: B
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 22, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -11, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 11, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 6462183954752524259, guid: e5b15ea80e0ca3245808e44868fc8d57, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:C"
+      setName: "\uADFC\uB9B0 \uB180\uC774\uD130"
+      variantCode: C
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 22, y: 18}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -11, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 11, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -7}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 4391652731141309431, guid: 3863abde6cb6d95428b964d9929b098b, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
       compositionKey: "town:\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589 \uC27C\uD130:A"
       setName: "\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589 \uC27C\uD130"
       variantCode: A
@@ -1995,6 +4233,159 @@ MonoBehaviour:
     clusterAllowed: 0
     presentationOnly: 1
   - descriptor:
+      compositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:A"
+      setName: "\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5"
+      variantCode: A
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 8211821290161286799, guid: a81c053852138d14e99ae8278198d9f0, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:B"
+      setName: "\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5"
+      variantCode: B
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 1535480653921655405, guid: f01835ef27737b8419d798508e9766f4, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:C"
+      setName: "\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5"
+      variantCode: C
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 8722383152655027763, guid: ce7e70cc9563cc941bad3a5cbf07c82c, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
       compositionKey: "town:\uC0DD\uD65C \uC11C\uBE44\uC2A4 \uACE8\uBAA9:A"
       setName: "\uC0DD\uD65C \uC11C\uBE44\uC2A4 \uACE8\uBAA9"
       variantCode: A
@@ -2140,6 +4531,162 @@ MonoBehaviour:
         localEuler: {x: 0, y: 0, z: 0}
     prefab: {fileID: 1973389041623917540, guid: c2e7d82ed13e1a749bba6f82a804f6af, type: 3}
     allowedLandCoverCodes:
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uC18C\uB3C4\uC2DC \uB3C4\uB85C \uC9C1\uC120:A"
+      setName: "\uC18C\uB3C4\uC2DC \uB3C4\uB85C \uC9C1\uC120"
+      variantCode: A
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 12}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -4}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -4}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 4693669729772203018, guid: bbadab4a8e2a381418c36392d5a43d41, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uC18C\uB3C4\uC2DC \uB3C4\uB85C \uC9C1\uC120:B"
+      setName: "\uC18C\uB3C4\uC2DC \uB3C4\uB85C \uC9C1\uC120"
+      variantCode: B
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 12}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -4}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -4}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2270629451800441080, guid: cd94bc90f44a18a469bd122d39e8713d, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uC18C\uB3C4\uC2DC \uB3C4\uB85C \uC9C1\uC120:C"
+      setName: "\uC18C\uB3C4\uC2DC \uB3C4\uB85C \uC9C1\uC120"
+      variantCode: C
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 12}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -4}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -4}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 876569470109012887, guid: 468a81904d31165408a6fdfe54f1cfa1, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
     - Residential
     allowedRegionRoleCodes:
     - Town
@@ -2321,6 +4868,174 @@ MonoBehaviour:
     allowedLandCoverCodes:
     - Residential
     - Corridor
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uC2ED\uC790 \uAD50\uCC28\uB85C:A"
+      setName: "\uC2ED\uC790 \uAD50\uCC28\uB85C"
+      variantCode: A
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 26, y: 26}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -13, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 13, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -11}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -11}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 1373594346904225075, guid: 871c3b3dc2c594d4eb1454984e2b187b, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uC2ED\uC790 \uAD50\uCC28\uB85C:B"
+      setName: "\uC2ED\uC790 \uAD50\uCC28\uB85C"
+      variantCode: B
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 26, y: 26}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -13, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 13, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -11}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -11}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 2970240898415705677, guid: 0045d57293e1e074bb0a6ee197edcddc, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Residential
+    allowedRegionRoleCodes:
+    - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uC2ED\uC790 \uAD50\uCC28\uB85C:C"
+      setName: "\uC2ED\uC790 \uAD50\uCC28\uB85C"
+      variantCode: C
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 26, y: 26}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -13, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 13, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -11}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: vehicle
+        categoryCode: vehicle
+        localPosition: {x: -3, y: 0, z: -2}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -11}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 5002852474990658563, guid: 3beeb5f024c166240ae8c3d4ae86917d, type: 3}
+    allowedLandCoverCodes:
+    - Corridor
+    - Residential
     allowedRegionRoleCodes:
     - Town
     slopeRange: {x: 0, y: 15}
@@ -2782,6 +5497,165 @@ MonoBehaviour:
     - Residential
     allowedRegionRoleCodes:
     - Town
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uD143\uBC2D\uD615 \uB2E8\uB3C5\uC8FC\uD0DD:A"
+      setName: "\uD143\uBC2D\uD615 \uB2E8\uB3C5\uC8FC\uD0DD"
+      variantCode: A
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 6166694642703842212, guid: ebee2d26c9b99c44a9173034e1e77082, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Cropland
+    allowedRegionRoleCodes:
+    - Town
+    - Farm
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uD143\uBC2D\uD615 \uB2E8\uB3C5\uC8FC\uD0DD:B"
+      setName: "\uD143\uBC2D\uD615 \uB2E8\uB3C5\uC8FC\uD0DD"
+      variantCode: B
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 8766326386008595476, guid: ce921cdf589ef844f986b3f14411284c, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Cropland
+    allowedRegionRoleCodes:
+    - Town
+    - Farm
+    slopeRange: {x: 0, y: 15}
+    requiresWaterMask: 0
+    clusterAllowed: 0
+    presentationOnly: 1
+  - descriptor:
+      compositionKey: "town:\uD143\uBC2D\uD615 \uB2E8\uB3C5\uC8FC\uD0DD:C"
+      setName: "\uD143\uBC2D\uD615 \uB2E8\uB3C5\uC8FC\uD0DD"
+      variantCode: C
+      packCode: town
+      sourceKind: synty-nested-prefab
+      footprint: {x: 24, y: 20}
+      cellSize: {x: 1, y: 1}
+      hasEnvironmentRoot: 1
+      hasOcclusionRoot: 0
+      hasInteriorRoot: 0
+      journeyKindCode: stateful
+      detailTierCodes:
+      - world
+      - zone
+      - object
+      connectors:
+      - connectorCode: pedestrian-west
+        directionCode: west
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: -12, y: 0, z: 0}
+        localYaw: 270
+        width: 2
+        expansionSocket: 1
+      - connectorCode: pedestrian-east
+        directionCode: east
+        connectorKindCode: pedestrian
+        routeSignature: town.pedestrian.local
+        localPosition: {x: 12, y: 0, z: 0}
+        localYaw: 90
+        width: 2
+        expansionSocket: 1
+      sockets:
+      - socketCode: interaction
+        categoryCode: interaction
+        localPosition: {x: 0, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+      - socketCode: actor
+        categoryCode: actor
+        localPosition: {x: -2, y: 0, z: -8}
+        localEuler: {x: 0, y: 0, z: 0}
+    prefab: {fileID: 6403340914293600475, guid: 087d2e0a43032864a981dc029d30dbdb, type: 3}
+    allowedLandCoverCodes:
+    - Residential
+    - Cropland
+    allowedRegionRoleCodes:
+    - Town
+    - Farm
     slopeRange: {x: 0, y: 15}
     requiresWaterMask: 0
     clusterAllowed: 0

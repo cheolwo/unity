@@ -16,11 +16,16 @@ namespace Ssalddel.Unity.Presentation.World
         public const string 산능선 = "산 능선";
         public const string 숲가장자리 = "숲 가장자리";
         public const string 개울회랑 = "개울 회랑";
+        public const string 초지야생화 = "초지·야생화";
+        public const string 숲빈터고사목 = "숲 빈터·고사목";
+        public const string 산길바위길목 = "산길·바위 길목";
+        public const string 고지대노출지 = "고지대 노출지";
 
         public static IReadOnlyList<string> All { get; } = new[]
         {
             활엽수림군집, 침엽수림군집, 혼효림군집, 수변완충지, 바위절개지,
-            산능선, 숲가장자리, 개울회랑,
+            산능선, 숲가장자리, 개울회랑, 초지야생화, 숲빈터고사목,
+            산길바위길목, 고지대노출지,
         };
     }
 

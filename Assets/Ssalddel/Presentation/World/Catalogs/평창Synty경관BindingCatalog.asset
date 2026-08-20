@@ -1,0 +1,1120 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4569709cfeb245d490ed534c162b918f, type: 3}
+  m_Name: "\uD3C9\uCC3DSynty\uACBD\uAD00BindingCatalog"
+  m_EditorClassIdentifier: "Ssalddel.Unity.Presentation::Ssalddel.Unity.Presentation.World.\uACF5\uAC04\uBB38\uBC95SyntyBindingCatalog"
+  bindingRevision: pyeongchang-synty-landscape-binding.v1
+  targetGrammarRevision: pyeongchang-landscape-grammar.v2
+  targetGrammarHashSha256: 4cd3feea4cb6f270760ef43e559fca3bd9e6db451ae9b415f1e95ce1cf501f4b
+  sourceCatalogs:
+  - catalogRevision: pyeongchang-four-pack-composition.v3
+    catalogHashSha256: d33f4d84d28be9d2a0ea82737667b0f616e4af264a6f7a42658d0719b0615a2c
+  - catalogRevision: pyeongchang-nature-composition-inventory.v1
+    catalogHashSha256: a622782eddb12ee361a7392c27790644fade100532858fdfb6447d6de3a4a173
+  - catalogRevision: pyeongchang-road-gate-composition-inventory.v1
+    catalogHashSha256: 12101cfbe2860bbc528e73cb94fe4052111d19453b1bc07afaab64d802142f96
+  entries:
+  - compositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:A"
+      prefab: {fileID: 4531132964281557813, guid: 5f812de0e0e429f4cadd9e4ef55afa19, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:B"
+      prefab: {fileID: 6848907565013541335, guid: bf34fda2bfbae344d8d61f2db31dccb8, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uACF5\uB3D9\uC8FC\uD0DD \uC0DD\uD65C\uB9C8\uB2F9:C"
+      prefab: {fileID: 1642399965244469317, guid: e8d3bf89d77c6ff418feac9510cb8ef1, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:A"
+      prefab: {fileID: 4374312862134173286, guid: a6310906ab661b54f918014716d4c106, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:B"
+      prefab: {fileID: 2603739789331585458, guid: 05e49c25dfcb81a43b6551e9ca846624, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2EC \uB9C8\uD2B8 \uC55E\uB9C8\uB2F9:C"
+      prefab: {fileID: 1445911953672204662, guid: bbd66fa23c4774043ba4ffdaa7b708cb, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:A"
+      prefab: {fileID: 2319571525984875384, guid: 3b52754bfef227947ae92d543b90accf, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:B"
+      prefab: {fileID: 2646918418029229619, guid: a899f14b094360948916c1aa3ad7e60e, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uBA39\uAC70\uB9AC \uC0C1\uC810 \uACE8\uBAA9:C"
+      prefab: {fileID: 309168474976399969, guid: da594d5a983837b46b2d1410d62ebd19, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:A"
+      prefab: {fileID: 5871688212106977410, guid: 98b2ef7f9bf57384087081f4e9bf6af2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:B"
+      prefab: {fileID: 7443388059328483129, guid: 1e809117f60daee42a30bcd23d0c1751, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uBB3C\uB958 Station \uC9C4\uC785\uBD80:C"
+      prefab: {fileID: 9121473698119990671, guid: 5805aca6edb7b5143825e5b953bde11f, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:A"
+      prefab: {fileID: 1628514304672814049, guid: c141a864d4d45894a8d500c453fc7f9f, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:B"
+      prefab: {fileID: 452728479631527319, guid: e19aa842ec931a94a92283706145809c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uC0C1\uD558\uCC28 Dock:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uC0C1\uD558\uCC28 Dock:C"
+      prefab: {fileID: 1217726175355491868, guid: 90b27e19121c9ca4aaee5ed9881cafd6, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:A"
+      prefab: {fileID: 2267020094846660802, guid: e901fa46bde8d9e449f9391fb1c92012, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:B"
+      prefab: {fileID: 8612038533779071499, guid: 7311fc7f6c706c1498f28939ad277a45, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uD654\uBB3C \uB300\uAE30 \uC57C\uB4DC:C"
+      prefab: {fileID: 5226762277380714504, guid: 7bfbd6e76d1bd2a4da515e136ea7835d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:A"
+      prefab: {fileID: 5429054574127294816, guid: bd8d560d0a4dcb447a34f753a7ab1ba0, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:B"
+      prefab: {fileID: 6413268302580439435, guid: 6d1d29a4f33829f4aacbd3c985d1a03e, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uAC10\uC790\uBC2D \uB450\uB801:C"
+      prefab: {fileID: 3696574056345039905, guid: 2734ece489d1e0b489a531bd32006e45, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:A"
+      prefab: {fileID: 4675952326127042086, guid: 9a43a7da06849dd469b885054a18a56e, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:B"
+      prefab: {fileID: 7671316172690548491, guid: 75daf610119bc6d44a1a72ceb0b74ff3, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uACFC\uC218\uC6D0 \uBE14\uB85D:C"
+      prefab: {fileID: 8983998874456125455, guid: 31ecd41b9150b254daec2d6f160e4a5a, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:A"
+      prefab: {fileID: 3369988508421097724, guid: 83d3f0dc758ce1f41a451a48d39b0fc0, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:B"
+      prefab: {fileID: 916560098623201582, guid: b9e4b0f767a8bab40a8a19df9ec00828, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB17C \uD544\uC9C0\xB7\uB18D\uC218\uB85C \uD45C\uD604:C"
+      prefab: {fileID: 3827931053796836049, guid: 90e22fe405d070d44aa0deaaffd62076, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:A"
+      prefab: {fileID: 4168583767720606273, guid: 2da8e1c9dc5705d4e9334162248a79de, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:B"
+      prefab: {fileID: 7915017653574340055, guid: 3bcdf1c36d932694a857b9e94b185288, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uB18D\uC0B0\uBB3C \uC9D1\uD558\xB7\uC9C1\uD310\uC7A5:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC218\uD655\uBB3C \uC9D1\uD558\uC7A5:C"
+      prefab: {fileID: 2003651536560686893, guid: 2dd3905e1e3fcae439e16e05d83edc8a, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:A"
+      prefab: {fileID: 1488889061014601022, guid: f10333310e07b1443a270cdc8bb4d169, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:B"
+      prefab: {fileID: 318810327587798258, guid: b6eb76c74a5255e4182d289d8f79abc0, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uB2E8\uB3D9:C"
+      prefab: {fileID: 3387294850392652383, guid: f016a40d2a8442047bb68ef93c7219be, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:A"
+      prefab: {fileID: 6248815174168493256, guid: 06aa53277ffb88a4d95d31d0cfcb94c6, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:B"
+      prefab: {fileID: 4285946280247197964, guid: eadd54e876c14a04ea4008f1a85867c6, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uC2DC\uC124\uD558\uC6B0\uC2A4 \uBCD1\uB82C\uB2E8\uC9C0:C"
+      prefab: {fileID: 5972715633120988662, guid: a9b411b2143b6f44faa1411872afac60, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:A"
+      prefab: {fileID: 6847503479151602550, guid: 6414d7a141f19df49bc9b5784ef0ee73, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:B"
+      prefab: {fileID: 679910196460361079, guid: 9907822b5d1d7314ca730f4d03d70559, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uD5DB\uAC04 \uC791\uC5C5\uB9C8\uB2F9:C"
+      prefab: {fileID: 324182925690009948, guid: 16a6a20a94e8b8546ae928d93b7f6b0e, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uD63C\uD569 \uC791\uBB3C\uBC2D:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uD63C\uD569 \uC791\uBB3C\uBC2D:A"
+      prefab: {fileID: 3396639082632223190, guid: ff464c590478d884c871fd43251402ca, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uD63C\uD569 \uC791\uBB3C\uBC2D:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uD63C\uD569 \uC791\uBB3C\uBC2D:B"
+      prefab: {fileID: 1684630258604272099, guid: 07bc0d8d3d0fbfd4783aa51f76b03545, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "farm:\uD63C\uD569 \uC791\uBB3C\uBC2D:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uD63C\uD569 \uC791\uBB3C\uBC2D:C"
+      prefab: {fileID: 3273847737407592523, guid: 67a65e907d73b95459aa2c9ee83c8eb7, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uAC1C\uC6B8 \uD68C\uB791:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uAC1C\uC6B8 \uD68C\uB791:A"
+      prefab: {fileID: 8303323076741801260, guid: f575c962ef2a1064fadf3000574441dc, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uAC1C\uC6B8 \uD68C\uB791:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uAC1C\uC6B8 \uD68C\uB791:B"
+      prefab: {fileID: 153946772115287373, guid: 1e50536d93909f645843d1baeeb3a218, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uAC1C\uC6B8 \uD68C\uB791:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uAC1C\uC6B8 \uD68C\uB791:C"
+      prefab: {fileID: 2645403337545550289, guid: 62be986ab51730b49b5d46cfcd9ba23c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0:A"
+      prefab: {fileID: 946007869048287374, guid: 83c789e408f916746bf240733feefbb6, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0:B"
+      prefab: {fileID: 7792298987338376386, guid: 542b65f17daa95042b6f418d4e91275d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uACE0\uC9C0\uB300 \uB178\uCD9C\uC9C0:C"
+      prefab: {fileID: 6424588049698401027, guid: 93b54f03b578c944e943ce00a28d1d21, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uBC14\uC704 \uC808\uAC1C\uC9C0:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uBC14\uC704 \uC808\uAC1C\uC9C0:A"
+      prefab: {fileID: 2632139949444309524, guid: 29d28603896f7074290702a443c993af, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uBC14\uC704 \uC808\uAC1C\uC9C0:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uBC14\uC704 \uC808\uAC1C\uC9C0:B"
+      prefab: {fileID: 2966165465644679439, guid: b39a8e2931453304b893b3cda3bf5437, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uBC14\uC704 \uC808\uAC1C\uC9C0:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uBC14\uC704 \uC808\uAC1C\uC9C0:C"
+      prefab: {fileID: 1556533632883281316, guid: 87e8a87565c654b40805dd49dc26e711, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC0B0 \uB2A5\uC120:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC0B0 \uB2A5\uC120:A"
+      prefab: {fileID: 8417303011978816517, guid: 1c251d174b0c69642be48f1862bcbf80, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC0B0 \uB2A5\uC120:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC0B0 \uB2A5\uC120:B"
+      prefab: {fileID: 5481249895379332284, guid: 7d6a2bc1052fca941ad516aff7d62098, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC0B0 \uB2A5\uC120:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC0B0 \uB2A5\uC120:C"
+      prefab: {fileID: 8535770332802758475, guid: 16caee6cba3f9fb41bfc1129c238aeec, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9:A"
+      prefab: {fileID: 946801071510529005, guid: cbd8c63a11a8c5542966e8c4c01792db, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9:B"
+      prefab: {fileID: 7249944687013173397, guid: cc7797ed358ee4e4894fd021edadfeb5, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC0B0\uAE38\xB7\uBC14\uC704 \uAE38\uBAA9:C"
+      prefab: {fileID: 2254836537947571103, guid: ebc9f2585c12f2c4eb156f41288b90c2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:A"
+      prefab: {fileID: 8186284648721282384, guid: ffc84ea11910c4340a9bd6478cc0a19c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:B"
+      prefab: {fileID: 6173282190065935562, guid: 4d021de2e72678e4c95e47aa3d44c02d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:C"
+      prefab: {fileID: 3643620017652780894, guid: 01ead55f04e9ab44ea7b6e2230f26e34, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC232 \uAC00\uC7A5\uC790\uB9AC:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC232 \uAC00\uC7A5\uC790\uB9AC:A"
+      prefab: {fileID: 4931452146539220189, guid: 87003de14a002e2479f8c3c975731a2b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC232 \uAC00\uC7A5\uC790\uB9AC:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC232 \uAC00\uC7A5\uC790\uB9AC:B"
+      prefab: {fileID: 7233477912020164479, guid: 3d63231409c35bf4f93166dbdc49205f, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC232 \uAC00\uC7A5\uC790\uB9AC:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC232 \uAC00\uC7A5\uC790\uB9AC:C"
+      prefab: {fileID: 5451307810408692239, guid: d2a0285bbf099ba4db3806bddf1c9443, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9:A"
+      prefab: {fileID: 7988339573312412597, guid: e0abc6039606dc549a3ede603fd9b3b7, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9:B"
+      prefab: {fileID: 7600649430742113416, guid: cf894b398c3b62f4f85086a144dd243c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC232 \uBE48\uD130\xB7\uACE0\uC0AC\uBAA9:C"
+      prefab: {fileID: 3605200719296344792, guid: 8bc12fc1cc9e8754f97d12eef73cec17, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654:A"
+      prefab: {fileID: 6385805593521792753, guid: 9eb05398272063f49821de4f058b1e6d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654:B"
+      prefab: {fileID: 2703259919159498134, guid: 38ad9ba60da3e7b44a2ec915418cfd7f, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uCD08\uC9C0\xB7\uC57C\uC0DD\uD654:C"
+      prefab: {fileID: 1642797751481094912, guid: 1d3174c614d15184c983ab12986cb3ac, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uCE68\uC5FD\uC218\uB9BC \uAD70\uC9D1:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uCE68\uC5FD\uC218\uB9BC \uAD70\uC9D1:A"
+      prefab: {fileID: 5075078434990999424, guid: 5093759d845c90f4d915eb3f12928608, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uCE68\uC5FD\uC218\uB9BC \uAD70\uC9D1:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uCE68\uC5FD\uC218\uB9BC \uAD70\uC9D1:B"
+      prefab: {fileID: 4857342056095718433, guid: 69d82173bd5147745909442dc7580d9c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uCE68\uC5FD\uC218\uB9BC \uAD70\uC9D1:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uCE68\uC5FD\uC218\uB9BC \uAD70\uC9D1:C"
+      prefab: {fileID: 6172028977436498312, guid: 5847a2cf41dcbe242ab0dcfe2259ccd2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uD63C\uD6A8\uB9BC \uAD70\uC9D1:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uD63C\uD6A8\uB9BC \uAD70\uC9D1:A"
+      prefab: {fileID: 5883277498434369173, guid: 2647b1aed019adb488a6f8da78f92432, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uD63C\uD6A8\uB9BC \uAD70\uC9D1:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uD63C\uD6A8\uB9BC \uAD70\uC9D1:B"
+      prefab: {fileID: 1301058060952991214, guid: afdba3c2308df92448b9a606465d2c16, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uD63C\uD6A8\uB9BC \uAD70\uC9D1:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uD63C\uD6A8\uB9BC \uAD70\uC9D1:C"
+      prefab: {fileID: 1376734424663736105, guid: 95f3ea165230a2b418ca97d2014f1033, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uD65C\uC5FD\uC218\uB9BC \uAD70\uC9D1:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uD65C\uC5FD\uC218\uB9BC \uAD70\uC9D1:A"
+      prefab: {fileID: 7877680040253711632, guid: f6ba731226f0f3d41958d214161c17cf, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uD65C\uC5FD\uC218\uB9BC \uAD70\uC9D1:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uD65C\uC5FD\uC218\uB9BC \uAD70\uC9D1:B"
+      prefab: {fileID: 3535059269791358256, guid: d0f1e2d2a48ff434ab6dddc80f86b17f, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "nature:\uD65C\uC5FD\uC218\uB9BC \uAD70\uC9D1:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uD65C\uC5FD\uC218\uB9BC \uAD70\uC9D1:C"
+      prefab: {fileID: 8586796706299408927, guid: 23743164bde40d84597928acbe947dbd, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C T\uC790:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 4212647292697687369, guid: 3f73224153bc8d841a5351298ae6c2b2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C T\uC790:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 4212647292697687369, guid: 3f73224153bc8d841a5351298ae6c2b2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C T\uC790:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 4212647292697687369, guid: 3f73224153bc8d841a5351298ae6c2b2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uACE1\uC120:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 1076617699600691859, guid: 87eb8e022c5722547bf998fb7f564459, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uACE1\uC120:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 1076617699600691859, guid: 87eb8e022c5722547bf998fb7f564459, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uACE1\uC120:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 1076617699600691859, guid: 87eb8e022c5722547bf998fb7f564459, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC2ED\uC790:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 4288075628388127259, guid: a42f723715614a84d9bb8ff63706dd11, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC2ED\uC790:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 4288075628388127259, guid: a42f723715614a84d9bb8ff63706dd11, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC2ED\uC790:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 4288075628388127259, guid: a42f723715614a84d9bb8ff63706dd11, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 4175572192850512129, guid: c4ae765f342a5bc45bc46dda8cdfdb1e, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 4175572192850512129, guid: c4ae765f342a5bc45bc46dda8cdfdb1e, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uCD0C\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 4175572192850512129, guid: c4ae765f342a5bc45bc46dda8cdfdb1e, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C T\uC790:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 8213079164408475309, guid: b9081ae1581898f4099bfcd5331d3f7d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C T\uC790:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 8213079164408475309, guid: b9081ae1581898f4099bfcd5331d3f7d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C T\uC790:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 8213079164408475309, guid: b9081ae1581898f4099bfcd5331d3f7d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uACE1\uC120:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 5910183294649166277, guid: 0fb9a16527f775642b9db0f158f59a43, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uACE1\uC120:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 5910183294649166277, guid: 0fb9a16527f775642b9db0f158f59a43, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uACE1\uC120:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 5910183294649166277, guid: 0fb9a16527f775642b9db0f158f59a43, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uC2ED\uC790:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 1611844914152080000, guid: c61d5960bf1ea7b4eb7595083e652f85, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uC2ED\uC790:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 1611844914152080000, guid: c61d5960bf1ea7b4eb7595083e652f85, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uC2ED\uC790:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 1611844914152080000, guid: c61d5960bf1ea7b4eb7595083e652f85, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uC9C1\uC120:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 8446548274167818304, guid: 84b6dd7e5d219bb45adfba3ce0ef4d40, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uC9C1\uC120:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 8446548274167818304, guid: 84b6dd7e5d219bb45adfba3ce0ef4d40, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uB3C4\uC2DC\uB3C4\uB85C \uC9C1\uC120:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uB3C4\uC2DC\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 8446548274167818304, guid: 84b6dd7e5d219bb45adfba3ce0ef4d40, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C T\uC790:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 6868334022644814703, guid: dbce1adb6eeb3994c8b73f250bb19b7b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C T\uC790:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 6868334022644814703, guid: dbce1adb6eeb3994c8b73f250bb19b7b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C T\uC790:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C T\uC790:A"
+      prefab: {fileID: 6868334022644814703, guid: dbce1adb6eeb3994c8b73f250bb19b7b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uACE1\uC120:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 3624637573029886842, guid: b8f1d6c84bc39dd4699f79d4db5baf21, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uACE1\uC120:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 3624637573029886842, guid: b8f1d6c84bc39dd4699f79d4db5baf21, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uACE1\uC120:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uBAA8\uC11C\uB9AC:A"
+      prefab: {fileID: 3624637573029886842, guid: b8f1d6c84bc39dd4699f79d4db5baf21, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uC2ED\uC790:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 2342763897008073600, guid: ec037d6ef852f8749b08cc94329eeed2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uC2ED\uC790:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 2342763897008073600, guid: ec037d6ef852f8749b08cc94329eeed2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uC2ED\uC790:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uC2ED\uC790:A"
+      prefab: {fileID: 2342763897008073600, guid: ec037d6ef852f8749b08cc94329eeed2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uC9C1\uC120:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 4820458174350239838, guid: 8e8d067f90f45a844989e17c180dd935, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uC9C1\uC120:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 4820458174350239838, guid: 8e8d067f90f45a844989e17c180dd935, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "network:\uD0C0\uC6B4\uB3C4\uB85C \uC9C1\uC120:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4\uB3C4\uB85C \uC9C1\uC120:A"
+      prefab: {fileID: 4820458174350239838, guid: 8e8d067f90f45a844989e17c180dd935, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:A"
+      prefab: {fileID: 4641059118441090361, guid: 568c7bf6c8ac94c4fafc6d44d376ea91, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:B"
+      prefab: {fileID: 6462183954752524259, guid: e5b15ea80e0ca3245808e44868fc8d57, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uADFC\uB9B0 \uB180\uC774\uD130:C"
+      prefab: {fileID: 4391652731141309431, guid: 3863abde6cb6d95428b964d9929b098b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589 \uC27C\uD130:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589
+        \uC27C\uD130:A"
+      prefab: {fileID: 711578205065843454, guid: 51df5296ae8e8ad468a16bca48574af4, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589 \uC27C\uD130:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589
+        \uC27C\uD130:B"
+      prefab: {fileID: 5020726076220488194, guid: c834dacc6bdb2754cb6d840fb84050e6, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589 \uC27C\uD130:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uBC84\uC2A4 \uC815\uB958\uC7A5\xB7\uBCF4\uD589
+        \uC27C\uD130:C"
+      prefab: {fileID: 6331473846698426294, guid: a7cd8922dac749b44a7cf5b8bdf273cd, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:A"
+      prefab: {fileID: 8211821290161286799, guid: a81c053852138d14e99ae8278198d9f0, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:B"
+      prefab: {fileID: 1535480653921655405, guid: f01835ef27737b8419d798508e9766f4, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC0DD\uD65C \uACF5\uACF5\uAD11\uC7A5:C"
+      prefab: {fileID: 8722383152655027763, guid: ce7e70cc9563cc941bad3a5cbf07c82c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:A"
+      prefab: {fileID: 8249479016997445755, guid: 5fa348abb9d692a489b6d7ad8f08e9c3, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:B"
+      prefab: {fileID: 6801073783283337043, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:C"
+      prefab: {fileID: 4484309039197395523, guid: 6e7e7928378e9974baaac8d4e72f376f, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC800\uCE35 \uC8FC\uD0DD \uBE14\uB85D:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC800\uCE35 \uC8FC\uD0DD \uBE14\uB85D:A"
+      prefab: {fileID: 230705347284565194, guid: 67782900506516e418a73b2e9f80d488, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC800\uCE35 \uC8FC\uD0DD \uBE14\uB85D:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC800\uCE35 \uC8FC\uD0DD \uBE14\uB85D:B"
+      prefab: {fileID: 6565001887370694563, guid: ff20622baf47553419263191edf6122b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC800\uCE35 \uC8FC\uD0DD \uBE14\uB85D:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC800\uCE35 \uC8FC\uD0DD \uBE14\uB85D:C"
+      prefab: {fileID: 3594538469391435311, guid: 981efa50a338bd54faa100044043cc35, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC815\uC6D0\xB7\uB2F4\uC7A5 \uACBD\uACC4:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC815\uC6D0\xB7\uB2F4\uC7A5 \uACBD\uACC4:A"
+      prefab: {fileID: 592895650470081446, guid: c1972b7e7ead4584bbf003878ea69831, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC815\uC6D0\xB7\uB2F4\uC7A5 \uACBD\uACC4:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC815\uC6D0\xB7\uB2F4\uC7A5 \uACBD\uACC4:B"
+      prefab: {fileID: 2389501736078424050, guid: 9daa2619094246b44ba2eac6ca350f57, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "town:\uC815\uC6D0\xB7\uB2F4\uC7A5 \uACBD\uACC4:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC815\uC6D0\xB7\uB2F4\uC7A5 \uACBD\uACC4:C"
+      prefab: {fileID: 1636722647566151095, guid: ef55da082412d12418233b380d1ec10d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uC7A5-\uD5C8\uBE0C \uB18D\uC7A5\uCD9C\uAD6C:A"
+      prefab: {fileID: 360257582641257329, guid: bfe56fb6be2ab0b48b32f43e45aa5b68, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "regional-logistics-hub:\uB18D\uC7A5-\uD5C8\uBE0C \uD5C8\uBE0C\uC785\uAD6C:A"
+      prefab: {fileID: 8192083856577100260, guid: 949360908297a4040891228265f4f75a, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Farm\u2013Hub \uC804\uD658:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uC7A5-\uD5C8\uBE0C \uB18D\uC7A5\uCD9C\uAD6C:A"
+      prefab: {fileID: 360257582641257329, guid: bfe56fb6be2ab0b48b32f43e45aa5b68, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Farm\u2013Town \uC804\uD658:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uC7A5-\uD0C0\uC6B4 \uB18D\uC7A5\uCD9C\uAD6C:A"
+      prefab: {fileID: 5536848457554471775, guid: 8edede6451cd5f1459e0035c555107c5, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Farm\u2013Town \uC804\uD658:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uB18D\uC7A5-\uD0C0\uC6B4 \uD0C0\uC6B4\uC785\uAD6C:A"
+      prefab: {fileID: 3233892879094058505, guid: 6e46419575fbbd847ab79a062ee6c69e, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Farm\u2013Town \uC804\uD658:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "farm:\uB18D\uC7A5-\uD0C0\uC6B4 \uB18D\uC7A5\uCD9C\uAD6C:A"
+      prefab: {fileID: 5536848457554471775, guid: 8edede6451cd5f1459e0035c555107c5, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Hub\u2013City \uC804\uD658:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "regional-logistics-hub:\uD5C8\uBE0C-\uC2DC\uD2F0 \uD5C8\uBE0C\uCD9C\uAD6C:A"
+      prefab: {fileID: 248062233967049618, guid: a064456ebf3e355498725c32548ef4b4, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Hub\u2013City \uC804\uD658:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uD5C8\uBE0C-\uC2DC\uD2F0 \uC2DC\uD2F0\uC785\uAD6C:A"
+      prefab: {fileID: 4857129111111476432, guid: c4c3a3f76494cd5428d93b039a3ce30f, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Hub\u2013City \uC804\uD658:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "regional-logistics-hub:\uD5C8\uBE0C-\uC2DC\uD2F0 \uD5C8\uBE0C\uCD9C\uAD6C:A"
+      prefab: {fileID: 248062233967049618, guid: a064456ebf3e355498725c32548ef4b4, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Nature\u2013Farm \uC804\uD658:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "mixed:Nature\u2013Farm \uC804\uD658:A"
+      prefab: {fileID: 7769175053753300723, guid: 057c4979f94645040b091ea8078960b8, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Nature\u2013Farm \uC804\uD658:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "mixed:Nature\u2013Farm \uC804\uD658:B"
+      prefab: {fileID: 3898130449471572841, guid: 8333a092e035f314bad20cd2c689293b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Nature\u2013Farm \uC804\uD658:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "mixed:Nature\u2013Farm \uC804\uD658:C"
+      prefab: {fileID: 4575630130629688599, guid: 546abbf6d4f765744a5ce82072e2d9a2, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Road\u2013BuildingFront \uC804\uD658:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:A"
+      prefab: {fileID: 8249479016997445755, guid: 5fa348abb9d692a489b6d7ad8f08e9c3, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Road\u2013BuildingFront \uC804\uD658:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:B"
+      prefab: {fileID: 6801073783283337043, guid: b33c9119fc8446a48b6ab465357bcc67, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Road\u2013BuildingFront \uC804\uD658:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uC74D\uB0B4 \uC0C1\uC810 \uC804\uBA74:C"
+      prefab: {fileID: 4484309039197395523, guid: 6e7e7928378e9974baaac8d4e72f376f, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Town\u2013City \uC804\uD658:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4-\uC2DC\uD2F0 \uD0C0\uC6B4\uCD9C\uAD6C:A"
+      prefab: {fileID: 8351224776137910505, guid: 1b68c87ef2d05964a91ca919f00b6a7c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Town\u2013City \uC804\uD658:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "city:\uD0C0\uC6B4-\uC2DC\uD2F0 \uC2DC\uD2F0\uC785\uAD6C:A"
+      prefab: {fileID: 5073688452344303233, guid: 056d611721e732f4591476a1a269483b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Town\u2013City \uC804\uD658:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4-\uC2DC\uD2F0 \uD0C0\uC6B4\uCD9C\uAD6C:A"
+      prefab: {fileID: 8351224776137910505, guid: 1b68c87ef2d05964a91ca919f00b6a7c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Town\u2013Hub \uC804\uD658:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4-\uD5C8\uBE0C \uD0C0\uC6B4\uCD9C\uAD6C:A"
+      prefab: {fileID: 4894083721454298081, guid: a7f15bc9ebc625943a4b6b82e324b60b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Town\u2013Hub \uC804\uD658:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "regional-logistics-hub:\uD0C0\uC6B4-\uD5C8\uBE0C \uD5C8\uBE0C\uC785\uAD6C:A"
+      prefab: {fileID: 8822407708323386602, guid: 9a6facd73c94d2d4dbf48f6072d83a31, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Town\u2013Hub \uC804\uD658:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "town:\uD0C0\uC6B4-\uD5C8\uBE0C \uD0C0\uC6B4\uCD9C\uAD6C:A"
+      prefab: {fileID: 4894083721454298081, guid: a7f15bc9ebc625943a4b6b82e324b60b, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Water\u2013Land \uC804\uD658:A"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:A"
+      prefab: {fileID: 8186284648721282384, guid: ffc84ea11910c4340a9bd6478cc0a19c, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Water\u2013Land \uC804\uD658:B"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:B"
+      prefab: {fileID: 6173282190065935562, guid: 4d021de2e72678e4c95e47aa3d44c02d, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1
+  - compositionKey: "transition:Water\u2013Land \uC804\uD658:C"
+    candidates:
+    - candidateRoleCode: Primary
+      priority: 0
+      sourceCompositionKey: "nature:\uC218\uBCC0 \uC644\uCDA9\uC9C0:C"
+      prefab: {fileID: 3643620017652780894, guid: 01ead55f04e9ab44ea7b6e2230f26e34, type: 3}
+      detailGeneratorRevision: wrapper-micro-detail.v1

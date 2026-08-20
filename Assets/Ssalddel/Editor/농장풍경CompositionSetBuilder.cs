@@ -23,7 +23,7 @@ namespace Ssalddel.Unity.Editor
 
         private const string VendorRoot = "Assets/Synty/PolygonFarm/Prefabs";
 
-        [MenuItem("Ssalddel/Farm Composition/Build 24 Reusable Sets")]
+        [MenuItem("Ssalddel/Farm Composition/Build 36 Reusable Sets")]
         public static void Build()
         {
             var definitions = CreateDefinitions();
@@ -115,8 +115,10 @@ namespace Ssalddel.Unity.Editor
             var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
             ground.name = "PreviewGround";
             ground.transform.SetParent(previewRoot.transform, false);
-            ground.transform.position = new Vector3(84f, -.3f, 22f);
-            ground.transform.localScale = new Vector3(190f, .5f, 74f);
+            var previewCenterX = (농장풍경SetNames.All.Count - 1) * 12f;
+            ground.transform.position = new Vector3(previewCenterX, -.3f, 22f);
+            ground.transform.localScale = new Vector3(
+                (농장풍경SetNames.All.Count - 1) * 24f + 36f, .5f, 74f);
 
             RenderSettings.ambientMode = AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(.68f, .64f, .56f);
@@ -135,11 +137,11 @@ namespace Ssalddel.Unity.Editor
             var camera = cameraObject.AddComponent<Camera>();
             camera.fieldOfView = 37f;
             camera.nearClipPlane = .3f;
-            camera.farClipPlane = 300f;
+            camera.farClipPlane = 450f;
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(.72f, .79f, .82f);
-            var focus = new Vector3(84f, 0f, 22f);
-            cameraObject.transform.position = focus + new Vector3(0f, 102f, -94f);
+            var focus = new Vector3(previewCenterX, 0f, 22f);
+            cameraObject.transform.position = focus + new Vector3(0f, 142f, -132f);
             cameraObject.transform.LookAt(focus);
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -396,6 +398,74 @@ namespace Ssalddel.Unity.Editor
                     P("SM_Env_Tree_Cherry_Grown_01", 4f, 0f, 0f),
                     P("SM_Env_Flowers_03", 0f, 0f, -3f),
                     P("SM_Generic_Small_Rocks_03", 5f, 0f, -3f)),
+
+                D(농장풍경SetNames.시설하우스단동, "A", 18f, 24f,
+                    P("SM_Bld_Greenhouse_01", 0f, 0f, 2f),
+                    P("SM_Prop_Watering_Can_01", -4f, 0f, -5f),
+                    P("SM_Prop_Trough_01", 4f, 0f, -4f),
+                    P("SM_Prop_Crate_01", 0f, 0f, -6f)),
+                D(농장풍경SetNames.시설하우스단동, "B", 18f, 24f,
+                    P("SM_Bld_Greenhouse_Large_01", 0f, 0f, 3f),
+                    P("SM_Prop_Watering_Can_01", 4f, 0f, -6f),
+                    P("SM_Prop_Trough_01", -4f, 0f, -5f, 180f),
+                    P("SM_Prop_Wheelbarrow_01", 0f, 0f, -7f)),
+                D(농장풍경SetNames.시설하우스단동, "C", 18f, 24f,
+                    P("SM_Bld_Greenhouse_01", 0f, 0f, 2f, 180f),
+                    P("SM_Prop_Watering_Can_01", 3f, 0f, 6f),
+                    P("SM_Prop_Trough_01", -3f, 0f, 5f),
+                    P("SM_Prop_PalletCrate_01", 0f, 0f, -6f)),
+
+                D(농장풍경SetNames.시설하우스병렬단지, "A", 38f, 28f,
+                    P("SM_Bld_Greenhouse_01", -10f, 0f, 3f),
+                    P("SM_Bld_Greenhouse_01", 0f, 0f, 3f),
+                    P("SM_Bld_Greenhouse_01", 10f, 0f, 3f),
+                    P("SM_Bld_WaterTower_01", 15f, 0f, -8f)),
+                D(농장풍경SetNames.시설하우스병렬단지, "B", 38f, 28f,
+                    P("SM_Bld_Greenhouse_Large_01", -9f, 0f, 4f),
+                    P("SM_Bld_Greenhouse_Large_01", 9f, 0f, 4f),
+                    P("SM_Bld_WaterTower_01", 0f, 0f, -9f),
+                    P("SM_Prop_PalletCrate_01", -5f, 0f, -9f)),
+                D(농장풍경SetNames.시설하우스병렬단지, "C", 38f, 28f,
+                    P("SM_Bld_Greenhouse_01", -10f, 0f, 2f, 180f),
+                    P("SM_Bld_Greenhouse_01", 0f, 0f, 2f, 180f),
+                    P("SM_Bld_Greenhouse_01", 10f, 0f, 2f, 180f),
+                    P("SM_Veh_Pickup_01", 14f, 0f, -8f, -20f)),
+
+                D(농장풍경SetNames.과수원블록, "A", 24f, 20f,
+                    P("SM_Generic_Tree_03", -7f, 0f, 4f),
+                    P("SM_Generic_Tree_04", 0f, 0f, 4f),
+                    P("SM_Generic_Tree_03", 7f, 0f, 4f),
+                    P("SM_Generic_Tree_04", -4f, 0f, -4f),
+                    P("SM_Generic_Tree_03", 4f, 0f, -4f)),
+                D(농장풍경SetNames.과수원블록, "B", 24f, 20f,
+                    P("SM_Generic_Tree_04", -7f, 0f, 4f),
+                    P("SM_Env_Tree_Large_01", 0f, 0f, 4f),
+                    P("SM_Generic_Tree_04", 7f, 0f, 4f),
+                    P("SM_Generic_Tree_03", -4f, 0f, -4f),
+                    P("SM_Generic_Tree_04", 4f, 0f, -4f)),
+                D(농장풍경SetNames.과수원블록, "C", 24f, 20f,
+                    P("SM_Env_Tree_Large_01", -7f, 0f, 4f),
+                    P("SM_Generic_Tree_03", 0f, 0f, 4f),
+                    P("SM_Env_Tree_Large_01", 7f, 0f, 4f),
+                    P("SM_Generic_Tree_04", -4f, 0f, -4f),
+                    P("SM_Generic_Tree_03", 4f, 0f, -4f)),
+
+                // 실제 벼 개체를 확정하지 않고 논두렁·급수·빈 필지만 표현합니다.
+                D(농장풍경SetNames.논필지농수로표현, "A", 24f, 18f,
+                    P("SM_Env_Road_Dirt_Straight_01", 0f, 0f, -6f),
+                    P("SM_Prop_Trough_01", -7f, 0f, 3f),
+                    P("SM_Prop_Fence_Wood_01", 0f, 0f, 6f),
+                    P("SM_Generic_Grass_Patch_01", 7f, 0f, 3f)),
+                D(농장풍경SetNames.논필지농수로표현, "B", 24f, 18f,
+                    P("SM_Env_Road_Dirt_Straight_01", 0f, 0f, 6f, 180f),
+                    P("SM_Prop_Trough_01", 7f, 0f, -3f, 180f),
+                    P("SM_Prop_Fence_Wood_Round_01", 0f, 0f, -6f),
+                    P("SM_Env_Pebbles_01", -7f, 0f, -3f)),
+                D(농장풍경SetNames.논필지농수로표현, "C", 24f, 18f,
+                    P("SM_Env_Road_Dirt_Straight_01", -6f, 0f, 0f, 90f),
+                    P("SM_Prop_Trough_01", 6f, 0f, 0f, 90f),
+                    P("SM_Prop_Fence_Wood_02", 0f, 0f, 6f),
+                    P("SM_Generic_Grass_Patch_02", 0f, 0f, -5f)),
             };
 
         private static SetDefinition D(

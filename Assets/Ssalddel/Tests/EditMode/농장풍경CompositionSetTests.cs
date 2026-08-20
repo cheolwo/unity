@@ -17,12 +17,13 @@ namespace Ssalddel.Unity.Tests.EditMode
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/농장풍경조합모음미리보기.unity";
 
         [Test]
-        public void 여덟풍경Set는_A_B_C_스물네Prefab으로해결된다()
+        public void 열두풍경Set는_A_B_C_서른여섯Prefab으로해결된다()
         {
             var catalog = LoadCatalog();
 
             Assert.DoesNotThrow(catalog.Validate);
-            Assert.That(catalog.Entries.Count, Is.EqualTo(24));
+            Assert.That(catalog.Entries.Count,
+                Is.EqualTo(농장풍경SetNames.All.Count * 농장풍경VariantCodes.All.Count));
             Assert.That(catalog.Entries.Select(value => value.SetName).Distinct(),
                 Is.EquivalentTo(농장풍경SetNames.All));
             foreach (var setName in 농장풍경SetNames.All)
@@ -92,7 +93,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
-        public void PreviewScene은_스물네Set와PerspectiveCamera를보존한다()
+        public void PreviewScene은_서른여섯Set와PerspectiveCamera를보존한다()
         {
             var previous = SceneManager.GetActiveScene();
             var scene = EditorSceneManager.OpenScene(PreviewScenePath, OpenSceneMode.Additive);
@@ -104,7 +105,8 @@ namespace Ssalddel.Unity.Tests.EditMode
                 var camera = roots.SelectMany(root =>
                     root.GetComponentsInChildren<Camera>(true)).Single();
 
-                Assert.That(sets.Length, Is.EqualTo(24));
+                Assert.That(sets.Length,
+                    Is.EqualTo(농장풍경SetNames.All.Count * 농장풍경VariantCodes.All.Count));
                 Assert.That(sets.All(value => value.ValidateWiring()), Is.True);
                 Assert.That(camera.orthographic, Is.False);
                 Assert.That(scene.isDirty, Is.False);
@@ -118,14 +120,15 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
-        public void TCS0는_스물네Set의시간반응가능Renderer와표면종류를측정한다()
+        public void TCS0는_서른여섯Set의시간반응가능Renderer와표면종류를측정한다()
         {
             var inventory = 농장Composition시간표면Inventory.Measure(LoadCatalog());
 
-            Assert.That(inventory.Count, Is.EqualTo(24));
+            var expectedCount = 농장풍경SetNames.All.Count * 농장풍경VariantCodes.All.Count;
+            Assert.That(inventory.Count, Is.EqualTo(expectedCount));
             Assert.That(inventory.All(value => value.Validate()), Is.True);
             Assert.That(inventory.Select(value => value.CompositionKey).Distinct().Count(),
-                Is.EqualTo(24));
+                Is.EqualTo(expectedCount));
             foreach (var setName in 농장풍경SetNames.All)
             {
                 var variants = inventory.Where(value => value.SetName == setName).ToArray();
@@ -135,7 +138,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             }
 
             Assert.That(inventory.Sum(value => value.EligibleMaterialSlotCount),
-                Is.GreaterThan(24));
+                Is.GreaterThan(expectedCount));
             Assert.That(inventory.SelectMany(value => value.SurfaceKinds).Distinct().Count(),
                 Is.GreaterThanOrEqualTo(4));
         }

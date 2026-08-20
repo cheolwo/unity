@@ -14,6 +14,12 @@ namespace Ssalddel.Unity.Presentation.World
         public const string 버스정류장보행쉼터 = "버스 정류장·보행 쉼터";
         public const string 생활서비스골목 = "생활 서비스 골목";
         public const string 소형배달주차공간 = "소형 배달·주차 공간";
+        public const string 소도시도로직선 = "소도시 도로 직선";
+        public const string T자교차로 = "T자 교차로";
+        public const string 십자교차로 = "십자 교차로";
+        public const string 텃밭형단독주택 = "텃밭형 단독주택";
+        public const string 근린놀이터 = "근린 놀이터";
+        public const string 생활공공광장 = "생활 공공광장";
 
         public static IReadOnlyList<string> All { get; } = new[]
         {
@@ -23,6 +29,12 @@ namespace Ssalddel.Unity.Presentation.World
             버스정류장보행쉼터,
             생활서비스골목,
             소형배달주차공간,
+            소도시도로직선,
+            T자교차로,
+            십자교차로,
+            텃밭형단독주택,
+            근린놀이터,
+            생활공공광장,
         };
     }
 
@@ -34,6 +46,12 @@ namespace Ssalddel.Unity.Presentation.World
         public const string 포장도로회차공간 = "포장도로·회차 공간";
         public const string 안전서비스설비 = "안전·서비스 설비";
         public const string TownHub전환경관 = "Town–Hub 전환 경관";
+        public const string 도시진입교차로 = "도시 진입 교차로";
+        public const string 도심마트앞마당 = "도심 마트 앞마당";
+        public const string 먹거리상점골목 = "먹거리 상점 골목";
+        public const string 공동주택생활마당 = "공동주택 생활마당";
+        public const string 사무공공정보관앞 = "사무·공공정보관 앞";
+        public const string 도시공원쉼터 = "도시 공원 쉼터";
 
         public static IReadOnlyList<string> All { get; } = new[]
         {
@@ -43,6 +61,28 @@ namespace Ssalddel.Unity.Presentation.World
             포장도로회차공간,
             안전서비스설비,
             TownHub전환경관,
+            도시진입교차로,
+            도심마트앞마당,
+            먹거리상점골목,
+            공동주택생활마당,
+            사무공공정보관앞,
+            도시공원쉼터,
+        };
+    }
+
+    public static class 혼합전환경관SetNames
+    {
+        public const string NatureFarm = "Nature–Farm 전환";
+        public const string FarmTown = "Farm–Town 전환";
+        public const string FarmHub = "Farm–Hub 전환";
+        public const string TownCity = "Town–City 전환";
+
+        public static IReadOnlyList<string> All { get; } = new[]
+        {
+            NatureFarm,
+            FarmTown,
+            FarmHub,
+            TownCity,
         };
     }
 
@@ -95,7 +135,8 @@ namespace Ssalddel.Unity.Presentation.World
             if (!descriptor.Validate()) return "DescriptorInvalid";
             if (descriptor.PackCode != 월드CompositionPackCodes.Farm
                 && descriptor.PackCode != 월드CompositionPackCodes.Town
-                && descriptor.PackCode != 월드CompositionPackCodes.City)
+                && descriptor.PackCode != 월드CompositionPackCodes.City
+                && descriptor.PackCode != 월드CompositionPackCodes.Mixed)
                 return "PackCodeInvalid";
             if (prefab == null) return "PrefabMissing";
             if (allowedLandCoverCodes.Length == 0
@@ -168,9 +209,10 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void Validate()
         {
-            const int expectedFarmCount = 24;
-            const int expectedTownCount = 18;
-            const int expectedCityCount = 18;
+            const int expectedFarmCount = 36;
+            const int expectedTownCount = 36;
+            const int expectedCityCount = 36;
+            const int expectedMixedCount = 12;
             var invalidEntries = entries == null
                 ? new[] { "entries:null" }
                 : entries.Select((value, index) => new { value, index })
@@ -186,20 +228,24 @@ namespace Ssalddel.Unity.Presentation.World
                 && value.Descriptor.PackCode == 월드CompositionPackCodes.Town) ?? 0;
             var cityCount = entries?.Count(value => value != null
                 && value.Descriptor.PackCode == 월드CompositionPackCodes.City) ?? 0;
+            var mixedCount = entries?.Count(value => value != null
+                && value.Descriptor.PackCode == 월드CompositionPackCodes.Mixed) ?? 0;
             if (string.IsNullOrWhiteSpace(catalogRevision)
                 || entries == null
-                || entries.Length != expectedFarmCount + expectedTownCount + expectedCityCount
+                || entries.Length != expectedFarmCount + expectedTownCount
+                    + expectedCityCount + expectedMixedCount
                 || invalidEntries.Length > 0
                 || entries.Select(value => value.CompositionKey)
                     .Distinct(StringComparer.Ordinal).Count() != entries.Length
                 || farmCount != expectedFarmCount
                 || townCount != expectedTownCount
-                || cityCount != expectedCityCount)
+                || cityCount != expectedCityCount
+                || mixedCount != expectedMixedCount)
             {
                 throw new InvalidOperationException(
                     "PackLandscapeCompositionCatalogInvalid:"
                     + $"revision={catalogRevision};count={entries?.Length ?? 0};"
-                    + $"farm={farmCount};town={townCount};city={cityCount};"
+                    + $"farm={farmCount};town={townCount};city={cityCount};mixed={mixedCount};"
                     + "invalid=" + string.Join(",", invalidEntries.Take(8)));
             }
 
