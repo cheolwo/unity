@@ -50,6 +50,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 AvailableCards = (wire.AvailableCards ?? Array.Empty<CardWire>())
                     .Select(MapCard).ToArray(),
                 TarotDraw = MapTarotDraw(wire.TarotDraw),
+                TarotContext = MapTarotContext(wire.TarotContext),
             };
             ValidateContext(context, sessionStableId);
             return context;
@@ -325,6 +326,37 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             };
             턴마감FixtureAuthorityClient.ValidateCard(card);
             return card;
+        }
+
+        private static 타로ContextStateData MapTarotContext(TarotContextWire wire)
+        {
+            wire ??= new TarotContextWire();
+            return new 타로ContextStateData
+            {
+                Revision = wire.FrameSet?.Revision ?? 0,
+                ActiveFrames = (wire.FrameSet?.ActiveFrames
+                        ?? Array.Empty<TarotFrameWire>())
+                    .Select(value => new 타로FrameData
+                    {
+                        FrameStableId = value.FrameStableId ?? string.Empty,
+                        CardStableId = value.CardStableId ?? string.Empty,
+                        CardCopyStableId = value.CardCopyStableId ?? string.Empty,
+                        OrientationCode = value.OrientationCode ?? string.Empty,
+                        FrameScopeCode = value.FrameScopeCode ?? string.Empty,
+                        ThemeCodes = value.ThemeCodes ?? Array.Empty<string>(),
+                    }).ToArray(),
+                Relations = (wire.Relations ?? Array.Empty<TarotRelationWire>())
+                    .Select(value => new 타로CardRelationData
+                    {
+                        SourceFrameStableId = value.SourceFrameStableId ?? string.Empty,
+                        TargetCardFamilyCode = value.TargetCardFamilyCode ?? string.Empty,
+                        TargetCardStableId = value.TargetCardStableId ?? string.Empty,
+                        TargetCardCopyStableId = value.TargetCardCopyStableId ?? string.Empty,
+                        RelationCode = value.RelationCode ?? string.Empty,
+                        ChangesAvailability = value.ChangesAvailability,
+                    }).ToArray(),
+                ContextStateHashSha256 = wire.ContextStateHashSha256 ?? string.Empty,
+            };
         }
 
         private static void ValidateContext(턴마감ContextData context, string expectedSession)
@@ -626,7 +658,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             => new { DistrictStableId = id, DistrictTypeCode = type, SourceStableIds = Sources() };
         private static string[] Sources() => new[] { "source:unity.turn-closing-server-r1" };
 
-        [Serializable] private sealed class ContextWire { public string SessionStableId; public int TurnNumber; public string GameDate; public long Revision; public int PendingTaskCount; public bool CanCloseTurn; public CardWire[] AvailableCards; public TarotDrawWire TarotDraw; }
+        [Serializable] private sealed class ContextWire { public string SessionStableId; public int TurnNumber; public string GameDate; public long Revision; public int PendingTaskCount; public bool CanCloseTurn; public CardWire[] AvailableCards; public TarotDrawWire TarotDraw; public TarotContextWire TarotContext; }
         [Serializable] private sealed class PreviewWire { public string PreviewStableId; public long BaseRevision; public int ClosingTurnNumber; public int NextTurnNumber; public string NextGameDate; public int PendingTaskCount; public CardWire[] SelectedCards; }
         [Serializable] private sealed class CardWire { public string CardStableId; public string CardRevision; public string CardKindCode; public string Title; public string Summary; public string EffectCode; public string TargetStatCode; public int StatDelta; public string SourceStableId; public string RegionKey; public string AvailableFromGameDate; public string AvailableThroughGameDate; public string CalendarRevision; public string EffectRuleRevision; public string SourceUrl; public string EvidenceCheckedAtUtc; }
         [Serializable] private sealed class SessionWire { public string SessionStableId; public long Revision; public WorldWire WorldContext; public SettlementWire Settlement; public ActiveEffectWire[] ActiveTurnCardEffects; public RegionalCausalityWire RegionalCausality; }
@@ -638,6 +670,10 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         [Serializable] private sealed class ActiveEffectWire { public string CardStableId; public string EffectCode; public int ActiveTurnNumber; }
         [Serializable] private sealed class TarotDrawWire { public string DrawStableId; public string DeckStableId; public string DeckRevision; public string DrawRuleRevision; public int TurnNumber; public string TurnHistoryHash; public TarotOfferWire[] Offers; }
         [Serializable] private sealed class TarotOfferWire { public string OfferStableId; public int OfferSlotNumber; public string CardCopyStableId; public string OrientationCode; public CardWire Card; }
+        [Serializable] private sealed class TarotContextWire { public TarotFrameSetWire FrameSet; public TarotRelationWire[] Relations; public string ContextStateHashSha256; }
+        [Serializable] private sealed class TarotFrameSetWire { public long Revision; public TarotFrameWire[] ActiveFrames; }
+        [Serializable] private sealed class TarotFrameWire { public string FrameStableId; public string CardStableId; public string CardCopyStableId; public string OrientationCode; public string FrameScopeCode; public string[] ThemeCodes; }
+        [Serializable] private sealed class TarotRelationWire { public string SourceFrameStableId; public string TargetCardFamilyCode; public string TargetCardStableId; public string TargetCardCopyStableId; public string RelationCode; public bool ChangesAvailability; }
         [Serializable] private sealed class TarotObjectReactionPreviewWire { public string PreviewStableId; public long BaseRevision; public int TurnNumber; public string DrawStableId; public string ObjectCatalogRevision; public bool IsCandidateOnly; public bool DoesNotMutateSession; public TarotCardReactionWire[] CardReactions; }
         [Serializable] private sealed class TarotCardReactionWire { public string OfferStableId; public string CardStableId; public string OrientationCode; public TarotObjectReactionWire[] ObjectReactions; public string[] HighlightObjectStableIds; }
         [Serializable] private sealed class TarotObjectReactionWire { public string ObjectStableId; public string PlacementStableId; public string ReactionStateCode; public bool CanHighlightInWorld; public string KoreanSummary; public string[] StateSourceStableIds; public string[] BlockReasonCodes; }

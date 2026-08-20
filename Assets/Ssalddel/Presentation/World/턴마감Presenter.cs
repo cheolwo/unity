@@ -38,6 +38,7 @@ namespace Ssalddel.Unity.Presentation.World
         public bool HasPreview => preview != null;
         public string Status => statusText != null ? statusText.text : string.Empty;
         public string SelectedTarotOfferStableId => selectedTarot?.OfferStableId ?? string.Empty;
+        public 턴마감ContextData? CurrentContext => context;
         public IReadOnlyCollection<string> HighlightedObjectStableIds
             => tarotHighlighter != null
                 ? tarotHighlighter.HighlightedObjectStableIds
@@ -116,6 +117,8 @@ namespace Ssalddel.Unity.Presentation.World
                 shell.SessionStableId, CancellationToken.None);
             if (context.SessionStableId != shell.SessionStableId)
                 throw new InvalidOperationException("TurnClosingContextSessionMismatch");
+            if (context.TarotContext.Relations.Any(value => value.ChangesAvailability))
+                throw new InvalidOperationException("TarotRelationChangedAvailability");
             foreach (var card in context.AvailableCards)
                 턴마감FixtureAuthorityClient.ValidateCard(card);
             selectedCardStableId = string.Empty;

@@ -56,6 +56,7 @@ namespace Ssalddel.Unity.Presentation.World
         private string acceptedEpoch = string.Empty;
         private string requestedFocusCellKey = string.Empty;
         private string playerCellKey = string.Empty;
+        private string pinnedFocusCellKey = string.Empty;
         private string movementDirectionCode = 공간LHWorldCodes.None;
         private long requestSequence;
         private long npcRequestSequence;
@@ -72,6 +73,8 @@ namespace Ssalddel.Unity.Presentation.World
         public bool PresentationOnly => presentationOnly;
         public string PlayerCellKey => playerCellKey;
         public string RequestedFocusCellKey => requestedFocusCellKey;
+        public string PinnedFocusCellKey => pinnedFocusCellKey;
+        public bool IsFocusPinned => !string.IsNullOrWhiteSpace(pinnedFocusCellKey);
         public string ActiveSeasonCode => activeSeasonCode;
         public int ActiveSeasonDay => activeSeasonDay;
         public float L3CellWorldSize => l3CellWorldSize;
@@ -112,6 +115,19 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void ConfigureFloatingOrigin(Transform worldRoot)
             => floatingOriginRoot = worldRoot;
+
+        public void PinFocusCell(string cellKey)
+        {
+            if (!공간LHCellKey.TryParseL3(cellKey, out _, out _))
+                throw new ArgumentException("LHWorldPinnedFocusCellInvalid", nameof(cellKey));
+            pinnedFocusCellKey = cellKey.Trim();
+            movementDirectionCode = 공간LHWorldCodes.None;
+            if (repository != null && lifetime != null
+                && pinnedFocusCellKey != requestedFocusCellKey)
+                _ = RequestWindowAsync(false, lifetime.Token);
+        }
+
+        public void ReleaseFocusPin() => pinnedFocusCellKey = string.Empty;
 
         public async Task InitializeAsync(I공간LHWorldRepository worldRepository)
         {
@@ -209,6 +225,14 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void EvaluateFocusAndRequest()
         {
+            if (!string.IsNullOrWhiteSpace(pinnedFocusCellKey))
+            {
+                if (pinnedFocusCellKey != requestedFocusCellKey
+                    && Volatile.Read(ref requestsInFlight) <
+                        (profile?.MaxConcurrentPreparations ?? 4))
+                    _ = RequestWindowAsync(false, lifetime.Token);
+                return;
+            }
             var current = 공간LHCellKey.FromWorldPosition(
                 focusTarget.position.x, focusTarget.position.z,
                 originWorldPosition.x, originWorldPosition.z);
@@ -294,7 +318,9 @@ namespace Ssalddel.Unity.Presentation.World
                 var playerKey = 공간LHCellKey.FromWorldPosition(
                     focusTarget.position.x, focusTarget.position.z,
                     originWorldPosition.x, originWorldPosition.z);
-                var focusKey = initial ? playerKey : DesiredPrefetchFocus(playerKey);
+                var focusKey = !string.IsNullOrWhiteSpace(pinnedFocusCellKey)
+                    ? pinnedFocusCellKey
+                    : initial ? playerKey : DesiredPrefetchFocus(playerKey);
                 var epoch = "lh-request:" + Interlocked.Increment(ref requestSequence);
                 var request = new 공간LHCellPreviewRequestData
                 {

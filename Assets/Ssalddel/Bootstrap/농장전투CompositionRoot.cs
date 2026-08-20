@@ -301,6 +301,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private async void OnCombatEntryRequested(string encounterStableId)
         {
+            if (!서버기준사용) return;
             try
             {
                 await StartCombatAsync(encounterStableId,

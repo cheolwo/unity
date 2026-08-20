@@ -40,6 +40,13 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             => SendAsync("POST", TeamRoleCardApiRoutes.EndActivity(sessionStableId),
                 request, cancellationToken);
 
+        public Task<TeamRoleCardStateApiModel> SetCombatLoadoutAsync(
+            string sessionStableId, TeamCombatCardLoadoutSetApiRequest request,
+            CancellationToken cancellationToken)
+            => SendAsync("POST",
+                TeamRoleCardApiRoutes.SetCombatLoadout(sessionStableId), request,
+                cancellationToken);
+
         private async Task<TeamRoleCardStateApiModel> SendAsync(
             string method, string route, object body,
             CancellationToken cancellationToken)

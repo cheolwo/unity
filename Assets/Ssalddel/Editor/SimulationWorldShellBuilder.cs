@@ -93,6 +93,7 @@ namespace Ssalddel.Unity.Editor
             Build정착지상호작용(ui.Canvas, presenter, shellRuntimeRoot.transform);
             Build물류이동(ui.Canvas, presenter, shellRuntimeRoot.transform);
             Build턴마감(ui.Canvas, presenter, shellRuntimeRoot.transform);
+            Build카드서랍(ui.Canvas, presenter, shellRuntimeRoot.transform);
             Build진부Hub입고Ui(ui.Canvas, presenter, shellRuntimeRoot.transform);
 
             new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
@@ -369,6 +370,49 @@ namespace Ssalddel.Unity.Editor
             AssetDatabase.SaveAssets();
             Validate턴마감OpenScene();
             Debug.Log("TURN-CARD-UI-1B built: " + ScenePath);
+        }
+
+        [MenuItem("Ssalddel/CARD-DRAWER-0/Build Unified Card Drawer")]
+        public static void Build카드서랍Interaction()
+        {
+            OpenShellIfRequired();
+            var root = Required(RootName);
+            var runtimeRoot = Required(root.transform, "ShellRuntimeRoot");
+            var canvas = Required(Required(root.transform, "PersistentUI"),
+                "SimulationWorldHud");
+            var oldPanel = canvas.Find("CardDrawerPanel");
+            if (oldPanel != null) UnityEngine.Object.DestroyImmediate(oldPanel.gameObject);
+            var oldPresenter = runtimeRoot.GetComponent<카드서랍Presenter>();
+            if (oldPresenter != null) UnityEngine.Object.DestroyImmediate(oldPresenter);
+            var oldComposition = runtimeRoot.GetComponent<카드서랍CompositionRoot>();
+            if (oldComposition != null) UnityEngine.Object.DestroyImmediate(oldComposition);
+            Build카드서랍(canvas, FindPresenter(), runtimeRoot);
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException("CardDrawerSceneSaveFailed");
+            AssetDatabase.SaveAssets();
+            Validate카드서랍OpenScene();
+            Debug.Log("CARD-DRAWER-0 built: " + ScenePath);
+        }
+
+        [MenuItem("Ssalddel/CARD-DRAWER-0/Validate Open Scene")]
+        public static void Validate카드서랍OpenScene()
+        {
+            var presenter = UnityEngine.Object.FindFirstObjectByType<카드서랍Presenter>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("CardDrawerPresenterMissing");
+            presenter.ValidateWiring();
+            var composition = UnityEngine.Object.FindFirstObjectByType<카드서랍CompositionRoot>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("CardDrawerCompositionMissing");
+            if (!composition.ServerAuthorityEnabled)
+                throw new InvalidOperationException("CardDrawerServerAuthorityDisabled");
+            var panel = Required(Required(RootName).transform,
+                "PersistentUI/SimulationWorldHud/CardDrawerPanel");
+            if (panel.GetComponentsInChildren<Button>(true).Length != 6)
+                throw new InvalidOperationException("CardDrawerButtonCountInvalid");
+            Debug.Log("CARD-DRAWER-0 validation passed");
         }
 
         [MenuItem("Ssalddel/TURN-CARD-UI-1B/Validate Open Scene")]
@@ -1014,6 +1058,51 @@ namespace Ssalddel.Unity.Editor
             presenter.SetContextVisible(false);
         }
 
+        private static void Build카드서랍(
+            Transform canvas,
+            SimulationWorldShellPresenter shell,
+            Transform runtimeRoot)
+        {
+            var panel = Panel(canvas, "CardDrawerPanel",
+                new Vector2(22f, -82f), new Vector2(640f, 700f), new Vector2(0f, 1f));
+            panel.GetComponent<Image>().color = new Color(.035f, .045f, .06f, .985f);
+            var title = Text(panel.transform, "TitleText", new Vector2(22f, -18f),
+                new Vector2(596f, 36f), 20, TextAnchor.UpperLeft,
+                new Color(.96f, .79f, .36f));
+            var content = Text(panel.transform, "ContentText", new Vector2(22f, -62f),
+                new Vector2(596f, 360f), 14, TextAnchor.UpperLeft, Color.white);
+            var selection = Text(panel.transform, "SelectionText", new Vector2(22f, -430f),
+                new Vector2(596f, 92f), 14, TextAnchor.UpperLeft,
+                new Color(.70f, .84f, .94f));
+            var status = Text(panel.transform, "StatusText", new Vector2(22f, -530f),
+                new Vector2(596f, 44f), 13, TextAnchor.UpperLeft,
+                new Color(.68f, .74f, .78f));
+            var previous = Button(panel.transform, "PreviousButton", "◀ 이전",
+                new Vector2(22f, -584f), new Vector2(86f, 40f), Rgb(.18f, .25f, .32f));
+            var next = Button(panel.transform, "NextButton", "다음 ▶",
+                new Vector2(116f, -584f), new Vector2(86f, 40f), Rgb(.18f, .25f, .32f));
+            var owner = Button(panel.transform, "OwnerActionButton", "원래 화면",
+                new Vector2(210f, -584f), new Vector2(96f, 40f), Rgb(.29f, .45f, .56f));
+            var direct = Button(panel.transform, "DirectPrimaryButton", "직접 주력",
+                new Vector2(314f, -584f), new Vector2(96f, 40f), Rgb(.48f, .28f, .22f));
+            var tactical = Button(panel.transform, "TacticalPrimaryButton", "지휘 주력",
+                new Vector2(418f, -584f), new Vector2(96f, 40f), Rgb(.34f, .30f, .56f));
+            var close = Button(panel.transform, "CloseButton", "닫기 C",
+                new Vector2(522f, -584f), new Vector2(96f, 40f), Rgb(.30f, .32f, .35f));
+            var presenter = runtimeRoot.gameObject.AddComponent<카드서랍Presenter>();
+            presenter.Configure(panel, title, content, selection, status,
+                previous, next, owner, direct, tactical, close);
+            var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
+                "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
+                ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");
+            var composition = runtimeRoot.gameObject.AddComponent<카드서랍CompositionRoot>();
+            composition.Configure(settings, shell, presenter,
+                runtimeRoot.GetComponent<턴마감Presenter>(),
+                runtimeRoot.GetComponent<현장전투CompositionRoot>(),
+                "actor:sim:player-survivor", true);
+            presenter.SetOpen(false);
+        }
+
         private static void Build진부Hub입고Ui(
             Transform canvas,
             SimulationWorldShellPresenter shell,
@@ -1246,7 +1335,16 @@ namespace Ssalddel.Unity.Editor
             var composition = runtimeRoot.gameObject
                 .AddComponent<농장전투CompositionRoot>();
             composition.Configure(settings, FindPresenter(), player, combat,
-                "actor:sim:player-survivor", true);
+                "actor:sim:player-survivor", false);
+
+            var previousUnifiedCombat = runtimeRoot
+                .GetComponent<현장전투CompositionRoot>();
+            if (previousUnifiedCombat != null)
+                UnityEngine.Object.DestroyImmediate(previousUnifiedCombat);
+            var unifiedCombat = runtimeRoot.gameObject
+                .AddComponent<현장전투CompositionRoot>();
+            unifiedCombat.Configure(settings, FindPresenter(), player, combat,
+                runtimeRoot, "actor:sim:player-survivor", true);
         }
 
         private static 전술분대Presenter Build전술분대Views(Transform runtimeRoot)

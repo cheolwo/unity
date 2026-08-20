@@ -46,6 +46,35 @@ namespace Ssalddel.Unity.Runtime.World
         public bool CanCloseTurn { get; set; }
         public 턴마감CardData[] AvailableCards { get; set; } = Array.Empty<턴마감CardData>();
         public 턴마감타로DrawData TarotDraw { get; set; } = new 턴마감타로DrawData();
+        public 타로ContextStateData TarotContext { get; set; } = new 타로ContextStateData();
+    }
+
+    public sealed class 타로FrameData
+    {
+        public string FrameStableId { get; set; } = string.Empty;
+        public string CardStableId { get; set; } = string.Empty;
+        public string CardCopyStableId { get; set; } = string.Empty;
+        public string OrientationCode { get; set; } = string.Empty;
+        public string FrameScopeCode { get; set; } = string.Empty;
+        public string[] ThemeCodes { get; set; } = Array.Empty<string>();
+    }
+
+    public sealed class 타로CardRelationData
+    {
+        public string SourceFrameStableId { get; set; } = string.Empty;
+        public string TargetCardFamilyCode { get; set; } = string.Empty;
+        public string TargetCardStableId { get; set; } = string.Empty;
+        public string TargetCardCopyStableId { get; set; } = string.Empty;
+        public string RelationCode { get; set; } = string.Empty;
+        public bool ChangesAvailability { get; set; }
+    }
+
+    public sealed class 타로ContextStateData
+    {
+        public long Revision { get; set; }
+        public 타로FrameData[] ActiveFrames { get; set; } = Array.Empty<타로FrameData>();
+        public 타로CardRelationData[] Relations { get; set; } = Array.Empty<타로CardRelationData>();
+        public string ContextStateHashSha256 { get; set; } = string.Empty;
     }
 
     public sealed class 턴마감PreviewData

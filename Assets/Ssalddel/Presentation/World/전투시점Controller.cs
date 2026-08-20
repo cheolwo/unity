@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Ssalddel.Unity.Battles;
 using Ssalddel.Unity.Survival;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -31,10 +32,13 @@ namespace Ssalddel.Unity.Presentation.World
         private long _observedWorldRevision;
         private int _commandSequence;
         private bool _reactionSubmitted;
+        private BattleInstanceApiModel? _localBattle;
 
         public event Action<FarmCombatReactionCommandDraft> ReactionCommandPrepared
             = delegate { };
         public event Action<string> CombatEntryRequested = delegate { };
+        public event Action<LocalCombatActionCommandDraft> LocalActionCommandPrepared
+            = delegate { };
         public event Action<FarmTacticalOrderPresentationFrame>
             TacticalViewTransitionSuggested = delegate { };
         public event Action<FarmTacticalOrderPreviewDraft>
@@ -56,10 +60,29 @@ namespace Ssalddel.Unity.Presentation.World
         public 전술분대Presenter TacticalSquads => tacticalSquads;
         public string InputPhaseCode => _inputPhaseCode;
         public string LastAuthorityErrorCode => _lastAuthorityErrorCode;
+        public string DesiredLocalControlModeCode
+            => player != null && player.CurrentMode == 플레이어시점Mode.FirstPerson
+                ? LocalCombatPresentationCodes.DirectAction
+                : LocalCombatPresentationCodes.TacticalCommand;
         public bool LocksPlayerMovement
-            => _activeFrame != null
+            => _localBattle == null && (_activeFrame != null
                 || _inputPhaseCode == FarmCombatPresentationCodes.Entering
-                || _inputPhaseCode == FarmCombatPresentationCodes.Submitting;
+                || _inputPhaseCode == FarmCombatPresentationCodes.Submitting);
+
+        public void ApplyUnifiedBattleState(BattleInstanceApiModel state,
+            string actorStableId)
+        {
+            if (state == null || state.CombatSpaceCode !=
+                    BattlePresentationCodes.WorldLocal
+                || !state.SimulationOnly || state.IsOperationalState)
+                throw new InvalidOperationException("LocalCombatAuthorityBoundaryInvalid");
+            _localBattle = state;
+            _actorStableId = actorStableId?.Trim() ?? string.Empty;
+            _lastAuthorityErrorCode = string.Empty;
+            _inputPhaseCode = state.PhaseCode == BattlePresentationCodes.Active
+                ? FarmCombatPresentationCodes.Telegraph
+                : FarmCombatPresentationCodes.Resolved;
+        }
 
         private void Awake()
         {
@@ -163,6 +186,10 @@ namespace Ssalddel.Unity.Presentation.World
             var frame = input.ReadFrame();
             if (frame.PointerOverUi && frame.HasAction) return true;
 
+            if (_localBattle != null
+                && _localBattle.PhaseCode == BattlePresentationCodes.Active)
+                return TryHandleLocalCombatInput(frame, Keyboard.current);
+
             if (_activeFrame == null)
             {
                 if (_inputPhaseCode != FarmCombatPresentationCodes.Ready
@@ -206,6 +233,58 @@ namespace Ssalddel.Unity.Presentation.World
             ReactionCommandPrepared(command);
             return true;
         }
+
+        private bool TryHandleLocalCombatInput(전투입력Frame frame, Keyboard? keyboard)
+        {
+            if (_localBattle == null || string.IsNullOrWhiteSpace(_actorStableId))
+                return false;
+            if (_localBattle.LocalCombat.ControlModeCode !=
+                    DesiredLocalControlModeCode)
+                return true;
+            var perspective = player.CurrentMode == 플레이어시점Mode.FirstPerson
+                ? LocalCombatPresentationCodes.FirstPerson
+                : LocalCombatPresentationCodes.TacticalThirdPerson;
+            var target = _localBattle.LocalCombat.FocusedTargetStableId;
+            LocalCombatActionCommandDraft? command = null;
+            if (keyboard?.digit1Key.wasPressedThisFrame == true
+                || keyboard?.numpad1Key.wasPressedThisFrame == true)
+                command = LocalCombatInputCommandFactory.CreateActionSlot(_localBattle,
+                    perspective, 1, _actorStableId, target, NextLocalCommandId(), 0);
+            else if (keyboard?.digit2Key.wasPressedThisFrame == true
+                || keyboard?.numpad2Key.wasPressedThisFrame == true)
+                command = LocalCombatInputCommandFactory.CreateActionSlot(_localBattle,
+                    perspective, 2, _actorStableId, target, NextLocalCommandId(), 0);
+            else if (keyboard?.digit3Key.wasPressedThisFrame == true
+                || keyboard?.numpad3Key.wasPressedThisFrame == true)
+                command = LocalCombatInputCommandFactory.CreateActionSlot(_localBattle,
+                    perspective, 3, _actorStableId, target, NextLocalCommandId(), 0);
+            else if (keyboard?.digit4Key.wasPressedThisFrame == true
+                || keyboard?.numpad4Key.wasPressedThisFrame == true)
+                command = LocalCombatInputCommandFactory.CreateActionSlot(_localBattle,
+                    perspective, 4, _actorStableId, target, NextLocalCommandId(), 0);
+            else if (frame.AttackPressed)
+                command = LocalCombatInputCommandFactory.CreatePointerAction(_localBattle,
+                    perspective, LocalCombatPresentationCodes.LeftPointer,
+                    _localBattle.LocalCombat.HostileTelegraphActive, _actorStableId,
+                    target, NextLocalCommandId(), 0);
+            else if (frame.DefendPressed)
+                command = LocalCombatInputCommandFactory.CreatePointerAction(_localBattle,
+                    perspective, LocalCombatPresentationCodes.RightPointer,
+                    _localBattle.LocalCombat.HostileTelegraphActive, _actorStableId,
+                    target, NextLocalCommandId(), 0);
+            if (command == null) return false;
+            player.ApplyCombatAnimation(command.ActionCode ==
+                LocalCombatPresentationCodes.Guard
+                || command.ActionCode == LocalCombatPresentationCodes.Dodge
+                || command.ActionCode == LocalCombatPresentationCodes.HoldPosition
+                    ? 공용AnimationIntentCodes.Guard
+                    : 공용AnimationIntentCodes.Attack);
+            LocalActionCommandPrepared(command);
+            return true;
+        }
+
+        private string NextLocalCommandId() => "command:unity:local-combat:"
+            + (++_commandSequence).ToString();
 
         public void SetAuthorityFailure(string errorCode)
         {
@@ -274,6 +353,8 @@ namespace Ssalddel.Unity.Presentation.World
             _reactionSubmitted = false;
             LastPreparedCommand = null;
         }
+
+        public void ClearUnifiedBattle() => _localBattle = null;
 
         public void ClearTacticalOrderWindow()
         {
