@@ -10,6 +10,7 @@ namespace Ssalddel.Unity.Runtime.Transport
         public string RelativePath { get; set; } = string.Empty;
         public string JsonBody { get; set; } = string.Empty;
         public bool RequiresAuthentication { get; set; }
+        public bool ExpectsBinaryResponse { get; set; }
 
         public void Validate()
         {
@@ -38,6 +39,7 @@ namespace Ssalddel.Unity.Runtime.Transport
         public long StatusCode { get; set; }
         public string Body { get; set; } = string.Empty;
         public string ErrorCode { get; set; } = string.Empty;
+        public byte[] BodyBytes { get; set; } = Array.Empty<byte>();
         public bool IsSuccess => StatusCode >= 200 && StatusCode <= 299;
     }
 

@@ -70,6 +70,64 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public async Task Npc경로체크포인트는_배차된화물차와순서를검증한뒤에만_운송을진행한다()
+        {
+            var initial = 물류이동FixtureAuthorityClient.CreateInitialSnapshot();
+            var coordinator = new 물류이동Coordinator(
+                new 물류이동FixtureAuthorityClient(initial), initial);
+            await coordinator.PreviewAsync();
+            await coordinator.ConfirmAsync();
+
+            var first = Checkpoint(coordinator.CurrentSnapshot, 1);
+            await coordinator.ApplyNpcRouteCheckpointAsync(first);
+            Assert.That(coordinator.CurrentSnapshot.CompletedRouteTicks, Is.EqualTo(1));
+            Assert.That(coordinator.PhaseCode, Is.EqualTo(물류이동PhaseCodes.InTransit));
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await coordinator.ApplyNpcRouteCheckpointAsync(first));
+            var wrongVehicle = Checkpoint(coordinator.CurrentSnapshot, 2);
+            wrongVehicle.VehicleStableId = "vehicle:sim.other";
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await coordinator.ApplyNpcRouteCheckpointAsync(wrongVehicle));
+            Assert.That(coordinator.CurrentSnapshot.CompletedRouteTicks, Is.EqualTo(1));
+
+            await coordinator.ApplyNpcRouteCheckpointAsync(
+                Checkpoint(coordinator.CurrentSnapshot, 2));
+            await coordinator.ApplyNpcRouteCheckpointAsync(
+                Checkpoint(coordinator.CurrentSnapshot, 3));
+            Assert.That(coordinator.PhaseCode, Is.EqualTo(물류이동PhaseCodes.Arrived));
+            Assert.That(coordinator.CurrentSnapshot.TaskStateCode, Is.EqualTo("Completed"));
+        }
+
+        [TestCase(Npc물류운송Codes.Freight)]
+        [TestCase(Npc물류운송Codes.FoodDelivery)]
+        public void 음식과화물은_같은ScenarioProcedural_Npc경로계약을사용한다(string transportKind)
+        {
+            const string route = "route:local:test";
+            var plan = new Npc물류RoutePlanData
+            {
+                RouteStableId = route,
+                RouteVersion = "npc-route.local.r1",
+                TransportKindCode = transportKind,
+                CargoOrOrderStableId = transportKind == Npc물류운송Codes.Freight
+                    ? "cargo:local:test" : "food-order:local:test",
+                NpcStableId = "npc:local:courier-1",
+                VehicleStableId = transportKind == Npc물류운송Codes.Freight
+                    ? "vehicle:local:truck-1" : "vehicle:local:scooter-1",
+                Waypoints = new[]
+                {
+                    Waypoint(route, 0, "kr5186:l3:2801:4581", 0d),
+                    Waypoint(route, 1, "kr5186:l3:2802:4581", 125d),
+                    Waypoint(route, 2, "kr5186:l3:2803:4581", 250d),
+                },
+            };
+
+            Assert.DoesNotThrow(plan.Validate);
+            Assert.That(plan.EvidenceKindCode,
+                Is.EqualTo(Npc물류운송Codes.ScenarioProcedural));
+        }
+
+        [Test]
         public async Task HttpAuthority는_공식물류PreviewConfirmTick경로를사용한다()
         {
             var api = new StubApiClient();
@@ -133,6 +191,29 @@ namespace Ssalddel.Unity.Tests.EditMode
                 if (root.name == "SimulationWorldShell") return root;
             throw new InvalidOperationException("SimulationWorldShellMissing");
         }
+
+        private static Npc물류RouteCheckpointData Checkpoint(
+            물류이동AuthoritySnapshot snapshot, int sequence)
+            => new()
+            {
+                CheckpointStableId = snapshot.RouteStableId + ":checkpoint:" + sequence,
+                RouteStableId = snapshot.RouteStableId,
+                CargoOrOrderStableId = snapshot.CargoStableId,
+                NpcStableId = snapshot.CarrierCandidateStableId,
+                VehicleStableId = snapshot.VehicleStableId,
+                Sequence = sequence,
+                ExpectedRevision = snapshot.Revision,
+            };
+
+        private static Npc물류WaypointData Waypoint(
+            string routeStableId, int sequence, string cellKey, double x)
+            => new()
+            {
+                WaypointStableId = routeStableId + ":waypoint:" + sequence,
+                Sequence = sequence,
+                L3CellKey = cellKey,
+                Position = new Npc물류PositionData { X = x },
+            };
 
         private sealed class StubApiClient : ISimulationRehearsalUnityApiClient
         {

@@ -1,7 +1,7 @@
 {
   "name": "Ssalddel.Unity.Runtime",
   "rootNamespace": "Ssalddel.Unity.Runtime",
-  "references": ["Ssalddel.Unity.Data"],
+  "references": ["Ssalddel.Unity.Data", "Ssalddel.WorkflowRules.Contracts", "Ssalddel.WorkflowRules"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

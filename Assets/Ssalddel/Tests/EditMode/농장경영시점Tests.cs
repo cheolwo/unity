@@ -33,6 +33,31 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public void 일인칭과삼인칭은_같은전환곡선을_서로반대방향으로사용한다()
+        {
+            var firstPerson = new Vector3(2f, 1.7f, -3f);
+            var thirdPerson = new Vector3(-7f, 10f, -14f);
+            const float arcHeight = 1.8f;
+            var samples = new[] { 0f, .1f, .25f, .5f, .75f, .9f, 1f };
+
+            foreach (var progress in samples)
+            {
+                var firstToThird = 카메라시점전환Math.EvaluateCurvedPosition(
+                    firstPerson, thirdPerson, progress, arcHeight);
+                var thirdToFirst = 카메라시점전환Math.EvaluateCurvedPosition(
+                    thirdPerson, firstPerson, 1f - progress, arcHeight);
+
+                Assert.That(Vector3.Distance(firstToThird, thirdToFirst),
+                    Is.LessThan(.00001f),
+                    $"왕복 전환 표본 {progress:0.00}의 위치가 다릅니다.");
+                Assert.That(
+                    카메라시점전환Math.EaseInOut(progress)
+                    + 카메라시점전환Math.EaseInOut(1f - progress),
+                    Is.EqualTo(1f).Within(.00001f));
+            }
+        }
+
+        [Test]
         public void 농장진입은_3인칭경영을기본으로하고_1인칭수동전환을허용한다()
         {
             var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);

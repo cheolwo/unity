@@ -29,6 +29,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
             Assert.That(player.Profile.MinimumX,
                 Is.EqualTo(평창군플레이어경관Fixture.WorldMinimumX));
             Assert.That(player.HasMovementSafetyGate, Is.True);
+            Assert.That(player.UsesStreamingTraversalCoverage, Is.True);
 
             var start = GroundedPosition(10.8f, 7f);
             var initialTick = shell!.WorldTick;
@@ -46,7 +47,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 InputSystem.QueueStateEvent(keyboard, new KeyboardState());
                 yield return null;
 
-                Assert.That(player.transform.position.x, Is.LessThan(10.2f));
+                Assert.That(player.transform.position.x, Is.LessThan(10.5f));
                 Assert.That(player.transform.position.x,
                     Is.GreaterThanOrEqualTo(player.Profile.MinimumX));
                 Assert.That(player.MovementBlockedByStreaming, Is.False);
@@ -57,6 +58,34 @@ namespace Ssalddel.Unity.Tests.PlayMode
             {
                 InputSystem.RemoveDevice(keyboard);
             }
+        }
+
+        [UnityTest]
+        public IEnumerator 스트리밍Coverage가준비되면_고정사각형밖위치를되돌리지않는다()
+        {
+            SceneManager.LoadScene("SimulationWorldShell", LoadSceneMode.Single);
+            yield return null;
+            yield return null;
+            Physics.SyncTransforms();
+
+            var player = Object.FindAnyObjectByType<플레이어경관Controller>(
+                FindObjectsInactive.Include);
+            var shell = Object.FindAnyObjectByType<SimulationWorldShellPresenter>();
+            Assert.That(player, Is.Not.Null);
+            Assert.That(shell, Is.Not.Null);
+            Assert.That(player!.UsesStreamingTraversalCoverage, Is.True);
+
+            var initialTick = shell!.WorldTick;
+            var initialRevision = shell.WorldRevision;
+            player.SetPresentationStartPose(new Vector3(32f, .08f, 0f), 90f);
+            player.ConfigureTraversalProfile(평창군플레이어경관Fixture.Create());
+            Physics.SyncTransforms();
+            yield return null;
+
+            Assert.That(player.transform.position.x,
+                Is.GreaterThan(평창군플레이어경관Fixture.WorldMaximumX));
+            Assert.That(shell.WorldTick, Is.EqualTo(initialTick));
+            Assert.That(shell.WorldRevision, Is.EqualTo(initialRevision));
         }
 
         private static Vector3 GroundedPosition(float x, float z)

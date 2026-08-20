@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.WorkflowRules;
+using Ssalddel.WorkflowRules.Contracts;
 
 namespace Ssalddel.Unity.Runtime.World
 {
@@ -12,6 +14,83 @@ namespace Ssalddel.Unity.Runtime.World
         public const string InTransit = "InTransit";
         public const string Arrived = "Arrived";
         public const string Failed = "Failed";
+    }
+
+    public static class Npc물류운송Codes
+    {
+        public const string Freight = "Freight";
+        public const string FoodDelivery = "FoodDelivery";
+        public const string ScenarioProcedural = "ScenarioProcedural";
+        public const string Planned = "Planned";
+        public const string AwaitingRouteCells = "AwaitingRouteCells";
+        public const string Moving = "Moving";
+        public const string PausedByStreaming = "PausedByStreaming";
+        public const string Arrived = "Arrived";
+    }
+
+    [Serializable]
+    public sealed class Npc물류PositionData
+    {
+        public double X;
+        public double Y;
+        public double Z;
+    }
+
+    [Serializable]
+    public sealed class Npc물류WaypointData
+    {
+        public string WaypointStableId = string.Empty;
+        public int Sequence;
+        public string L3CellKey = string.Empty;
+        public Npc물류PositionData Position = new();
+    }
+
+    [Serializable]
+    public sealed class Npc물류RoutePlanData
+    {
+        public string RouteStableId = string.Empty;
+        public string RouteVersion = string.Empty;
+        public string TransportKindCode = string.Empty;
+        public string EvidenceKindCode = Npc물류운송Codes.ScenarioProcedural;
+        public string CargoOrOrderStableId = string.Empty;
+        public string NpcStableId = string.Empty;
+        public string VehicleStableId = string.Empty;
+        public Npc물류WaypointData[] Waypoints = Array.Empty<Npc물류WaypointData>();
+
+        public void Validate()
+        {
+            if (string.IsNullOrWhiteSpace(RouteStableId)
+                || string.IsNullOrWhiteSpace(RouteVersion)
+                || (TransportKindCode != Npc물류운송Codes.Freight
+                    && TransportKindCode != Npc물류운송Codes.FoodDelivery)
+                || EvidenceKindCode != Npc물류운송Codes.ScenarioProcedural
+                || string.IsNullOrWhiteSpace(CargoOrOrderStableId)
+                || string.IsNullOrWhiteSpace(NpcStableId)
+                || string.IsNullOrWhiteSpace(VehicleStableId)
+                || Waypoints == null || Waypoints.Length < 2)
+                throw new InvalidOperationException("NpcLogisticsRoutePlanInvalid");
+            for (var index = 0; index < Waypoints.Length; index++)
+            {
+                var waypoint = Waypoints[index];
+                if (waypoint == null || waypoint.Sequence != index
+                    || waypoint.WaypointStableId != RouteStableId + ":waypoint:" + index
+                    || string.IsNullOrWhiteSpace(waypoint.L3CellKey)
+                    || waypoint.Position == null)
+                    throw new InvalidOperationException("NpcLogisticsWaypointInvalid:" + index);
+            }
+        }
+    }
+
+    [Serializable]
+    public sealed class Npc물류RouteCheckpointData
+    {
+        public string CheckpointStableId = string.Empty;
+        public string RouteStableId = string.Empty;
+        public string CargoOrOrderStableId = string.Empty;
+        public string NpcStableId = string.Empty;
+        public string VehicleStableId = string.Empty;
+        public int Sequence;
+        public long ExpectedRevision;
     }
 
     [Serializable]
@@ -248,6 +327,35 @@ namespace Ssalddel.Unity.Runtime.World
             }
         }
 
+        public async Task ApplyNpcRouteCheckpointAsync(
+            Npc물류RouteCheckpointData checkpoint,
+            CancellationToken cancellationToken = default)
+        {
+            if (checkpoint == null)
+                throw new ArgumentNullException(nameof(checkpoint));
+            if (PhaseCode != 물류이동PhaseCodes.Reserved
+                && PhaseCode != 물류이동PhaseCodes.InTransit)
+                throw new InvalidOperationException("NpcLogisticsActiveTransportRequired");
+            var snapshot = CurrentSnapshot;
+            var expectedSequence = snapshot.CompletedRouteTicks + 1;
+            if (checkpoint.RouteStableId != snapshot.RouteStableId
+                || checkpoint.CargoOrOrderStableId != snapshot.CargoStableId
+                || checkpoint.NpcStableId != snapshot.CarrierCandidateStableId
+                || checkpoint.VehicleStableId != snapshot.VehicleStableId
+                || checkpoint.ExpectedRevision != snapshot.Revision
+                || checkpoint.Sequence != expectedSequence
+                || checkpoint.CheckpointStableId
+                    != snapshot.RouteStableId + ":checkpoint:" + expectedSequence)
+                throw new InvalidOperationException("NpcLogisticsRouteCheckpointRejected");
+
+            var beforeRevision = snapshot.Revision;
+            var beforeProgress = snapshot.CompletedRouteTicks;
+            await AdvanceAsync(cancellationToken);
+            if (CurrentSnapshot.Revision != beforeRevision + 1
+                || CurrentSnapshot.CompletedRouteTicks != beforeProgress + 1)
+                throw new InvalidOperationException("NpcLogisticsCheckpointAuthorityMismatch");
+        }
+
         private void Apply(물류이동AuthoritySnapshot next)
         {
             if (next.SessionStableId != CurrentSnapshot.SessionStableId
@@ -428,42 +536,68 @@ namespace Ssalddel.Unity.Runtime.World
         }
 
         private static 화물배차후보평가Data[] CreateCandidateEvaluations()
-            => new[]
+        {
+            var source = 화물배차Fixture.CreateRequest();
+            var decision = 화물배차후보선정Policy.판정(new 화물배차후보선정요청
             {
-                new 화물배차후보평가Data
+                화물수량 = 300m,
+                화물단위코드 = "KGM",
+                위치유효시간분 = source.LocationFreshnessMinutes,
+                기본상차접근반경Km = source.BasePickupRadiusKm,
+                원거리상차접근최대반경Km = source.MaximumRemotePickupRadiusKm,
+                원거리상차평균속도KmH = source.RemotePickupAverageSpeedKmH,
+                원거리상차도착여유분 = source.RemotePickupArrivalBufferMinutes,
+                상차시간창남은분 = source.PickupWindowRemainingMinutes,
+                제외후보StableId = source.ExcludedCarrierCandidateStableId,
+                후보목록 = Array.ConvertAll(source.Candidates, candidate => new 화물배차후보입력
                 {
-                    CarrierCandidateStableId = "carrier-candidate:sim.waiting-truck",
-                    VehicleStableId = "vehicle:sim.truck-fresh",
-                    IsEligible = true,
-                    IsRecommended = true,
-                    Rank = 1,
-                    PickupDistanceKm = 6m,
-                    VehicleCapacity = 400m,
-                    VehicleCapacityUnitCode = "KGM",
-                    Reason = "대기 중인 지역 트럭 · 상차 6.0km · 기사대기보정 +9 · 추천점수 43",
-                    BaseScore = 34m,
-                    DriverWaitingScore = 9m,
-                    TotalScore = 43m,
-                },
-                new 화물배차후보평가Data
-                {
-                    CarrierCandidateStableId = "carrier-candidate:sim.small-van",
-                    VehicleStableId = "vehicle:sim.van-small",
-                    VehicleCapacity = 200m,
-                    VehicleCapacityUnitCode = "KGM",
-                    BlockReasonCodes = new[] { "VehicleCapacityExceeded" },
-                    Reason = "차단: VehicleCapacityExceeded",
-                },
-                new 화물배차후보평가Data
-                {
-                    CarrierCandidateStableId = "carrier-candidate:sim.stale-truck",
-                    VehicleStableId = "vehicle:sim.truck-stale",
-                    VehicleCapacity = 400m,
-                    VehicleCapacityUnitCode = "KGM",
-                    BlockReasonCodes = new[] { "CandidateLocationStale" },
-                    Reason = "차단: CandidateLocationStale",
-                },
-            };
+                    후보StableId = candidate.CarrierCandidateStableId,
+                    차량StableId = candidate.VehicleStableId,
+                    화물운송앱여부 = candidate.IsFreightApp,
+                    차량활성여부 = candidate.IsVehicleActive,
+                    기사운행중여부 = candidate.IsDriverOperating,
+                    이전거절여부 = candidate.WasPreviouslyRejected,
+                    위치경과분 = candidate.LocationAgeMinutes,
+                    상차거리Km = candidate.PickupDistanceKm,
+                    상차접근허용반경Km = candidate.PickupAllowedRadiusKm,
+                    차량용량 = candidate.VehicleCapacity,
+                    차량용량단위코드 = candidate.VehicleCapacityUnitCode,
+                    차량적합여부 = candidate.IsVehicleCompatible,
+                    차량부적합사유코드목록 = candidate.VehicleBlockReasonCodes,
+                    기사대기분 = candidate.DriverWaitingMinutes,
+                    기본추천사유 = candidate.BaseReason,
+                    추천점수요청 = new 화물배차추천점수요청
+                    {
+                        전체일정완수가능여부 = candidate.CanCompleteSchedule,
+                        일정삽입가능여부 = candidate.CanInsertSchedule,
+                        경로변경이점여부 = candidate.HasRouteChangeBenefit,
+                        예상추가순이익 = candidate.EstimatedExtraProfit,
+                        추가지연분 = candidate.AdditionalDelayMinutes,
+                        경로기준거리Km = candidate.PickupDistanceKm,
+                        추천유형 = candidate.RecommendationTypeCode,
+                        화물민감여부 = candidate.IsCargoSensitive,
+                        복귀우회증가거리Km = candidate.ReturnDetourDistanceKm,
+                        복귀지기준사용여부 = candidate.UsesReturnDestination,
+                    },
+                }),
+            });
+            return Array.ConvertAll(decision.후보평가목록, value => new 화물배차후보평가Data
+            {
+                CarrierCandidateStableId = value.후보StableId,
+                VehicleStableId = value.차량StableId,
+                IsEligible = value.적격여부,
+                IsRecommended = value.후보StableId == decision.추천후보StableId,
+                Rank = value.추천순위,
+                PickupDistanceKm = value.상차거리Km,
+                VehicleCapacity = value.차량용량,
+                VehicleCapacityUnitCode = value.차량용량단위코드,
+                Reason = value.추천사유,
+                BlockReasonCodes = value.차단사유코드목록,
+                BaseScore = value.기본추천점수,
+                DriverWaitingScore = value.기사대기보정점수,
+                TotalScore = value.총추천점수,
+            });
+        }
 
         public Task<물류이동AuthoritySnapshot> AdvanceAsync(
             string sessionStableId,

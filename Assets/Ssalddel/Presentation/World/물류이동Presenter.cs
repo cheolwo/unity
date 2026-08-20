@@ -24,11 +24,13 @@ namespace Ssalddel.Unity.Presentation.World
         private 물류이동Coordinator coordinator = null!;
         private bool busy;
         private bool listenersBound;
+        private string npcRouteStateCode = Npc물류운송Codes.Planned;
 
         public 물류이동AuthoritySnapshot? CurrentAuthoritySnapshot
             => coordinator == null ? null : coordinator.CurrentSnapshot;
         public string CurrentPhaseCode
             => coordinator == null ? string.Empty : coordinator.PhaseCode;
+        public string NpcRouteStateCode => npcRouteStateCode;
 
         private void Awake()
         {
@@ -100,13 +102,44 @@ namespace Ssalddel.Unity.Presentation.World
             });
         }
 
+        public async Task ApplyNpcRouteCheckpointAsync(Npc물류RouteCheckpointData checkpoint)
+        {
+            await Run(async () =>
+            {
+                await coordinator.ApplyNpcRouteCheckpointAsync(checkpoint);
+                npcRouteStateCode = coordinator.PhaseCode == 물류이동PhaseCodes.Arrived
+                    ? Npc물류운송Codes.Arrived
+                    : Npc물류운송Codes.Moving;
+                shellPresenter.ApplyAuthoritativeSnapshot(
+                    coordinator.CurrentSnapshot.Settlement.ToWorldShellSnapshot());
+            });
+        }
+
+        public void SetNpcRoutePresentationState(string stateCode)
+        {
+            npcRouteStateCode = stateCode ?? string.Empty;
+            ApplyPresentation();
+        }
+
         public async Task RunGoldenPathAsync()
         {
             await PreviewAsync();
             await ConfirmAsync();
-            await AdvanceAsync();
-            await AdvanceAsync();
-            await AdvanceAsync();
+            while (coordinator.PhaseCode != 물류이동PhaseCodes.Arrived)
+            {
+                var snapshot = coordinator.CurrentSnapshot;
+                var sequence = snapshot.CompletedRouteTicks + 1;
+                await ApplyNpcRouteCheckpointAsync(new Npc물류RouteCheckpointData
+                {
+                    CheckpointStableId = snapshot.RouteStableId + ":checkpoint:" + sequence,
+                    RouteStableId = snapshot.RouteStableId,
+                    CargoOrOrderStableId = snapshot.CargoStableId,
+                    NpcStableId = snapshot.CarrierCandidateStableId,
+                    VehicleStableId = snapshot.VehicleStableId,
+                    Sequence = sequence,
+                    ExpectedRevision = snapshot.Revision,
+                });
+            }
         }
 
         public void ValidateWiring()
@@ -131,7 +164,6 @@ namespace Ssalddel.Unity.Presentation.World
             if (listenersBound) return;
             previewButton.onClick.AddListener(() => _ = PreviewAsync());
             confirmButton.onClick.AddListener(() => _ = ConfirmAsync());
-            tickButton.onClick.AddListener(() => _ = AdvanceAsync());
             listenersBound = true;
         }
 
@@ -150,14 +182,12 @@ namespace Ssalddel.Unity.Presentation.World
             detailText.text = BuildDetail(snapshot);
             SetButtonLabel(previewButton, "배차 미리보기");
             SetButtonLabel(confirmButton, "추천 기사 확정");
-            SetButtonLabel(tickButton, "하루 진행 +1");
+            SetButtonLabel(tickButton, "NPC 자동 운행");
             previewButton.interactable = !busy
                 && coordinator.PhaseCode == 물류이동PhaseCodes.CargoSelected;
             confirmButton.interactable = !busy
                 && coordinator.PhaseCode == 물류이동PhaseCodes.PreviewReady;
-            tickButton.interactable = !busy
-                && (coordinator.PhaseCode == 물류이동PhaseCodes.Reserved
-                    || coordinator.PhaseCode == 물류이동PhaseCodes.InTransit);
+            tickButton.interactable = false;
         }
 
         private string BuildDetail(물류이동AuthoritySnapshot snapshot)
@@ -194,11 +224,12 @@ namespace Ssalddel.Unity.Presentation.World
                 + " · " + snapshot.VehicleStableId
                 + "\n상태  " + snapshot.DispatchStateCode
                 + "\n운송  " + snapshot.CompletedRouteTicks + " / " + snapshot.RequiredRouteTicks
-                + "일 · " + snapshot.MovementStateCode
+                + "구간 · " + snapshot.MovementStateCode
+                + "\nNPC 경로  " + NpcRouteLabel(npcRouteStateCode)
                 + "\n출발지 재고  " + Number(snapshot.SourceAvailableQuantity) + "kg"
                 + " · 예약 " + Number(snapshot.ReservedQuantity) + "kg"
                 + "\n도착 후보  " + preview.DestinationStockCandidateStableId
-                + "\n\n차량 애니메이션은 표현이며 도착은 WorldTick 작업이 확정합니다.";
+                + "\n\nNPC가 경로 체크포인트를 순서대로 통과할 때만 로컬 권위가 진행됩니다.";
         }
 
         private static string PhaseLabel(string phase) => phase switch
@@ -219,6 +250,16 @@ namespace Ssalddel.Unity.Presentation.World
                 "carrier-candidate:sim.waiting-truck" => "대기 중인 지역 트럭 기사",
                 _ => stableId,
             };
+
+        private static string NpcRouteLabel(string stateCode) => stateCode switch
+        {
+            Npc물류운송Codes.Planned => "배차 계획됨",
+            Npc물류운송Codes.AwaitingRouteCells => "경로 준비 대기",
+            Npc물류운송Codes.Moving => "경로 이동 중",
+            Npc물류운송Codes.PausedByStreaming => "다음 공간 생성 대기",
+            Npc물류운송Codes.Arrived => "목적지 도착",
+            _ => stateCode,
+        };
 
         private static string BlockLabel(string[] codes)
             => string.Join(", ", codes.Select(value => value switch

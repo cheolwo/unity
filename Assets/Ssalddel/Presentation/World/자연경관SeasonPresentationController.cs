@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -15,6 +16,10 @@ namespace Ssalddel.Unity.Presentation.World
             Array.Empty<자연경관SeasonFxBinding>();
         [SerializeField] private string activeSeasonCode = 자연경관SeasonCodes.Spring;
         [SerializeField] private bool presentationOnly = true;
+
+        private readonly Dictionary<Renderer, Material[]> originalSharedMaterials = new();
+        private readonly Dictionary<string, Material> sharedSeasonVariants =
+            new(StringComparer.Ordinal);
 
         public string ActiveSeasonCode => activeSeasonCode;
         public bool PresentationOnly => presentationOnly;
@@ -60,27 +65,54 @@ namespace Ssalddel.Unity.Presentation.World
         private void ApplyFoliageTint(Color tint)
         {
             if (compositionRoot == null) return;
-            var block = new MaterialPropertyBlock();
             foreach (var view in compositionRoot
                          .GetComponentsInChildren<자연경관CompositionSetView>(true))
             foreach (var renderer in view.GetComponentsInChildren<Renderer>(true))
             {
-                var materials = renderer.sharedMaterials;
+                if (!originalSharedMaterials.TryGetValue(renderer, out var originals))
+                {
+                    originals = renderer.sharedMaterials.ToArray();
+                    originalSharedMaterials.Add(renderer, originals);
+                }
+                var materials = originals.ToArray();
                 for (var index = 0; index < materials.Length; index++)
                 {
-                    var material = materials[index];
-                    if (material == null || !IsFoliage(material.name)) continue;
-                    block.Clear();
-                    if (material.HasProperty(BaseColor))
-                        block.SetColor(BaseColor,
-                            Multiply(material.GetColor(BaseColor), tint));
-                    else if (material.HasProperty(ColorProperty))
-                        block.SetColor(ColorProperty,
-                            Multiply(material.GetColor(ColorProperty), tint));
-                    else continue;
-                    renderer.SetPropertyBlock(block, index);
+                    var source = originals[index];
+                    if (source == null || !IsFoliage(source.name)) continue;
+                    materials[index] = ResolveSharedSeasonVariant(source, tint);
                 }
+                renderer.sharedMaterials = materials;
             }
+        }
+
+        private Material ResolveSharedSeasonVariant(Material source, Color tint)
+        {
+            var key = source.GetEntityId() + ":" + activeSeasonCode;
+            if (sharedSeasonVariants.TryGetValue(key, out var existing)) return existing;
+            var variant = new Material(source)
+            {
+                name = source.name + " [Season " + activeSeasonCode + "]",
+            };
+            if (variant.HasProperty(BaseColor))
+                variant.SetColor(BaseColor, Multiply(source.GetColor(BaseColor), tint));
+            else if (variant.HasProperty(ColorProperty))
+                variant.SetColor(ColorProperty, Multiply(source.GetColor(ColorProperty), tint));
+            sharedSeasonVariants.Add(key, variant);
+            return variant;
+        }
+
+        private void OnDestroy()
+        {
+            foreach (var pair in originalSharedMaterials)
+                if (pair.Key != null) pair.Key.sharedMaterials = pair.Value;
+            foreach (var material in sharedSeasonVariants.Values)
+            {
+                if (material == null) continue;
+                if (UnityEngine.Application.isPlaying) Destroy(material);
+                else DestroyImmediate(material);
+            }
+            originalSharedMaterials.Clear();
+            sharedSeasonVariants.Clear();
         }
 
         private static bool IsFoliage(string materialName)

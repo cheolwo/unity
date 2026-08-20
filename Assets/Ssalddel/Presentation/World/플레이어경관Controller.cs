@@ -23,9 +23,19 @@ namespace Ssalddel.Unity.Presentation.World
         public static Vector3 EvaluateCurvedPosition(
             Vector3 start, Vector3 end, float progress, float arcHeight)
         {
-            var value = Mathf.Clamp01(progress);
-            var control = Vector3.Lerp(start, end, .5f)
+            var control = CreateSharedControlPoint(start, end, arcHeight);
+            return EvaluateQuadraticPosition(start, control, end, progress);
+        }
+
+        public static Vector3 CreateSharedControlPoint(
+            Vector3 firstEndpoint, Vector3 secondEndpoint, float arcHeight)
+            => Vector3.Lerp(firstEndpoint, secondEndpoint, .5f)
                 + Vector3.up * Mathf.Max(0f, arcHeight);
+
+        public static Vector3 EvaluateQuadraticPosition(
+            Vector3 start, Vector3 control, Vector3 end, float progress)
+        {
+            var value = Mathf.Clamp01(progress);
             var inverse = 1f - value;
             return inverse * inverse * start
                 + 2f * inverse * value * control
@@ -81,6 +91,9 @@ namespace Ssalddel.Unity.Presentation.World
         private Vector3 _viewTransitionStartPosition;
         private Quaternion _viewTransitionStartRotation;
         private float _viewTransitionStartFieldOfView;
+        private Vector3 _viewTransitionEndPosition;
+        private Quaternion _viewTransitionEndRotation;
+        private float _viewTransitionEndFieldOfView;
         private Vector3 _viewTransitionControlPoint;
         private float _viewTransitionElapsed;
         private bool _viewTransitionTargetShowsVisual;
@@ -102,6 +115,8 @@ namespace Ssalddel.Unity.Presentation.World
             ? string.Empty : animationAdapter.CurrentIntentCode;
         public bool MovementBlockedByStreaming { get; private set; }
         public bool HasMovementSafetyGate => movementGate != null;
+        public bool UsesStreamingTraversalCoverage
+            => movementGate != null && movementGate.UsesStreamingCoverage;
         public string CurrentActivityCode => _currentActivityCode;
         public PlayerActivityViewDecision CurrentViewDecision
             => _currentViewDecision ?? _activityViewPolicies.Resolve(
@@ -213,10 +228,7 @@ namespace Ssalddel.Unity.Presentation.World
                 profile.TacticalMinimumDistance,
                 profile.TacticalMaximumDistance);
             ClampToTraversalBounds();
-            _tacticalFocus = new Vector3(
-                Mathf.Clamp(_tacticalFocus.x, profile.MinimumX, profile.MaximumX),
-                _tacticalFocus.y,
-                Mathf.Clamp(_tacticalFocus.z, profile.MinimumZ, profile.MaximumZ));
+            _tacticalFocus = ClampTacticalFocus(_tacticalFocus);
         }
 
         /// <summary>
@@ -359,10 +371,7 @@ namespace Ssalddel.Unity.Presentation.World
             var direction = forward * panInput.y + right * panInput.x;
             if (direction.sqrMagnitude > 1f) direction.Normalize();
             _tacticalFocus += direction * (profile.TacticalPanSpeed * deltaTime);
-            _tacticalFocus.x = Mathf.Clamp(
-                _tacticalFocus.x, profile.MinimumX, profile.MaximumX);
-            _tacticalFocus.z = Mathf.Clamp(
-                _tacticalFocus.z, profile.MinimumZ, profile.MaximumZ);
+            _tacticalFocus = ClampTacticalFocus(_tacticalFocus);
             _tacticalDistance = Mathf.Clamp(
                 _tacticalDistance - scrollInput * .01f * profile.TacticalZoomSpeed,
                 profile.TacticalMinimumDistance,
@@ -372,10 +381,7 @@ namespace Ssalddel.Unity.Presentation.World
         public void FocusTacticalCameraOnPlayer()
         {
             _tacticalFocus = transform.position;
-            _tacticalFocus.x = Mathf.Clamp(
-                _tacticalFocus.x, profile.MinimumX, profile.MaximumX);
-            _tacticalFocus.z = Mathf.Clamp(
-                _tacticalFocus.z, profile.MinimumZ, profile.MaximumZ);
+            _tacticalFocus = ClampTacticalFocus(_tacticalFocus);
         }
 
         public void TickPresentation(
@@ -418,10 +424,12 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void SetThirdPersonDestination(Vector3 destination)
         {
-            _destination = new Vector3(
-                Mathf.Clamp(destination.x, profile.MinimumX, profile.MaximumX),
-                destination.y,
-                Mathf.Clamp(destination.z, profile.MinimumZ, profile.MaximumZ));
+            _destination = UsesStreamingTraversalCoverage
+                ? destination
+                : new Vector3(
+                    Mathf.Clamp(destination.x, profile.MinimumX, profile.MaximumX),
+                    destination.y,
+                    Mathf.Clamp(destination.z, profile.MinimumZ, profile.MaximumZ));
             _hasDestination = true;
             destinationMarker.transform.position = _destination + Vector3.up * .08f;
             destinationMarker.SetActive(true);
@@ -469,10 +477,26 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void ClampToTraversalBounds()
         {
+            if (UsesStreamingTraversalCoverage) return;
             var position = transform.position;
             position.x = Mathf.Clamp(position.x, profile.MinimumX, profile.MaximumX);
             position.z = Mathf.Clamp(position.z, profile.MinimumZ, profile.MaximumZ);
             transform.position = position;
+        }
+
+        private Vector3 ClampTacticalFocus(Vector3 value)
+        {
+            if (movementGate != null
+                && movementGate.TryGetTrackedWorldBounds(out var trackedBounds))
+            {
+                value.x = Mathf.Clamp(value.x, trackedBounds.min.x, trackedBounds.max.x);
+                value.z = Mathf.Clamp(value.z, trackedBounds.min.z, trackedBounds.max.z);
+                return value;
+            }
+
+            value.x = Mathf.Clamp(value.x, profile.MinimumX, profile.MaximumX);
+            value.z = Mathf.Clamp(value.z, profile.MinimumZ, profile.MaximumZ);
+            return value;
         }
 
         private void LateUpdate()
@@ -553,6 +577,7 @@ namespace Ssalddel.Unity.Presentation.World
         private void EnterFirstPersonModeCore()
         {
             if (!ValidateWiring()) return;
+            var sourcePose = CaptureActiveCameraPose();
             _currentMode = 플레이어시점Mode.FirstPerson;
             _yaw = visualRoot.eulerAngles.y;
             _pitch = profile.InitialPitch;
@@ -560,7 +585,7 @@ namespace Ssalddel.Unity.Presentation.World
             ApplySelectionState(false);
             ClearDestination();
             if (farmManagement != null) farmManagement.SetActive(false);
-            BeginCameraTransition(firstPersonCamera, false, false);
+            BeginCameraTransition(firstPersonCamera, false, false, sourcePose);
         }
 
         public void EnterThirdPersonMode()
@@ -577,6 +602,7 @@ namespace Ssalddel.Unity.Presentation.World
         private void EnterThirdPersonModeCore()
         {
             if (!ValidateWiring()) return;
+            var sourcePose = CaptureActiveCameraPose();
             _currentMode = 플레이어시점Mode.ThirdPerson;
             _yaw = profile.TacticalYaw;
             _pitch = profile.TacticalPitch;
@@ -590,7 +616,8 @@ namespace Ssalddel.Unity.Presentation.World
                 true,
                 string.Equals(_currentActivityCode,
                     PlayerActivityCodes.FarmManagement,
-                    System.StringComparison.Ordinal));
+                    System.StringComparison.Ordinal),
+                sourcePose);
         }
 
         public void ExitPlayerMode()
@@ -638,14 +665,16 @@ namespace Ssalddel.Unity.Presentation.World
             var progress = Mathf.Clamp01(
                 _viewTransitionElapsed / Mathf.Max(.1f, viewTransitionDuration));
             var eased = 카메라시점전환Math.EaseInOut(progress);
-            var targetPosition = _viewTransitionTarget.transform.position;
-            var targetRotation = _viewTransitionTarget.transform.rotation;
-            var targetFieldOfView = _viewTransitionTarget.fieldOfView;
             _viewTransitionCamera.transform.SetPositionAndRotation(
-                EvaluateTransitionPosition(targetPosition, eased),
-                Quaternion.Slerp(_viewTransitionStartRotation, targetRotation, eased));
+                EvaluateTransitionPosition(eased),
+                Quaternion.Slerp(
+                    _viewTransitionStartRotation,
+                    _viewTransitionEndRotation,
+                    eased));
             _viewTransitionCamera.fieldOfView = Mathf.Lerp(
-                _viewTransitionStartFieldOfView, targetFieldOfView, eased);
+                _viewTransitionStartFieldOfView,
+                _viewTransitionEndFieldOfView,
+                eased);
 
             var visualSwitchProgress = _viewTransitionTargetShowsVisual ? .32f : .72f;
             if (!_viewTransitionVisualSwitched && progress >= visualSwitchProgress)
@@ -656,16 +685,18 @@ namespace Ssalddel.Unity.Presentation.World
             if (progress >= 1f) CompleteCameraTransition();
         }
 
-        private Vector3 EvaluateTransitionPosition(Vector3 targetPosition, float easedProgress)
-        {
-            var inverse = 1f - easedProgress;
-            return inverse * inverse * _viewTransitionStartPosition
-                + 2f * inverse * easedProgress * _viewTransitionControlPoint
-                + easedProgress * easedProgress * targetPosition;
-        }
+        private Vector3 EvaluateTransitionPosition(float easedProgress)
+            => 카메라시점전환Math.EvaluateQuadraticPosition(
+                _viewTransitionStartPosition,
+                _viewTransitionControlPoint,
+                _viewTransitionEndPosition,
+                easedProgress);
 
         private void BeginCameraTransition(
-            Camera target, bool showVisual, bool enableFarmManagement)
+            Camera target,
+            bool showVisual,
+            bool enableFarmManagement,
+            CameraTransitionPose? sourcePose = null)
         {
             var source = FindActiveCamera();
             if (!UnityEngine.Application.isPlaying || source == null || source == target)
@@ -683,15 +714,22 @@ namespace Ssalddel.Unity.Presentation.World
 
             var transition = EnsureViewTransitionCamera();
             if (source != transition) transition.CopyFrom(source);
+            var startPose = sourcePose ?? CameraTransitionPose.Capture(source);
+            var endPose = CameraTransitionPose.Capture(target);
             transition.transform.SetPositionAndRotation(
-                source.transform.position, source.transform.rotation);
-            transition.fieldOfView = source.fieldOfView;
-            _viewTransitionStartPosition = transition.transform.position;
-            _viewTransitionStartRotation = transition.transform.rotation;
-            _viewTransitionStartFieldOfView = transition.fieldOfView;
-            _viewTransitionControlPoint = Vector3.Lerp(
-                    _viewTransitionStartPosition, target.transform.position, .5f)
-                + Vector3.up * viewTransitionArcHeight;
+                startPose.Position, startPose.Rotation);
+            transition.fieldOfView = startPose.FieldOfView;
+            _viewTransitionStartPosition = startPose.Position;
+            _viewTransitionStartRotation = startPose.Rotation;
+            _viewTransitionStartFieldOfView = startPose.FieldOfView;
+            _viewTransitionEndPosition = endPose.Position;
+            _viewTransitionEndRotation = endPose.Rotation;
+            _viewTransitionEndFieldOfView = endPose.FieldOfView;
+            _viewTransitionControlPoint =
+                카메라시점전환Math.CreateSharedControlPoint(
+                    _viewTransitionStartPosition,
+                    _viewTransitionEndPosition,
+                    viewTransitionArcHeight);
             _viewTransitionTarget = target;
             _viewTransitionElapsed = 0f;
             _viewTransitionTargetShowsVisual = showVisual;
@@ -701,6 +739,35 @@ namespace Ssalddel.Unity.Presentation.World
             if (farmManagement != null) farmManagement.SetActive(false);
             DisableAllCamerasExcept(transition);
             transition.enabled = true;
+        }
+
+        private CameraTransitionPose? CaptureActiveCameraPose()
+        {
+            var activeCamera = FindActiveCamera();
+            return activeCamera == null
+                ? null
+                : CameraTransitionPose.Capture(activeCamera);
+        }
+
+        private readonly struct CameraTransitionPose
+        {
+            public CameraTransitionPose(
+                Vector3 position, Quaternion rotation, float fieldOfView)
+            {
+                Position = position;
+                Rotation = rotation;
+                FieldOfView = fieldOfView;
+            }
+
+            public Vector3 Position { get; }
+            public Quaternion Rotation { get; }
+            public float FieldOfView { get; }
+
+            public static CameraTransitionPose Capture(Camera camera)
+                => new(
+                    camera.transform.position,
+                    camera.transform.rotation,
+                    camera.fieldOfView);
         }
 
         private Camera EnsureViewTransitionCamera()

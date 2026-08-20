@@ -33,6 +33,7 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private int originTileY = 공간TileStreamingCodes.CenterY;
         [SerializeField] private bool presentationOnly = true;
         [SerializeField] private 공간문법CompositionCatalog landscapeCompositionCatalog = null!;
+        [SerializeField] private 공간문법SyntyBindingCatalog landscapeSyntyBindingCatalog = null!;
 
         private readonly Dictionary<string, TileSlot> slots =
             new Dictionary<string, TileSlot>(StringComparer.Ordinal);
@@ -119,9 +120,22 @@ namespace Ssalddel.Unity.Presentation.World
         public void ConfigureLandscapeAssembly(공간문법CompositionCatalog catalog)
         {
             landscapeCompositionCatalog = catalog;
+            landscapeSyntyBindingCatalog = null!;
             landscapeAssembler = catalog == null
                 ? null
                 : new 공간문법LandscapeRuntimeAssembler(catalog, tileWorldSize);
+        }
+
+        public void ConfigureLandscapeAssembly(
+            공간문법CompositionCatalog catalog,
+            공간문법SyntyBindingCatalog bindingCatalog)
+        {
+            landscapeCompositionCatalog = catalog;
+            landscapeSyntyBindingCatalog = bindingCatalog;
+            landscapeAssembler = catalog == null || bindingCatalog == null
+                ? null
+                : new 공간문법LandscapeRuntimeAssembler(
+                    catalog, bindingCatalog, tileWorldSize);
         }
 
         public async Task InitializeAsync(I공간TileStreamRepository streamRepository)
@@ -135,8 +149,13 @@ namespace Ssalddel.Unity.Presentation.World
             landscapeRepository = streamRepository as I공간TileLandscapeCompositionRepository;
             landscapeAssembler = landscapeCompositionCatalog == null
                 ? null
-                : new 공간문법LandscapeRuntimeAssembler(
-                    landscapeCompositionCatalog, tileWorldSize);
+                : landscapeSyntyBindingCatalog == null
+                    ? new 공간문법LandscapeRuntimeAssembler(
+                        landscapeCompositionCatalog, tileWorldSize)
+                    : new 공간문법LandscapeRuntimeAssembler(
+                        landscapeCompositionCatalog,
+                        landscapeSyntyBindingCatalog,
+                        tileWorldSize);
             recipe = await repository.LoadRecipeAsync(
                 공간TileStreamingCodes.RecipeStableId, lifetime.Token);
             recipe.Validate();
@@ -277,6 +296,41 @@ namespace Ssalddel.Unity.Presentation.World
         }
 
         public bool IsTracked(string tileKey) => slots.ContainsKey(tileKey);
+
+        /// <summary>
+        /// 현재 준비·활성·선행 적재 창이 덮는 Unity 로컬 X/Z 범위를 반환합니다.
+        /// 고정 World 사각형 대신 스트리밍 Coverage를 카메라·이동 보조 경계로 사용할 때 쓴다.
+        /// </summary>
+        public bool TryGetTrackedWorldBounds(out Bounds bounds)
+        {
+            bounds = default;
+            if (!IsInitialized || slots.Count == 0) return false;
+
+            var minimumX = float.PositiveInfinity;
+            var maximumX = float.NegativeInfinity;
+            var minimumZ = float.PositiveInfinity;
+            var maximumZ = float.NegativeInfinity;
+            var half = tileWorldSize * .5f;
+            foreach (var key in slots.Keys)
+            {
+                var center = WorldPositionForTile(key);
+                minimumX = Mathf.Min(minimumX, center.x - half);
+                maximumX = Mathf.Max(maximumX, center.x + half);
+                minimumZ = Mathf.Min(minimumZ, center.z - half);
+                maximumZ = Mathf.Max(maximumZ, center.z + half);
+            }
+
+            bounds = new Bounds(
+                new Vector3(
+                    (minimumX + maximumX) * .5f,
+                    centerTileWorldPosition.y,
+                    (minimumZ + maximumZ) * .5f),
+                new Vector3(
+                    maximumX - minimumX,
+                    0f,
+                    maximumZ - minimumZ));
+            return true;
+        }
 
         public bool IsSafeBaseReady(string tileKey)
             => slots.TryGetValue(tileKey, out var slot)

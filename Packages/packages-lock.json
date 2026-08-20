@@ -1,7 +1,29 @@
 {
   "dependencies": {
+    "com.ssalddel.code-metadata": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.CodeMetadata",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.ssalddel.simulation.data": {
       "version": "file:../../source/repos/Hongdal/Ssalddel.Unity",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.code-metadata": "0.1.0"
+      }
+    },
+    "com.ssalddel.workflow-rules": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.WorkflowRules/UnityPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.workflow-rules.contracts": "0.1.0"
+      }
+    },
+    "com.ssalddel.workflow-rules.contracts": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.WorkflowRules.Contracts/UnityPackage",
       "depth": 0,
       "source": "local",
       "dependencies": {}

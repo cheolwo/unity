@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "com.ssalddel.code-metadata": "file:../../source/repos/Hongdal/Ssalddel.CodeMetadata",
     "com.ssalddel.simulation.data": "file:../../source/repos/Hongdal/Ssalddel.Unity",
+    "com.ssalddel.workflow-rules.contracts": "file:../../source/repos/Hongdal/Ssalddel.WorkflowRules.Contracts/UnityPackage",
+    "com.ssalddel.workflow-rules": "file:../../source/repos/Hongdal/Ssalddel.WorkflowRules/UnityPackage",
     "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.18.0",
     "com.unity.ai.assistant": "2.17.0-pre.1",
     "com.unity.ai.inference": "2.6.1",

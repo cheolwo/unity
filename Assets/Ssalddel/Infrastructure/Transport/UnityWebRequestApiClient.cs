@@ -45,7 +45,9 @@ namespace Ssalddel.Unity.Infrastructure.Transport
             {
                 downloadHandler = new DownloadHandlerBuffer(),
             };
-            webRequest.SetRequestHeader("Accept", "application/json");
+            webRequest.SetRequestHeader("Accept", request.ExpectsBinaryResponse
+                ? "application/octet-stream"
+                : "application/json");
 
             if (!string.IsNullOrWhiteSpace(request.JsonBody))
             {
@@ -76,6 +78,7 @@ namespace Ssalddel.Unity.Infrastructure.Transport
             {
                 StatusCode = webRequest.responseCode,
                 Body = webRequest.downloadHandler?.text ?? string.Empty,
+                BodyBytes = webRequest.downloadHandler?.data ?? Array.Empty<byte>(),
                 ErrorCode = webRequest.result == UnityWebRequest.Result.Success
                     ? string.Empty
                     : webRequest.result.ToString(),

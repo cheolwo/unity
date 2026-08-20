@@ -304,6 +304,10 @@ namespace Ssalddel.Unity.Tests.EditMode
                 var gate = root.AddComponent<공간안전이동Gate>();
                 gate.Configure(tileController, ~0, true);
 
+                Assert.That(gate.UsesStreamingCoverage, Is.True);
+                Assert.That(gate.TryGetTrackedWorldBounds(out var trackedBounds), Is.True);
+                Assert.That(trackedBounds.size.x, Is.EqualTo(216f).Within(.001f));
+                Assert.That(trackedBounds.size.z, Is.EqualTo(216f).Within(.001f));
                 Assert.That(gate.CanEnter(Vector3.zero), Is.True);
                 Assert.That(gate.LastProbeHadGround, Is.True);
                 Assert.That(gate.CanEnter(new Vector3(1000f, 0f, 1000f)), Is.False);
