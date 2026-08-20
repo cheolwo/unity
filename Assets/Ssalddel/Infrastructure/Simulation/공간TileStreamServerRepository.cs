@@ -11,6 +11,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         I공간TileLandscapeCompositionRepository,
         I공간AreaSetLandscapeGraphRepository,
         I실제E5AreaSetNetworkRepository,
+        IH5세계배치Repository,
         I공간LHWorldRepository
     {
         private const string BaseRoute = "api/simulation/v1/world-stream/";
@@ -123,6 +124,27 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             value.Validate();
             return value;
         }
+
+        public async Task<H5세계배치DefinitionData> LoadWorldLayoutAsync(
+            string worldLayoutStableId, CancellationToken cancellationToken)
+        {
+            var value = await GetAsync<H5세계배치DefinitionData>(
+                "world-layouts/" + Uri.EscapeDataString(worldLayoutStableId), cancellationToken);
+            value.Validate();
+            return value;
+        }
+
+        public async Task<H5현실결속BindingData> LoadGroundingBindingAsync(
+            string worldLayoutStableId, CancellationToken cancellationToken)
+            => await GetAsync<H5현실결속BindingData>(
+                "world-layouts/" + Uri.EscapeDataString(worldLayoutStableId)
+                + "/grounding-binding", cancellationToken);
+
+        public async Task<H5현실결속준비도Data> LoadGroundingReadinessAsync(
+            string worldLayoutStableId, CancellationToken cancellationToken)
+            => await GetAsync<H5현실결속준비도Data>(
+                "world-layouts/" + Uri.EscapeDataString(worldLayoutStableId)
+                + "/grounding-readiness", cancellationToken);
 
         public async Task<공간TileArtifactPayloadData> LoadArtifactContentAsync(
             string tileKey,

@@ -15,6 +15,8 @@ namespace Ssalddel.Unity.Runtime.World
         public const string GeneratorVersion = "lh-generator.pyeongchang.v1";
         public const string WorldSeed = "pyeongchang-daegwallyeong-farm-2026";
         public const string LocalEngine = "LocalLhEngine";
+        public const string ScenarioProcedural = "ScenarioProcedural";
+        public const string AuthoritativeWorld = "AuthoritativeWorld";
         public const string AreaSetStableId = "area-set:sim:pyeongchang:farm-hub-town.v1";
         public const string RecipeStableId = 공간TileStreamingCodes.RecipeStableId;
         public const string Detail = "Detail";
@@ -68,6 +70,14 @@ namespace Ssalddel.Unity.Runtime.World
 
         public void Validate()
         {
+            if (Levels != null)
+            {
+                foreach (var level in Levels)
+                {
+                    if (string.IsNullOrWhiteSpace(level.PrimaryHQueryLevelCode))
+                        level.PrimaryHQueryLevelCode = level.DefaultHLevelCode;
+                }
+            }
             if (SchemaVersion != 공간LHWorldCodes.SchemaVersion
                 || ProfileHashSha256 == null || ProfileHashSha256.Length != 64
                 || string.IsNullOrWhiteSpace(WorldSeed)
@@ -75,11 +85,12 @@ namespace Ssalddel.Unity.Runtime.World
                 || AreaSetStableId != 공간LHWorldCodes.AreaSetStableId
                 || AreaSetBoundaryHashSha256 == null || AreaSetBoundaryHashSha256.Length != 64
                 || Levels == null || Levels.Length != 4
-                || Levels.Single(value => value.LevelCode == "L0").DefaultHLevelCode != "H4"
-                || Levels.Single(value => value.LevelCode == "L1").DefaultHLevelCode != "H3"
-                || Levels.Single(value => value.LevelCode == "L2").DefaultHLevelCode != "H2"
-                || Levels.Single(value => value.LevelCode == "L3").DefaultHLevelCode != "H1"
+                || Levels.Select(value => value.LevelCode).Distinct().Count() != 4
+                || Levels.Single(value => value.LevelCode == "L0").CellSizeMeters != 8000
+                || Levels.Single(value => value.LevelCode == "L1").CellSizeMeters != 2000
+                || Levels.Single(value => value.LevelCode == "L2").CellSizeMeters != 500
                 || L3CellSize != 공간LHWorldCodes.L3CellSizeMeters
+                || Levels.Any(value => !IsHLevelCode(value.PrimaryHQueryLevelCode))
                 || DetailRadius != 1 || ActiveRadius != 2 || PrefetchRadius != 4
                 || MaxConcurrentPreparations != 4
                 || Math.Abs(BoundaryPrefetchFraction - .25d) > .000001d
@@ -89,6 +100,9 @@ namespace Ssalddel.Unity.Runtime.World
                 || !PresentationOnly || IsOperationalState)
                 throw new InvalidOperationException("LHWorldProfileInvalid");
         }
+
+        private static bool IsHLevelCode(string value)
+            => value == "H1" || value == "H2" || value == "H3" || value == "H4";
     }
 
     [Serializable]
@@ -96,7 +110,9 @@ namespace Ssalddel.Unity.Runtime.World
     {
         public string LevelCode = string.Empty;
         public int CellSizeMeters;
+        // 기존 JSON 호환용 필드이며 L과 H가 같은 계층이라는 뜻은 아니다.
         public string DefaultHLevelCode = string.Empty;
+        public string PrimaryHQueryLevelCode = string.Empty;
     }
 
     [Serializable]
@@ -128,6 +144,7 @@ namespace Ssalddel.Unity.Runtime.World
         public string RequestEpoch = string.Empty;
         public string RecipeStableId = string.Empty;
         public string AreaSetStableId = string.Empty;
+        public string ContentSourceCode = 공간LHWorldCodes.ScenarioProcedural;
         public int WorldTick;
         public long WorldRevision;
         public 공간LHSeasonData Season = new();
@@ -144,11 +161,18 @@ namespace Ssalddel.Unity.Runtime.World
             if (RequestEpoch != expectedEpoch
                 || RecipeStableId != 공간LHWorldCodes.RecipeStableId
                 || AreaSetStableId != 공간LHWorldCodes.AreaSetStableId
+                || (ContentSourceCode != 공간LHWorldCodes.ScenarioProcedural
+                    && ContentSourceCode != 공간LHWorldCodes.AuthoritativeWorld)
                 || Season == null || Cells == null || OutsideCoverageCellKeys == null
                 || !IsCandidateOnly || !DoesNotApplyResourceLedgers || IsOperationalState)
                 throw new InvalidOperationException("LHWorldCellPreviewInvalid");
             Season.Validate();
-            foreach (var cell in Cells) cell.Validate();
+            foreach (var cell in Cells)
+            {
+                cell.Validate();
+                if (cell.ContentSourceCode != ContentSourceCode)
+                    throw new InvalidOperationException("LHWorldContentSourceMismatch");
+            }
         }
     }
 
@@ -181,6 +205,7 @@ namespace Ssalddel.Unity.Runtime.World
         public string L2ParentCellKey = string.Empty;
         public string WindowRoleCode = string.Empty;
         public int Priority;
+        public string ContentSourceCode = 공간LHWorldCodes.ScenarioProcedural;
         public string BasePlanHashSha256 = string.Empty;
         public string PresentationHashSha256 = string.Empty;
         public 공간LHHBindingData[] HBindings = Array.Empty<공간LHHBindingData>();
@@ -194,6 +219,8 @@ namespace Ssalddel.Unity.Runtime.World
         {
             if (CellKey != 공간LHCellKey.L3(CellX, CellY)
                 || !공간LHCellKey.TryParseL3(CellKey, out _, out _)
+                || (ContentSourceCode != 공간LHWorldCodes.ScenarioProcedural
+                    && ContentSourceCode != 공간LHWorldCodes.AuthoritativeWorld)
                 || BasePlanHashSha256 == null || BasePlanHashSha256.Length != 64
                 || PresentationHashSha256 == null || PresentationHashSha256.Length != 64
                 || HBindings == null || Placements == null || Connectors == null
@@ -600,7 +627,13 @@ namespace Ssalddel.Unity.Runtime.World
         }
 
         private static 공간LHLevelData Level(string level, int size, string h)
-            => new() { LevelCode = level, CellSizeMeters = size, DefaultHLevelCode = h };
+            => new()
+            {
+                LevelCode = level,
+                CellSizeMeters = size,
+                DefaultHLevelCode = h,
+                PrimaryHQueryLevelCode = h,
+            };
 
         private static 공간LHGenerationLayerData Layer(
             string code, int paddingMeters, string ownership, params string[] dependencies)

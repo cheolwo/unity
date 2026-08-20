@@ -24,6 +24,8 @@ namespace Ssalddel.Unity.Tests.EditMode
 
             Assert.That(response.Profile.Levels.Single(value => value.LevelCode == "L0")
                 .DefaultHLevelCode, Is.EqualTo("H4"));
+            Assert.That(response.Profile.Levels.Single(value => value.LevelCode == "L0")
+                .PrimaryHQueryLevelCode, Is.EqualTo("H4"));
             Assert.That(response.Profile.Levels.Single(value => value.LevelCode == "L1")
                 .DefaultHLevelCode, Is.EqualTo("H3"));
             Assert.That(response.Profile.Levels.Single(value => value.LevelCode == "L2")
@@ -32,7 +34,37 @@ namespace Ssalddel.Unity.Tests.EditMode
                 .DefaultHLevelCode, Is.EqualTo("H1"));
             Assert.That(response.Profile.L3CellSize, Is.EqualTo(125));
             Assert.That(response.Cells, Has.Length.EqualTo(81));
+            Assert.That(response.ContentSourceCode,
+                Is.EqualTo(공간LHWorldCodes.ScenarioProcedural));
+            Assert.That(response.Cells.All(value => value.ContentSourceCode
+                == 공간LHWorldCodes.ScenarioProcedural), Is.True);
             Assert.That(repository.SourceModeCode, Is.EqualTo(공간LHWorldCodes.LocalEngine));
+        }
+
+        [Test]
+        public async Task L실행해상도는_H주조회단계를_독립적으로_바꿔도_유효하다()
+        {
+            var repository = new 로컬공간LHWorldEngine();
+            var response = await repository.PreviewCellsAsync(Request("independent", 2801, 4581),
+                CancellationToken.None);
+
+            foreach (var level in response.Profile.Levels)
+                level.PrimaryHQueryLevelCode = "H2";
+
+            Assert.DoesNotThrow(() => response.Profile.Validate());
+            Assert.That(response.Profile.Levels.Select(value => value.CellSizeMeters),
+                Is.EqualTo(new[] { 8000, 2000, 500, 125 }));
+        }
+
+        [Test]
+        public async Task 응답과_셀의_내용공급자가_다르면_거부한다()
+        {
+            var repository = new 로컬공간LHWorldEngine();
+            var response = await repository.PreviewCellsAsync(Request("source-mismatch", 2801, 4581),
+                CancellationToken.None);
+            response.Cells[0].ContentSourceCode = 공간LHWorldCodes.AuthoritativeWorld;
+
+            Assert.Throws<InvalidOperationException>(() => response.Validate("source-mismatch"));
         }
 
         [Test]

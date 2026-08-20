@@ -63,6 +63,7 @@ namespace Ssalddel.Unity.Presentation.World
         private string requestedNpcCellKey = string.Empty;
         private string activeSeasonCode = string.Empty;
         private int activeSeasonDay;
+        private string activeContentSourceCode = 공간LHWorldCodes.ScenarioProcedural;
         private string lastError = string.Empty;
         private Vector3 accumulatedOriginShift;
         private int originShiftCount;
@@ -317,6 +318,7 @@ namespace Ssalddel.Unity.Presentation.World
                 acceptedEpoch = epoch;
                 expectedWorldRevision = response.WorldRevision;
                 profile = response.Profile;
+                activeContentSourceCode = response.ContentSourceCode;
                 ApplySeason(response.Season);
                 QueueResponse(response, epoch);
                 lastError = string.Empty;
@@ -633,8 +635,11 @@ namespace Ssalddel.Unity.Presentation.World
                 ? "로컬 싱글 플레이 생성"
                 : SourceModeCode == 공간TileStreamingCodes.SimulationServer
                     ? "시뮬레이션 서버 생성" : SourceModeCode;
+            var contentLabel = activeContentSourceCode == 공간LHWorldCodes.AuthoritativeWorld
+                ? "권위 있는 실제 세계"
+                : "시나리오 절차생성";
             statusLabel.text = string.IsNullOrWhiteSpace(lastError)
-                ? $"LH 오픈 월드 · {sourceLabel} · L3 125m · {activeSeasonCode} {activeSeasonDay}/28\n"
+                ? $"LH 오픈 월드 · {sourceLabel} · {contentLabel} · L3 125m · {activeSeasonCode} {activeSeasonDay}/28\n"
                   + $"플레이어 {playerCellKey} · 준비 {traversable}/{cells.Count} · 조립 대기 {PendingAssemblyCount}"
                 : "LH 오픈 월드 준비 실패\n" + lastError;
         }
