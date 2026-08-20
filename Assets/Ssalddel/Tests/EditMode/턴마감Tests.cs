@@ -101,6 +101,10 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Is.EqualTo("SimulationServer"));
             Assert.That(confirmed.ActiveEffectCode,
                 Is.EqualTo("LocalContextAwareness"));
+            Assert.That(confirmed.WorldSnapshot.RegionalCausality.RecoveryScore,
+                Is.EqualTo(1));
+            Assert.That(confirmed.WorldSnapshot.RegionalCausality.OutcomeCode,
+                Is.EqualTo("Recovery"));
         }
 
         [Test]
@@ -231,6 +235,11 @@ namespace Ssalddel.Unity.Tests.EditMode
                     + ",\"FoodSecurityDays\":10,\"ActiveTaskStableIds\":[]"
                     + ",\"MarketSupplyByProduct\":[{\"ProductStableId\":\"product:potato\",\"Quantity\":300}]"
                     + ",\"Districts\":[{\"DistrictStableId\":\"district:farm\"},{\"DistrictStableId\":\"district:town\"},{\"DistrictStableId\":\"district:market\"},{\"DistrictStableId\":\"district:storage\"},{\"DistrictStableId\":\"district:logistics\"},{\"DistrictStableId\":\"district:residential\"},{\"DistrictStableId\":\"district:garrison\"},{\"DistrictStableId\":\"district:gate\"}]}"
+                    + ",\"RegionalCausality\":{"
+                    + "\"Revision\":" + revision + ",\"ThreatScore\":0"
+                    + ",\"RecoveryScore\":" + (active ? 1 : 0)
+                    + ",\"NetPressureModifier\":" + (active ? -1 : 0)
+                    + ",\"OutcomeCode\":\"" + (active ? "Recovery" : "Normal") + "\"}"
                     + ",\"ActiveTurnCardEffects\":" + (active
                         ? "[{\"CardStableId\":\"" + 턴마감CardStableIds.SeoulCulture
                             + "\",\"EffectCode\":\"LocalContextAwareness\",\"ActiveTurnNumber\":2}]"

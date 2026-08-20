@@ -26,6 +26,18 @@ namespace Ssalddel.Unity.Presentation.World
                 catalog, compressedTileWorldSize);
         }
 
+        public 공간AreaSetLandscapeGraphRuntimeAssembler(
+            공간문법CompositionCatalog catalog,
+            공간문법SyntyBindingCatalog bindingCatalog,
+            float compressedTileWorldSize)
+        {
+            if (compressedTileWorldSize <= 0f)
+                throw new ArgumentOutOfRangeException(nameof(compressedTileWorldSize));
+            tileWorldSize = compressedTileWorldSize;
+            tileAssembler = new 공간문법LandscapeRuntimeAssembler(
+                catalog, bindingCatalog, compressedTileWorldSize);
+        }
+
         public GameObject BuildStaging(
             공간LandscapeGraphData graph,
             Transform areaSetRoot,
@@ -36,7 +48,10 @@ namespace Ssalddel.Unity.Presentation.World
             graph.Validate();
             if (!graph.CanAssemble)
                 throw new InvalidOperationException("WorldLandscapeGraphNotReady");
-            if (!공간TileWindowPlanner.TryParse(anchorTileKey, out var anchorX, out var anchorY))
+            var scenarioLocal = anchorTileKey.StartsWith(
+                "scenario-local:", StringComparison.Ordinal);
+            if (!scenarioLocal
+                && !공간TileWindowPlanner.TryParse(anchorTileKey, out _, out _))
                 throw new InvalidOperationException("WorldLandscapeGraphAnchorTileInvalid");
 
             var graphRoot = new GameObject("LandscapeGraphRoot_Staging");
@@ -48,15 +63,27 @@ namespace Ssalddel.Unity.Presentation.World
                 {
                     var tileData = graph.ToTileData(tileKey);
                     if (!tileData.CanAssemble || tileData.Placements.Length == 0) continue;
-                    if (!공간TileWindowPlanner.TryParse(tileKey, out var tileX, out var tileY))
+                    if (!scenarioLocal
+                        && !공간TileWindowPlanner.TryParse(tileKey, out _, out _))
                         throw new InvalidOperationException("WorldLandscapeGraphTileKeyInvalid");
 
                     var fragment = new GameObject("TileFragment_" + SafeName(tileKey));
                     fragment.transform.SetParent(graphRoot.transform, false);
-                    fragment.transform.localPosition = new Vector3(
-                        (tileX - anchorX) * tileWorldSize,
-                        0f,
-                        (tileY - anchorY) * tileWorldSize);
+                    if (scenarioLocal)
+                    {
+                        fragment.transform.localPosition = Vector3.zero;
+                    }
+                    else
+                    {
+                        공간TileWindowPlanner.TryParse(anchorTileKey,
+                            out var anchorX, out var anchorY);
+                        공간TileWindowPlanner.TryParse(tileKey,
+                            out var tileX, out var tileY);
+                        fragment.transform.localPosition = new Vector3(
+                            (tileX - anchorX) * tileWorldSize,
+                            0f,
+                            (tileY - anchorY) * tileWorldSize);
+                    }
                     var staging = tileAssembler.BuildStaging(tileData, fragment.transform);
                     staging.name = "LandscapeCompositionRoot";
                     staging.SetActive(true);

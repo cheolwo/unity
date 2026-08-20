@@ -195,7 +195,7 @@ namespace Ssalddel.Unity.Tests.EditMode
                 GraphRevision = 1,
                 DefinitionHashSha256 = new string('d', 64),
                 GraphHashSha256 = new string('g', 64),
-                GrammarRevision = 공간LandscapeCompositionCodes.GrammarRevision,
+                GrammarRevision = catalog.CatalogRevision,
                 GrammarHashSha256 = catalog.BuildSafeCatalogHashSha256(),
                 StatusCode = 공간LandscapeCompositionCodes.Available,
                 Bounds = new 공간LandscapeBoundsData

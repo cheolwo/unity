@@ -6,7 +6,8 @@
 - **Unity Pipeline/MCP 우선**: 연결된 Editor가 있을 때 Scene 계층, Game View, Console, 선택한 GameObject, 실행 중 상태처럼 Editor가 가진 사실을 확인하거나 변경할 때 사용한다.
 - **Unity CLI 병행**: `unity run`은 재현 가능한 Scene 생성·asset import·batch 작업에, `unity test`는 EditMode/PlayMode 결과 XML을 남기는 자동 검증에 사용한다.
 - Pipeline 연결을 사용할 수 없거나 Editor가 열려 있지 않으면 CLI batch 검증으로 대체하고, 최종 보고에 Pipeline 미사용 사유와 미검증 범위를 적는다.
-- 화면·Scene 변경은 가능하면 Pipeline에서 Game View와 Console을 확인한 뒤, CLI EditMode와 PlayMode 테스트로 다시 검증한다.
+- 현재 개발 단계에서는 소스 정적 검사, 컴파일, 관련 EditMode·단위 시험과 저장 Scene·조립 코드의 구조 검증을 기본으로 한다. 사용자가 실행 화면이나 시각 마감을 명시적으로 요청하지 않은 작업은 Game View, Play Mode 수동 조작과 PNG 캡처 없이 코드 수준에서 완료할 수 있다.
+- 화면에서만 판별할 수 있는 입력·카메라·배치 문제, 릴리스 검증, 또는 사용자가 실제 화면 확인을 요청한 경우에는 Pipeline Game View·Console과 필요한 PlayMode 시험을 추가한다. 생략한 경우에는 코드·시험 검증과 Play Mode·Game View 미검증을 분리해 보고한다.
 
 ## P2 World Map 검증 기준
 
@@ -28,5 +29,5 @@
 
 - `Assets/Ssalddel/`, `Packages/manifest.json`, `Packages/packages-lock.json`, `ProjectSettings/EditorBuildSettings.asset` 이외의 기존 변경은 다른 작업일 수 있으므로 되돌리거나 함께 stage하지 않는다.
 - commit과 push는 사용자의 명시 요청이 있을 때만 수행한다.
-- Scene·prefab·material·camera·UI 변경으로 Game View가 달라지면 Pipeline에서 최종 Game View PNG를 다시 캡처한다. 대표 PNG는 `Documentation/Changes/<날짜>-<주제>/`에 두고 관련 코드·Scene·변경 기록과 같은 맥락의 커밋에 포함한다. 중간 캡처와 test output은 `artifacts/`에만 두고 commit하지 않는다.
-- Scene View는 배선·배치 설명을 위한 보조 증거이며 최종 Game View를 대신하지 않는다. Play Mode를 실행할 수 없으면 이유와 대체 검증을 변경 기록에 명시한다.
+- Scene·prefab·material·camera·UI 변경도 현재 단계에서는 코드·시험 검증을 기본으로 한다. 사용자가 실제 화면 확인·시각 마감·릴리스 증거를 요청했을 때 Pipeline에서 최종 Game View PNG를 캡처하고, 대표 PNG를 `Documentation/Changes/<날짜>-<주제>/`에 두어 관련 코드·Scene·변경 기록과 같은 맥락의 커밋에 포함한다. 중간 캡처와 test output은 `artifacts/`에만 두고 commit하지 않는다.
+- Scene View는 배선·배치 설명을 위한 보조 증거이며 최종 Game View를 대신하지 않는다. Game View를 생략한 작업은 변경 기록과 보고에 `코드·시험 검증 완료 / Play Mode·Game View 미검증`으로 명시한다.

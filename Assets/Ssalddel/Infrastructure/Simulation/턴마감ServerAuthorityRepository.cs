@@ -370,7 +370,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 {
                     new SimulationWorldSettlementNode(
                         settlement.SettlementStableId ?? string.Empty, districts),
-                });
+                },
+                MapRegionalCausality(wire.RegionalCausality));
             return new 턴마감ResultData
             {
                 SessionStableId = snapshot.SessionStableId,
@@ -388,6 +389,23 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 DateTimeStyles.AssumeUniversal, out var parsed)
                 ? parsed.ToString("Year 1 · MM-dd", CultureInfo.InvariantCulture)
                 : throw new InvalidOperationException("TurnClosingGameDateInvalid");
+
+        private static 실제E5RegionalCausalityData MapRegionalCausality(
+            RegionalCausalityWire wire)
+        {
+            var value = wire == null
+                ? new 실제E5RegionalCausalityData()
+                : new 실제E5RegionalCausalityData
+                {
+                    Revision = wire.Revision,
+                    ThreatScore = wire.ThreatScore,
+                    RecoveryScore = wire.RecoveryScore,
+                    NetPressureModifier = wire.NetPressureModifier,
+                    OutcomeCode = wire.OutcomeCode ?? "Normal",
+                };
+            value.Validate();
+            return value;
+        }
 
         private static DateTimeOffset? ParseOptionalDate(string value)
             => string.IsNullOrWhiteSpace(value)
@@ -436,6 +454,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                     },
                     Facilities = new[]
                     {
+                        new { FacilityStableId = "facility:unity:harvest-day:farm", FacilityTypeCode = "Farm", DistrictStableId = "district:farm", SourceStableIds = Sources() },
                         new { FacilityStableId = "facility:sim.storage", FacilityTypeCode = "Storage", DistrictStableId = "district:storage", SourceStableIds = Sources() },
                         new { FacilityStableId = "facility:sim.market", FacilityTypeCode = "Market", DistrictStableId = "district:market", SourceStableIds = Sources() },
                     },
@@ -449,6 +468,158 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                     },
                     SourceStableIds = Sources(),
                 },
+                SpatialWorld = CreateHarvestDaySpatialWorld(),
+                FarmSurvival = CreateHarvestDayFarmState(),
+            };
+
+        private static object CreateHarvestDaySpatialWorld()
+            => new
+            {
+                Definitions = new[]
+                {
+                    new
+                    {
+                        SpatialStableId = "spatial:unity:harvest-day:production-plot",
+                        FacilityStableId = "facility:unity:harvest-day:farm",
+                        AreaStableId = "area:sim:pyeongchang:daegwallyeong-farm",
+                        AreaSetStableId = "area-set:sim:pyeongchang:farm-hub-town.v1",
+                        LandscapeGraphStableId = "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+                        LandscapeNodeStableId = "candidate:harvest-day:production-plot",
+                        EvidenceKindCode = "Scenario",
+                        AccessStateCode = "Available",
+                        CapabilityCodes = new[]
+                        {
+                            "Spatial.WorkerAccessible", "Spatial.CropProduction",
+                            "Spatial.CargoAccessible", "Spatial.HarvestWorkArea",
+                        },
+                        BaseCapacities = new[]
+                        {
+                            new { CapacityCode = "WorkArea", Quantity = 1m, UnitCode = "slot" },
+                        },
+                        DefinitionRevision = "wi-spatial-seedbed:farm-production.v1:r1",
+                        DefinitionHashSha256 = new string('A', 64),
+                        SourceStableIds = new[]
+                        {
+                            "wi-spatial-seedbed:farm-production.v1",
+                            "landscape-block-candidate:sim:pyeongchang:daegwallyeong-harvest-day.v1",
+                        },
+                    },
+                    new
+                    {
+                        SpatialStableId = 오늘작업계획Codes.WorkYardSpatial,
+                        FacilityStableId = "facility:unity:harvest-day:farm",
+                        AreaStableId = "area:sim:pyeongchang:daegwallyeong-farm",
+                        AreaSetStableId = "area-set:sim:pyeongchang:farm-hub-town.v1",
+                        LandscapeGraphStableId = "landscape-graph:sim:pyeongchang:daegwallyeong-farm.v1",
+                        LandscapeNodeStableId = "candidate:harvest-day:work-yard",
+                        EvidenceKindCode = "Scenario",
+                        AccessStateCode = "Available",
+                        CapabilityCodes = new[]
+                        {
+                            "Spatial.WorkerAccessible", "Spatial.CargoAccessible",
+                            "Spatial.CollectionWorkArea", "Spatial.PackingWorkArea",
+                        },
+                        BaseCapacities = new[]
+                        {
+                            new { CapacityCode = "WorkArea", Quantity = 1m, UnitCode = "slot" },
+                        },
+                        DefinitionRevision = "wi-spatial-seedbed:farm-work-yard.v1:r1",
+                        DefinitionHashSha256 = new string('B', 64),
+                        SourceStableIds = new[]
+                        {
+                            "wi-spatial-seedbed:farm-work-yard.v1",
+                            "landscape-block-candidate:sim:pyeongchang:daegwallyeong-harvest-day.v1",
+                        },
+                    },
+                },
+            };
+
+        private static object CreateHarvestDayFarmState()
+            => new
+            {
+                RuleRevision = "farm-survival.scenic-season.r1",
+                RegionStableId = "region:legal-dong:5176031000",
+                AreaStableId = "area:sim:pyeongchang:daegwallyeong-farm",
+                TileKey = "kr5186:l2:700:1145",
+                FarmBuildingStableId = "facility:unity:harvest-day:farm",
+                SupplyUnits = 8m,
+                RepairMaterialUnits = 4m,
+                SeedUnits = 2m,
+                WaterUnits = 2m,
+                Actors = new[]
+                {
+                    new
+                    {
+                        ActorStableId = 오늘작업계획Codes.PlayerActor,
+                        ActorKindCode = "Player",
+                        KoreanName = "나",
+                        Health = 100m,
+                        Stamina = 100m,
+                        CapabilityCodes = new[]
+                        {
+                            "FarmHarvest", "FarmCollection", "FarmPacking",
+                        },
+                    },
+                    new
+                    {
+                        ActorStableId = 오늘작업계획Codes.NpcActor,
+                        ActorKindCode = "Npc",
+                        KoreanName = "농장 일꾼",
+                        Health = 100m,
+                        Stamina = 100m,
+                        CapabilityCodes = new[]
+                        {
+                            "FarmHarvest", "FarmCollection", "FarmPacking",
+                        },
+                    },
+                },
+                SoilTiles = Enumerable.Range(0, 2)
+                    .SelectMany(row => Enumerable.Range(0, 5)
+                        .Select(column => new
+                        {
+                            SoilTileStableId = $"farm-soil:pyeongchang:{row}:{column}",
+                            GridX = row,
+                            GridY = column,
+                            StateCode = "Tilled",
+                            PhysicalAreaSquareMeters = 100m,
+                        }))
+                    .ToArray(),
+                CultivationUnits = Enumerable.Range(0, 2)
+                    .SelectMany(row => Enumerable.Range(0, 5)
+                        .Select(column => new
+                        {
+                            CultivationUnitStableId = $"farm-plot:pyeongchang:{row}:{column}",
+                            Revision = 1,
+                            TileStableId = $"farm-soil:pyeongchang:{row}:{column}",
+                            CultivationStableId = $"cultivation:unity:harvest-day:potato:{row}:{column}",
+                            ProductStableId = "product:potato",
+                            CropVariantStableId = "crop-variant:potato.fixture",
+                            StateCode = "HarvestReady",
+                            PhysicalAreaSquareMeters = 100m,
+                            EffectiveCultivationAreaRatio = 1m,
+                            SourceStableIds = new[] { "source:fixture.harvest-day-cultivation" },
+                        }))
+                    .ToArray(),
+                Defenses = Array.Empty<object>(),
+                PotatoProductionRule = new
+                {
+                    RuleStableId = "rule:potato-production.fixture.v1",
+                    RuleRevision = 1,
+                    SourceTypeCode = "Fixture",
+                    ProductStableId = "product:potato",
+                    CropVariantStableId = "crop-variant:potato.fixture",
+                    BaseYieldKilogramsPerSquareMeter = 3m,
+                    MinimumEnvironmentFactor = .5m,
+                    MaximumEnvironmentFactor = 1m,
+                    MinimumInputFactor = .8m,
+                    MaximumInputFactor = 1.2m,
+                    MinimumFacilityFactor = .8m,
+                    MaximumFacilityFactor = 1.2m,
+                    MinimumLossFactor = .1m,
+                    MaximumLossFactor = 1m,
+                    SourceStableIds = new[] { "source:fixture.potato-yield-rule" },
+                    Limitations = new[] { "실제 생산량 또는 운영 수확량으로 사용하지 않는다." },
+                },
             };
 
         private static object District(string id, string type)
@@ -458,7 +629,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         [Serializable] private sealed class ContextWire { public string SessionStableId; public int TurnNumber; public string GameDate; public long Revision; public int PendingTaskCount; public bool CanCloseTurn; public CardWire[] AvailableCards; public TarotDrawWire TarotDraw; }
         [Serializable] private sealed class PreviewWire { public string PreviewStableId; public long BaseRevision; public int ClosingTurnNumber; public int NextTurnNumber; public string NextGameDate; public int PendingTaskCount; public CardWire[] SelectedCards; }
         [Serializable] private sealed class CardWire { public string CardStableId; public string CardRevision; public string CardKindCode; public string Title; public string Summary; public string EffectCode; public string TargetStatCode; public int StatDelta; public string SourceStableId; public string RegionKey; public string AvailableFromGameDate; public string AvailableThroughGameDate; public string CalendarRevision; public string EffectRuleRevision; public string SourceUrl; public string EvidenceCheckedAtUtc; }
-        [Serializable] private sealed class SessionWire { public string SessionStableId; public long Revision; public WorldWire WorldContext; public SettlementWire Settlement; public ActiveEffectWire[] ActiveTurnCardEffects; }
+        [Serializable] private sealed class SessionWire { public string SessionStableId; public long Revision; public WorldWire WorldContext; public SettlementWire Settlement; public ActiveEffectWire[] ActiveTurnCardEffects; public RegionalCausalityWire RegionalCausality; }
+        [Serializable] private sealed class RegionalCausalityWire { public long Revision; public int ThreatScore; public int RecoveryScore; public int NetPressureModifier; public string OutcomeCode; }
         [Serializable] private sealed class WorldWire { public int WorldTick; public string GameDate; }
         [Serializable] private sealed class SettlementWire { public string SettlementStableId; public decimal TreasuryBalance; public decimal LaborAvailable; public decimal LaborReserved; public decimal FoodReserveEquivalent; public decimal FoodSecurityDays; public string[] ActiveTaskStableIds; public MarketWire[] MarketSupplyByProduct; public DistrictWire[] Districts; }
         [Serializable] private sealed class MarketWire { public string ProductStableId; public decimal Quantity; }

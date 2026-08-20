@@ -9,7 +9,9 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
 {
     public sealed class 공간TileStreamServerRepository : I공간TileStreamRepository,
         I공간TileLandscapeCompositionRepository,
-        I공간AreaSetLandscapeGraphRepository
+        I공간AreaSetLandscapeGraphRepository,
+        I실제E5AreaSetNetworkRepository,
+        I공간LHWorldRepository
     {
         private const string BaseRoute = "api/simulation/v1/world-stream/";
         private readonly ISimulationRehearsalUnityApiClient apiClient;
@@ -77,7 +79,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             int radiusTiles,
             CancellationToken cancellationToken)
         {
-            if (!공간TileWindowPlanner.TryParse(centerTileKey, out _, out _)
+            if (!공간AreaSetLandscapeGraphCodes.IsSupportedTileRef(centerTileKey)
                 || radiusTiles < 0 || radiusTiles > 12)
                 throw new InvalidOperationException("WorldLandscapeGraphIndexRequestInvalid");
             var value = await GetAsync<공간LandscapeGraphIndexData>(
@@ -96,6 +98,28 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             var value = await GetAsync<공간LandscapeGraphData>(
                 "landscape-graphs/" + Uri.EscapeDataString(landscapeGraphStableId),
                 cancellationToken);
+            value.Validate();
+            return value;
+        }
+
+        public async Task<실제E5AreaSetNetworkData> LoadAreaSetNetworkAsync(
+            string networkStableId,
+            CancellationToken cancellationToken)
+        {
+            var value = await GetAsync<실제E5AreaSetNetworkData>(
+                "area-set-networks/" + Uri.EscapeDataString(networkStableId),
+                cancellationToken);
+            value.Validate();
+            return value;
+        }
+
+        public async Task<실제E5InteractionReadinessData> LoadInteractionReadinessAsync(
+            string networkStableId,
+            CancellationToken cancellationToken)
+        {
+            var value = await GetAsync<실제E5InteractionReadinessData>(
+                "area-set-networks/" + Uri.EscapeDataString(networkStableId)
+                + "/interaction-readiness", cancellationToken);
             value.Validate();
             return value;
         }
@@ -133,6 +157,28 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 Bytes = response.BodyBytes,
             };
             value.Validate();
+            return value;
+        }
+
+        public async Task<공간LHCellPreviewData> PreviewCellsAsync(
+            공간LHCellPreviewRequestData request,
+            CancellationToken cancellationToken)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            var response = await apiClient.SendAsync(new UnityApiRequest
+            {
+                Method = "POST",
+                RelativePath = BaseRoute + "lh/cells/preview",
+                JsonBody = JsonConvert.SerializeObject(request),
+                RequiresAuthentication = false,
+            }, cancellationToken);
+            if (!response.IsSuccess)
+                throw new InvalidOperationException(
+                    "LHWorldCellPreviewRequestFailed:"
+                    + response.StatusCode + ":" + response.ErrorCode);
+            var value = JsonConvert.DeserializeObject<공간LHCellPreviewData>(response.Body)
+                ?? throw new InvalidOperationException("LHWorldCellPreviewJsonInvalid");
+            value.Validate(request.RequestEpoch);
             return value;
         }
 

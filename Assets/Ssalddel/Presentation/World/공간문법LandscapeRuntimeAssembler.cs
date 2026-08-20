@@ -18,6 +18,12 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private string compositionKey = string.Empty;
         [SerializeField] private string evidenceKindCode = string.Empty;
         [SerializeField] private string graphHashSha256 = string.Empty;
+        [SerializeField] private string grammarRevision = string.Empty;
+        [SerializeField] private string grammarHashSha256 = string.Empty;
+        [SerializeField] private string bindingRevision = string.Empty;
+        [SerializeField] private string bindingHashSha256 = string.Empty;
+        [SerializeField] private string selectedSourceCompositionKey = string.Empty;
+        [SerializeField] private bool fallbackUsed;
         [SerializeField] private string detailGeneratorRevision = string.Empty;
         [SerializeField] private int deterministicSeed;
         [SerializeField] private double physicalElevationMeters;
@@ -27,6 +33,12 @@ namespace Ssalddel.Unity.Presentation.World
         public string CompositionKey => compositionKey;
         public int DeterministicSeed => deterministicSeed;
         public string DetailGeneratorRevision => detailGeneratorRevision;
+        public string GrammarRevision => grammarRevision;
+        public string GrammarHashSha256 => grammarHashSha256;
+        public string BindingRevision => bindingRevision;
+        public string BindingHashSha256 => bindingHashSha256;
+        public string SelectedSourceCompositionKey => selectedSourceCompositionKey;
+        public bool FallbackUsed => fallbackUsed;
 
         public void Configure(
             공간LandscapePlacementData placement,
@@ -37,10 +49,34 @@ namespace Ssalddel.Unity.Presentation.World
             compositionKey = placement.CompositionKey;
             evidenceKindCode = placement.EvidenceKindCode;
             graphHashSha256 = graphHash;
+            grammarRevision = string.Empty;
+            grammarHashSha256 = string.Empty;
+            bindingRevision = string.Empty;
+            bindingHashSha256 = string.Empty;
+            selectedSourceCompositionKey = string.Empty;
+            fallbackUsed = false;
             detailGeneratorRevision = generatorRevision;
             deterministicSeed = placement.DeterministicSeed;
             physicalElevationMeters = placement.PhysicalElevationMeters;
             presentationOnly = true;
+        }
+
+        public void Configure(
+            공간LandscapePlacementData placement,
+            string graphHash,
+            string sourceGrammarRevision,
+            string sourceGrammarHash,
+            공간문법SyntyBindingCatalog binding,
+            공간문법SyntyBindingResolution resolution)
+        {
+            Configure(placement, graphHash,
+                resolution.Candidate.DetailGeneratorRevision);
+            grammarRevision = sourceGrammarRevision;
+            grammarHashSha256 = sourceGrammarHash;
+            bindingRevision = binding.BindingRevision;
+            bindingHashSha256 = binding.BuildBindingHashSha256();
+            selectedSourceCompositionKey = resolution.Candidate.SourceCompositionKey;
+            fallbackUsed = resolution.FallbackUsed;
         }
     }
 
@@ -51,6 +87,7 @@ namespace Ssalddel.Unity.Presentation.World
     public sealed class 공간문법LandscapeRuntimeAssembler
     {
         private readonly 공간문법CompositionCatalog catalog;
+        private readonly 공간문법SyntyBindingCatalog? bindingCatalog;
         private readonly float tileWorldSize;
 
         public 공간문법LandscapeRuntimeAssembler(
@@ -60,10 +97,26 @@ namespace Ssalddel.Unity.Presentation.World
             catalog = sourceCatalog != null
                 ? sourceCatalog
                 : throw new ArgumentNullException(nameof(sourceCatalog));
+            bindingCatalog = null;
             if (compressedTileWorldSize <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(compressedTileWorldSize));
             tileWorldSize = compressedTileWorldSize;
             catalog.Validate();
+        }
+
+        public 공간문법LandscapeRuntimeAssembler(
+            공간문법CompositionCatalog neutralGrammarCatalog,
+            공간문법SyntyBindingCatalog syntyBindingCatalog,
+            float compressedTileWorldSize)
+            : this(neutralGrammarCatalog, compressedTileWorldSize)
+        {
+            bindingCatalog = syntyBindingCatalog != null
+                ? syntyBindingCatalog
+                : throw new ArgumentNullException(nameof(syntyBindingCatalog));
+            bindingCatalog.Validate();
+            if (bindingCatalog.TargetGrammarHashSha256
+                != catalog.BuildNeutralGrammarHashSha256())
+                throw new InvalidOperationException("LandscapeSyntyBindingGrammarMismatch");
         }
 
         public GameObject BuildStaging(
@@ -76,9 +129,18 @@ namespace Ssalddel.Unity.Presentation.World
             catalog.Validate();
             if (!data.CanAssemble)
                 throw new InvalidOperationException("WorldLandscapeCompositionNotReady");
-            if (data.GrammarRevision != catalog.CatalogRevision
-                || !string.Equals(data.GrammarHashSha256,
-                    catalog.BuildSafeCatalogHashSha256(), StringComparison.OrdinalIgnoreCase))
+            var expectedGrammarRevision = bindingCatalog == null
+                ? catalog.CatalogRevision
+                : 공간문법CompositionCatalog.NeutralGrammarRevision;
+            var expectedGrammarHash = bindingCatalog == null
+                ? catalog.BuildSafeCatalogHashSha256()
+                : catalog.BuildNeutralGrammarHashSha256();
+            var authoredActualE5 = data.GrammarRevision ==
+                                   공간LandscapeCompositionCodes.ActualE5AuthoredScenarioRevision;
+            if (!authoredActualE5
+                && (data.GrammarRevision != expectedGrammarRevision
+                    || !string.Equals(data.GrammarHashSha256,
+                        expectedGrammarHash, StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidOperationException("WorldLandscapeGrammarCatalogMismatch");
 
             ValidateGraphReferences(data);
@@ -102,19 +164,28 @@ namespace Ssalddel.Unity.Presentation.World
                     if (entry.TopologyCode != placement.TopologyCode)
                         throw new InvalidOperationException(
                             "WorldLandscapePlacementTopologyMismatch:" + placement.PlacementStableId);
+                    var bindingResolution = bindingCatalog?.Resolve(placement.CompositionKey);
+                    var prefab = bindingResolution?.Candidate.Prefab ?? entry.Prefab;
+                    var detailGeneratorRevision = bindingResolution?.Candidate.DetailGeneratorRevision
+                        ?? entry.InternalGeneration.DetailGeneratorRevision;
                     var instance = UnityEngine.Object.Instantiate(
-                        entry.Prefab, topologyRoots[entry.TopologyCode], false);
+                        prefab, topologyRoots[entry.TopologyCode], false);
                     instance.name = "VisualRoot_" + SafeName(placement.PlacementStableId);
                     ApplyTransform(instance.transform, data.TileKey, placement);
                     var view = instance.GetComponent<공간문법PlacementInstanceView>()
                                ?? instance.AddComponent<공간문법PlacementInstanceView>();
-                    view.Configure(placement, data.GraphHashSha256,
-                        entry.InternalGeneration.DetailGeneratorRevision);
+                    if (bindingCatalog == null || bindingResolution == null)
+                        view.Configure(placement, data.GraphHashSha256,
+                            detailGeneratorRevision);
+                    else
+                        view.Configure(placement, data.GraphHashSha256,
+                            data.GrammarRevision, data.GrammarHashSha256,
+                            bindingCatalog, bindingResolution);
                     foreach (var generator in instance.GetComponentsInChildren<MonoBehaviour>(true)
                                  .OfType<I공간문법MicroDetailGenerator>())
                         generator.GenerateMicroDetail(
                             placement.DeterministicSeed,
-                            entry.InternalGeneration.DetailGeneratorRevision);
+                            detailGeneratorRevision);
                 }
                 return staging;
             }
@@ -144,12 +215,24 @@ namespace Ssalddel.Unity.Presentation.World
             string tileKey,
             공간LandscapePlacementData placement)
         {
-            if (!공간TileWindowPlanner.TryParse(tileKey, out var tileX, out var tileY))
-                throw new InvalidOperationException("WorldLandscapeTileKeyInvalid");
             const double tileSizeMeters = 500d;
-            var centerEasting = tileX * tileSizeMeters + tileSizeMeters * .5d;
-            var centerNorthing = tileY * tileSizeMeters + tileSizeMeters * .5d;
             var metersToWorld = tileWorldSize / (float)tileSizeMeters;
+            double centerEasting;
+            double centerNorthing;
+            if (tileKey.StartsWith("scenario-local:", StringComparison.Ordinal))
+            {
+                centerEasting = 0d;
+                centerNorthing = 0d;
+            }
+            else if (공간TileWindowPlanner.TryParse(tileKey, out var tileX, out var tileY))
+            {
+                centerEasting = tileX * tileSizeMeters + tileSizeMeters * .5d;
+                centerNorthing = tileY * tileSizeMeters + tileSizeMeters * .5d;
+            }
+            else
+            {
+                throw new InvalidOperationException("WorldLandscapeTileKeyInvalid");
+            }
             target.localPosition = new Vector3(
                 (float)(placement.EastingMeters - centerEasting) * metersToWorld,
                 0f,

@@ -9,6 +9,11 @@ namespace Ssalddel.Unity.Runtime.World
         public const string AreaSetSchemaVersion = "simulation-world-area-set.v1";
         public const string GraphSchemaVersion = "simulation-world-landscape-graph.v2";
         public const string CanonicalAreaSet = "area-set:sim:pyeongchang:farm-hub-town.v1";
+        public const string ActualE5Network =
+            "area-set-network:sim:pyeongchang:nature-farm-hub-town.v1";
+        public const string ScenarioLocalMeters = "ScenarioLocalMeters";
+        public const string AreaSetOwner = "AreaSet";
+        public const string AreaSetNetworkOwner = "AreaSetNetwork";
         public const string GraphV2 = "GraphV2";
         public const string TileFacadeV1 = "TileFacadeV1";
         public const string Declared = "Declared";
@@ -18,6 +23,11 @@ namespace Ssalddel.Unity.Runtime.World
 
         public static bool IsKnownRelation(string value)
             => value == Adjacent || value == Connected || value == Transition;
+
+        public static bool IsSupportedTileRef(string value) =>
+            공간TileWindowPlanner.TryParse(value, out _, out _)
+            || (!string.IsNullOrWhiteSpace(value)
+                && value.StartsWith("scenario-local:", StringComparison.Ordinal));
     }
 
     public enum 공간LandscapeGraphStreamingState
@@ -39,6 +49,8 @@ namespace Ssalddel.Unity.Runtime.World
         public string Summary = string.Empty;
         public string DefinitionHashSha256 = string.Empty;
         public string DocumentHashSha256 = string.Empty;
+        public string CanonicalNetworkStableId = string.Empty;
+        public string CoordinateSpaceCode = string.Empty;
         public string[] AreaRefs = Array.Empty<string>();
         public string[] ScenarioRouteRefs = Array.Empty<string>();
         public string[] CompletionAreaRefs = Array.Empty<string>();
@@ -63,6 +75,12 @@ namespace Ssalddel.Unity.Runtime.World
                 || string.IsNullOrWhiteSpace(DefinitionStatusCode)
                 || !PresentationOnly || IsOperationalState)
                 throw new InvalidOperationException("WorldAreaSetDefinitionInvalid");
+            if ((!string.IsNullOrWhiteSpace(CanonicalNetworkStableId)
+                    || !string.IsNullOrWhiteSpace(CoordinateSpaceCode))
+                && (CanonicalNetworkStableId != 공간AreaSetLandscapeGraphCodes.ActualE5Network
+                    || CoordinateSpaceCode !=
+                    공간AreaSetLandscapeGraphCodes.ScenarioLocalMeters))
+                throw new InvalidOperationException("WorldAreaSetNetworkBindingInvalid");
             if (AreaRefs.Distinct(StringComparer.Ordinal).Count() != AreaRefs.Length
                 || ScenarioRouteRefs.Distinct(StringComparer.Ordinal).Count()
                     != ScenarioRouteRefs.Length
@@ -94,7 +112,7 @@ namespace Ssalddel.Unity.Runtime.World
         {
             if (SchemaVersion != 공간AreaSetLandscapeGraphCodes.GraphSchemaVersion
                 || string.IsNullOrWhiteSpace(AreaSetStableId)
-                || !공간TileWindowPlanner.TryParse(CenterTileKey, out _, out _)
+                || !공간AreaSetLandscapeGraphCodes.IsSupportedTileRef(CenterTileKey)
                 || RadiusTiles < 0 || RadiusTiles > 12
                 || Graphs == null || CoveredTileKeys == null || !PresentationOnly)
                 throw new InvalidOperationException("WorldLandscapeGraphIndexInvalid");
@@ -111,6 +129,9 @@ namespace Ssalddel.Unity.Runtime.World
         public string DefinitionHashSha256 = string.Empty;
         public string BuildStatusCode = string.Empty;
         public string GraphHashSha256 = string.Empty;
+        public string SpatialOwnerKindCode = string.Empty;
+        public string SpatialOwnerStableId = string.Empty;
+        public string CoordinateSpaceCode = string.Empty;
         public 공간LandscapeBoundsData Bounds = new 공간LandscapeBoundsData();
         public string[] AreaRefs = Array.Empty<string>();
         public string[] TileRefs = Array.Empty<string>();
@@ -126,8 +147,19 @@ namespace Ssalddel.Unity.Runtime.World
                 || DefinitionHashSha256 == null || DefinitionHashSha256.Length != 64
                 || string.IsNullOrWhiteSpace(BuildStatusCode)
                 || Bounds == null || AreaRefs == null || TileRefs == null || ScenarioRouteRefs == null
-                || TileRefs.Any(value => !공간TileWindowPlanner.TryParse(value, out _, out _)))
+                || TileRefs.Any(value =>
+                    !공간AreaSetLandscapeGraphCodes.IsSupportedTileRef(value)))
                 throw new InvalidOperationException("WorldLandscapeGraphDescriptorInvalid");
+            if ((!string.IsNullOrWhiteSpace(SpatialOwnerKindCode)
+                    || !string.IsNullOrWhiteSpace(SpatialOwnerStableId)
+                    || !string.IsNullOrWhiteSpace(CoordinateSpaceCode))
+                && ((SpatialOwnerKindCode != 공간AreaSetLandscapeGraphCodes.AreaSetOwner
+                        && SpatialOwnerKindCode !=
+                        공간AreaSetLandscapeGraphCodes.AreaSetNetworkOwner)
+                    || string.IsNullOrWhiteSpace(SpatialOwnerStableId)
+                    || CoordinateSpaceCode !=
+                    공간AreaSetLandscapeGraphCodes.ScenarioLocalMeters))
+                throw new InvalidOperationException("WorldLandscapeGraphOwnerInvalid");
             Bounds.Validate();
             if (TileRefs.Distinct(StringComparer.Ordinal).Count() != TileRefs.Length)
                 throw new InvalidOperationException("WorldLandscapeGraphTileDuplicate");
@@ -208,6 +240,9 @@ namespace Ssalddel.Unity.Runtime.World
         public int GraphRevision;
         public string DefinitionHashSha256 = string.Empty;
         public string GraphHashSha256 = string.Empty;
+        public string SpatialOwnerKindCode = string.Empty;
+        public string SpatialOwnerStableId = string.Empty;
+        public string CoordinateSpaceCode = string.Empty;
         public string GrammarRevision = string.Empty;
         public string GrammarHashSha256 = string.Empty;
         public string StatusCode = string.Empty;
@@ -230,13 +265,16 @@ namespace Ssalddel.Unity.Runtime.World
         public void Validate()
         {
             if (SchemaVersion != 공간AreaSetLandscapeGraphCodes.GraphSchemaVersion
-                || string.IsNullOrWhiteSpace(AreaSetStableId)
+                || (string.IsNullOrWhiteSpace(AreaSetStableId)
+                    && (SpatialOwnerKindCode !=
+                            공간AreaSetLandscapeGraphCodes.AreaSetNetworkOwner
+                        || string.IsNullOrWhiteSpace(SpatialOwnerStableId)))
                 || string.IsNullOrWhiteSpace(LandscapeGraphStableId)
                 || string.IsNullOrWhiteSpace(GraphBuildStableId)
                 || string.IsNullOrWhiteSpace(GraphRoleCode) || GraphRevision <= 0
                 || DefinitionHashSha256 == null || DefinitionHashSha256.Length != 64
                 || GraphHashSha256 == null || GraphHashSha256.Length != 64
-                || GrammarRevision != 공간LandscapeCompositionCodes.GrammarRevision
+                || !공간LandscapeCompositionCodes.IsSupportedGrammarRevision(GrammarRevision)
                 || string.IsNullOrWhiteSpace(StatusCode)
                 || Bounds == null || AreaRefs == null || TileRefs == null || ScenarioRouteRefs == null
                 || Nodes == null || Edges == null || Placements == null
@@ -244,8 +282,19 @@ namespace Ssalddel.Unity.Runtime.World
                 || !PresentationOnly || IsOperationalState)
                 throw new InvalidOperationException("WorldLandscapeGraphInvalid");
             Bounds.Validate();
+            if ((!string.IsNullOrWhiteSpace(SpatialOwnerKindCode)
+                    || !string.IsNullOrWhiteSpace(SpatialOwnerStableId)
+                    || !string.IsNullOrWhiteSpace(CoordinateSpaceCode))
+                && ((SpatialOwnerKindCode != 공간AreaSetLandscapeGraphCodes.AreaSetOwner
+                        && SpatialOwnerKindCode !=
+                        공간AreaSetLandscapeGraphCodes.AreaSetNetworkOwner)
+                    || string.IsNullOrWhiteSpace(SpatialOwnerStableId)
+                    || CoordinateSpaceCode !=
+                    공간AreaSetLandscapeGraphCodes.ScenarioLocalMeters))
+                throw new InvalidOperationException("WorldLandscapeGraphOwnerInvalid");
             var tileSet = TileRefs.ToHashSet(StringComparer.Ordinal);
-            if (TileRefs.Any(value => !공간TileWindowPlanner.TryParse(value, out _, out _))
+            if (TileRefs.Any(value =>
+                    !공간AreaSetLandscapeGraphCodes.IsSupportedTileRef(value))
                 || Placements.Any(value => !tileSet.Contains(value.OwnerTileKey)))
                 throw new InvalidOperationException("WorldLandscapeGraphTileRefInvalid");
             foreach (var node in Nodes) node.Validate();
@@ -271,7 +320,8 @@ namespace Ssalddel.Unity.Runtime.World
             {
                 SchemaVersion = 공간LandscapeCompositionCodes.SchemaVersion,
                 TileKey = tileKey,
-                AreaSetStableId = AreaSetStableId,
+                AreaSetStableId = string.IsNullOrWhiteSpace(AreaSetStableId)
+                    ? SpatialOwnerStableId : AreaSetStableId,
                 GraphBuildStableId = GraphBuildStableId + ":tile:" + tileKey,
                 GraphHashSha256 = GraphHashSha256,
                 GrammarRevision = GrammarRevision,

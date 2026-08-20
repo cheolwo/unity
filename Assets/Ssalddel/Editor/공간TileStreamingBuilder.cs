@@ -32,6 +32,8 @@ namespace Ssalddel.Unity.Editor
             visualRoot.SetParent(root.transform, false);
             var objectVisualRoot = new GameObject("DynamicVisibleObjectPool").transform;
             objectVisualRoot.SetParent(root.transform, false);
+            var lhCellRoot = new GameObject("LH_L3CellPool_125m").transform;
+            lhCellRoot.SetParent(root.transform, false);
 
             var canvasRoot = new GameObject(
                 "DynamicTileStreamingStatusCanvas",
@@ -85,6 +87,8 @@ namespace Ssalddel.Unity.Editor
             label.verticalOverflow = VerticalWrapMode.Truncate;
             label.text = "동적 공간 타일 준비 중\n실제 DEM·배치 마스크 자료 대기 · 경계 표현만 사용합니다.";
 
+            var lhStatusLabel = CreateLhStatusLabel(canvasRoot.transform);
+
             var controller = root.AddComponent<공간TileStreamingController>();
             controller.Configure(
                 player.transform,
@@ -99,8 +103,25 @@ namespace Ssalddel.Unity.Editor
                                        "LandscapeGrammarCatalogMissing");
             controller.ConfigureLandscapeAssembly(landscapeCatalog);
 
+            var lhEngine = root.AddComponent<공간LHStreamingEngine>();
+            lhEngine.Configure(
+                player.transform,
+                lhCellRoot,
+                lhStatusLabel,
+                landscapeCatalog,
+                player.transform.position,
+                125f);
+            var authorityShell = UnityEngine.Object
+                .FindFirstObjectByType<SimulationWorldShellPresenter>(
+                    FindObjectsInactive.Include);
+            lhEngine.ConfigureAuthority(authorityShell);
+            var floatingOriginRoot = parent.parent != null && parent.parent.parent != null
+                ? parent.parent.parent
+                : parent;
+            lhEngine.ConfigureFloatingOrigin(floatingOriginRoot);
+
             var gate = root.AddComponent<공간안전이동Gate>();
-            gate.Configure(controller, ~0, true);
+            gate.Configure(controller, lhEngine, ~0, true);
             player.ConfigureMovementGate(gate);
 
             var catalog = AssetDatabase.LoadAssetAtPath<법정동경관VisualCatalog>(
@@ -123,8 +144,9 @@ namespace Ssalddel.Unity.Editor
             UnityEventTools.AddPersistentListener(
                 diagnosticButton.onClick, diagnostic.Toggle);
 
-            root.AddComponent<공간TileStreamingCompositionRoot>()
-                .Configure(controller, objectController, null, false);
+            var compositionRoot = root.AddComponent<공간TileStreamingCompositionRoot>();
+            compositionRoot.Configure(controller, objectController, lhEngine, null, false);
+            실제E5AreaSetNetworkShellBuilder.BindToOpenShell(compositionRoot, false);
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
@@ -132,7 +154,34 @@ namespace Ssalddel.Unity.Editor
             Debug.Log(
                 "WORLD-STREAM-VISIBILITY-1: 3x3 활성·5x5 준비 타일, 안전 이동 경계, "
                 + "시야 기반 건물 프록시→Synty 상세 승격, 경관 Graph 원자적 조립, "
-                + "런타임 진단 트리를 연결했습니다.");
+                + "125m L3 선행 생성·계절·런타임 진단 트리를 연결했습니다.");
+        }
+
+        private static Text CreateLhStatusLabel(Transform canvas)
+        {
+            var panel = new GameObject(
+                "LH오픈월드상태Panel", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image));
+            panel.transform.SetParent(canvas, false);
+            var panelRect = panel.GetComponent<RectTransform>();
+            panelRect.anchorMin = new Vector2(0f, 1f);
+            panelRect.anchorMax = new Vector2(0f, 1f);
+            panelRect.pivot = new Vector2(0f, 1f);
+            panelRect.anchoredPosition = new Vector2(22f, -266f);
+            panelRect.sizeDelta = new Vector2(640f, 92f);
+            panel.GetComponent<Image>().color = new Color(.035f, .075f, .055f, .9f);
+
+            var label = CreateText(panel.transform, "LH오픈월드상태Text", 18, FontStyle.Normal);
+            label.rectTransform.anchorMin = Vector2.zero;
+            label.rectTransform.anchorMax = Vector2.one;
+            label.rectTransform.offsetMin = new Vector2(18f, 8f);
+            label.rectTransform.offsetMax = new Vector2(-12f, -8f);
+            label.alignment = TextAnchor.MiddleLeft;
+            label.color = new Color(.9f, .97f, .86f, 1f);
+            label.horizontalOverflow = HorizontalWrapMode.Wrap;
+            label.verticalOverflow = VerticalWrapMode.Truncate;
+            label.text = "LH 오픈 월드 준비 중 · L3 125m · H4 승인 경계 안에서 생성";
+            return label;
         }
 
         private static GameObject CreateDiagnosticPanel(Transform canvas, out Text treeText)

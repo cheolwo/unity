@@ -8,12 +8,19 @@ namespace Ssalddel.Unity.Runtime.World
     public static class 공간LandscapeCompositionCodes
     {
         public const string SchemaVersion = "simulation-world-landscape-composition.v1";
-        public const string GrammarRevision = "pyeongchang-landscape-grammar.v1";
+        public const string LegacyGrammarRevision = "pyeongchang-landscape-grammar.v1";
+        public const string GrammarRevision = "pyeongchang-landscape-grammar.v2";
+        public const string ActualE5AuthoredScenarioRevision =
+            "actual-e5-authored-scenario.r1";
         public const string Available = "Available";
         public const string WaitingForSpatialArtifact = "WaitingForSpatialArtifact";
         public const string WaitingForGrammarManifest = "WaitingForGrammarManifest";
         public const string PartialUnresolved = "PartialUnresolved";
         public const string CatalogMismatch = "CatalogMismatch";
+
+        public static bool IsSupportedGrammarRevision(string value) =>
+            value == GrammarRevision || value == LegacyGrammarRevision
+            || value == ActualE5AuthoredScenarioRevision;
     }
 
     [Serializable]
@@ -42,10 +49,10 @@ namespace Ssalddel.Unity.Runtime.World
         public void Validate()
         {
             if (SchemaVersion != 공간LandscapeCompositionCodes.SchemaVersion
-                || !공간TileWindowPlanner.TryParse(TileKey, out _, out _)
+                || !공간AreaSetLandscapeGraphCodes.IsSupportedTileRef(TileKey)
                 || string.IsNullOrWhiteSpace(AreaSetStableId)
                 || string.IsNullOrWhiteSpace(GraphBuildStableId)
-                || GrammarRevision != 공간LandscapeCompositionCodes.GrammarRevision
+                || !공간LandscapeCompositionCodes.IsSupportedGrammarRevision(GrammarRevision)
                 || string.IsNullOrWhiteSpace(StatusCode)
                 || Nodes == null || Edges == null || Placements == null
                 || ExternalConnectorStubs == null || Unresolved == null
@@ -169,7 +176,8 @@ namespace Ssalddel.Unity.Runtime.World
         {
             if (string.IsNullOrWhiteSpace(StubStableId)
                 || string.IsNullOrWhiteSpace(PlacementStableId)
-                || !공간TileWindowPlanner.TryParse(NeighborTileKey, out _, out _)
+                || (!공간AreaSetLandscapeGraphCodes.IsSupportedTileRef(NeighborTileKey)
+                    && NeighborTileKey != "area-set-network")
                 || string.IsNullOrWhiteSpace(ConnectorTypeCode)
                 || string.IsNullOrWhiteSpace(RouteSignature)
                 || string.IsNullOrWhiteSpace(DirectionCode)

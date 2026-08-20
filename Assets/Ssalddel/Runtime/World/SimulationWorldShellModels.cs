@@ -101,7 +101,8 @@ namespace Ssalddel.Unity.Runtime.World
             decimal foodSecurityDays,
             int activeTaskCount,
             string sourceModeCode,
-            IEnumerable<SimulationWorldSettlementNode> settlementNodes)
+            IEnumerable<SimulationWorldSettlementNode> settlementNodes,
+            실제E5RegionalCausalityData regionalCausality = null)
         {
             SessionStableId = Required(sessionStableId, "SimulationSessionStableIdMissing");
             if (worldRevision < 0) throw new InvalidOperationException("SimulationWorldRevisionInvalid");
@@ -122,6 +123,16 @@ namespace Ssalddel.Unity.Runtime.World
             FoodSecurityDays = foodSecurityDays;
             ActiveTaskCount = activeTaskCount;
             SourceModeCode = Required(sourceModeCode, "SimulationSourceModeMissing");
+            regionalCausality ??= new 실제E5RegionalCausalityData();
+            regionalCausality.Validate();
+            RegionalCausality = new 실제E5RegionalCausalityData
+            {
+                Revision = regionalCausality.Revision,
+                ThreatScore = regionalCausality.ThreatScore,
+                RecoveryScore = regionalCausality.RecoveryScore,
+                NetPressureModifier = regionalCausality.NetPressureModifier,
+                OutcomeCode = regionalCausality.OutcomeCode,
+            };
 
             settlements = new Dictionary<string, SimulationWorldSettlementNode>(StringComparer.Ordinal);
             foreach (var settlement in settlementNodes
@@ -149,6 +160,7 @@ namespace Ssalddel.Unity.Runtime.World
         public decimal FoodSecurityDays { get; }
         public int ActiveTaskCount { get; }
         public string SourceModeCode { get; }
+        public 실제E5RegionalCausalityData RegionalCausality { get; }
         public int SettlementCount => settlements.Count;
 
         public bool ContainsSettlement(string stableId)

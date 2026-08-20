@@ -34,11 +34,13 @@ namespace Ssalddel.Unity.Presentation.World
         private bool listenersBound;
 
         public event Action? PresentationChanged;
+        public event Action<SimulationWorldShellSnapshot>? AuthoritativeSnapshotApplied;
 
         public string ObservationScaleCode => stateMachine?.State.ObservationScaleCode ?? string.Empty;
         public string SessionStableId => stateMachine?.Snapshot.SessionStableId ?? string.Empty;
         public long WorldRevision => stateMachine?.Snapshot.WorldRevision ?? -1;
         public long WorldTick => stateMachine?.Snapshot.WorldTick ?? -1;
+        public SimulationWorldShellSnapshot CurrentSnapshot => stateMachine?.Snapshot;
         public bool IsWorldMapVisible => worldMapRoot != null && worldMapRoot.activeSelf;
         public bool IsSettlementVisible => settlementInteriorRoot != null
             && settlementInteriorRoot.activeSelf;
@@ -200,6 +202,7 @@ namespace Ssalddel.Unity.Presentation.World
         {
             stateMachine.ApplySnapshot(snapshot);
             ApplyPresentation(ResolveFocusAnchorId());
+            AuthoritativeSnapshotApplied?.Invoke(snapshot);
         }
 
         public void ValidateWiring()
