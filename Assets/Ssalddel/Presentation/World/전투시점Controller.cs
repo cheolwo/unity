@@ -64,6 +64,8 @@ namespace Ssalddel.Unity.Presentation.World
             => player != null && player.CurrentMode == 플레이어시점Mode.FirstPerson
                 ? LocalCombatPresentationCodes.DirectAction
                 : LocalCombatPresentationCodes.TacticalCommand;
+        public bool HasActiveUnifiedBattle => _localBattle != null
+            && _localBattle.PhaseCode == BattlePresentationCodes.Active;
         public bool LocksPlayerMovement
             => _localBattle == null && (_activeFrame != null
                 || _inputPhaseCode == FarmCombatPresentationCodes.Entering
@@ -82,6 +84,20 @@ namespace Ssalddel.Unity.Presentation.World
             _inputPhaseCode = state.PhaseCode == BattlePresentationCodes.Active
                 ? FarmCombatPresentationCodes.Telegraph
                 : FarmCombatPresentationCodes.Resolved;
+        }
+
+        public bool TryRequestLocalEncounter(string encounterStableId)
+        {
+            if (string.IsNullOrWhiteSpace(encounterStableId)
+                || HasActiveUnifiedBattle || player == null
+                || player.IsCameraTransitioning)
+                return false;
+            if (player.CurrentMode == 플레이어시점Mode.Strategy)
+                player.EnterExplorationMode();
+            _inputPhaseCode = FarmCombatPresentationCodes.Entering;
+            _lastAuthorityErrorCode = string.Empty;
+            CombatEntryRequested(encounterStableId.Trim());
+            return true;
         }
 
         private void Awake()

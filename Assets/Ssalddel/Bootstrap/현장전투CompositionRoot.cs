@@ -37,9 +37,16 @@ namespace Ssalddel.Unity.Bootstrap
         private float tickAccumulator;
         private int commandSequence;
         private GameObject? derivedBattlefieldRoot;
+        private string lastResolvedBattleStableId = string.Empty;
+
+        public event Action<string> WorldLocalBattleResolved = delegate { };
+        public event Action<string, string> WorldLocalBattleRequestFailed
+            = delegate { };
 
         public BattleInstanceApiModel? Current => current;
         public bool ServerAuthorityEnabled => 서버기준사용;
+        public bool AuthorityReady => authority != null
+            && !string.IsNullOrWhiteSpace(sessionStableId);
         public bool PinsLhWindow => current?.CombatSpaceCode ==
             BattlePresentationCodes.WorldLocal && current.PhaseCode ==
             BattlePresentationCodes.Active;
@@ -183,7 +190,11 @@ namespace Ssalddel.Unity.Bootstrap
                                 .BattlefieldDerivationInputHashSha256 : string.Empty,
                     }, lifetime?.Token ?? CancellationToken.None));
             }
-            catch (Exception error) { combat.SetAuthorityFailure(error.Message); }
+            catch (Exception error)
+            {
+                combat.SetAuthorityFailure(error.Message);
+                WorldLocalBattleRequestFailed(encounterStableId, error.Message);
+            }
             finally { commandInFlight = false; }
         }
 
@@ -206,6 +217,18 @@ namespace Ssalddel.Unity.Bootstrap
             current = value ?? throw new InvalidOperationException("BattleStateMissing");
             if (current.CombatSpaceCode == BattlePresentationCodes.WorldLocal)
             {
+                if (current.PhaseCode != BattlePresentationCodes.Active)
+                {
+                    lhStreamingEngine?.ReleaseFocusPin();
+                    combat.ApplyUnifiedBattleState(current, actorStableId);
+                    player.EnterExplorationMode();
+                    if (lastResolvedBattleStableId != current.BattleStableId)
+                    {
+                        lastResolvedBattleStableId = current.BattleStableId;
+                        WorldLocalBattleResolved(current.EncounterStableId);
+                    }
+                    return;
+                }
                 if (lhStreamingEngine != null)
                 {
                     var requested = current.LocalCombat.WorldContext.FocusL3CellKey;
