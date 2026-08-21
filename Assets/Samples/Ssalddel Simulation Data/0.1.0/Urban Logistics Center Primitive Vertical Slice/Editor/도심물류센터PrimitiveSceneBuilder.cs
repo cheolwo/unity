@@ -13,7 +13,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
         private const string SceneDirectory = "Assets/Ssalddel/Scenes";
         private const string ScenePath = SceneDirectory + "/UrbanLogisticsCenterPrimitive.unity";
 
-        [MenuItem("Ssalddel/Samples/Create Urban Logistics Center Primitive Scene")]
+
         public static void CreateScene()
         {
             if (!CanReplaceCurrentScene())
@@ -61,7 +61,7 @@ namespace Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor
             Debug.Log("Created urban logistics center primitive scene. Bake NavMesh before movement validation: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/Samples/Validate Urban Logistics Center Primitive Scene")]
+
         public static void ValidateGeneratedScene()
         {
             if (!File.Exists(ScenePath))

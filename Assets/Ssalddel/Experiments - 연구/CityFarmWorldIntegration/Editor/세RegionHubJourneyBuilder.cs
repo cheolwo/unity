@@ -157,7 +157,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             }
         }
 
-        [MenuItem("Ssalddel/World Composition/Build Three Region Hub Journey")]
+
         public static void Build()
         {
             EnsureFolder(Path.GetDirectoryName(ScenePath)!.Replace('\\', '/'));
@@ -200,7 +200,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("ThreeRegionHubJourneyBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/World Composition/Capture Three Region Hub Art Pass")]
+
         public static void CaptureArtPass()
         {
             var camera = Camera.main ?? Object.FindFirstObjectByType<Camera>();
@@ -236,7 +236,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             }
         }
 
-        [MenuItem("Ssalddel/World Composition/Capture Three Region 300m Play Mode")]
+
         public static void CaptureSpacedPlayMode()
         {
             if (!EditorApplication.isPlaying)
@@ -250,54 +250,54 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("ThreeRegion300mGameViewCaptureRequested:" + path);
         }
 
-        [MenuItem("Ssalddel/World Composition/Capture Hub Transition Landmarks Play Mode")]
+
         public static void CaptureHubTransitionPlayMode()
         {
             FocusCamera(HubFocusId);
             EditorApplication.delayCall += () => CapturePlayModeTo(SpacedHubCaptureRelativePath);
         }
 
-        [MenuItem("Ssalddel/World Composition/Preview Hub City Roadside Day")]
+
         public static void PreviewRoadsideDay()
         {
             RequireNightRaid().ApplyDayPreview();
             FocusNightRaidCamera();
         }
 
-        [MenuItem("Ssalddel/World Composition/Preview Night Monster Looting")]
+
         public static void PreviewNightRaid()
         {
             RequireNightRaid().ApplyNightPreview(.62f);
             FocusNightRaidCamera();
         }
 
-        [MenuItem("Ssalddel/World Composition/Capture Hub City Roadside Day Play Mode")]
+
         public static void CaptureRoadsideDayPlayMode()
         {
             PreviewRoadsideDay();
             EditorApplication.delayCall += () => CapturePlayModeTo(RoadsideDayCaptureRelativePath);
         }
 
-        [MenuItem("Ssalddel/World Composition/Capture Night Monster Looting Play Mode")]
+
         public static void CaptureNightRaidPlayMode()
         {
             PreviewNightRaid();
             EditorApplication.delayCall += () => CapturePlayModeTo(NightRaidCaptureRelativePath);
         }
 
-        [MenuItem("Ssalddel/World Composition/Focus Three Region Overview")]
+
         public static void FocusOverview() => FocusCamera(WorldFocusId);
 
-        [MenuItem("Ssalddel/World Composition/Focus Farm Region")]
+
         public static void FocusFarm() => FocusCamera(FarmFocusId);
 
-        [MenuItem("Ssalddel/World Composition/Focus Town Region")]
+
         public static void FocusTown() => FocusCamera(TownFocusId);
 
-        [MenuItem("Ssalddel/World Composition/Focus Hub Region")]
+
         public static void FocusHub() => FocusCamera(HubFocusId);
 
-        [MenuItem("Ssalddel/World Composition/Focus City Region")]
+
         public static void FocusCity() => FocusCamera(CityFocusId);
 
         public static 화물JourneyPresentationModel[] CreateCargoModelsForValidation()

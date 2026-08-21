@@ -15,7 +15,7 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
         private const string ScenePath = SceneDirectory + "/FarmPrimitive.unity";
         private const string TillingScenePath = SceneDirectory + "/FarmTillingVerticalSlice.unity";
 
-        [MenuItem("Ssalddel/Samples/Create Farm Primitive Scene")]
+
         public static void CreateScene()
         {
             if (!CanReplaceCurrentScene()) return;
@@ -88,7 +88,7 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
             Debug.Log("Created farm primitive scene: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/FARM-2/Create Tilling Vertical Slice Scene")]
+
         public static void CreateTillingVerticalSliceScene()
         {
             if (!CanReplaceCurrentScene()) return;
@@ -112,7 +112,7 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
             Debug.Log("Created FARM-2 tilling vertical slice: " + TillingScenePath);
         }
 
-        [MenuItem("Ssalddel/FARM-2/Validate Tilling Vertical Slice Scene")]
+
         public static void ValidateTillingVerticalSliceScene()
         {
             if (!File.Exists(TillingScenePath))
@@ -131,7 +131,7 @@ namespace Ssalddel.Unity.Samples.Farm.Editor
             Debug.Log("Validated FARM-2 selection, Preview, Confirm and Simulation Tick wiring.");
         }
 
-        [MenuItem("Ssalddel/Samples/Validate Farm Primitive Scene")]
+
         public static void ValidateGeneratedScene()
         {
             if (!File.Exists(ScenePath)) throw new FileNotFoundException("Farm scene was not generated.", ScenePath);

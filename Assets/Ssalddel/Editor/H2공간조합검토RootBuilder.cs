@@ -27,7 +27,7 @@ namespace Ssalddel.Unity.Editor
         private const string KnowledgeCatalogRelativePath =
             "eng/world-seedbeds/synty-bottom-up-inventory/catalog.v3.json";
 
-        [MenuItem("Ssalddel/Synty Web 검토/H2 상세 조립법 6종 Root 생성")]
+        [MenuItem("Ssalddel/검토실/Synty Web/H2 상세 조립법 6종 Root 생성")]
         public static void BuildRoots()
         {
             WI공간모판AuthoringSource.RequireEditMode();
@@ -112,7 +112,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log($"H2CompositionReviewRootsBuilt:{items.Count}:{OutputFolder}");
         }
 
-        [MenuItem("Ssalddel/Synty Web 검토/H2 상세 조립법 6종 Root 생성·5시점 촬영")]
+        [MenuItem("Ssalddel/검토실/Synty Web/H2 상세 조립법 6종 Root 생성·5시점 촬영")]
         public static void BuildAndCapture()
         {
             BuildRoots();

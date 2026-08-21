@@ -9,7 +9,7 @@ namespace Ssalddel.Unity.Editor
         private const string TargetTestClass =
             "Ssalddel.Unity.Tests.EditMode.Npc업무행동Tests";
 
-        [MenuItem("Ssalddel/Validation/NPC-WORKFORCE-1 진부 Hub 집중 검증 _F6")]
+        [MenuItem("Ssalddel/검증/NPC-WORKFORCE-1 진부 Hub 집중 검증 _F6")]
         public static void RunFocusedTests()
         {
             var api = ScriptableObject.CreateInstance<TestRunnerApi>();

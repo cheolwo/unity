@@ -31,7 +31,7 @@ namespace Ssalddel.Unity.Editor
         private const string TownRoot = "Assets/Synty/PolygonTown/Prefabs/";
         private const string CityRoot = "Assets/Synty/PolygonCity/Prefabs/";
 
-        [MenuItem("Ssalddel/World Composition/Build Minimum Anchor A Sets")]
+        [MenuItem("Ssalddel/공간·경관/구성/Build Minimum Anchor A Sets")]
         public static void Build()
         {
             var definitions = CreateDefinitions();
@@ -62,7 +62,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log($"MinimumAnchorCompositionSetsBuilt:{entries.Length}:{CatalogPath}");
         }
 
-        [MenuItem("Ssalddel/World Composition/Open Minimum Anchor Preview")]
+        [MenuItem("Ssalddel/공간·경관/구성/Open Minimum Anchor Preview")]
         public static void OpenLibraryPreview()
             => EditorSceneManager.OpenScene(PreviewScenePath, OpenSceneMode.Single);
 

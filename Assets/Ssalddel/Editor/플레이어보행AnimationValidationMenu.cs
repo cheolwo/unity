@@ -17,7 +17,7 @@ namespace Ssalddel.Unity.Editor
             EvidenceDirectory + "/synty-farm-player-locomotion-game-view.png";
         private static double _captureImportDeadline;
 
-        [MenuItem("Ssalddel/Validation/PLAYER-LOCOMOTION-1 집중 Play Mode 검증")]
+        [MenuItem("Ssalddel/검증/PLAYER-LOCOMOTION-1 집중 Play Mode 검증")]
         public static void RunFocusedTests()
         {
             var api = ScriptableObject.CreateInstance<TestRunnerApi>();
@@ -29,7 +29,7 @@ namespace Ssalddel.Unity.Editor
             }));
         }
 
-        [MenuItem("Ssalddel/Validation/PLAYER-LOCOMOTION-1 현재 Game View 저장")]
+        [MenuItem("Ssalddel/검증/PLAYER-LOCOMOTION-1 현재 Game View 저장")]
         public static void CaptureCurrentGameView()
         {
             if (!UnityEngine.Application.isPlaying)

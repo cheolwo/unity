@@ -14,7 +14,7 @@ namespace Ssalddel.Unity.Editor
     {
         public const string RootName = "L11_동적공간TileStreaming_PresentationOnly";
 
-        [MenuItem("Ssalddel/WORLD-STREAM-VISIBILITY-1/SimulationWorldShell에 시야 기반 월드 연결")]
+        [MenuItem("Ssalddel/통합 월드/공간 스트리밍/SimulationWorldShell에 시야 기반 월드 연결")]
         public static void IntegrateIntoSimulationWorldShell()
         {
             OpenShell();
@@ -147,6 +147,9 @@ namespace Ssalddel.Unity.Editor
             var compositionRoot = root.AddComponent<공간TileStreamingCompositionRoot>();
             compositionRoot.Configure(controller, objectController, lhEngine, null, false);
             실제E5AreaSetNetworkShellBuilder.BindToOpenShell(compositionRoot, false);
+
+            // 진단 자료와 Presenter 배선은 유지하되 기본 플레이 화면에서는 숨긴다.
+            canvasRoot.SetActive(false);
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             EditorSceneManager.SaveScene(SceneManager.GetActiveScene());

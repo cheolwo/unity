@@ -47,7 +47,7 @@ namespace Ssalddel.Unity.Editor
             new(도시물류경관SetNames.공동주택생활마당, 도시물류경관SetNames.공동주택생활마당),
         };
 
-        [MenuItem("Ssalddel/World Placement/공간 문법 Composition 156개 생성")]
+        [MenuItem("Ssalddel/공간·경관/배치 대장/공간 문법 Composition 156개 생성")]
         public static 공간문법CompositionCatalog Build()
         {
             var nature = Required<자연경관CompositionCatalog>(자연경관CompositionSetBuilder.CatalogPath);

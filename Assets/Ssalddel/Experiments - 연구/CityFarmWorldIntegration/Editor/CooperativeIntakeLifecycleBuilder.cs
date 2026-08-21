@@ -16,7 +16,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string EvidencePath =
             "Documentation/Changes/2026-08-10-cooperative-intake-lifecycle/cooperative-intake-game-view.png";
 
-        [MenuItem("Ssalddel/COOP-1/Build Cooperative Intake Lifecycle")]
+
         public static void Build()
         {
             if (!File.Exists(HarvestDispositionChoiceBuilder.ScenePath))
@@ -58,7 +58,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("CooperativeIntakeLifecycleBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/COOP-1/Validate Cooperative Intake Lifecycle")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -72,7 +72,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("CooperativeIntakeInitialPresentationInvalid:actions=" + actions);
         }
 
-        [MenuItem("Ssalddel/COOP-1/Capture Cooperative Intake Play Mode")]
+
         public static void Capture()
         {
             if (!EditorApplication.isPlaying)

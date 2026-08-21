@@ -12,7 +12,7 @@ namespace Ssalddel.Unity.Samples.UrbanMarket.Editor
         private const string SceneDirectory = "Assets/Ssalddel/Scenes";
         private const string ScenePath = SceneDirectory + "/UrbanMarketPrimitive.unity";
 
-        [MenuItem("Ssalddel/Samples/Create Urban Market Primitive Scene")]
+
         public static void CreateScene()
         {
             if (!CanReplaceCurrentScene())

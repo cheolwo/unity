@@ -71,8 +71,12 @@ namespace Ssalddel.Unity.Editor
             var modeCanvas = bar.GetComponentInParent<Canvas>();
             if (modeCanvas == null || modeCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
                 throw new InvalidOperationException("UnifiedWorldModeCanvasMustBeOverlay");
-            if (bar.GetComponentsInChildren<Button>(true).Length != 4)
+            if (bar.GetComponentsInChildren<Button>(false).Length != 3)
                 throw new InvalidOperationException("UnifiedWorldModeButtonCountInvalid");
+            var inboundButton = bar.transform.Find("JinbuInboundButton");
+            if (inboundButton == null || inboundButton.gameObject.activeSelf)
+                throw new InvalidOperationException("UnifiedWorldInboundButtonMustBeHidden");
+            SimulationWorldShellBuilder.ValidateMinimalPlayHudOpenScene();
 
             var enabledScenes = EditorBuildSettings.scenes.Where(value => value.enabled).ToArray();
             if (enabledScenes.Length != 1 || enabledScenes[0].path != ShellScenePath)

@@ -16,7 +16,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string EvidencePath =
             "Documentation/Changes/2026-08-10-direct-online-sale-lifecycle/direct-online-sale-game-view.png";
 
-        [MenuItem("Ssalddel/DIRECT-1/Build Direct Online Sale Lifecycle")]
+
         public static void Build()
         {
             if (!File.Exists(HarvestDispositionChoiceBuilder.ScenePath))
@@ -58,7 +58,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("DirectOnlineSaleLifecycleBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/DIRECT-1/Validate Direct Online Sale Lifecycle")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -72,7 +72,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("DirectOnlineSaleInitialPresentationInvalid:actions=" + actions);
         }
 
-        [MenuItem("Ssalddel/DIRECT-1/Capture Direct Online Sale Play Mode")]
+
         public static void Capture()
         {
             if (!EditorApplication.isPlaying)

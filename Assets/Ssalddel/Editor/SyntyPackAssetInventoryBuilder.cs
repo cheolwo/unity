@@ -31,7 +31,7 @@ namespace Ssalddel.Unity.Editor
                     "Assets/Synty/PolygonConstruction/Prefabs",
             };
 
-        [MenuItem("Ssalddel/World Placement/신티 5팩 전수 기술 대장 생성")]
+        [MenuItem("Ssalddel/공간·경관/배치 대장/신티 5팩 전수 기술 대장 생성")]
         public static SyntyPackAssetInventoryCatalog Build()
         {
             EnsureFolder(Path.GetDirectoryName(CatalogPath)!.Replace('\\', '/'));

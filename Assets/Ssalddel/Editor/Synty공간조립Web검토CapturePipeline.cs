@@ -55,7 +55,7 @@ namespace Ssalddel.Unity.Editor
             "ui=review-metadata-on-web-only",
             "camera=four-fixed-bounds-relative-views"));
 
-        [MenuItem("Ssalddel/Synty Web 검토/01 회복 발전소 A Normal · 4시점 로컬 촬영 _F10")]
+        [MenuItem("Ssalddel/검토실/Synty Web/01 회복 발전소 A Normal · 4시점 로컬 촬영 _F10")]
         public static void CaptureOneCardMenu()
         {
             var bundle = CaptureOneCard(string.Empty, 0);
@@ -64,7 +64,7 @@ namespace Ssalddel.Unity.Editor
             EditorUtility.RevealInFinder(bundle.OutputFolder);
         }
 
-        [MenuItem("Ssalddel/Synty Web 검토/02 회복 발전소 A Normal · 최초 업로드 및 등록")]
+        [MenuItem("Ssalddel/검토실/Synty Web/02 회복 발전소 A Normal · 최초 업로드 및 등록")]
         public static async void UploadInitialOneCardMenu()
         {
             try
@@ -78,7 +78,7 @@ namespace Ssalddel.Unity.Editor
             }
         }
 
-        [MenuItem("Ssalddel/Synty Web 검토/03 NeedsRevision 1카드 · 재촬영 및 등록")]
+        [MenuItem("Ssalddel/검토실/Synty Web/03 NeedsRevision 1카드 · 재촬영 및 등록")]
         public static async void RecaptureNeedsRevisionOneCardMenu()
         {
             try

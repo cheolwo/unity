@@ -15,7 +15,7 @@ namespace Ssalddel.Unity.Editor.Experiments
         private const string PrefabRoot = "Assets/Synty/PolygonStarter/Prefabs/";
         private const string MaterialRoot = "Assets/Ssalddel/Experiments - 연구/SyntyCommunityPlaza/Materials/";
 
-        [MenuItem("Ssalddel/Experiments/Build Synty Community Plaza")]
+
         public static void Build()
         {
             EnsureFolder("Assets/Ssalddel/Experiments - 연구/SyntyCommunityPlaza/Materials");

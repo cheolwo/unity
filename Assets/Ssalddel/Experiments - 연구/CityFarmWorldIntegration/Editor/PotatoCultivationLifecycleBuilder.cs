@@ -18,7 +18,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string EvidencePath =
             "Documentation/Changes/2026-08-10-potato-cultivation-lifecycle/potato-cultivation-lifecycle-game-view.png";
 
-        [MenuItem("Ssalddel/FARM-3/Build Potato Cultivation Lifecycle")]
+
         public static void Build()
         {
             if (!File.Exists(PotatoJourneyFarmVerticalSliceBuilder.ScenePath))
@@ -74,11 +74,11 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("PotatoCultivationLifecycleBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/FARM-3/Open Potato Cultivation Lifecycle")]
+
         public static void Open()
             => EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        [MenuItem("Ssalddel/FARM-3/Validate Potato Cultivation Lifecycle")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -101,7 +101,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             }
         }
 
-        [MenuItem("Ssalddel/FARM-3/Capture Potato Cultivation Lifecycle Play Mode")]
+
         public static void CapturePlayMode()
         {
             if (!EditorApplication.isPlaying)

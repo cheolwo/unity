@@ -26,7 +26,7 @@ namespace Ssalddel.Unity.Editor
         private const string TownRoot = "Assets/Synty/PolygonTown/Prefabs";
         private const string CityRoot = "Assets/Synty/PolygonCity/Prefabs";
 
-        [MenuItem("Ssalddel/OBJ-2~7A/통합 Object Catalog와 모판 생성")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/오브젝트 2/통합 Object Catalog와 모판 생성")]
         public static void BuildAll()
         {
             if (EditorApplication.isPlaying)
@@ -36,7 +36,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("IntegratedExhibitionObjectSeedbedBuilt:" + PreviewScenePath);
         }
 
-        [MenuItem("Ssalddel/OBJ-2~7A/통합 Object Catalog 생성")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/오브젝트 2/통합 Object Catalog 생성")]
         public static void BuildCatalog()
         {
             Directory.CreateDirectory(PrefabRoot);
@@ -57,7 +57,7 @@ namespace Ssalddel.Unity.Editor
             catalog.Validate();
         }
 
-        [MenuItem("Ssalddel/OBJ-3~7A/독립 Object 모판 생성")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/오브젝트 3/독립 Object 모판 생성")]
         public static void BuildPreviewScene()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -85,7 +85,7 @@ namespace Ssalddel.Unity.Editor
             Selection.activeGameObject = root;
         }
 
-        [MenuItem("Ssalddel/OBJ-3~7A/독립 Object 모판 검증")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/오브젝트 3/독립 Object 모판 검증")]
         public static void ValidateOpenPreviewScene()
         {
             var root = GameObject.Find(PreviewRootName)

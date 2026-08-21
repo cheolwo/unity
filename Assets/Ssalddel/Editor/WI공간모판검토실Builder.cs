@@ -35,7 +35,7 @@ namespace Ssalddel.Unity.Editor
             new(.42f, .35f, .65f),
         };
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/00 전체 생성 및 열기")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/00 전체 생성 및 열기")]
         public static void BuildAll()
         {
             RequireEditMode();
@@ -46,7 +46,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("E4 증거 · H1 WI 공간 모판 검토실 생성 완료: 5개 모판 / 9개 공간 / 27개 고유 후보");
         }
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/00 빠른 원본·Catalog 새로고침")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/00 빠른 원본·Catalog 새로고침")]
         public static void RefreshSourceAndCatalog()
         {
             RequireEditMode();
@@ -55,21 +55,21 @@ namespace Ssalddel.Unity.Editor
             Debug.Log($"E4 증거 · H1 빠른 새로고침 완료: 원본 변경={sourceChanged}, Catalog 변경={catalogResult.Changed}");
         }
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/01 원본 JSON 동기화")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/01 원본 JSON 동기화")]
         public static void SyncAuthoritativeJson()
         {
             RequireEditMode();
             WI공간모판SourceSynchronizer.Sync(MirrorRoot);
         }
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/02 Visual Catalog 생성")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/02 Visual Catalog 생성")]
         public static WI공간모판VisualCatalog BuildVisualCatalog()
         {
             RequireEditMode();
             return WI공간모판CatalogBuilder.Build(VisualCatalogPath).Catalog;
         }
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/03 검토실 Scene 생성")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/03 검토실 Scene 생성")]
         public static void BuildSceneFromCatalog()
         {
             RequireEditMode();
@@ -77,7 +77,7 @@ namespace Ssalddel.Unity.Editor
             BuildScene(catalog);
         }
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/04 열린 Scene 검증")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/04 열린 Scene 검증")]
         public static void ValidateScene()
         {
             var scene = SceneManager.GetActiveScene();
@@ -99,25 +99,25 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("E4 증거 · H1 WI 공간 모판 검토실 검증 통과");
         }
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/보기/전체 개요")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/보기/전체 개요")]
         public static void ShowOverview() => WithPresenter(value => value.ShowOverview());
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/보기/01 농장 생산 대표")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/보기/01 농장 생산 대표")]
         public static void ShowFarmProduction() => ShowSeedbed("wi-spatial-seedbed:farm-production.v1");
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/보기/02 농장 작업마당 대표")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/보기/02 농장 작업마당 대표")]
         public static void ShowFarmWorkYard() => ShowSeedbed("wi-spatial-seedbed:farm-work-yard.v1");
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/보기/03 농장 상차 Gate 대표")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/보기/03 농장 상차 Gate 대표")]
         public static void ShowFarmLoadingGate() => ShowSeedbed("wi-spatial-seedbed:farm-loading-gate.v1");
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/보기/04 Farm Hub 회랑 대표")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/보기/04 Farm Hub 회랑 대표")]
         public static void ShowFarmHubCorridor() => ShowSeedbed("wi-spatial-seedbed:farm-hub-corridor.v1");
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/보기/05 Hub 입고 보관 대표")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/보기/05 Hub 입고 보관 대표")]
         public static void ShowHubReceivingStorage() => ShowSeedbed("wi-spatial-seedbed:hub-receiving-storage.v1");
 
-        [MenuItem("Ssalddel/E4 · H1 WI 공간 모판/보기/선택 모판 후보 비교")]
+        [MenuItem("Ssalddel/검토실/E4 H1 WI 공간 모판/보기/선택 모판 후보 비교")]
         public static void ShowCandidateSheet() => WithPresenter(value => value.ShowSelectedCandidateSheet());
 
         private static void BuildScene(WI공간모판VisualCatalog catalog)

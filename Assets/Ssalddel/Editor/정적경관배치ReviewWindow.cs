@@ -33,7 +33,7 @@ namespace Ssalddel.Unity.Editor
         private Vector2 _canvasPan;
         private float _canvasZoom = 1f;
 
-        [MenuItem("Ssalddel/WORLD-PLAN 평창 정적 경관 배치 검토창")]
+        [MenuItem("Ssalddel/공간·경관/정적 경관 계획/검토창")]
         public static void Open()
         {
             var window = GetWindow<정적경관배치ReviewWindow>();

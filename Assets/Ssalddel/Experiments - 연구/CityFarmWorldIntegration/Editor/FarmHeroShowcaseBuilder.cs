@@ -21,7 +21,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         private const string FarmRoot = "Assets/Synty/PolygonFarm/Prefabs/";
         private const string FarmFocus = "camera-focus:zone.farm-production";
 
-        [MenuItem("Ssalddel/SHOWCASE/Build Farm Hero Slice")]
+
         public static void Build()
         {
             FarmCityGraphicalShowcaseBuilder.Build();
@@ -52,7 +52,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("FarmHeroShowcaseBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/SHOWCASE/Validate Farm Hero Slice")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -92,7 +92,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("FarmHeroTimeOfDayInvalid");
         }
 
-        [MenuItem("Ssalddel/SHOWCASE/Open Farm Hero Slice")]
+
         public static void Open()
             => EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
@@ -238,39 +238,39 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             camera.backgroundColor = new Color(.64f, .72f, .76f);
         }
 
-        [MenuItem("Ssalddel/SHOWCASE/Capture Farm Hero Play Mode")]
+
         public static void CapturePlayMode()
         {
             CapturePlayModeTo(
                 "Documentation/Changes/2026-08-10-farm-hero-slice/farm-hero-slice.png");
         }
 
-        [MenuItem("Ssalddel/SHOWCASE/Capture Farm Hero ART4 Play Mode")]
+
         public static void CaptureArt4PlayMode()
             => CapturePlayModeTo(
                 "Documentation/Changes/2026-08-10-farm-hero-slice/farm-hero-art4-motion.png");
 
-        [MenuItem("Ssalddel/SHOWCASE/TIME/Capture 01 Dawn")]
+
         public static void CaptureDawn()
             => ApplyTimeAndCapture("01-dawn", 5.5f / 24f);
 
-        [MenuItem("Ssalddel/SHOWCASE/TIME/Capture 02 Morning")]
+
         public static void CaptureMorning()
             => ApplyTimeAndCapture("02-morning", 8.5f / 24f);
 
-        [MenuItem("Ssalddel/SHOWCASE/TIME/Capture 03 Midday")]
+
         public static void CaptureMidday()
             => ApplyTimeAndCapture("03-midday", 12.5f / 24f);
 
-        [MenuItem("Ssalddel/SHOWCASE/TIME/Capture 04 Afternoon")]
+
         public static void CaptureAfternoon()
             => ApplyTimeAndCapture("04-afternoon", 16f / 24f);
 
-        [MenuItem("Ssalddel/SHOWCASE/TIME/Capture 05 Golden Dusk")]
+
         public static void CaptureGoldenDusk()
             => ApplyTimeAndCapture("05-golden-dusk", 18.5f / 24f);
 
-        [MenuItem("Ssalddel/SHOWCASE/TIME/Capture 06 Night")]
+
         public static void CaptureNight()
             => ApplyTimeAndCapture("06-night", 21f / 24f);
 

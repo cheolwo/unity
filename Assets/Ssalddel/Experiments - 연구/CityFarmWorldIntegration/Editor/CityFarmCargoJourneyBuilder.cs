@@ -28,7 +28,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         private const string MaterialDirectory =
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorldIntegration/Materials";
 
-        [MenuItem("Ssalddel/WORLD-4/Build Cargo Journey")]
+
         public static void Build()
         {
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(SourceScenePath) == null)
@@ -75,7 +75,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("WORLD-4 cargo journey created: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/WORLD-4/Validate Cargo Journey")]
+
         public static void ValidateOpenScene()
         {
             var view = UnityEngine.Object.FindFirstObjectByType<CargoJourneyView>();

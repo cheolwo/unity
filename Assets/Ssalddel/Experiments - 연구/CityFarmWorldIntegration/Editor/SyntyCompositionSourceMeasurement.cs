@@ -298,7 +298,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string DefaultReportPath =
             "artifacts/CMP2/SyntyCompositionSourceMeasurements.json";
 
-        [MenuItem("Ssalddel/Validation/Measure Synty Composition Sources")]
+
         public static void MeasureAndWriteReport()
         {
             var report = Inspect();

@@ -15,6 +15,16 @@
 - Pipeline으로 실제 Scene을 볼 때는 `WorldBootstrapScene`의 상태 패널, marker 수, marker 선택 상세 패널, Console 오류를 확인한다.
 - API 주소와 WebApp 상세 페이지 주소는 별도 설정으로 유지한다. 개인 위치, 원장 원본, 신청·운송 실행 데이터를 공개 marker에 넣지 않는다.
 
+## Farm·Hub·City 독립 영역 우선
+
+- Farm, Hub, City는 공급망 순서에 종속된 하나의 slice가 아니라 각각 독립적으로 개발·검증하는 업무 영역이다.
+- 별도 사용자 요청이 없으면 `Farm→Hub`, `Hub→City`, `Farm→Hub→City`를 첫 구현, 다음 구현 또는 대표 수직 slice로 선택하지 않는다. 기존 감자 Farm→Hub 자산과 시험은 호환·회귀 증거로만 유지한다.
+- 각 영역은 다른 영역 없이 시작할 수 있는 Fixture, 영역 내부 플레이 폐루프, 서버 조회·저장·재생 경계와 선택·관찰 가능한 표현을 먼저 갖춘다.
+- 영역 간 회랑과 화물 인계는 출발·도착 영역의 독립 준비 뒤에 수행하는 별도 통합 slice다. 연결이 없어도 각 영역 모듈은 실행 가능해야 한다.
+- Hub와 City를 새 문서·Root·완료 증거에서 `City/Hub` 한 영역으로 합치지 않는다. 기존 API·JSON·stable ID 이름은 호환성 검토 없이 바꾸지 않는다.
+- 영역별 공식 Scene을 새로 만들지 않고 canonical `SimulationWorldShell` 안의 독립 모듈로 조립한다.
+- 상세 단일 기준은 Hongdal 저장소의 `docs/Architecture/FarmHubCity독립영역우선개발정책.md`를 따른다.
+
 ## 한국어 중심 용어와 작업 보고
 
 - 문서, README, 사람이 읽는 주석, 진행·완료 보고와 검증 설명은 한국어를 기본으로 한다.

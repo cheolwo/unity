@@ -18,7 +18,7 @@ namespace Ssalddel.Unity.Editor
         public const string ExternalOutputEnvironmentVariable =
             "SSALDDEL_LANDSCAPE_GRAMMAR_OUTPUT";
 
-        [MenuItem("Ssalddel/World Placement/공간 문법 안전 Manifest 내보내기")]
+        [MenuItem("Ssalddel/공간·경관/배치 대장/공간 문법 안전 Manifest 내보내기")]
         public static string Export()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<공간문법CompositionCatalog>(

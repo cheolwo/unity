@@ -20,7 +20,7 @@ namespace Ssalddel.Unity.Samples.UrbanMarket.Editor
         private const string GeneratedDirectory = "Assets/Ssalddel/Generated";
         private const string AnimatorPath = GeneratedDirectory + "/UrbanMarketRepresentativePrimitive.controller";
 
-        [MenuItem("Ssalddel/Samples/Create Urban Market Manager Primitive Scene")]
+
         public static void CreateScene()
         {
             if (!CanReplaceCurrentScene()) return;

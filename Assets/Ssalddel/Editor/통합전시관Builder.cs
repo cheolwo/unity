@@ -41,7 +41,7 @@ namespace Ssalddel.Unity.Editor
         private const string FoodDriverPath = "Assets/Synty/PolygonTown/Prefabs/Characters/SM_Chr_Father_02.prefab";
         private const string PizzaBoxPath = "Assets/Synty/PolygonTown/Prefabs/Items/SM_Item_Pizza_Box_01.prefab";
 
-        [MenuItem("Ssalddel/EXH-5/통합 모판 전시관 생성")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/통합 모판 전시관 생성")]
         public static void Build()
         {
             if (EditorApplication.isPlaying)
@@ -70,7 +70,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("IntegratedSeedbedExhibitionBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/EXH-5/통합 모판 전시관 검증")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/통합 모판 전시관 검증")]
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find(RootName)
@@ -133,22 +133,22 @@ namespace Ssalddel.Unity.Editor
             presenter.Execute(통합전시관ActionCode.첫번째전시);
         }
 
-        [MenuItem("Ssalddel/EXH-5/신티 에셋 모판 보기")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/신티 에셋 모판 보기")]
         public static void ShowAssetSeedbed() => FindPresenter().Execute(통합전시관ActionCode.첫번째전시);
 
-        [MenuItem("Ssalddel/EXH-5/음식배달 계보 보기")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/음식배달 계보 보기")]
         public static void ShowFoodDelivery() => FindPresenter().Execute(통합전시관ActionCode.두번째전시);
 
-        [MenuItem("Ssalddel/EXH-5/감자 재배 체험 보기")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/감자 재배 체험 보기")]
         public static void ShowFarmLifecycle() => FindPresenter().Execute(통합전시관ActionCode.세번째전시);
 
-        [MenuItem("Ssalddel/EXH-5/화물 Hub 창고 계보 보기")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/화물 Hub 창고 계보 보기")]
         public static void ShowCargoHubWarehouse() => FindPresenter().Execute(통합전시관ActionCode.네번째전시);
 
-        [MenuItem("Ssalddel/EXH-5/감자 현실 관측 보기")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/감자 현실 관측 보기")]
         public static void ShowPotatoObservation() => FindPresenter().Execute(통합전시관ActionCode.다섯번째전시);
 
-        [MenuItem("Ssalddel/EXH-5/주문자 집단 도심마트 경계 보기")]
+        [MenuItem("Ssalddel/검토실/통합 전시관/주문자 집단 도심마트 경계 보기")]
         public static void ShowOrdererGroupUrbanMarket() => FindPresenter().Execute(통합전시관ActionCode.여섯번째전시);
 
         private static 통합전시관Presenter FindPresenter()

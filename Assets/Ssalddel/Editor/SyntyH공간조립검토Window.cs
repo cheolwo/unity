@@ -27,7 +27,7 @@ namespace Ssalddel.Unity.Editor
         private bool isRunning;
         private Vector2 scroll;
 
-        [MenuItem("Ssalddel/Synty Web 검토/H1-H4 조합물 촬영·전송")]
+        [MenuItem("Ssalddel/검토실/Synty Web/H1-H4 조합물 촬영·전송")]
         public static void Open()
         {
             var window = GetWindow<SyntyH공간조립검토Window>();

@@ -42,7 +42,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public static IReadOnlyList<string> CanonicalProductStableIds { get; } =
             BuildSpecs().Select(value => value.StableId).ToArray();
 
-        [MenuItem("Ssalddel/World/Rebuild Farm Product Visual Catalog")]
+
         public static void Build()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<FarmProductVisualCatalog>(CatalogPath);

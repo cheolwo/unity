@@ -26,7 +26,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             "도시 도착",
         };
 
-        [MenuItem("Ssalddel/감자생산유통/Build 통합 흐름")]
+
         public static void Build()
         {
             EnsureSourceScenes();
@@ -121,10 +121,10 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("PotatoProductionDistributionIntegratedBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/감자생산유통/Open 통합 흐름")]
+
         public static void Open() => EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        [MenuItem("Ssalddel/감자생산유통/Validate 통합 흐름")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -161,7 +161,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                     throw new InvalidOperationException("PotatoIntegratedStageRootMissing:" + name);
         }
 
-        [MenuItem("Ssalddel/감자생산유통/Capture 통합 흐름 Play Mode")]
+
         public static void CapturePlayMode()
         {
             if (!EditorApplication.isPlaying)

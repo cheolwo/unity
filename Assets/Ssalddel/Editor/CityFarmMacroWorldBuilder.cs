@@ -17,7 +17,7 @@ namespace Ssalddel.Unity.Editor
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Materials";
         private const string WorldFocusAnchorId = "camera-focus:world.city-farm-supply-chain";
 
-        [MenuItem("Ssalddel/WORLD-1/Build City Farm Macro World")]
+
         public static void Build()
         {
             var layout = 공급망WorldLayoutFixture.Create();
@@ -84,30 +84,30 @@ namespace Ssalddel.Unity.Editor
             SceneView.RepaintAll();
         }
 
-        [MenuItem("Ssalddel/WORLD-1/Focus/World Overview")]
+
         public static void FocusWorld() => Focus(WorldFocusAnchorId);
 
-        [MenuItem("Ssalddel/WORLD-1/Focus/Farm Production")]
+
         public static void FocusFarmProduction()
             => Focus("camera-focus:zone." + 공급망PresentationZoneCodes.FarmProduction);
 
-        [MenuItem("Ssalddel/WORLD-1/Focus/Farm Yard")]
+
         public static void FocusFarmYard()
             => Focus("camera-focus:zone." + 공급망PresentationZoneCodes.FarmYard);
 
-        [MenuItem("Ssalddel/WORLD-1/Focus/Transport Corridor")]
+
         public static void FocusTransport()
             => Focus("camera-focus:zone." + 공급망PresentationZoneCodes.TransportCorridor);
 
-        [MenuItem("Ssalddel/WORLD-1/Focus/Urban Logistics")]
+
         public static void FocusLogistics()
             => Focus("camera-focus:zone." + 공급망PresentationZoneCodes.UrbanLogistics);
 
-        [MenuItem("Ssalddel/WORLD-1/Focus/Urban Market")]
+
         public static void FocusMarket()
             => Focus("camera-focus:zone." + 공급망PresentationZoneCodes.UrbanMarket);
 
-        [MenuItem("Ssalddel/WORLD-1/Focus/Residential Community")]
+
         public static void FocusResidential()
             => Focus("camera-focus:zone." + 공급망PresentationZoneCodes.ResidentialCommunity);
 

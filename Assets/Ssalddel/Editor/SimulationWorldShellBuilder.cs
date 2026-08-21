@@ -50,7 +50,7 @@ namespace Ssalddel.Unity.Editor
 
         private const float TacticalNavigationFloorThickness = .12f;
 
-        [MenuItem("Ssalddel/WORLD-SHELL-0/Build Read Only Shell")]
+        [MenuItem("Ssalddel/통합 월드/공식 Scene/Build Read Only Shell")]
         public static void BuildWorldShell()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -111,7 +111,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-SHELL-0 built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-SCENE-0/Build First Settlement")]
+        [MenuItem("Ssalddel/통합 월드/정착지/기본/Build First Settlement")]
         public static void BuildSettlementScene()
         {
             OpenShellIfRequired();
@@ -141,7 +141,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("SETTLEMENT-SCENE-0 built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/JINBU-INBOUND-UI-0/Build Figma MAUI Compatible UI")]
+        [MenuItem("Ssalddel/통합 월드/Hub 입고/Build Figma MAUI Compatible UI")]
         public static void Build진부Hub입고Ui()
         {
             OpenShellIfRequired();
@@ -164,7 +164,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("JINBU-INBOUND-UI-0 built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/JINBU-INBOUND-UI-0/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/Hub 입고/Validate Open Scene")]
         public static void Validate진부Hub입고UiOpenScene()
         {
             var presenter = UnityEngine.Object.FindFirstObjectByType<진부Hub입고UiPresenter>(
@@ -212,6 +212,7 @@ namespace Ssalddel.Unity.Editor
                 FindObjectsInactive.Include)
                 ?? throw new InvalidOperationException("UnifiedWorldInboundUiMissing");
             Build통합월드ModeNavigation(persistentUi, runtimeRoot, shell, player, inbound);
+            ApplyMinimalPlayHudLayout(root);
 
             var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
             EditorSceneManager.MarkSceneDirty(scene);
@@ -221,7 +222,171 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("UNIFIED-WORLD-1: 기존 SimulationWorldShell에 통합 모드 전환 UI를 연결했습니다.");
         }
 
-        [MenuItem("Ssalddel/FARM-TACTICAL-SQUAD-0/Build Formation Movement")]
+        [MenuItem("Ssalddel/통합 월드/UI/최소 플레이 HUD 적용")]
+        public static void ApplyMinimalPlayHud()
+        {
+            OpenShellIfRequired();
+            var root = Required(RootName);
+            ApplyMinimalPlayHudLayout(root);
+
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException("MinimalPlayHudSceneSaveFailed");
+            AssetDatabase.SaveAssets();
+            ValidateMinimalPlayHudOpenScene();
+            Debug.Log("WORLD-UI-MINIMAL-1: 상태·진단 HUD를 숨기고 하단 시점 전환만 남겼습니다.");
+        }
+
+        [MenuItem("Ssalddel/통합 월드/UI/최소 플레이 HUD 검증")]
+        public static void ValidateMinimalPlayHudOpenScene()
+        {
+            var root = Required(RootName);
+            var hud = Required(root.transform, "PersistentUI/SimulationWorldHud");
+            if (hud.gameObject.activeSelf)
+                throw new InvalidOperationException("MinimalPlayHudBusinessCanvasVisible");
+            RequireInactive(hud, "WorldStatusPanel");
+            RequireInactive(hud, "NavigationPanel");
+            RequireInactive(hud, "ActualE5NetworkHud");
+
+            var streamingCanvas = root.GetComponentsInChildren<Canvas>(true)
+                .FirstOrDefault(value => value.name == "DynamicTileStreamingStatusCanvas")
+                ?? throw new InvalidOperationException("MinimalPlayHudStreamingCanvasMissing");
+            if (streamingCanvas.gameObject.activeSelf)
+                throw new InvalidOperationException("MinimalPlayHudStreamingCanvasVisible");
+
+            if (root.GetComponentsInChildren<오늘작업계획Presenter>(true)
+                .Any(value => value.HudVisible))
+                throw new InvalidOperationException("MinimalPlayHudDailyPlanVisible");
+            if (root.GetComponentsInChildren<농장경영시점Controller>(true)
+                .Any(value => value.GuidanceVisible))
+                throw new InvalidOperationException("MinimalPlayHudManagementGuidanceVisible");
+            if (root.GetComponentsInChildren<플레이어경관Controller>(true)
+                .Any(value => value.GuidanceVisible))
+                throw new InvalidOperationException("MinimalPlayHudPlayerGuidanceVisible");
+
+            var bar = Required(root.transform,
+                "PersistentUI/UnifiedWorldModeCanvas/UnifiedWorldModeBar");
+            var rect = bar.GetComponent<RectTransform>();
+            if (rect == null || rect.anchorMin != new Vector2(.5f, 0f)
+                || rect.anchorMax != new Vector2(.5f, 0f))
+                throw new InvalidOperationException("MinimalPlayHudModeBarPositionInvalid");
+            if (bar.GetComponentsInChildren<Button>(false).Length != 3)
+                throw new InvalidOperationException("MinimalPlayHudModeButtonCountInvalid");
+            RequireInactive(bar, "JinbuInboundButton");
+
+            var players = root.GetComponentsInChildren<플레이어경관Controller>(true);
+            if (players.Length != 1)
+                throw new InvalidOperationException("MinimalPlayHudPlayerCountInvalid");
+            var modeCanvas = bar.GetComponentInParent<Canvas>()
+                             ?? throw new InvalidOperationException("MinimalPlayHudModeCanvasMissing");
+            var singlePlayerView = root.GetComponent<단일PlayerViewController>()
+                                   ?? throw new InvalidOperationException("MinimalPlayHudSinglePlayerViewMissing");
+            singlePlayerView.ValidateWiring();
+            if (!singlePlayerView.ApplyOnPlay
+                || singlePlayerView.Player != players[0]
+                || singlePlayerView.ModeCanvas != modeCanvas)
+                throw new InvalidOperationException("MinimalPlayHudSinglePlayerViewInvalid");
+
+            var modePresenter = root.GetComponentInChildren<통합월드ModePresenter>(true)
+                                ?? throw new InvalidOperationException("MinimalPlayHudModePresenterMissing");
+            if (!modePresenter.StartsInTacticalMode)
+                throw new InvalidOperationException("MinimalPlayHudDefaultPerspectiveInvalid");
+            Debug.Log("WORLD-UI-MINIMAL-1 validation passed");
+        }
+
+        private static void ApplyMinimalPlayHudLayout(GameObject root)
+        {
+            var hud = Required(root.transform, "PersistentUI/SimulationWorldHud");
+            hud.gameObject.SetActive(false);
+            SetInactiveIfPresent(hud, "WorldStatusPanel");
+            SetInactiveIfPresent(hud, "NavigationPanel");
+            SetInactiveIfPresent(hud, "ActualE5NetworkHud");
+
+            var streamingCanvas = root.GetComponentsInChildren<Canvas>(true)
+                .FirstOrDefault(value => value.name == "DynamicTileStreamingStatusCanvas");
+            if (streamingCanvas != null) streamingCanvas.gameObject.SetActive(false);
+
+            foreach (var dailyPlan in root
+                         .GetComponentsInChildren<오늘작업계획Presenter>(true))
+            {
+                dailyPlan.SetHudVisible(false);
+                EditorUtility.SetDirty(dailyPlan);
+            }
+            foreach (var management in root
+                         .GetComponentsInChildren<농장경영시점Controller>(true))
+            {
+                management.SetGuidanceVisible(false);
+                EditorUtility.SetDirty(management);
+            }
+            foreach (var player in root
+                         .GetComponentsInChildren<플레이어경관Controller>(true))
+            {
+                player.SetGuidanceVisible(false);
+                EditorUtility.SetDirty(player);
+            }
+
+            var bar = Required(root.transform,
+                "PersistentUI/UnifiedWorldModeCanvas/UnifiedWorldModeBar");
+            var rect = bar.GetComponent<RectTransform>()
+                       ?? throw new InvalidOperationException("MinimalPlayHudModeBarRectMissing");
+            rect.anchorMin = new Vector2(.5f, 0f);
+            rect.anchorMax = new Vector2(.5f, 0f);
+            rect.pivot = new Vector2(.5f, 0f);
+            rect.anchoredPosition = new Vector2(0f, 18f);
+            rect.sizeDelta = new Vector2(274f, 52f);
+
+            ConfigureMinimalModeButton(bar, "WorldOverviewButton", "전략 시점", 8f);
+            ConfigureMinimalModeButton(bar, "FarmFirstPersonButton", "1인칭", 96f);
+            ConfigureMinimalModeButton(bar, "FarmTacticalButton", "3인칭", 184f);
+            SetInactiveIfPresent(bar, "JinbuInboundButton");
+
+            var players = root.GetComponentsInChildren<플레이어경관Controller>(true);
+            if (players.Length != 1)
+                throw new InvalidOperationException("MinimalPlayHudPlayerCountInvalid");
+            var modeCanvas = bar.GetComponentInParent<Canvas>()
+                             ?? throw new InvalidOperationException("MinimalPlayHudModeCanvasMissing");
+            var singlePlayerView = root.GetComponent<단일PlayerViewController>()
+                                   ?? root.AddComponent<단일PlayerViewController>();
+            singlePlayerView.Configure(players[0], modeCanvas, true);
+            EditorUtility.SetDirty(singlePlayerView);
+
+            var modePresenter = root.GetComponentInChildren<통합월드ModePresenter>(true)
+                                ?? throw new InvalidOperationException("MinimalPlayHudModePresenterMissing");
+            modePresenter.SetStartInTacticalMode(true);
+            EditorUtility.SetDirty(modePresenter);
+        }
+
+        private static void ConfigureMinimalModeButton(
+            Transform bar, string name, string label, float x)
+        {
+            var button = Required(bar, name);
+            var rect = button.GetComponent<RectTransform>()
+                       ?? throw new InvalidOperationException("MinimalPlayHudButtonRectMissing:" + name);
+            rect.anchoredPosition = new Vector2(x, -8f);
+            rect.sizeDelta = new Vector2(82f, 36f);
+            button.gameObject.SetActive(true);
+            var text = button.GetComponentInChildren<Text>(true)
+                       ?? throw new InvalidOperationException("MinimalPlayHudButtonTextMissing:" + name);
+            text.text = label;
+            text.fontSize = 13;
+        }
+
+        private static void SetInactiveIfPresent(Transform parent, string name)
+        {
+            var child = parent.Find(name);
+            if (child != null) child.gameObject.SetActive(false);
+        }
+
+        private static void RequireInactive(Transform parent, string name)
+        {
+            var child = parent.Find(name)
+                        ?? throw new InvalidOperationException("MinimalPlayHudElementMissing:" + name);
+            if (child.gameObject.activeSelf)
+                throw new InvalidOperationException("MinimalPlayHudElementVisible:" + name);
+        }
+
+        [MenuItem("Ssalddel/통합 월드/Farm 전술 분대/Build Formation Movement")]
         public static void Build전술분대이동()
         {
             OpenShellIfRequired();
@@ -239,7 +404,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("FARM-TACTICAL-SQUAD-0 built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/FARM-TACTICAL-SQUAD-0/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/Farm 전술 분대/Validate Open Scene")]
         public static void Validate전술분대이동OpenScene()
         {
             var presenter = UnityEngine.Object.FindFirstObjectByType<전술분대Presenter>(
@@ -261,14 +426,14 @@ namespace Ssalddel.Unity.Editor
                 throw new InvalidOperationException("TacticalCombatSquadBridgeInvalid");
         }
 
-        [MenuItem("Ssalddel/WORLD-SHELL-0/Build Shell And Settlement")]
+        [MenuItem("Ssalddel/통합 월드/공식 Scene/Build Shell And Settlement")]
         public static void BuildAll()
         {
             BuildWorldShell();
             BuildSettlementScene();
         }
 
-        [MenuItem("Ssalddel/WORLD-SHELL-0/Add Player Strategy Camera")]
+        [MenuItem("Ssalddel/통합 월드/공식 Scene/Add Player Strategy Camera")]
         public static void BuildPlayerStrategyCamera()
         {
             OpenShellIfRequired();
@@ -287,7 +452,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("PLAYER-CAMERA-0 built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-VISUAL-BASE-0/Build Visual Base")]
+        [MenuItem("Ssalddel/통합 월드/정착지/표현/Build Visual Base")]
         public static void BuildVisualBase()
         {
             OpenShellIfRequired();
@@ -307,7 +472,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("SETTLEMENT-VISUAL-BASE-0 built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-INTERACTION-0/Build Interaction")]
+        [MenuItem("Ssalddel/통합 월드/정착지/상호작용/Build Interaction")]
         public static void Build정착지상호작용()
         {
             OpenShellIfRequired();
@@ -318,6 +483,10 @@ namespace Ssalddel.Unity.Editor
             if (existingCard != null) UnityEngine.Object.DestroyImmediate(existingCard.gameObject);
             var existing = runtimeRoot.GetComponent<정착지상호작용Presenter>();
             if (existing != null) UnityEngine.Object.DestroyImmediate(existing);
+            var existingComposition = runtimeRoot
+                .GetComponent<정착지상호작용SceneCompositionRoot>();
+            if (existingComposition != null)
+                UnityEngine.Object.DestroyImmediate(existingComposition);
             Build정착지상호작용(canvas, FindPresenter(), runtimeRoot);
 
             var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
@@ -329,7 +498,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("SETTLEMENT-INTERACTION-0 built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/LOGISTICS-MOVEMENT-1/Build Interaction")]
+        [MenuItem("Ssalddel/통합 월드/물류 이동/Build Interaction")]
         public static void Build물류이동Interaction()
         {
             OpenShellIfRequired();
@@ -340,16 +509,39 @@ namespace Ssalddel.Unity.Editor
             if (existingCard != null) UnityEngine.Object.DestroyImmediate(existingCard.gameObject);
             var existing = runtimeRoot.GetComponent<물류이동Presenter>();
             if (existing != null) UnityEngine.Object.DestroyImmediate(existing);
+            var existingComposition = runtimeRoot.GetComponent<물류이동SceneCompositionRoot>();
+            if (existingComposition != null)
+                UnityEngine.Object.DestroyImmediate(existingComposition);
             Build물류이동(canvas, FindPresenter(), runtimeRoot);
             var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
             EditorSceneManager.MarkSceneDirty(scene);
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
                 throw new InvalidOperationException("LogisticsMovementSceneSaveFailed");
             AssetDatabase.SaveAssets();
+            Validate물류이동OpenScene();
             Debug.Log("LOGISTICS-MOVEMENT-1 interaction built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/TURN-CARD-UI-1B/Build Turn Closing")]
+        [MenuItem("Ssalddel/통합 월드/물류 이동/Validate Open Scene")]
+        public static void Validate물류이동OpenScene()
+        {
+            var presenter = UnityEngine.Object.FindFirstObjectByType<물류이동Presenter>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("LogisticsMovementPresenterMissing");
+            presenter.ValidateWiring();
+            var composition = UnityEngine.Object.FindFirstObjectByType<물류이동SceneCompositionRoot>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("LogisticsMovementCompositionMissing");
+            if (!composition.서버기준사용중)
+                throw new InvalidOperationException("LogisticsMovementServerAuthorityDisabled");
+            var card = Required(Required(RootName).transform,
+                "PersistentUI/SimulationWorldHud/LogisticsMovementCard");
+            if (card.GetComponentsInChildren<Button>(true).Length != 3)
+                throw new InvalidOperationException("LogisticsMovementButtonCountInvalid");
+            Debug.Log("LOGISTICS-MOVEMENT-1 validation passed");
+        }
+
+        [MenuItem("Ssalddel/통합 월드/턴 마감/Build Turn Closing")]
         public static void Build턴마감Interaction()
         {
             OpenShellIfRequired();
@@ -372,7 +564,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("TURN-CARD-UI-1B built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/CARD-DRAWER-0/Build Unified Card Drawer")]
+        [MenuItem("Ssalddel/통합 월드/카드 서랍/Build Unified Card Drawer")]
         public static void Build카드서랍Interaction()
         {
             OpenShellIfRequired();
@@ -396,7 +588,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("CARD-DRAWER-0 built: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/CARD-DRAWER-0/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/카드 서랍/Validate Open Scene")]
         public static void Validate카드서랍OpenScene()
         {
             var presenter = UnityEngine.Object.FindFirstObjectByType<카드서랍Presenter>(
@@ -415,7 +607,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("CARD-DRAWER-0 validation passed");
         }
 
-        [MenuItem("Ssalddel/TURN-CARD-UI-1B/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/턴 마감/Validate Open Scene")]
         public static void Validate턴마감OpenScene()
         {
             var presenter = UnityEngine.Object.FindFirstObjectByType<턴마감Presenter>(
@@ -434,7 +626,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("TURN-CARD-UI-1B validation passed");
         }
 
-        [MenuItem("Ssalddel/TURN-CARD-UI-1B/Preview Fool Card")]
+        [MenuItem("Ssalddel/통합 월드/턴 마감/Preview Fool Card")]
         public static async void Preview턴마감Fool()
         {
             if (!EditorApplication.isPlaying)
@@ -446,7 +638,7 @@ namespace Ssalddel.Unity.Editor
             await presenter.PreviewAsync();
         }
 
-        [MenuItem("Ssalddel/TURN-CARD-UI-1B/Run Fool Golden Path")]
+        [MenuItem("Ssalddel/통합 월드/턴 마감/Run Fool Golden Path")]
         public static async void Run턴마감FoolGoldenPath()
         {
             if (!EditorApplication.isPlaying)
@@ -459,7 +651,7 @@ namespace Ssalddel.Unity.Editor
             await presenter.ConfirmAsync();
         }
 
-        [MenuItem("Ssalddel/CULTURE-CARD-0/Preview Seoul Culture Card")]
+        [MenuItem("Ssalddel/통합 월드/문화 카드/Preview Seoul Culture Card")]
         public static async void Preview서울문화Card()
         {
             if (!EditorApplication.isPlaying)
@@ -471,7 +663,7 @@ namespace Ssalddel.Unity.Editor
             await presenter.PreviewAsync();
         }
 
-        [MenuItem("Ssalddel/CULTURE-CARD-0/Run Seoul Culture Golden Path")]
+        [MenuItem("Ssalddel/통합 월드/문화 카드/Run Seoul Culture Golden Path")]
         public static async void Run서울문화CardGoldenPath()
         {
             if (!EditorApplication.isPlaying)
@@ -484,7 +676,7 @@ namespace Ssalddel.Unity.Editor
             await presenter.ConfirmAsync();
         }
 
-        [MenuItem("Ssalddel/LOGISTICS-MOVEMENT-1/Preview Cargo")]
+        [MenuItem("Ssalddel/통합 월드/물류 이동/Preview Cargo")]
         public static void Preview물류화물()
         {
             if (!EditorApplication.isPlaying)
@@ -495,7 +687,7 @@ namespace Ssalddel.Unity.Editor
             FindPresenter().NavigateTo(target);
         }
 
-        [MenuItem("Ssalddel/LOGISTICS-MOVEMENT-1/Run Golden Path")]
+        [MenuItem("Ssalddel/통합 월드/물류 이동/Run Golden Path")]
         public static async void Run물류이동GoldenPath()
         {
             Preview물류화물();
@@ -505,20 +697,27 @@ namespace Ssalddel.Unity.Editor
             await presenter.RunGoldenPathAsync();
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-INTERACTION-0/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/정착지/상호작용/Validate Open Scene")]
         public static void Validate정착지상호작용OpenScene()
         {
             var presenter = UnityEngine.Object.FindFirstObjectByType<정착지상호작용Presenter>(
                 FindObjectsInactive.Include)
                 ?? throw new InvalidOperationException("SettlementInteractionPresenterMissing");
             presenter.ValidateWiring();
+            if (presenter.자동Fixture시작중)
+                throw new InvalidOperationException("SettlementInteractionAutomaticFixtureEnabled");
+            var composition = UnityEngine.Object.FindFirstObjectByType<
+                정착지상호작용SceneCompositionRoot>(FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("SettlementInteractionCompositionMissing");
+            if (!composition.서버기준사용중)
+                throw new InvalidOperationException("SettlementInteractionServerAuthorityDisabled");
             var card = Required(Required(RootName).transform, "PersistentUI/SimulationWorldHud/HarvestDispositionCard");
             if (card.GetComponentsInChildren<Button>(true).Length != 6)
                 throw new InvalidOperationException("SettlementInteractionButtonCountInvalid");
             Debug.Log("SETTLEMENT-INTERACTION-0 validation passed");
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-INTERACTION-0/Preview Harvest Lot")]
+        [MenuItem("Ssalddel/통합 월드/정착지/상호작용/Preview Harvest Lot")]
         public static void Preview수확Lot()
         {
             if (!EditorApplication.isPlaying)
@@ -529,7 +728,7 @@ namespace Ssalddel.Unity.Editor
             FindPresenter().NavigateTo(target);
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-INTERACTION-0/Preview Reserve Candidate")]
+        [MenuItem("Ssalddel/통합 월드/정착지/상호작용/Preview Reserve Candidate")]
         public static async void Preview비축Candidate()
         {
             Preview수확Lot();
@@ -539,7 +738,7 @@ namespace Ssalddel.Unity.Editor
             await presenter.SelectChoiceAsync(Ssalddel.Unity.Farm.HarvestDispositionChoiceCodes.ReserveStorage);
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-INTERACTION-0/Run Reserve Golden Path")]
+        [MenuItem("Ssalddel/통합 월드/정착지/상호작용/Run Reserve Golden Path")]
         public static async void Run비축GoldenPath()
         {
             Preview수확Lot();
@@ -549,7 +748,7 @@ namespace Ssalddel.Unity.Editor
             await presenter.RunReserveStorageGoldenPathAsync();
         }
 
-        [MenuItem("Ssalddel/WORLD-SHELL-0/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/공식 Scene/Validate Open Scene")]
         public static void ValidateWorldShellOpenScene()
         {
             var root = Required(RootName);
@@ -589,7 +788,7 @@ namespace Ssalddel.Unity.Editor
                 throw new InvalidOperationException("SimulationWorldShellAuthorityLeak");
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-SCENE-0/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/정착지/기본/Validate Open Scene")]
         public static void ValidateSettlementSceneOpenScene()
         {
             ValidateWorldShellOpenScene();
@@ -612,7 +811,7 @@ namespace Ssalddel.Unity.Editor
             foreach (var target in targets) target.Validate();
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-VISUAL-BASE-0/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/정착지/표현/Validate Open Scene")]
         public static void ValidateSettlementVisualBaseOpenScene()
         {
             ValidateSettlementSceneOpenScene();
@@ -665,11 +864,11 @@ namespace Ssalddel.Unity.Editor
                 throw new InvalidOperationException("SimulationSettlementTimeOfDayInvalid");
         }
 
-        [MenuItem("Ssalddel/WORLD-SHELL-0/Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/공식 Scene/Open Scene")]
         public static void Open()
             => EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        [MenuItem("Ssalddel/WORLD-SHELL-0/Preview World Map")]
+        [MenuItem("Ssalddel/통합 월드/공식 Scene/Preview World Map")]
         public static void PreviewWorldMap()
         {
             var presenter = FindPresenter();
@@ -679,7 +878,7 @@ namespace Ssalddel.Unity.Editor
             SceneView.RepaintAll();
         }
 
-        [MenuItem("Ssalddel/WORLD-SHELL-0/Preview Settlement")]
+        [MenuItem("Ssalddel/통합 월드/공식 Scene/Preview Settlement")]
         public static void PreviewSettlement()
         {
             var presenter = FindPresenter();
@@ -689,16 +888,16 @@ namespace Ssalddel.Unity.Editor
             SceneView.RepaintAll();
         }
 
-        [MenuItem("Ssalddel/SETTLEMENT-VISUAL-BASE-0/Preview Farm District")]
+        [MenuItem("Ssalddel/통합 월드/정착지/표현/Preview Farm District")]
         public static void PreviewFarmDistrict() => PreviewDistrict("district:farm");
 
-        [MenuItem("Ssalddel/SETTLEMENT-VISUAL-BASE-0/Preview Market District")]
+        [MenuItem("Ssalddel/통합 월드/정착지/표현/Preview Market District")]
         public static void PreviewMarketDistrict() => PreviewDistrict("district:market");
 
-        [MenuItem("Ssalddel/SETTLEMENT-VISUAL-BASE-0/Preview Town District")]
+        [MenuItem("Ssalddel/통합 월드/정착지/표현/Preview Town District")]
         public static void PreviewTownDistrict() => PreviewDistrict("district:town");
 
-        [MenuItem("Ssalddel/SETTLEMENT-VISUAL-BASE-0/Preview Logistics District")]
+        [MenuItem("Ssalddel/통합 월드/정착지/표현/Preview Logistics District")]
         public static void PreviewLogisticsDistrict() => PreviewDistrict("district:logistics");
 
         private static void PreviewDistrict(string stableId)
@@ -927,6 +1126,7 @@ namespace Ssalddel.Unity.Editor
             var scaler = canvas.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1600, 900);
+            canvas.SetActive(false);
 
             var top = Panel(canvas.transform, "WorldStatusPanel",
                 new Vector2(22f, -22f), new Vector2(450f, 276f), new Vector2(0f, 1f));
@@ -952,6 +1152,10 @@ namespace Ssalddel.Unity.Editor
             var speed = Button(navigation.transform, "SpeedButton", "1× · 미연결",
                 new Vector2(570f, -87f), new Vector2(124f, 34f), new Color(.25f, .28f, .31f));
 
+            // 상태·탐색 정보는 Presenter 배선을 위해 보존하되 플레이 화면에는 노출하지 않는다.
+            top.SetActive(false);
+            navigation.SetActive(false);
+
             return new HudReferences(canvas.transform, mode, identity, economy, selection,
                 worldMap, settlement, back, pause, speed);
         }
@@ -970,9 +1174,9 @@ namespace Ssalddel.Unity.Editor
                 new Vector2(476f, 48f), 15, TextAnchor.UpperLeft, new Color(.56f, .82f, .94f));
             var preview = Text(card.transform, "PreviewText", new Vector2(22f, -138f),
                 new Vector2(476f, 196f), 17, TextAnchor.UpperLeft, Color.white);
-            var cooperative = Button(card.transform, "CooperativeButton", "생산자 조합 출하",
+            var cooperative = Button(card.transform, "CooperativeButton", "Hub 출하",
                 new Vector2(22f, -344f), new Vector2(230f, 42f), new Color(.30f, .52f, .30f));
-            var direct = Button(card.transform, "DirectButton", "온라인 직접 판매",
+            var direct = Button(card.transform, "DirectButton", "Town 직거래",
                 new Vector2(268f, -344f), new Vector2(230f, 42f), new Color(.31f, .48f, .68f));
             var storage = Button(card.transform, "StorageButton", "비축 보관",
                 new Vector2(22f, -394f), new Vector2(230f, 42f), new Color(.59f, .44f, .22f));
@@ -989,6 +1193,14 @@ namespace Ssalddel.Unity.Editor
             var presenter = runtimeRoot.gameObject.AddComponent<정착지상호작용Presenter>();
             presenter.Configure(shell, card, title, phase, preview,
                 cooperative, direct, storage, export, confirm, advance);
+            presenter.Set자동Fixture시작(false);
+            var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
+                "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
+                ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");
+            var composition = runtimeRoot.gameObject
+                .AddComponent<정착지상호작용SceneCompositionRoot>();
+            composition.Configure(settings, shell, presenter,
+                정착지상호작용AuthorityMode.Server);
             card.SetActive(false);
         }
 
@@ -1017,6 +1229,11 @@ namespace Ssalddel.Unity.Editor
             boundary.text = "시뮬레이션 전용 · 실제 기사 호출 없음 · 도착 후 인수 전에는 목적지 재고 아님";
             var presenter = runtimeRoot.gameObject.AddComponent<물류이동Presenter>();
             presenter.Configure(shell, card, cargo, phase, detail, preview, confirm, tick);
+            var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
+                "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
+                ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");
+            var composition = runtimeRoot.gameObject.AddComponent<물류이동SceneCompositionRoot>();
+            composition.Configure(settings, shell, presenter, 물류이동AuthorityMode.Server);
             card.SetActive(false);
         }
 
@@ -1199,23 +1416,26 @@ namespace Ssalddel.Unity.Editor
             scaler.referenceResolution = new Vector2(1600f, 900f);
 
             var bar = Panel(canvas.transform, "UnifiedWorldModeBar",
-                new Vector2(306f, -16f), new Vector2(340f, 52f), new Vector2(0f, 1f));
+                new Vector2(0f, 18f), new Vector2(274f, 52f), new Vector2(.5f, 0f));
             bar.GetComponent<Image>().color = new Color(.04f, .055f, .06f, .94f);
-            var world = Button(bar.transform, "WorldOverviewButton", "월드",
-                new Vector2(8f, -8f), new Vector2(76f, 36f), Rgb(.94f, .42f, .05f));
-            var firstPerson = Button(bar.transform, "FarmFirstPersonButton", "농장 1인칭",
-                new Vector2(90f, -8f), new Vector2(78f, 36f), Rgb(.15f, .19f, .20f));
-            var tactical = Button(bar.transform, "FarmTacticalButton", "농장 경영",
-                new Vector2(174f, -8f), new Vector2(74f, 36f), Rgb(.15f, .19f, .20f));
+            var world = Button(bar.transform, "WorldOverviewButton", "전략 시점",
+                new Vector2(8f, -8f), new Vector2(82f, 36f), Rgb(.94f, .42f, .05f));
+            var firstPerson = Button(bar.transform, "FarmFirstPersonButton", "1인칭",
+                new Vector2(96f, -8f), new Vector2(82f, 36f), Rgb(.15f, .19f, .20f));
+            var tactical = Button(bar.transform, "FarmTacticalButton", "3인칭",
+                new Vector2(184f, -8f), new Vector2(82f, 36f), Rgb(.15f, .19f, .20f));
             var inboundButton = Button(bar.transform, "JinbuInboundButton", "진부 입고",
-                new Vector2(254f, -8f), new Vector2(78f, 36f), Rgb(.15f, .19f, .20f));
+                new Vector2(0f, 0f), new Vector2(78f, 36f), Rgb(.15f, .19f, .20f));
+            inboundButton.gameObject.SetActive(false);
             foreach (var label in bar.GetComponentsInChildren<Text>(true))
-                label.fontSize = 12;
+                label.fontSize = 13;
 
             Build농장경영시점(runtimeRoot, player);
             var presenter = runtimeRoot.gameObject.AddComponent<통합월드ModePresenter>();
             presenter.Configure(
                 shell, player, inbound, world, firstPerson, tactical, inboundButton);
+            presenter.SetStartInTacticalMode(true);
+            EditorUtility.SetDirty(presenter);
         }
 
         private static void Build농장경영시점(
@@ -1303,6 +1523,9 @@ namespace Ssalddel.Unity.Editor
                 .AddComponent<오늘작업계획Presenter>();
             dailyPresenter.Configure(management, player,
                 runtimeRoot.GetComponent<턴마감Presenter>());
+            dailyPresenter.SetHudVisible(false);
+            management.SetGuidanceVisible(false);
+            player.SetGuidanceVisible(false);
             var dailySettings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
                 "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
                 ?? throw new InvalidOperationException("UnityClientRuntimeSettingsMissing");

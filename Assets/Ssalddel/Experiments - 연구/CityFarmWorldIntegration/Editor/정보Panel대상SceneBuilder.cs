@@ -7,7 +7,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
 {
     public static class 정보Panel대상SceneBuilder
     {
-        [MenuItem("Ssalddel/UI/대상 Scene 정보 Panel 다시 만들기")]
+
         public static void BuildAll()
         {
             Build(PotatoJourneyFarmVerticalSliceBuilder.Build,
@@ -48,7 +48,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException(label + " 정보 Panel 상호작용 연결이 올바르지 않습니다.");
         }
 
-        [MenuItem("Ssalddel/UI/신티 에셋 연구소 정보 Panel 적용")]
+
         public static void PatchExistingAssetLab()
         {
             var scene = EditorSceneManager.OpenScene(신티에셋연구소Builder.ScenePath);

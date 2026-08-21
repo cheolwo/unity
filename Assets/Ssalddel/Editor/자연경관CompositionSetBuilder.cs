@@ -17,7 +17,7 @@ namespace Ssalddel.Unity.Editor
             "Assets/Ssalddel/Presentation/World/Generated/평창군법정동World/NatureCompositionSets";
         private const string Nature = "Assets/Synty/PolygonNature/Prefabs/";
 
-        [MenuItem("Ssalddel/WORLD-NATURE-1 평창군 Nature 경관 Composition 생성")]
+        [MenuItem("Ssalddel/공간·경관/네이처/평창 Nature 경관 구성")]
         public static void Build()
         {
             Directory.CreateDirectory(PrefabRoot);

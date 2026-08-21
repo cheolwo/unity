@@ -18,7 +18,7 @@ namespace Ssalddel.Unity.Editor
         private const string SettingsPath =
             "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset";
 
-        [MenuItem("Ssalddel/NATURE-PLAY-1/Apply Exploration Encounter Loop")]
+        [MenuItem("Ssalddel/통합 월드/네이처 플레이/Apply Exploration Encounter Loop")]
         public static void ApplyToCanonicalScene()
         {
             var scene = EditorSceneManager.OpenScene(
@@ -51,7 +51,10 @@ namespace Ssalddel.Unity.Editor
             var presenter = root.gameObject.AddComponent<네이처조우Presenter>();
             // 현재 설치된 Nature 팩에는 캐릭터·몬스터 Prefab이 없다.
             // null 슬롯은 명시적인 대체 위협 형상을 사용하며 추후 검토한 자산으로 교체한다.
-            presenter.Configure(player, root, null);
+            var natureSpace = UnityEngine.Object.FindFirstObjectByType<
+                네이처생활핵조우방어공간Root>(FindObjectsInactive.Include);
+            presenter.Configure(player,
+                natureSpace?.FindConnectorAnchor("ThreatInput") ?? root, null);
 
             var settings = AssetDatabase.LoadAssetAtPath<UnityClientRuntimeSettings>(
                 SettingsPath) ?? throw new InvalidOperationException(
@@ -73,7 +76,7 @@ namespace Ssalddel.Unity.Editor
                 + 통합WorldScenePolicy.CanonicalScenePath);
         }
 
-        [MenuItem("Ssalddel/NATURE-PLAY-1/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/네이처 플레이/Validate Open Scene")]
         public static void ValidateOpenScene()
         {
             var presenter = UnityEngine.Object.FindFirstObjectByType<

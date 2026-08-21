@@ -68,7 +68,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 ["generic"] = "Assets/Synty/PolygonGeneric/Prefabs/FX",
             };
 
-        [MenuItem("Ssalddel/Validation/Inspect Synty Animation Sources")]
+
         public static void InspectAndLog()
         {
             var report = Inspect();

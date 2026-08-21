@@ -34,7 +34,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
 
         private static int serial;
 
-        [MenuItem("Ssalddel/SHOWCASE/Build Farm City Graphical Background")]
+
         public static void Build()
         {
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(SourceScenePath) == null)
@@ -71,7 +71,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("Farm City graphical showcase created: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/SHOWCASE/Validate Farm City Graphical Background")]
+
         public static void ValidateOpenScene()
         {
             CityFarmVisualQualityGateBuilder.ValidateOpenScene();
@@ -110,16 +110,16 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("ShowcaseMissingScriptReference");
         }
 
-        [MenuItem("Ssalddel/SHOWCASE/Focus World Overview")]
+
         public static void FocusWorldOverview() => ConfigureCamera(WorldFocus);
 
-        [MenuItem("Ssalddel/SHOWCASE/Focus Farm Landscape")]
+
         public static void FocusFarmLandscape() => ConfigureCamera(FarmFocus);
 
-        [MenuItem("Ssalddel/SHOWCASE/Focus Rural City Transition")]
+
         public static void FocusRuralTransition() => ConfigureCamera(TransitionFocus);
 
-        [MenuItem("Ssalddel/SHOWCASE/Focus Urban Market")]
+
         public static void FocusUrbanMarket() => ConfigureCamera(MarketFocus);
 
         private static void BuildFarmLandscape(Transform parent, WorldVisualCatalog catalog)

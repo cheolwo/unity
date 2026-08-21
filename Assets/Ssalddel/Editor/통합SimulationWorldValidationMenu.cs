@@ -19,6 +19,10 @@ namespace Ssalddel.Unity.Editor
             "Documentation/Changes/2026-08-14-simulation-world-integration/"
             + "unified-world-farm-tactical-game-view.png";
 
+        public const string MinimalPlayerEvidencePath =
+            "Documentation/Changes/2026-08-21-minimal-player-view/"
+            + "minimal-player-game-view.png";
+
         [MenuItem("Ssalddel/통합 월드/Play Mode 통합 화면 저장")]
         public static async void CaptureIntegratedGameView()
         {
@@ -65,6 +69,23 @@ namespace Ssalddel.Unity.Editor
             Directory.CreateDirectory(Path.GetDirectoryName(absolutePath)!);
             ScreenCapture.CaptureScreenshot(absolutePath, 1);
             Debug.Log("UNIFIED-WORLD-1 농장 전술 Game View 저장 요청: " + absolutePath);
+        }
+
+        [MenuItem("Ssalddel/통합 월드/Play Mode 최소 Player 화면 저장")]
+        public static void CaptureMinimalPlayerGameView()
+        {
+            if (!EditorApplication.isPlaying)
+                throw new InvalidOperationException("MinimalPlayerCaptureRequiresPlayMode");
+
+            var view = UnityEngine.Object.FindAnyObjectByType<단일PlayerViewController>(
+                FindObjectsInactive.Include)
+                ?? throw new InvalidOperationException("MinimalPlayerViewMissing");
+            view.ApplyView();
+
+            var absolutePath = Path.GetFullPath(MinimalPlayerEvidencePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(absolutePath)!);
+            ScreenCapture.CaptureScreenshot(absolutePath, 1);
+            Debug.Log("WORLD-PLAYER-MINIMAL-1 Game View 저장 요청: " + absolutePath);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Ssalddel.Unity.Editor
         private const string CityCharacter =
             "Assets/Synty/PolygonCity/Prefabs/Characters/Character_BusinessMan_Shirt.prefab";
 
-        [MenuItem("Ssalddel/World Composition/Build Common Animation Fallback Preview")]
+        [MenuItem("Ssalddel/공간·경관/구성/Build Common Animation Fallback Preview")]
         public static void Build()
         {
             EnsureFolder(Path.GetDirectoryName(CatalogPath)!.Replace('\\', '/'));

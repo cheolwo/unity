@@ -36,7 +36,7 @@ namespace Ssalddel.Unity.Editor
         private const string EvidenceRoot =
             "Assets/Documentation/Changes/2026-08-13-daegwallyeong-farm-1km-completion";
 
-        [MenuItem("Ssalddel/WORLD-LEGAL-2 평창군 Synty 경관 배치 _F7")]
+        [MenuItem("Ssalddel/공간·경관/평창 경관/Synty 경관 배치 _F7")]
         public static void Build()
         {
             var scene = EditorSceneManager.GetActiveScene();
@@ -153,7 +153,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-COMPLETION-AREA-1: 대관령면 Farm 1km 경관 완결 영역을 L2 500m 2x2 구획으로 구성했습니다. WorldCover 위치와 Scenario 경관은 분리했고 Scene Mesh는 아직 ScenarioTerrainPreview입니다.");
         }
 
-        [MenuItem("Ssalddel/WORLD-INVENTORY-UNITY-2 대관령 L2 창고 1인칭 상호작용 연결")]
+        [MenuItem("Ssalddel/통합 월드/Farm 창고/L2 창고 1인칭 상호작용 연결")]
         public static void Build대관령L2창고일인칭상호작용()
         {
             var scene = EditorSceneManager.GetActiveScene();
@@ -204,7 +204,7 @@ namespace Ssalddel.Unity.Editor
                     "DaegwallyeongWarehouseInteractionWiringInvalid");
         }
 
-        [MenuItem("Ssalddel/WORLD-LEGAL-3 공간 Pipeline 배치 증거 캡처")]
+        [MenuItem("Ssalddel/검증/화면 증거/평창 공간 Pipeline 배치")]
         public static void CaptureEvidence()
         {
             var scene = EditorSceneManager.GetActiveScene();
@@ -238,7 +238,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-COMPLETION-AREA-1: 대관령 Farm 1km 첫 화면과 연계 화면을 PNG로 렌더링했습니다. Play Mode 입력 검증과는 분리된 표현 증거입니다.");
         }
 
-        [MenuItem("Ssalddel/WORLD-COMPLETION-AREA-1 대관령 Farm Play 화면 저장")]
+        [MenuItem("Ssalddel/검증/화면 증거/대관령 Farm Play")]
         public static void CaptureFarmPlayGameView()
         {
             if (!UnityEngine.Application.isPlaying)
@@ -265,7 +265,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-COMPLETION-AREA-1: 실제 Play Mode Game View에서 대관령 Farm 1km 화면 저장을 요청했습니다.");
         }
 
-        [MenuItem("Ssalddel/WORLD-COMPLETION-AREA-2 대관령 Farm 1인칭 Play 화면 저장 _F8")]
+        [MenuItem("Ssalddel/검증/화면 증거/대관령 Farm 1인칭 _F8")]
         public static void CaptureFarmFirstPersonPlayGameView()
         {
             if (!UnityEngine.Application.isPlaying)
@@ -293,7 +293,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-COMPLETION-AREA-2: 경관 품질 Pipeline을 적용한 실제 1인칭 Play Mode Game View 저장을 요청했습니다.");
         }
 
-        [MenuItem("Ssalddel/WORLD-COMPLETION-AREA-3 대관령 Farm RTS 전술 지휘 화면 저장 _F9")]
+        [MenuItem("Ssalddel/검증/화면 증거/대관령 Farm RTS 전술 지휘 _F9")]
         public static void CaptureFarmPlayerWalkGameView()
         {
             if (!UnityEngine.Application.isPlaying)
@@ -318,7 +318,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-COMPLETION-AREA-3: 높은 사선 RTS 전술 카메라, 선택 유닛과 우클릭 목적지 Game View 저장을 요청했습니다.");
         }
 
-        [MenuItem("Ssalddel/WORLD-COMPLETION-AREA-3 대관령 Farm 플레이어 1인칭 화면 저장")]
+        [MenuItem("Ssalddel/검증/화면 증거/대관령 Farm 플레이어 1인칭")]
         public static void CaptureFarmPlayerFirstPersonGameView()
         {
             if (!UnityEngine.Application.isPlaying)

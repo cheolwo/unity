@@ -20,7 +20,7 @@ namespace Ssalddel.Unity.Editor
         public const string EvidencePath =
             "Assets/Documentation/Changes/2026-08-11-turn-card-seedbed-ui-1/turn-card-seedbed.png";
 
-        [MenuItem("Ssalddel/TURN-CARD-SEEDBED-UI-1/Build Turn Card Seedbed")]
+        [MenuItem("Ssalddel/검토실/턴 카드 모판/Build Turn Card Seedbed")]
         public static void Build()
         {
             if (EditorApplication.isPlaying)
@@ -48,7 +48,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("TurnCardSeedbedBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/TURN-CARD-SEEDBED-UI-1/Validate Turn Card Seedbed")]
+        [MenuItem("Ssalddel/검토실/턴 카드 모판/Validate Turn Card Seedbed")]
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find(RootName)
@@ -67,13 +67,13 @@ namespace Ssalddel.Unity.Editor
                 throw new InvalidOperationException("TurnCardSeedbedTurnAuthorityForbidden");
         }
 
-        [MenuItem("Ssalddel/TURN-CARD-SEEDBED-UI-1/Show Philosophy Academy")]
+        [MenuItem("Ssalddel/검토실/턴 카드 모판/Show Philosophy Academy")]
         public static void ShowPhilosophyAcademy()
         {
             FindPresenter().Execute(턴카드모판ActionCode.철학학당보기);
         }
 
-        [MenuItem("Ssalddel/TURN-CARD-SEEDBED-UI-1/Show Regional Culture")]
+        [MenuItem("Ssalddel/검토실/턴 카드 모판/Show Regional Culture")]
         public static void ShowRegionalCulture()
         {
             FindPresenter().Execute(턴카드모판ActionCode.지역문화보기);

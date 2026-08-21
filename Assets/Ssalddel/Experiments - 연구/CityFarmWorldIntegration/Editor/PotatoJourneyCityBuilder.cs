@@ -25,7 +25,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         private static double automatedCaptureStartedAt;
         private static bool automatedCaptureRequested;
 
-        [MenuItem("Ssalddel/PVS/Build Potato Journey City")]
+
         public static void Build()
         {
             if (!File.Exists(PotatoJourneyHubRouteBuilder.ScenePath))
@@ -68,10 +68,10 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("PotatoJourneyCityBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/PVS/Open Potato Journey City")]
+
         public static void Open() => EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        [MenuItem("Ssalddel/PVS/Validate Potato Journey City")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -91,7 +91,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                     throw new InvalidOperationException("PotatoJourneyCityCommandAuthorityLeak");
         }
 
-        [MenuItem("Ssalddel/PVS/Capture Potato Journey City Play Mode")]
+
         public static void CapturePlayMode()
         {
             if (!EditorApplication.isPlaying)

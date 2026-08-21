@@ -26,7 +26,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         private const string MaterialRoot =
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/CompositionSets/PotatoJourneyMaterials/";
 
-        [MenuItem("Ssalddel/PVS/Build Potato Journey Farm Slice")]
+
         public static void Build()
         {
             if (!File.Exists(FarmHeroScenePath)) FarmHeroShowcaseBuilder.Build();
@@ -64,11 +64,9 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("PotatoJourneyFarmVerticalSliceBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/PVS/Open Potato Journey Farm Slice")]
         public static void Open()
             => EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        [MenuItem("Ssalddel/PVS/Validate Potato Journey Farm Slice")]
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -94,7 +92,6 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("PotatoJourneyCommandAuthorityLeak");
         }
 
-        [MenuItem("Ssalddel/PVS/Capture Potato Journey Farm Play Mode")]
         public static void CapturePlayMode()
         {
             if (!EditorApplication.isPlaying)

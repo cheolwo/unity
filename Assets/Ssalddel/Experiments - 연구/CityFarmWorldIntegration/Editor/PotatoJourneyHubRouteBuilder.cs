@@ -21,7 +21,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         private const string VanPath =
             "Assets/Synty/PolygonCity/Prefabs/Vehicles/SM_Veh_Car_Van_01.prefab";
 
-        [MenuItem("Ssalddel/PVS/Build Potato Journey Hub Route")]
+
         public static void Build()
         {
             if (!File.Exists(PotatoHarvestCargoLifecycleBuilder.ScenePath))
@@ -71,10 +71,10 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("PotatoJourneyHubRouteBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/PVS/Open Potato Journey Hub Route")]
+
         public static void Open() => EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        [MenuItem("Ssalddel/PVS/Validate Potato Journey Hub Route")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -96,7 +96,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                     throw new InvalidOperationException("PotatoJourneyHubCommandAuthorityLeak");
         }
 
-        [MenuItem("Ssalddel/PVS/Capture Potato Journey Hub Route Play Mode")]
+
         public static void CapturePlayMode()
         {
             if (!EditorApplication.isPlaying)

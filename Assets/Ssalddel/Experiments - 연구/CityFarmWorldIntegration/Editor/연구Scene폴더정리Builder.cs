@@ -26,7 +26,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             AssetStudy("신티에셋연구소"),
         };
 
-        [MenuItem("Ssalddel/연구 Scene/맥락별 폴더 정리")]
+
         public static void Organize()
         {
             var activeScene = SceneManager.GetActiveScene();

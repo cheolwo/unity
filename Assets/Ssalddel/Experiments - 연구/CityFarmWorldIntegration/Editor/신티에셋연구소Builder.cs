@@ -49,7 +49,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         private const string FarmProductVisualCatalogPath =
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/FarmProductVisualCatalog.asset";
 
-        [MenuItem("Ssalddel/에셋 연구소/에셋연구-0 생성")]
+
         public static void Build()
         {
             EnsureFolder(Path.GetDirectoryName(IndexPath)!.Replace('\\', '/'));

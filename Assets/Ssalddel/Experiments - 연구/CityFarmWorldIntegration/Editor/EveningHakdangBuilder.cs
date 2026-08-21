@@ -17,7 +17,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string EvidencePath =
             "Documentation/Changes/2026-08-11-evening-hakdang/evening-hakdang-game-view.png";
 
-        [MenuItem("Ssalddel/EVENING-1/Build Evening Hakdang")]
+
         public static void Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -43,7 +43,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("EveningHakdangBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/EVENING-1/Validate Evening Hakdang")]
+
         public static void ValidateOpenScene()
         {
             var presenter = GameObject.Find(RootName)?.GetComponent<EveningHakdangPresenter>()
@@ -53,7 +53,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("EveningHakdangInitialPresentationInvalid");
         }
 
-        [MenuItem("Ssalddel/EVENING-1/Capture Completed Study Play Mode")]
+
         public static void Capture()
         {
             if (!EditorApplication.isPlaying)

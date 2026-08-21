@@ -32,7 +32,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         private const string MaterialDirectory =
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorldIntegration/Materials";
 
-        [MenuItem("Ssalddel/WORLD-3/Build Business View Integration")]
+
         public static void Build()
         {
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(SourceScenePath) == null)
@@ -70,7 +70,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("WORLD-3 business View integration created: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/WORLD-3/Validate Business View Integration")]
+
         public static void ValidateOpenScene()
         {
             var grid = UnityEngine.Object.FindFirstObjectByType<FarmSoilTileGridView>();

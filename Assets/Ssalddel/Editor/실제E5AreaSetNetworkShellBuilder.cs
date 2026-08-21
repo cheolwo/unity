@@ -21,7 +21,7 @@ namespace Ssalddel.Unity.Editor
         private const string RuntimeSettingsPath =
             "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset";
 
-        [MenuItem("Ssalddel/WORLD-E5-1/SimulationWorldShell에 실제 E5 Network 연결")]
+        [MenuItem("Ssalddel/통합 월드/E5 AreaSet/SimulationWorldShell에 실제 E5 Network 연결")]
         public static void BindToCanonicalShell()
         {
             OpenShell();
@@ -62,6 +62,7 @@ namespace Ssalddel.Unity.Editor
             var binding = AssetDatabase.LoadAssetAtPath<공간문법SyntyBindingCatalog>(
                 공간문법SyntyBindingCatalogBuilder.CatalogPath);
             var hud = BuildHud(hudCanvas);
+            hud.gameObject.SetActive(false);
             var controller = runtimeRoot.gameObject
                 .AddComponent<실제E5AreaSetNetworkController>();
             controller.Configure(
@@ -95,7 +96,7 @@ namespace Ssalddel.Unity.Editor
                 + "WI 30/5/6·지역 인과 HUD를 연결했습니다.");
         }
 
-        [MenuItem("Ssalddel/WORLD-E5-1/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/E5 AreaSet/Validate Open Scene")]
         public static void ValidateOpenScene()
         {
             var shell = GameObject.Find(SimulationWorldShellBuilder.RootName)

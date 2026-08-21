@@ -13,7 +13,7 @@ namespace Ssalddel.Unity.Editor
             "Documentation/Changes/2026-08-14-researched-l2-stream-window/"
             + "l2-researched-window-game-view.png";
 
-        [MenuItem("Ssalddel/WORLD-STREAM-VISIBILITY-1/Play Mode 1인칭 검증 화면 준비")]
+        [MenuItem("Ssalddel/통합 월드/공간 스트리밍/Play Mode 1인칭 검증 화면 준비")]
         public static async void PrepareFirstPersonEvidence()
         {
             if (!UnityEngine.Application.isPlaying)

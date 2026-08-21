@@ -15,7 +15,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string RootName = "CARGO-1 Potato Harvest Cargo Lifecycle";
         public const string EvidencePath = "Documentation/Changes/2026-08-10-potato-harvest-cargo-lifecycle/potato-harvest-cargo-game-view.png";
 
-        [MenuItem("Ssalddel/CARGO-1/Build Potato Harvest Cargo Lifecycle")]
+
         public static void Build()
         {
             EditorSceneManager.OpenScene(PotatoCultivationLifecycleBuilder.ScenePath, OpenSceneMode.Single);
@@ -51,7 +51,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("PotatoHarvestCargoLifecycleBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/CARGO-1/Validate Potato Harvest Cargo Lifecycle")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -64,7 +64,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("CargoInitialPresentationInvalid:actions=" + actionCount);
         }
 
-        [MenuItem("Ssalddel/CARGO-1/Capture Potato Harvest Cargo Play Mode")]
+
         public static void CapturePlayMode()
         {
             if (!EditorApplication.isPlaying) throw new InvalidOperationException("CargoCaptureRequiresPlayMode");

@@ -25,7 +25,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         private const string WorldFocusAnchorId =
             "camera-focus:world.city-farm-supply-chain";
 
-        [MenuItem("Ssalddel/WORLD-5/Build Visual Quality Gate")]
+
         public static void Build()
         {
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(SourceScenePath) == null)
@@ -54,7 +54,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("WORLD-5 visual quality gate created: " + ScenePath);
         }
 
-        [MenuItem("Ssalddel/WORLD-5/Validate Visual Quality Gate")]
+
         public static void ValidateOpenScene()
         {
             CityFarmSyntyWorldBuilder.ValidateOpenScene();

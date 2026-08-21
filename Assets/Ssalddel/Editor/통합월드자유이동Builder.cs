@@ -11,7 +11,7 @@ namespace Ssalddel.Unity.Editor
 {
     public static class 통합월드자유이동Builder
     {
-        [MenuItem("Ssalddel/WORLD-TRAVERSAL-1/SimulationWorldShell 전체 지도 자유 이동 적용")]
+        [MenuItem("Ssalddel/통합 월드/자유 이동/SimulationWorldShell 전체 지도 자유 이동 적용")]
         public static void ApplyToSimulationWorldShell()
         {
             var scene = OpenShell();
@@ -28,7 +28,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-TRAVERSAL-1: SimulationWorldShell 전체 평창 지도 WASD 이동 범위를 적용했습니다.");
         }
 
-        [MenuItem("Ssalddel/WORLD-TRAVERSAL-1/Validate Open Scene")]
+        [MenuItem("Ssalddel/통합 월드/자유 이동/Validate Open Scene")]
         public static void ValidateOpenScene()
         {
             var player = UnityEngine.Object.FindFirstObjectByType<플레이어경관Controller>(

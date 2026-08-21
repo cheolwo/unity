@@ -22,7 +22,7 @@ namespace Ssalddel.Unity.Editor
             new("05-hub-receiving-storage", "모판05_", "Hub 입고 보관 공간 모판", "h1-stock:hub-receiving-storage"),
         };
 
-        [MenuItem("Ssalddel/Synty Web 검토/기존 H1 5종 로컬 일괄 촬영")]
+        [MenuItem("Ssalddel/검토실/Synty Web/기존 H1 5종 로컬 일괄 촬영")]
         public static void CaptureExistingH1Inventory()
         {
             if (!UnityEngine.Application.isBatchMode

@@ -23,7 +23,7 @@ namespace Ssalddel.Unity.Editor
 
         private const string VendorRoot = "Assets/Synty/PolygonFarm/Prefabs";
 
-        [MenuItem("Ssalddel/Farm Composition/Build 36 Reusable Sets")]
+        [MenuItem("Ssalddel/검토실/Farm 구성/Build 36 Reusable Sets")]
         public static void Build()
         {
             var definitions = CreateDefinitions();
@@ -67,7 +67,7 @@ namespace Ssalddel.Unity.Editor
             if (UnityEngine.Application.isBatchMode) EditorApplication.Exit(0);
         }
 
-        [MenuItem("Ssalddel/Farm Composition/Open Library Preview")]
+        [MenuItem("Ssalddel/검토실/Farm 구성/Open Library Preview")]
         public static void OpenLibraryPreview()
             => EditorSceneManager.OpenScene(PreviewScenePath, OpenSceneMode.Single);
 

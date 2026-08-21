@@ -32,7 +32,7 @@ namespace Ssalddel.Unity.Editor.Experiments
         private const string PalletPrefab = CityRoot + "Props/SM_Prop_Pallet_01.prefab";
         private const string BoxPrefab = CityRoot + "Props/SM_Prop_CardboardBox_01.prefab";
 
-        [MenuItem("Ssalddel/City Pack/Build Urban Market Vertical Slice")]
+
         public static void BuildMarket()
         {
             EnsureAssets();
@@ -71,7 +71,7 @@ namespace Ssalddel.Unity.Editor.Experiments
             Debug.Log("[Ssalddel City Pack] Built market vertical slice: " + MarketScenePath);
         }
 
-        [MenuItem("Ssalddel/City Pack/Validate Urban Market Vertical Slice")]
+
         public static void ValidateMarket()
         {
             var representative = UnityEngine.Object.FindFirstObjectByType<공동주택대표NpcView>();
@@ -92,7 +92,7 @@ namespace Ssalddel.Unity.Editor.Experiments
             Debug.Log("[Ssalddel City Pack] Validated market VisualRoot, Humanoid avatar and Synty shaders.");
         }
 
-        [MenuItem("Ssalddel/City Pack/Build Urban Logistics Vertical Slice")]
+
         public static void BuildLogistics()
         {
             EnsureAssets();
@@ -147,7 +147,7 @@ namespace Ssalddel.Unity.Editor.Experiments
             Debug.Log("[Ssalddel City Pack] Built logistics vertical slice: " + LogisticsScenePath);
         }
 
-        [MenuItem("Ssalddel/City Pack/Validate Urban Logistics Vertical Slice")]
+
         public static void ValidateLogistics()
         {
             var overview = UnityEngine.Object.FindFirstObjectByType<LogisticsFacilityOverviewView>()

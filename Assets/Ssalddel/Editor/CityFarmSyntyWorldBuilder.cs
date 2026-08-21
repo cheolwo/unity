@@ -28,7 +28,7 @@ namespace Ssalddel.Unity.Editor
         private const string FarmRoot = "Assets/Synty/PolygonFarm/Prefabs/";
         private const string CityRoot = "Assets/Synty/PolygonCity/Prefabs/";
 
-        [MenuItem("Ssalddel/WORLD-2/Build Synty City Farm World")]
+
         public static void Build()
         {
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(CityFarmMacroWorldBuilder.ScenePath) == null)
@@ -73,7 +73,7 @@ namespace Ssalddel.Unity.Editor
             SceneView.RepaintAll();
         }
 
-        [MenuItem("Ssalddel/WORLD-2/Validate Synty City Farm World")]
+
         public static void ValidateOpenScene()
         {
             ValidateScene(

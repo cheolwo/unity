@@ -16,7 +16,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string EvidencePath =
             "Documentation/Changes/2026-08-10-potato-hub-disposition-lifecycle/potato-hub-disposition-game-view.png";
 
-        [MenuItem("Ssalddel/HUB-2 WORLD-8/Build Potato Hub Disposition Lifecycle")]
+
         public static void Build()
         {
             if (!File.Exists(PotatoHubReceivingLifecycleBuilder.ScenePath))
@@ -61,7 +61,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("PotatoHubDispositionLifecycleBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/HUB-2 WORLD-8/Validate Potato Hub Disposition Lifecycle")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -75,7 +75,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("HubDispositionInitialInvalid:actions=" + actionCount);
         }
 
-        [MenuItem("Ssalddel/HUB-2 WORLD-8/Capture Potato Hub Disposition Play Mode")]
+
         public static void Capture()
         {
             if (!EditorApplication.isPlaying)

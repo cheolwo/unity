@@ -20,7 +20,7 @@ namespace Ssalddel.Unity.Editor
             new("transition", "혼합·전환", "Assets/Ssalddel/Presentation/World/Generated/평창군법정동World/PackCompositionSets/mixed", 12),
         };
 
-        [MenuItem("Ssalddel/Synty Web 검토/156 기준 경관 문법 로컬 일괄 촬영")]
+        [MenuItem("Ssalddel/검토실/Synty Web/156 기준 경관 문법 로컬 일괄 촬영")]
         public static void CaptureCanonicalGrammarInventory()
         {
             EditorSceneManager.OpenScene(

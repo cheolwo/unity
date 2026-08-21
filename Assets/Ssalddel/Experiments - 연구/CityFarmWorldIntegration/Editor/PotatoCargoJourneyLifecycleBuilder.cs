@@ -14,7 +14,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string RootName="JOURNEY-1 Potato Cargo Farm Hub";
         public const string EvidencePath="Documentation/Changes/2026-08-10-potato-cargo-journey-lifecycle/potato-cargo-journey-game-view.png";
 
-        [MenuItem("Ssalddel/JOURNEY-1/Build Potato Cargo Journey Lifecycle")]
+
         public static void Build()
         {
             if(!File.Exists(PotatoJourneyHubRouteBuilder.ScenePath))PotatoJourneyHubRouteBuilder.Build();
@@ -32,7 +32,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("PotatoCargoJourneyLifecycleBuilt:"+ScenePath);
         }
 
-        [MenuItem("Ssalddel/JOURNEY-1/Validate Potato Cargo Journey Lifecycle")]
+
         public static void ValidateOpenScene()
         {
             var root=GameObject.Find("WorldBootstrap/"+RootName)??throw new InvalidOperationException("JourneyRootMissing");var presenter=root.GetComponent<PotatoCargoJourneyLifecyclePresenter>()??throw new InvalidOperationException("JourneyPresenterMissing");presenter.ResetJourney();
@@ -40,7 +40,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             if(!presenter.ValidateWiring()||presenter.CurrentModel.StateCode!="Loaded"||actions!=7)throw new InvalidOperationException("JourneyInitialPresentationInvalid:actions="+actions);
         }
 
-        [MenuItem("Ssalddel/JOURNEY-1/Capture Potato Cargo Journey Play Mode")]
+
         public static void CapturePlayMode()
         {if(!EditorApplication.isPlaying)throw new InvalidOperationException("JourneyCaptureRequiresPlayMode");var presenter=GameObject.Find("WorldBootstrap/"+RootName)?.GetComponent<PotatoCargoJourneyLifecyclePresenter>()??throw new InvalidOperationException("JourneyPresenterMissing");presenter.RunGoldenPath();var absolute=Path.GetFullPath(EvidencePath);Directory.CreateDirectory(Path.GetDirectoryName(absolute)!);ScreenCapture.CaptureScreenshot(absolute,1);Debug.Log("PotatoCargoJourneyCaptureRequested:"+absolute);}
 

@@ -38,7 +38,7 @@ namespace Ssalddel.Unity.Editor
         private const string FarmRoadRoot =
             "Assets/Synty/PolygonFarm/Prefabs/Environments/";
 
-        [MenuItem("Ssalddel/World Composition/Build Road and Gate A Sets")]
+        [MenuItem("Ssalddel/공간·경관/구성/Build Road and Gate A Sets")]
         public static void Build()
         {
             var definitions = CreateDefinitions();
@@ -70,7 +70,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log($"RoadGateCompositionSetsBuilt:{entries.Length}:{CatalogPath}");
         }
 
-        [MenuItem("Ssalddel/World Composition/Open Road and Gate Preview")]
+        [MenuItem("Ssalddel/공간·경관/구성/Open Road and Gate Preview")]
         public static void OpenLibraryPreview()
             => EditorSceneManager.OpenScene(PreviewScenePath, OpenSceneMode.Single);
 

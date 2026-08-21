@@ -18,7 +18,7 @@ namespace Ssalddel.Unity.Editor
         public const string RoadGateInventoryRevision =
             "pyeongchang-road-gate-composition-inventory.v1";
 
-        [MenuItem("Ssalddel/World Placement/공간 문법 Synty Binding 생성")]
+        [MenuItem("Ssalddel/공간·경관/배치 대장/공간 문법 Synty Binding 생성")]
         public static 공간문법SyntyBindingCatalog Build()
         {
             var grammar = AssetDatabase.LoadAssetAtPath<공간문법CompositionCatalog>(

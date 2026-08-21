@@ -141,7 +141,7 @@ namespace Ssalddel.Unity.Editor
                         new Vector2(32f, 24f), new Vector2(-14f, -14.5f)),
             };
 
-        [MenuItem("Ssalddel/WORLD-PLAN-1 평창 정적 경관 기본 JSON 생성")]
+        [MenuItem("Ssalddel/공간·경관/정적 경관 계획/01 기본 JSON 생성")]
         public static void GenerateBasePlanJson()
         {
             Directory.CreateDirectory(PlanDirectory);
@@ -179,7 +179,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-PLAN-1: Scene을 수정하지 않고 평창 정적 경관 기본·보정 JSON을 준비했습니다.");
         }
 
-        [MenuItem("Ssalddel/WORLD-PLAN-2 평창 정적 경관 계획 검증과 staging 생성")]
+        [MenuItem("Ssalddel/공간·경관/정적 경관 계획/02 검증과 staging 생성")]
         public static void ValidateAndStageMenu()
         {
             var report = ValidateAndStage();
@@ -191,7 +191,7 @@ namespace Ssalddel.Unity.Editor
                 + $"경고={report.WarningCount}");
         }
 
-        [MenuItem("Ssalddel/WORLD-PLAN-3 검증된 평창 정적 경관 Scene 적용")]
+        [MenuItem("Ssalddel/공간·경관/정적 경관 계획/03 검증된 Scene 적용")]
         public static void ApplyValidatedPlanToScene()
         {
             var report = ValidateAndStage();

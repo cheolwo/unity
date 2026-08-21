@@ -23,7 +23,7 @@ namespace Ssalddel.Unity.Editor
         private const string FarmRoot = "Assets/Synty/PolygonFarm/Prefabs/";
         private const string NatureRoot = "Assets/Synty/PolygonNature/Prefabs/";
 
-        [MenuItem("Ssalddel/World Placement/Farm·Town·City 경관 조합 대장 생성")]
+        [MenuItem("Ssalddel/공간·경관/배치 대장/Farm·Town·City 경관 조합 대장 생성")]
         public static 팩경관CompositionCatalog Build()
         {
             var farmCatalog = AssetDatabase.LoadAssetAtPath<농장풍경CompositionCatalog>(

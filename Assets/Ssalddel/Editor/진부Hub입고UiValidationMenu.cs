@@ -15,7 +15,7 @@ namespace Ssalddel.Unity.Editor
             "Assets/Documentation/Changes/2026-08-14-figma-maui-jinbu-inbound-ui/"
             + "jinbu-inbound-ui-completed.png";
 
-        [MenuItem("Ssalddel/Validation/JINBU-INBOUND-UI-0 Fixture 완료 화면 저장")]
+        [MenuItem("Ssalddel/검증/JINBU-INBOUND-UI-0 Fixture 완료 화면 저장")]
         public static async void CaptureFixtureCompletedGameView()
         {
             if (!EditorApplication.isPlaying)

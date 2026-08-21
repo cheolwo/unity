@@ -16,7 +16,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public const string EvidencePath =
             "Documentation/Changes/2026-08-10-harvest-disposition-choice/harvest-disposition-choice-game-view.png";
 
-        [MenuItem("Ssalddel/HARVEST-CHOICE-1/Build Harvest Disposition Choice")]
+
         public static void Build()
         {
             if (!File.Exists(PotatoCultivationLifecycleBuilder.ScenePath))
@@ -65,7 +65,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             Debug.Log("HarvestDispositionChoiceBuilt:" + ScenePath);
         }
 
-        [MenuItem("Ssalddel/HARVEST-CHOICE-1/Validate Harvest Disposition Choice")]
+
         public static void ValidateOpenScene()
         {
             var root = GameObject.Find("WorldBootstrap/" + RootName)
@@ -82,7 +82,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 throw new InvalidOperationException("HarvestDispositionInitialPresentationInvalid:actions=" + actions);
         }
 
-        [MenuItem("Ssalddel/HARVEST-CHOICE-1/Capture Direct Online Choice Play Mode")]
+
         public static void Capture()
         {
             if (!EditorApplication.isPlaying)
