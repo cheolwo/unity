@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Ssalddel.Unity.Bootstrap;
 using Ssalddel.Unity.Infrastructure.Simulation;
 using Ssalddel.Unity.Presentation.World;
 using Ssalddel.Unity.Runtime.Transport;
 using Ssalddel.Unity.Runtime.World;
 using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 namespace Ssalddel.Unity.Tests.EditMode
@@ -28,6 +31,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(coordinator.PhaseCode, Is.EqualTo(물류이동PhaseCodes.PreviewReady));
             Assert.That(coordinator.CurrentSnapshot, Is.SameAs(initial));
             Assert.That(coordinator.CurrentSnapshot.SourceAvailableQuantity, Is.EqualTo(300m));
+            Assert.That(coordinator.CurrentSnapshot.UnitCode, Is.EqualTo("KGM"));
             Assert.That(coordinator.CurrentPreview!.DestinationStockCandidateStableId,
                 Is.EqualTo("stock-candidate:arrival:cargo:sim.potato-1"));
             Assert.That(coordinator.CurrentPreview.RecommendedCarrierCandidateStableId,
@@ -161,6 +165,60 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public void 서버권위는_UnityFixturePreview문맥을사용하지않는다()
+        {
+            var initial = 물류이동FixtureAuthorityClient.CreateInitialSnapshot();
+            initial.SourceModeCode = "SimulationServer";
+            var coordinator = new 물류이동Coordinator(
+                new 물류이동FixtureAuthorityClient(initial), initial);
+
+            var error = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await coordinator.PreviewAsync());
+
+            Assert.That(error!.Message,
+                Is.EqualTo("SimulationLogisticsMovementPreviewContextMissing"));
+            Assert.That(coordinator.PhaseCode, Is.EqualTo(물류이동PhaseCodes.Failed));
+        }
+
+        [Test]
+        public async Task Presenter는_암묵Fixture를만들지않고_검토조립에서만명시적으로받는다()
+        {
+            var root = new GameObject("LogisticsAuthorityBoundaryTest");
+            var card = new GameObject("Card");
+            try
+            {
+                var shell = root.AddComponent<SimulationWorldShellPresenter>();
+                var presenter = root.AddComponent<물류이동Presenter>();
+                presenter.Configure(
+                    shell,
+                    card,
+                    CreateText(card.transform, "Cargo"),
+                    CreateText(card.transform, "Phase"),
+                    CreateText(card.transform, "Detail"),
+                    CreateButton(card.transform, "Preview"),
+                    CreateButton(card.transform, "Confirm"),
+                    CreateButton(card.transform, "Tick"));
+
+                Assert.That(presenter.AuthorityInitialized, Is.False);
+
+                var composition = root.AddComponent<물류이동SceneCompositionRoot>();
+                Assert.That(composition.AuthorityMode, Is.EqualTo(물류이동AuthorityMode.Server));
+                composition.Configure(null!, shell, presenter,
+                    물류이동AuthorityMode.ReviewFixture);
+                await composition.InitializeAsync();
+
+                Assert.That(presenter.AuthorityInitialized, Is.True);
+                Assert.That(presenter.CurrentAuthoritySnapshot!.SourceModeCode,
+                    Is.EqualTo("SimulationFixtureAuthority"));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(card);
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
         public void 저장Scene은_Cargo선택과세단계ActionCard를가진다()
         {
             var scene = SceneManager.GetSceneByPath(ScenePath);
@@ -171,6 +229,9 @@ namespace Ssalddel.Unity.Tests.EditMode
                 var presenter = root.GetComponentInChildren<물류이동Presenter>(true);
                 Assert.That(presenter, Is.Not.Null);
                 Assert.DoesNotThrow(() => presenter!.ValidateWiring());
+                var composition = root.GetComponentInChildren<물류이동SceneCompositionRoot>(true);
+                Assert.That(composition, Is.Not.Null);
+                Assert.That(composition!.서버기준사용중, Is.True);
                 var card = root.transform.Find("PersistentUI/SimulationWorldHud/LogisticsMovementCard");
                 Assert.That(card, Is.Not.Null);
                 Assert.That(card!.GetComponentsInChildren<UnityEngine.UI.Button>(true), Has.Length.EqualTo(3));
@@ -214,6 +275,20 @@ namespace Ssalddel.Unity.Tests.EditMode
                 L3CellKey = cellKey,
                 Position = new Npc물류PositionData { X = x },
             };
+
+        private static Text CreateText(Transform parent, string name)
+        {
+            var value = new GameObject(name, typeof(RectTransform), typeof(Text));
+            value.transform.SetParent(parent, false);
+            return value.GetComponent<Text>();
+        }
+
+        private static Button CreateButton(Transform parent, string name)
+        {
+            var value = new GameObject(name, typeof(RectTransform), typeof(Button));
+            value.transform.SetParent(parent, false);
+            return value.GetComponent<Button>();
+        }
 
         private sealed class StubApiClient : ISimulationRehearsalUnityApiClient
         {

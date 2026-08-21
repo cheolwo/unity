@@ -204,6 +204,7 @@ namespace Ssalddel.Unity.Runtime.World
         public string MovementStateCode { get; set; } = string.Empty;
         public string TaskStateCode { get; set; } = string.Empty;
         public decimal Quantity { get; set; }
+        public string UnitCode { get; set; } = string.Empty;
         public decimal ReservedQuantity { get; set; }
         public decimal SourceAvailableQuantity { get; set; }
         public int CompletedRouteTicks { get; set; }
@@ -262,6 +263,10 @@ namespace Ssalddel.Unity.Runtime.World
             var before = CurrentSnapshot;
             try
             {
+                if (string.Equals(before.SourceModeCode, "SimulationServer",
+                    StringComparison.Ordinal))
+                    throw new InvalidOperationException(
+                        "SimulationLogisticsMovementPreviewContextMissing");
                 var preview = await authority.PreviewAsync(
                     before.SessionStableId,
                     물류이동Fixture.CreateRequest(),
@@ -475,6 +480,7 @@ namespace Ssalddel.Unity.Runtime.World
                 GameDateLabel = settlement.GameDateLabel,
                 CargoStableId = 물류이동Fixture.CargoStableId,
                 Quantity = 300m,
+                UnitCode = "KGM",
                 SourceAvailableQuantity = 300m,
                 RequiredRouteTicks = 3,
                 RouteStableId = "route:sim.farm-hub-1",

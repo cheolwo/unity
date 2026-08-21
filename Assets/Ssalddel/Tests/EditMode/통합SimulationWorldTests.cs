@@ -45,7 +45,70 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Assert.That(bar, Is.Not.Null);
                 Assert.That(bar.GetComponentInParent<Canvas>().renderMode,
                     Is.EqualTo(RenderMode.ScreenSpaceOverlay));
-                Assert.That(bar.GetComponentsInChildren<Button>(true), Has.Length.EqualTo(4));
+                Assert.That(bar.GetComponentsInChildren<Button>(false), Has.Length.EqualTo(3));
+                Assert.That(bar.Find("JinbuInboundButton")!.gameObject.activeSelf, Is.False);
+            }
+            finally
+            {
+                if (scene.isLoaded) EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        [Test]
+        public void 저장Scene은_인칭전환만남기고_진단상태Hud를숨긴다()
+        {
+            var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                var root = Array.Find(scene.GetRootGameObjects(), value =>
+                    value.name == "SimulationWorldShell");
+                Assert.That(root, Is.Not.Null);
+
+                var hud = root.transform.Find("PersistentUI/SimulationWorldHud");
+                Assert.That(hud!.gameObject.activeSelf, Is.False);
+                Assert.That(hud.Find("WorldStatusPanel")!.gameObject.activeSelf, Is.False);
+                Assert.That(hud.Find("NavigationPanel")!.gameObject.activeSelf, Is.False);
+                Assert.That(hud.Find("ActualE5NetworkHud")!.gameObject.activeSelf, Is.False);
+
+                var streamingCanvas = root.GetComponentsInChildren<Canvas>(true)
+                    .Single(value => value.name == "DynamicTileStreamingStatusCanvas");
+                Assert.That(streamingCanvas.gameObject.activeSelf, Is.False);
+
+                var dailyPlans = root.GetComponentsInChildren<오늘작업계획Presenter>(true);
+                Assert.That(dailyPlans, Is.Not.Empty);
+                Assert.That(dailyPlans.All(value => !value.HudVisible), Is.True);
+                var managementControllers = root
+                    .GetComponentsInChildren<농장경영시점Controller>(true);
+                Assert.That(managementControllers, Is.Not.Empty);
+                Assert.That(managementControllers.All(value => !value.GuidanceVisible), Is.True);
+                var players = root.GetComponentsInChildren<플레이어경관Controller>(true);
+                Assert.That(players, Has.Length.EqualTo(1));
+                Assert.That(players.All(value => !value.GuidanceVisible), Is.True);
+
+                var bar = root.transform.Find(
+                    "PersistentUI/UnifiedWorldModeCanvas/UnifiedWorldModeBar");
+                Assert.That(bar, Is.Not.Null);
+                var rect = bar!.GetComponent<RectTransform>();
+                Assert.That(rect.anchorMin, Is.EqualTo(new Vector2(.5f, 0f)));
+                Assert.That(rect.anchorMax, Is.EqualTo(new Vector2(.5f, 0f)));
+                Assert.That(bar.GetComponentsInChildren<Button>(false)
+                    .Select(value => value.name), Is.EquivalentTo(new[]
+                    {
+                        "WorldOverviewButton", "FarmFirstPersonButton", "FarmTacticalButton",
+                    }));
+
+                var singlePlayerView = root.GetComponent<단일PlayerViewController>();
+                Assert.That(singlePlayerView, Is.Not.Null);
+                Assert.That(singlePlayerView!.ApplyOnPlay, Is.True);
+                Assert.That(singlePlayerView.PresentationOnly, Is.True);
+                Assert.That(singlePlayerView.Player, Is.SameAs(players[0]));
+                Assert.That(singlePlayerView.ModeCanvas,
+                    Is.SameAs(bar.GetComponentInParent<Canvas>()));
+                Assert.DoesNotThrow(singlePlayerView.ValidateWiring);
+
+                var mode = root.GetComponentInChildren<통합월드ModePresenter>(true);
+                Assert.That(mode, Is.Not.Null);
+                Assert.That(mode!.StartsInTacticalMode, Is.True);
             }
             finally
             {

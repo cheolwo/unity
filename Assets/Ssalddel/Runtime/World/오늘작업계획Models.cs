@@ -137,6 +137,16 @@ namespace Ssalddel.Unity.Runtime.World
             CurrentPreview = null;
         }
 
+        public void ApplyCanonicalState(오늘작업CanonicalStateData state)
+        {
+            EnsureBound();
+            if (state == null || state.WorldRevision < Revision)
+                throw new InvalidOperationException("DailyWorkPlanCanonicalStateInvalid");
+            Revision = state.WorldRevision;
+            CurrentState = state;
+            CurrentPreview = null;
+        }
+
         public async Task<오늘작업계획PreviewData> PreviewAsync(
             오늘작업계획ItemData[] items, CancellationToken cancellationToken)
         {

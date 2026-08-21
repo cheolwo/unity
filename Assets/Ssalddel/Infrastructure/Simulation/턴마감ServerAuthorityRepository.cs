@@ -334,11 +334,14 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             return new 타로ContextStateData
             {
                 Revision = wire.FrameSet?.Revision ?? 0,
+                JourneyRoot = MapJourneyRoot(wire.FrameSet?.JourneyRoot),
                 ActiveFrames = (wire.FrameSet?.ActiveFrames
                         ?? Array.Empty<TarotFrameWire>())
                     .Select(value => new 타로FrameData
                     {
                         FrameStableId = value.FrameStableId ?? string.Empty,
+                        ParentJourneyFrameStableId = value.ParentJourneyFrameStableId ?? string.Empty,
+                        MetaLayerCode = value.MetaLayerCode ?? string.Empty,
                         CardStableId = value.CardStableId ?? string.Empty,
                         CardCopyStableId = value.CardCopyStableId ?? string.Empty,
                         OrientationCode = value.OrientationCode ?? string.Empty,
@@ -359,6 +362,27 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             };
         }
 
+        private static 타로JourneyRootData MapJourneyRoot(TarotJourneyRootWire wire)
+        {
+            wire ??= new TarotJourneyRootWire();
+            return new 타로JourneyRootData
+            {
+                FrameStableId = wire.FrameStableId ?? string.Empty,
+                CardStableId = wire.CardStableId ?? string.Empty,
+                CardRevision = wire.CardRevision ?? string.Empty,
+                Title = wire.Title ?? string.Empty,
+                Summary = wire.Summary ?? string.Empty,
+                TraditionalArcanaNumber = wire.TraditionalArcanaNumber,
+                JourneySequenceOrder = wire.JourneySequenceOrder,
+                HierarchyTierCode = wire.HierarchyTierCode ?? string.Empty,
+                MetaLayerCode = wire.MetaLayerCode ?? string.Empty,
+                IsAlwaysActive = wire.IsAlwaysActive,
+                ThemeCodes = wire.ThemeCodes ?? Array.Empty<string>(),
+                RuleRevision = wire.RuleRevision ?? string.Empty,
+                SourceStableId = wire.SourceStableId ?? string.Empty,
+            };
+        }
+
         private static void ValidateContext(턴마감ContextData context, string expectedSession)
         {
             if (context.SessionStableId != expectedSession || context.TurnNumber <= 0
@@ -366,6 +390,20 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 || context.AvailableCards.Select(value => value.CardStableId).Distinct().Count()
                     != context.AvailableCards.Length)
                 throw new InvalidOperationException("TurnClosingContextAuthorityMismatch");
+
+            var root = context.TarotContext?.JourneyRoot;
+            if (root == null
+                || root.CardStableId != 턴마감CardStableIds.Fool
+                || string.IsNullOrWhiteSpace(root.FrameStableId)
+                || root.TraditionalArcanaNumber != 0
+                || root.JourneySequenceOrder != 1
+                || root.HierarchyTierCode != "Meta"
+                || root.MetaLayerCode != 타로MetaLayerCodes.JourneyRoot
+                || !root.IsAlwaysActive
+                || context.TarotContext.ActiveFrames.Any(frame =>
+                    frame.ParentJourneyFrameStableId != root.FrameStableId
+                    || frame.MetaLayerCode != 타로MetaLayerCodes.ActiveMajorArcana))
+                throw new InvalidOperationException("TarotJourneyRootAuthorityMismatch");
         }
 
         private static 턴마감ResultData ParseSession(string json)
@@ -467,7 +505,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 {
                     TreasuryBalance = 1000000m, CurrencyCode = "KRW",
                     LaborCapacityTotal = 100m, LaborReserved = 25m,
-                    StorageCapacity = 2000m, StorageOccupied = 1200m,
+                    StorageCapacity = 2000m, StorageOccupied = 2000m,
                     StorageUnitCode = "KGM", PopulationCount = 100,
                     PopulationFoodDemandPerTick = 100m, GarrisonCount = 20,
                     GarrisonFoodDemandPerTick = 20m,
@@ -502,6 +540,191 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 },
                 SpatialWorld = CreateHarvestDaySpatialWorld(),
                 FarmSurvival = CreateHarvestDayFarmState(),
+                IntegratedWorld = CreateFarmSmallStorageIntegratedWorld(),
+                NatureMind = new
+                {
+                    RuleRevision = "nature-mind-balance.r1",
+                    Players = new[]
+                    {
+                        new
+                        {
+                            PlayerStableId = "player:session:owner",
+                            RecoveryBaseOutput = 6m,
+                            ThreatBaseOutput = 4m,
+                        },
+                    },
+                },
+            };
+
+        private static object CreateFarmSmallStorageIntegratedWorld()
+            => new
+            {
+                ScenarioRevision = "farm-small-storage.r1",
+                ScenarioHashSha256 = "sha256:farm-small-storage-r1",
+                FacilityDefinitions = new object[]
+                {
+                    new
+                    {
+                        FacilityDefinitionStableId =
+                            "facility-definition:unity-hub-workshop.v1",
+                        Revision = "r1",
+                        HashSha256 =
+                            "sha256:facility-definition-unity-hub-workshop-r1",
+                        FacilityTypeCode = "ManufacturingWorkshop",
+                        CapabilityCodes = new[]
+                        {
+                            "Spatial.ManufacturingWorkArea",
+                            "Spatial.FinishedGoodsInspectionArea",
+                            "Spatial.WorkerAccessible",
+                        },
+                        Capacities = Array.Empty<object>(),
+                    },
+                    new
+                    {
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-small-storage.v1",
+                        Revision = "r1",
+                        HashSha256 =
+                            "sha256:facility-definition-farm-small-storage-r1",
+                        FacilityTypeCode = "FarmSmallStorage",
+                        CapabilityCodes = new[]
+                        {
+                            "Spatial.Storage", "Spatial.WorkerAccessible",
+                        },
+                        Capacities = new[]
+                        {
+                            new
+                            {
+                                CapacityCode = "StorageCapacity",
+                                Quantity = 500m,
+                                UnitCode = "KGM",
+                            },
+                        },
+                    },
+                },
+                FacilitySeeds = new[]
+                {
+                    new
+                    {
+                        FacilityStableId = "facility:unity:hub-workshop",
+                        FacilityDefinitionStableId =
+                            "facility-definition:unity-hub-workshop.v1",
+                        PlacementH1StableId = "h1:Hub:component-workshop",
+                        AccessConnectorStableIds = new[]
+                        {
+                            "connector:FarmHubRoute",
+                        },
+                    },
+                },
+                Actors = new[]
+                {
+                    new
+                    {
+                        ActorStableId = 오늘작업계획Codes.NpcActor,
+                        EligibilityRank = 1,
+                        FarmLaborEligible = true,
+                    },
+                },
+                Lots = new[]
+                {
+                    new
+                    {
+                        LotStableId = "lot:unity.hub-component-raw-material",
+                        ItemCode = "ManufacturingRawMaterial",
+                        Quantity = 2m,
+                        UnitCode = "unit",
+                        FacilityStableId = "facility:unity:hub-workshop",
+                    },
+                    new
+                    {
+                        LotStableId = "lot:coop.owner.components",
+                        ItemCode = "CoopFacilityComponent",
+                        Quantity = 2m,
+                        UnitCode = "unit",
+                        FacilityStableId = "player:session:owner",
+                    },
+                    new
+                    {
+                        LotStableId = "lot:coop.guest.components",
+                        ItemCode = "CoopFacilityComponent",
+                        Quantity = 2m,
+                        UnitCode = "unit",
+                        FacilityStableId = "player:sim.guest-1",
+                    },
+                },
+                ManufacturingRecipes = new[]
+                {
+                    new
+                    {
+                        RecipeStableId =
+                            "recipe:farm-small-storage-components.v1",
+                        Revision = "r1",
+                        HashSha256 =
+                            "sha256:recipe-farm-small-storage-components-r1",
+                        ProcessingTicks = 1,
+                        Inputs = new[]
+                        {
+                            new
+                            {
+                                ItemCode = "ManufacturingRawMaterial",
+                                Quantity = 2m,
+                                UnitCode = "unit",
+                            },
+                        },
+                        Outputs = new[]
+                        {
+                            new
+                            {
+                                ItemCode = "FacilityComponent",
+                                Quantity = 2m,
+                                UnitCode = "unit",
+                            },
+                        },
+                    },
+                },
+                FacilityBlueprints = new[]
+                {
+                    new
+                    {
+                        BlueprintStableId = Farm창고건설Codes.BlueprintStableId,
+                        Revision = "r1",
+                        HashSha256 = "sha256:blueprint-farm-small-storage-r1",
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-small-storage.v1",
+                        SettlementFacilityTypeCode = "Storage",
+                        SettlementDistrictStableId = "district:farm",
+                        ConstructionTicks = 2,
+                        Materials = new[]
+                        {
+                            new
+                            {
+                                ItemCode = "FacilityComponent",
+                                Quantity = 2m,
+                                UnitCode = "unit",
+                            },
+                        },
+                    },
+                    new
+                    {
+                        BlueprintStableId = "blueprint:farm-coop-storage.v1",
+                        Revision = "r1",
+                        HashSha256 = "sha256:blueprint-farm-coop-storage-r1",
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-small-storage.v1",
+                        SettlementFacilityTypeCode = "Storage",
+                        SettlementDistrictStableId = "district:farm",
+                        ConstructionTicks = 1,
+                        Materials = new[]
+                        {
+                            new
+                            {
+                                ItemCode = "CoopFacilityComponent",
+                                Quantity = 4m,
+                                UnitCode = "unit",
+                            },
+                        },
+                    },
+                },
             };
 
         private static object CreateHarvestDaySpatialWorld()
@@ -671,8 +894,9 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         [Serializable] private sealed class TarotDrawWire { public string DrawStableId; public string DeckStableId; public string DeckRevision; public string DrawRuleRevision; public int TurnNumber; public string TurnHistoryHash; public TarotOfferWire[] Offers; }
         [Serializable] private sealed class TarotOfferWire { public string OfferStableId; public int OfferSlotNumber; public string CardCopyStableId; public string OrientationCode; public CardWire Card; }
         [Serializable] private sealed class TarotContextWire { public TarotFrameSetWire FrameSet; public TarotRelationWire[] Relations; public string ContextStateHashSha256; }
-        [Serializable] private sealed class TarotFrameSetWire { public long Revision; public TarotFrameWire[] ActiveFrames; }
-        [Serializable] private sealed class TarotFrameWire { public string FrameStableId; public string CardStableId; public string CardCopyStableId; public string OrientationCode; public string FrameScopeCode; public string[] ThemeCodes; }
+        [Serializable] private sealed class TarotFrameSetWire { public long Revision; public TarotJourneyRootWire JourneyRoot; public TarotFrameWire[] ActiveFrames; }
+        [Serializable] private sealed class TarotJourneyRootWire { public string FrameStableId; public string CardStableId; public string CardRevision; public string Title; public string Summary; public int TraditionalArcanaNumber; public int JourneySequenceOrder; public string HierarchyTierCode; public string MetaLayerCode; public bool IsAlwaysActive; public string[] ThemeCodes; public string RuleRevision; public string SourceStableId; }
+        [Serializable] private sealed class TarotFrameWire { public string FrameStableId; public string ParentJourneyFrameStableId; public string MetaLayerCode; public string CardStableId; public string CardCopyStableId; public string OrientationCode; public string FrameScopeCode; public string[] ThemeCodes; }
         [Serializable] private sealed class TarotRelationWire { public string SourceFrameStableId; public string TargetCardFamilyCode; public string TargetCardStableId; public string TargetCardCopyStableId; public string RelationCode; public bool ChangesAvailability; }
         [Serializable] private sealed class TarotObjectReactionPreviewWire { public string PreviewStableId; public long BaseRevision; public int TurnNumber; public string DrawStableId; public string ObjectCatalogRevision; public bool IsCandidateOnly; public bool DoesNotMutateSession; public TarotCardReactionWire[] CardReactions; }
         [Serializable] private sealed class TarotCardReactionWire { public string OfferStableId; public string CardStableId; public string OrientationCode; public TarotObjectReactionWire[] ObjectReactions; public string[] HighlightObjectStableIds; }

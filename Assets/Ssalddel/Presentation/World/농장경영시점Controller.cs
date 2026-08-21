@@ -117,16 +117,21 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private 농장경영선택대상View[] targets =
             Array.Empty<농장경영선택대상View>();
         [SerializeField] private bool presentationOnly = true;
+        [SerializeField] private bool guidanceVisible = true;
 
         private readonly List<농장경영선택대상View> selected = new();
         private string selectedActionCode = 농장경영작업Codes.Till;
 
         public bool IsActive { get; private set; }
         public bool PresentationOnly => presentationOnly;
+        public bool GuidanceVisible => guidanceVisible;
         public IReadOnlyList<농장경영선택대상View> SelectedTargets => selected;
+        public IReadOnlyList<농장경영선택대상View> Targets => targets;
         public string SelectedActionCode => selectedActionCode;
         public 농장경영작업초안? CurrentDraft { get; private set; }
         public string RuleRevision => PlayerActivityViewPolicyCatalog.RuleRevision;
+
+        public void SetGuidanceVisible(bool visible) => guidanceVisible = visible;
 
         private void Awake()
         {
@@ -335,7 +340,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnGUI()
         {
-            if (!IsActive) return;
+            if (!guidanceVisible || !IsActive) return;
             GUI.color = new Color(.035f, .055f, .045f, .92f);
             GUI.DrawTexture(new Rect(18f, 84f, 330f, 176f), Texture2D.whiteTexture);
             GUI.color = Color.white;

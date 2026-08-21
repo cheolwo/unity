@@ -31,13 +31,10 @@ namespace Ssalddel.Unity.Presentation.World
         public string CurrentPhaseCode
             => coordinator == null ? string.Empty : coordinator.PhaseCode;
         public string NpcRouteStateCode => npcRouteStateCode;
+        public bool AuthorityInitialized => coordinator != null;
 
         private void Awake()
         {
-            InitializeAuthority(
-                new 물류이동FixtureAuthorityClient(
-                    물류이동FixtureAuthorityClient.CreateInitialSnapshot()),
-                물류이동FixtureAuthorityClient.CreateInitialSnapshot());
             BindListeners();
         }
 
@@ -69,6 +66,8 @@ namespace Ssalddel.Unity.Presentation.World
             previewButton = preview;
             confirmButton = confirm;
             tickButton = tick;
+            BindListeners();
+            SetActionsInteractable(false);
         }
 
         public void InitializeAuthority(
@@ -76,6 +75,7 @@ namespace Ssalddel.Unity.Presentation.World
             물류이동AuthoritySnapshot initial)
         {
             ValidateWiring();
+            BindListeners();
             coordinator = new 물류이동Coordinator(authority, initial);
             ApplyPresentation();
         }
@@ -153,6 +153,11 @@ namespace Ssalddel.Unity.Presentation.World
         private async Task Run(Func<Task> action)
         {
             if (busy) return;
+            if (coordinator == null)
+            {
+                Debug.LogError("LogisticsMovementAuthorityNotInitialized");
+                return;
+            }
             busy = true;
             try { await action(); }
             catch (Exception error) { Debug.LogError("LogisticsMovementFailed:" + error.Message); }
@@ -161,21 +166,29 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void BindListeners()
         {
-            if (listenersBound) return;
+            if (listenersBound || previewButton == null || confirmButton == null) return;
             previewButton.onClick.AddListener(() => _ = PreviewAsync());
             confirmButton.onClick.AddListener(() => _ = ConfirmAsync());
             listenersBound = true;
         }
 
+        private void SetActionsInteractable(bool interactable)
+        {
+            if (previewButton != null) previewButton.interactable = interactable;
+            if (confirmButton != null) confirmButton.interactable = interactable;
+            if (tickButton != null) tickButton.interactable = false;
+        }
+
         private void ApplyPresentation()
         {
             if (coordinator == null || shellPresenter == null || cardRoot == null) return;
-            var selected = shellPresenter.SelectedObjectStableId == 물류이동Fixture.CargoStableId;
+            var snapshot = coordinator.CurrentSnapshot;
+            var selected = shellPresenter.SelectedObjectStableId == snapshot.CargoStableId;
             cardRoot.SetActive(selected);
             if (!selected) return;
 
-            var snapshot = coordinator.CurrentSnapshot;
-            cargoText.text = "감자 CARGO · 300 kg\n" + snapshot.CargoStableId;
+            cargoText.text = "감자 CARGO · " + Number(snapshot.Quantity) + " "
+                + UnitLabel(snapshot.UnitCode) + "\n" + snapshot.CargoStableId;
             phaseText.text = PhaseLabel(coordinator.PhaseCode)
                 + " · WorldTick " + snapshot.WorldTick
                 + " · Revision " + snapshot.Revision;
@@ -196,7 +209,8 @@ namespace Ssalddel.Unity.Presentation.World
                 return "차단: " + coordinator.ErrorCode;
             if (coordinator.CurrentPreview == null)
                 return "농장 포장장 → 지역 물류 거점\n"
-                    + "300kg 감자를 실을 가상 기사를 비교합니다.\n"
+                    + Number(snapshot.Quantity) + UnitLabel(snapshot.UnitCode)
+                    + " 감자를 실을 가상 기사를 비교합니다.\n"
                     + "미리보기는 재고·배차·차량을 변경하지 않습니다.";
 
             var preview = coordinator.CurrentPreview;
@@ -229,7 +243,7 @@ namespace Ssalddel.Unity.Presentation.World
                 + "\n출발지 재고  " + Number(snapshot.SourceAvailableQuantity) + "kg"
                 + " · 예약 " + Number(snapshot.ReservedQuantity) + "kg"
                 + "\n도착 후보  " + preview.DestinationStockCandidateStableId
-                + "\n\nNPC가 경로 체크포인트를 순서대로 통과할 때만 로컬 권위가 진행됩니다.";
+                + "\n\nNPC가 경로 체크포인트를 순서대로 통과하고 서버 상태를 다시 조회해야 진행됩니다.";
         }
 
         private static string PhaseLabel(string phase) => phase switch
@@ -277,5 +291,10 @@ namespace Ssalddel.Unity.Presentation.World
 
         private static string Number(decimal value)
             => value.ToString("0.##", CultureInfo.InvariantCulture);
+
+        private static string UnitLabel(string unitCode)
+            => string.Equals(unitCode, "KGM", StringComparison.OrdinalIgnoreCase)
+                ? "kg"
+                : string.IsNullOrWhiteSpace(unitCode) ? "단위 미확인" : unitCode;
     }
 }

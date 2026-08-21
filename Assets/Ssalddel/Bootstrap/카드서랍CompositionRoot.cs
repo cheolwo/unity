@@ -256,37 +256,58 @@ namespace Ssalddel.Unity.Bootstrap
 
         private static CardWorkspaceFamilySnapshot BuildTarot(턴마감ContextData? turn)
         {
+            var root = turn?.TarotContext.JourneyRoot;
             var frames = turn?.TarotContext.ActiveFrames ?? Array.Empty<타로FrameData>();
             var offers = turn?.TarotDraw.Offers ?? Array.Empty<턴마감타로OfferData>();
+            var items = new List<CardWorkspaceItem>();
+            if (root != null && !string.IsNullOrWhiteSpace(root.CardStableId))
+            {
+                items.Add(new CardWorkspaceItem
+                {
+                    CardStableId = root.CardStableId,
+                    Title = root.Title,
+                    Summary = string.Join(" · ", root.ThemeCodes) + " / " + root.Summary,
+                    FamilyCode = CardFamilyCodes.Tarot,
+                    HierarchyTierCode = CardHierarchyTierCodes.Meta,
+                    MetaLayerCode = CardMetaLayerCodes.JourneyRoot,
+                    AuthorityCode = CardAuthorityCodes.ProjectionReadOnly,
+                    ActionRouteCode = CardActionRouteCodes.None,
+                    IsAvailable = root.IsAlwaysActive,
+                });
+            }
+            items.AddRange(frames.Select(frame =>
+            {
+                var card = offers.FirstOrDefault(value =>
+                    value.Card.CardStableId == frame.CardStableId)?.Card;
+                return new CardWorkspaceItem
+                {
+                    CardStableId = frame.CardStableId,
+                    CardCopyStableId = frame.CardCopyStableId,
+                    Title = card?.Title ?? frame.CardStableId,
+                    Summary = string.Join(" · ", frame.ThemeCodes)
+                        + " / " + frame.OrientationCode,
+                    FamilyCode = CardFamilyCodes.Tarot,
+                    HierarchyTierCode = CardHierarchyTierCodes.Meta,
+                    MetaLayerCode = CardMetaLayerCodes.ActiveMajorArcana,
+                    AuthorityCode = CardAuthorityCodes.ServerMutable,
+                    ActionRouteCode = CardActionRouteCodes.OpenTurnClosing,
+                    IsAvailable = true,
+                };
+            }));
             return new CardWorkspaceFamilySnapshot
             {
                 FamilyCode = CardFamilyCodes.Tarot,
                 SourceRevision = turn?.TarotContext.Revision ?? 0,
-                Items = frames.Select(frame =>
-                {
-                    var card = offers.FirstOrDefault(value =>
-                        value.Card.CardStableId == frame.CardStableId)?.Card;
-                    return new CardWorkspaceItem
-                    {
-                        CardStableId = frame.CardStableId,
-                        CardCopyStableId = frame.CardCopyStableId,
-                        Title = card?.Title ?? frame.CardStableId,
-                        Summary = string.Join(" · ", frame.ThemeCodes)
-                            + " / " + frame.OrientationCode,
-                        FamilyCode = CardFamilyCodes.Tarot,
-                        HierarchyTierCode = CardHierarchyTierCodes.Meta,
-                        AuthorityCode = CardAuthorityCodes.ServerMutable,
-                        ActionRouteCode = CardActionRouteCodes.OpenTurnClosing,
-                        IsAvailable = true,
-                    };
-                }).ToArray(),
+                Items = items.ToArray(),
                 Relations = (turn?.TarotContext.Relations
                         ?? Array.Empty<타로CardRelationData>())
                     .Select(relation => new CardWorkspaceRelation
                     {
-                        SourceCardStableId = frames.FirstOrDefault(value =>
-                            value.FrameStableId == relation.SourceFrameStableId)
-                            ?.CardStableId ?? relation.SourceFrameStableId,
+                        SourceCardStableId = relation.SourceFrameStableId == root?.FrameStableId
+                            ? root.CardStableId
+                            : frames.FirstOrDefault(value =>
+                                value.FrameStableId == relation.SourceFrameStableId)
+                                ?.CardStableId ?? relation.SourceFrameStableId,
                         TargetCardStableId = relation.TargetCardStableId,
                         RelationCode = relation.RelationCode,
                         ChangesAvailability = relation.ChangesAvailability,

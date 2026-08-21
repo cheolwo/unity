@@ -66,6 +66,7 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField, Min(.1f)] private float viewTransitionDuration = .9f;
         [SerializeField, Min(0f)] private float viewTransitionArcHeight = 1.8f;
         [SerializeField] private bool presentationOnly = true;
+        [SerializeField] private bool guidanceVisible = true;
 
         private CharacterController _characterController = null!;
         private Camera? _previousCamera;
@@ -103,9 +104,13 @@ namespace Ssalddel.Unity.Presentation.World
         public 플레이어경관Profile Profile => profile;
         public Camera PlayerCamera => thirdPersonCamera;
         public Camera FirstPersonCamera => firstPersonCamera;
+        public Transform VisualRoot => visualRoot;
         public 플레이어시점Mode CurrentMode => _currentMode;
         public bool PresentationOnly => presentationOnly;
+        public bool GuidanceVisible => guidanceVisible;
         public bool IsPlayerMode => _currentMode != 플레이어시점Mode.Strategy;
+
+        public void SetGuidanceVisible(bool visible) => guidanceVisible = visible;
         public bool IsSelected => _isSelected;
         public bool HasDestination => _hasDestination;
         public Vector3 Destination => _destination;
@@ -920,7 +925,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnGUI()
         {
-            if (!IsPlayerMode) return;
+            if (!guidanceVisible || !IsPlayerMode) return;
             GUI.color = new Color(0f, 0f, 0f, .52f);
             GUI.DrawTexture(new Rect(14f, Screen.height - 62f, 940f, 42f),
                 Texture2D.whiteTexture);

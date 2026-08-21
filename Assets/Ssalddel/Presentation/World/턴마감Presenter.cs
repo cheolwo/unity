@@ -39,6 +39,7 @@ namespace Ssalddel.Unity.Presentation.World
         public string Status => statusText != null ? statusText.text : string.Empty;
         public string SelectedTarotOfferStableId => selectedTarot?.OfferStableId ?? string.Empty;
         public 턴마감ContextData? CurrentContext => context;
+        public bool 권위연결됨 => authority != null;
         public IReadOnlyCollection<string> HighlightedObjectStableIds
             => tarotHighlighter != null
                 ? tarotHighlighter.HighlightedObjectStableIds
@@ -63,7 +64,7 @@ namespace Ssalddel.Unity.Presentation.World
         {
             if (!자동시작) return;
             ValidateWiring();
-            authority ??= new 턴마감FixtureAuthorityClient();
+            RequireExplicitAuthority();
             BindListeners();
             try
             {
@@ -94,7 +95,13 @@ namespace Ssalddel.Unity.Presentation.World
             => authority = client ?? throw new ArgumentNullException(nameof(client));
 
         public void Set자동시작(bool enabled)
-            => 자동시작 = enabled;
+        {
+            if (enabled && authority == null)
+                throw new InvalidOperationException(
+                    "TurnClosingImplicitFixtureAuthorityDisabled");
+
+            자동시작 = enabled;
+        }
 
         public async Task InitializeAsync(I턴마감AuthorityClient client)
         {
@@ -104,6 +111,13 @@ namespace Ssalddel.Unity.Presentation.World
             BindListeners();
             await LoadAsync();
             SetContextVisible(true);
+        }
+
+        private void RequireExplicitAuthority()
+        {
+            if (authority == null)
+                throw new InvalidOperationException(
+                    "TurnClosingImplicitFixtureAuthorityDisabled");
         }
 
         public void SetContextVisible(bool visible)

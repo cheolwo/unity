@@ -1,0 +1,1366 @@
+{
+  "schemaVersion": "simulation-world-area-set-composition-plans.v1",
+  "revision": "simulation-world-area-set-composition-plans.r1",
+  "sourceLedgerRevision": "simulation-world-area-set-composition-patterns.r1",
+  "theoryFactoryRevision": "simulation-world-theory-spatial-factory-output.r3",
+  "generatedAtRuleCode": "DeterministicNoWallClock",
+  "counts": {
+    "areaRoles": 4,
+    "baselinePatterns": 4,
+    "variantPatterns": 4,
+    "totalPatterns": 8,
+    "resolvedH3Placements": 32,
+    "resolvedConnections": 32
+  },
+  "baselineSelections": [
+    {
+      "areaRoleCode": "CityHub",
+      "baselinePatternStableId": "area-set-composition:cityhub:inbound-storage-outbound",
+      "worldIntentRef": "h4-blueprint:logistics-hub-region",
+      "compositionPatternHashSha256": "918819f66a529060da2347dc58b087e63a7a9452ab386f42c7d3dfb1a4e8b99d",
+      "documentHashSha256": "414e458a38d222eaed58e1200a45b696f4c94bd77ced15a5fae6bf6bc7bfb252"
+    },
+    {
+      "areaRoleCode": "Farm",
+      "baselinePatternStableId": "area-set-composition:farm:highland-production-processing",
+      "worldIntentRef": "h4-blueprint:farm-production-processing-region",
+      "compositionPatternHashSha256": "ec8179b01d3f485621356d94e6272584540e4c1266956ec623c5c81e5530d615",
+      "documentHashSha256": "8b6f1a6fbaac8b296b5410ff0b6b8bc696b6888e1992f6a16ef3e44b22a85325"
+    },
+    {
+      "areaRoleCode": "NatureHome",
+      "baselinePatternStableId": "area-set-composition:nature:forest-river-home-loop",
+      "worldIntentRef": "h4-blueprint:nature-home-exploration-region",
+      "compositionPatternHashSha256": "162f49b1bcaa2ae8fee34c0e37459482da05f5421a9cac088257fe9542c1329d",
+      "documentHashSha256": "65ec9d4fa141e6b64f3344ca43ec546dc22e0ee5b72fab2c6dae3d9998579361"
+    },
+    {
+      "areaRoleCode": "Town",
+      "baselinePatternStableId": "area-set-composition:town:lowrise-life-market",
+      "worldIntentRef": "h4-blueprint:lowrise-market-region",
+      "compositionPatternHashSha256": "17113a5debb758e1753630d15b8b17dca10c31d097f7a8b126252f0a0ef83e50",
+      "documentHashSha256": "1b358b36c8519667edb2e505e75d61cb2abd0ad858e9c3127236972497cd9aa1"
+    }
+  ],
+  "resolvedPatterns": [
+    {
+      "compositionPatternStableId": "area-set-composition:cityhub:inbound-storage-outbound",
+      "patternCode": "CITYHUB-ASET-COMP-01",
+      "title": "City/Hub 기준 구성 01 — 입고·보관·출고 선형",
+      "areaRoleCode": "CityHub",
+      "worldIntentRef": "h4-blueprint:logistics-hub-region",
+      "gamePlanCode": "CityHubLogisticsResilience",
+      "patternKindCode": "Baseline",
+      "basePatternStableId": "",
+      "leadPackCode": "City",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/cityhub.md",
+      "documentHashSha256": "414e458a38d222eaed58e1200a45b696f4c94bd77ced15a5fae6bf6bc7bfb252",
+      "resolvedH3Placements": [
+        {
+          "placementStableId": "placement:area-pattern:cityhub:fulfillment",
+          "roleSlotCode": "FulfillmentOperations",
+          "selectedH3PatternRef": "h3-candidate:hub-fulfillment-operations",
+          "h3PatternCode": "CITY-H3-HUB-04",
+          "h3DisplayNameKo": "Hub 보관·피킹·상차 운영 구역",
+          "childH2Refs": [
+            "h2-candidate:hub-fulfillment",
+            "h2-candidate:hub-longterm-cold-storage",
+            "h2-candidate:hub-outbound-vehicle"
+          ],
+          "x": 960.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b"
+        },
+        {
+          "placementStableId": "placement:area-pattern:cityhub:inbound",
+          "roleSlotCode": "InboundOutbound",
+          "selectedH3PatternRef": "h3-candidate:jinbu-hub",
+          "h3PatternCode": "CITY-H3-HUB-01",
+          "h3DisplayNameKo": "Hub 입고장·창고·출고장 구역",
+          "childH2Refs": [
+            "h2-candidate:hub-inbound-storage",
+            "h2-candidate:hub-outbound-vehicle"
+          ],
+          "x": -960.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3"
+        },
+        {
+          "placementStableId": "placement:area-pattern:cityhub:maintenance",
+          "roleSlotCode": "MaintenanceEmergency",
+          "selectedH3PatternRef": "h3-candidate:hub-maintenance-emergency-loop",
+          "h3PatternCode": "CITY-H3-HUB-03",
+          "h3DisplayNameKo": "Hub 정비고·비상전력 구역",
+          "childH2Refs": [
+            "h2-candidate:hub-emergency-power",
+            "h2-candidate:hub-maintenance-yard",
+            "h2-candidate:hub-outbound-vehicle"
+          ],
+          "x": 0.0,
+          "z": 960.0,
+          "rotationDegrees": 90,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee"
+        },
+        {
+          "placementStableId": "placement:area-pattern:cityhub:storage",
+          "roleSlotCode": "ResilientStorage",
+          "selectedH3PatternRef": "h3-candidate:resilient-logistics-hub",
+          "h3PatternCode": "CITY-H3-HUB-02",
+          "h3DisplayNameKo": "Hub 검역장·저온창고 구역",
+          "childH2Refs": [
+            "h2-candidate:hub-inbound-storage",
+            "h2-candidate:hub-longterm-cold-storage",
+            "h2-candidate:hub-outbound-vehicle",
+            "h2-candidate:hub-quarantine-staging"
+          ],
+          "x": 0.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b"
+        }
+      ],
+      "resolvedH2Overrides": [],
+      "resolvedConnections": [
+        {
+          "connectionStableId": "connection:area-pattern:cityhub:fulfillment-inbound",
+          "fromRoleSlotCode": "FulfillmentOperations",
+          "fromH3PatternRef": "h3-candidate:hub-fulfillment-operations",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:hub-fulfillment-operations:egress",
+          "toRoleSlotCode": "InboundOutbound",
+          "toH3PatternRef": "h3-candidate:jinbu-hub",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:jinbu-hub:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:cityhub:inbound-storage",
+          "fromRoleSlotCode": "InboundOutbound",
+          "fromH3PatternRef": "h3-candidate:jinbu-hub",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:jinbu-hub:egress",
+          "toRoleSlotCode": "ResilientStorage",
+          "toH3PatternRef": "h3-candidate:resilient-logistics-hub",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:resilient-logistics-hub:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:cityhub:maintenance-fulfillment",
+          "fromRoleSlotCode": "MaintenanceEmergency",
+          "fromH3PatternRef": "h3-candidate:hub-maintenance-emergency-loop",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:hub-maintenance-emergency-loop:egress",
+          "toRoleSlotCode": "FulfillmentOperations",
+          "toH3PatternRef": "h3-candidate:hub-fulfillment-operations",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:hub-fulfillment-operations:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:cityhub:storage-maintenance",
+          "fromRoleSlotCode": "ResilientStorage",
+          "fromH3PatternRef": "h3-candidate:resilient-logistics-hub",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:resilient-logistics-hub:egress",
+          "toRoleSlotCode": "MaintenanceEmergency",
+          "toH3PatternRef": "h3-candidate:hub-maintenance-emergency-loop",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:hub-maintenance-emergency-loop:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "gameplayLoop": {
+        "startRoleSlotCode": "InboundOutbound",
+        "resultRoleSlotCode": "FulfillmentOperations",
+        "returnRoleSlotCode": "InboundOutbound",
+        "movementKindCode": "PlayerTraversal"
+      },
+      "relatedWiStableIds": [
+        "WI-001",
+        "WI-002",
+        "WI-HUB-03",
+        "WI-HUB-04",
+        "WI-HUB-05",
+        "WI-HUB-06",
+        "WI-LOG-04",
+        "WI-LOG-05"
+      ],
+      "structureQualificationCode": "AreaSetCompositionStructureQualified",
+      "closureStateCode": "Closed",
+      "compositionPatternHashSha256": "918819f66a529060da2347dc58b087e63a7a9452ab386f42c7d3dfb1a4e8b99d",
+      "runtimeState": false,
+      "presentationOnly": true
+    },
+    {
+      "compositionPatternStableId": "area-set-composition:cityhub:quarantine-emergency-detour",
+      "patternCode": "CITYHUB-ASET-COMP-01-V01",
+      "title": "City/Hub 변형 01 — 격리·비상 우회형",
+      "areaRoleCode": "CityHub",
+      "worldIntentRef": "h4-blueprint:logistics-hub-region",
+      "gamePlanCode": "CityHubLogisticsResilience",
+      "patternKindCode": "Variant",
+      "basePatternStableId": "area-set-composition:cityhub:inbound-storage-outbound",
+      "leadPackCode": "City",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/cityhub.md",
+      "documentHashSha256": "414e458a38d222eaed58e1200a45b696f4c94bd77ced15a5fae6bf6bc7bfb252",
+      "resolvedH3Placements": [
+        {
+          "placementStableId": "placement:area-pattern:cityhub-v01:fulfillment",
+          "roleSlotCode": "FulfillmentOperations",
+          "selectedH3PatternRef": "h3-candidate:hub-fulfillment-operations",
+          "h3PatternCode": "CITY-H3-HUB-04",
+          "h3DisplayNameKo": "Hub 보관·피킹·상차 운영 구역",
+          "childH2Refs": [
+            "h2-candidate:hub-fulfillment",
+            "h2-candidate:hub-longterm-cold-storage",
+            "h2-candidate:hub-outbound-vehicle"
+          ],
+          "x": 960.0,
+          "z": 0.0,
+          "rotationDegrees": 180,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "5eb7d79454877c5bb93049dcaea288e0327518d7de6290362b9df0be5df0902b"
+        },
+        {
+          "placementStableId": "placement:area-pattern:cityhub-v01:inbound",
+          "roleSlotCode": "InboundOutbound",
+          "selectedH3PatternRef": "h3-candidate:jinbu-hub",
+          "h3PatternCode": "CITY-H3-HUB-01",
+          "h3DisplayNameKo": "Hub 입고장·창고·출고장 구역",
+          "childH2Refs": [
+            "h2-candidate:hub-inbound-storage",
+            "h2-candidate:hub-outbound-vehicle"
+          ],
+          "x": -960.0,
+          "z": -960.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "d32a3192fd82ae179c71faebc424e41132769246f1f1909b94504ab8a5e71cb3"
+        },
+        {
+          "placementStableId": "placement:area-pattern:cityhub-v01:maintenance",
+          "roleSlotCode": "MaintenanceEmergency",
+          "selectedH3PatternRef": "h3-candidate:hub-maintenance-emergency-loop",
+          "h3PatternCode": "CITY-H3-HUB-03",
+          "h3DisplayNameKo": "Hub 정비고·비상전력 구역",
+          "childH2Refs": [
+            "h2-candidate:hub-emergency-power",
+            "h2-candidate:hub-maintenance-yard",
+            "h2-candidate:hub-outbound-vehicle"
+          ],
+          "x": -960.0,
+          "z": 960.0,
+          "rotationDegrees": 270,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "e6fc1c2deef73df119a7e47e39a696706c6b08cf5088ef1e0c4e02cf022169ee"
+        },
+        {
+          "placementStableId": "placement:area-pattern:cityhub-v01:storage",
+          "roleSlotCode": "ResilientStorage",
+          "selectedH3PatternRef": "h3-candidate:resilient-logistics-hub",
+          "h3PatternCode": "CITY-H3-HUB-02",
+          "h3DisplayNameKo": "Hub 검역장·저온창고 구역",
+          "childH2Refs": [
+            "h2-candidate:hub-inbound-storage",
+            "h2-candidate:hub-longterm-cold-storage",
+            "h2-candidate:hub-outbound-vehicle",
+            "h2-candidate:hub-quarantine-staging"
+          ],
+          "x": 0.0,
+          "z": 0.0,
+          "rotationDegrees": 90,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "9384af399f1c3676fefe4e85dc4eff25dc5ece159488669e35811bdb5a5c2a3b"
+        }
+      ],
+      "resolvedH2Overrides": [],
+      "resolvedConnections": [
+        {
+          "connectionStableId": "connection:area-pattern:cityhub-v01:fulfillment-inbound",
+          "fromRoleSlotCode": "FulfillmentOperations",
+          "fromH3PatternRef": "h3-candidate:hub-fulfillment-operations",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:hub-fulfillment-operations:egress",
+          "toRoleSlotCode": "InboundOutbound",
+          "toH3PatternRef": "h3-candidate:jinbu-hub",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:jinbu-hub:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:cityhub-v01:inbound-storage",
+          "fromRoleSlotCode": "InboundOutbound",
+          "fromH3PatternRef": "h3-candidate:jinbu-hub",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:jinbu-hub:egress",
+          "toRoleSlotCode": "ResilientStorage",
+          "toH3PatternRef": "h3-candidate:resilient-logistics-hub",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:resilient-logistics-hub:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:cityhub-v01:maintenance-fulfillment",
+          "fromRoleSlotCode": "MaintenanceEmergency",
+          "fromH3PatternRef": "h3-candidate:hub-maintenance-emergency-loop",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:hub-maintenance-emergency-loop:egress",
+          "toRoleSlotCode": "FulfillmentOperations",
+          "toH3PatternRef": "h3-candidate:hub-fulfillment-operations",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:hub-fulfillment-operations:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:cityhub-v01:storage-maintenance",
+          "fromRoleSlotCode": "ResilientStorage",
+          "fromH3PatternRef": "h3-candidate:resilient-logistics-hub",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:resilient-logistics-hub:egress",
+          "toRoleSlotCode": "MaintenanceEmergency",
+          "toH3PatternRef": "h3-candidate:hub-maintenance-emergency-loop",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:hub-maintenance-emergency-loop:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "gameplayLoop": {
+        "startRoleSlotCode": "InboundOutbound",
+        "resultRoleSlotCode": "MaintenanceEmergency",
+        "returnRoleSlotCode": "InboundOutbound",
+        "movementKindCode": "PlayerTraversal"
+      },
+      "relatedWiStableIds": [
+        "WI-001",
+        "WI-002",
+        "WI-HUB-05",
+        "WI-HUB-06",
+        "WI-LOG-04",
+        "WI-LOG-05"
+      ],
+      "structureQualificationCode": "AreaSetCompositionStructureQualified",
+      "closureStateCode": "Closed",
+      "compositionPatternHashSha256": "88a268c1aab94c47c1e5e38a259ca8e59bdc3904131fd98676809b321b2408b9",
+      "runtimeState": false,
+      "presentationOnly": true
+    },
+    {
+      "compositionPatternStableId": "area-set-composition:farm:highland-production-processing",
+      "patternCode": "FARM-ASET-COMP-01",
+      "title": "Farm 기준 구성 01 — 고지대 생산·후처리형",
+      "areaRoleCode": "Farm",
+      "worldIntentRef": "h4-blueprint:farm-production-processing-region",
+      "gamePlanCode": "FarmProductionSurvival",
+      "patternKindCode": "Baseline",
+      "basePatternStableId": "",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [
+        "Construction",
+        "Nature"
+      ],
+      "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/farm.md",
+      "documentHashSha256": "8b6f1a6fbaac8b296b5410ff0b6b8bc696b6888e1992f6a16ef3e44b22a85325",
+      "resolvedH3Placements": [
+        {
+          "placementStableId": "placement:area-pattern:farm:dispatch",
+          "roleSlotCode": "SeasonalDispatch",
+          "selectedH3PatternRef": "h3-candidate:farm-seasonal-production-loop",
+          "h3PatternCode": "FARM-H3-REGION-04",
+          "h3DisplayNameKo": "관수 경작지·출하장 구역",
+          "childH2Refs": [
+            "h2-candidate:farm-harvest-throughput",
+            "h2-candidate:farm-irrigation-service",
+            "h2-candidate:farm-processing-shipping"
+          ],
+          "x": 960.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "b75fa67772480909100c071e93117ab7134adf4159a1395286a25dabec91b009"
+        },
+        {
+          "placementStableId": "placement:area-pattern:farm:incident",
+          "roleSlotCode": "IncidentRecovery",
+          "selectedH3PatternRef": "h3-candidate:farm-incident-recovery",
+          "h3PatternCode": "FARM-H3-REGION-03",
+          "h3DisplayNameKo": "격리구획·복구 작업장 구역",
+          "childH2Refs": [
+            "h2-candidate:farm-incident-containment",
+            "h2-candidate:farm-loss-restoration-handoff"
+          ],
+          "x": 0.0,
+          "z": 960.0,
+          "rotationDegrees": 90,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "39f6549c7bae56ca62ea4d0e4e4b592fdc12d43f4d36d828a2db4760011aa9a4"
+        },
+        {
+          "placementStableId": "placement:area-pattern:farm:processing",
+          "roleSlotCode": "HomeProcessing",
+          "selectedH3PatternRef": "h3-candidate:farm-processing-campus",
+          "h3PatternCode": "FARM-H3-REGION-02",
+          "h3DisplayNameKo": "농가·생산·후처리 생활 구역",
+          "childH2Refs": [
+            "h2-candidate:farm-processing-shipping",
+            "h2-candidate:farm-seed-and-tools",
+            "h2-candidate:farm-wash-sort-pack",
+            "h2-candidate:farm-worker-support",
+            "h2-candidate:highland-production"
+          ],
+          "x": 0.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "770b3ef795a6e31cdd9a4377ecf3771404f5a10e391493463d76dea5a69c2b63"
+        },
+        {
+          "placementStableId": "placement:area-pattern:farm:production",
+          "roleSlotCode": "HighlandProduction",
+          "selectedH3PatternRef": "h3-candidate:highland-farm",
+          "h3PatternCode": "FARM-H3-REGION-01",
+          "h3DisplayNameKo": "고지대 경작지·숲경계 구역",
+          "childH2Refs": [
+            "h2-candidate:farm-processing-shipping",
+            "h2-candidate:forest-edge-farm",
+            "h2-candidate:highland-production"
+          ],
+          "x": -960.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "5b54508e95534ee5e42d7ca9ab3170e37d86c10d5e74ca52289d0408de6061e3"
+        }
+      ],
+      "resolvedH2Overrides": [],
+      "resolvedConnections": [
+        {
+          "connectionStableId": "connection:area-pattern:farm:dispatch-production",
+          "fromRoleSlotCode": "SeasonalDispatch",
+          "fromH3PatternRef": "h3-candidate:farm-seasonal-production-loop",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:farm-seasonal-production-loop:egress",
+          "toRoleSlotCode": "HighlandProduction",
+          "toH3PatternRef": "h3-candidate:highland-farm",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:highland-farm:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:farm:incident-dispatch",
+          "fromRoleSlotCode": "IncidentRecovery",
+          "fromH3PatternRef": "h3-candidate:farm-incident-recovery",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:farm-incident-recovery:egress",
+          "toRoleSlotCode": "SeasonalDispatch",
+          "toH3PatternRef": "h3-candidate:farm-seasonal-production-loop",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:farm-seasonal-production-loop:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:farm:processing-incident",
+          "fromRoleSlotCode": "HomeProcessing",
+          "fromH3PatternRef": "h3-candidate:farm-processing-campus",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:farm-processing-campus:egress",
+          "toRoleSlotCode": "IncidentRecovery",
+          "toH3PatternRef": "h3-candidate:farm-incident-recovery",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:farm-incident-recovery:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:farm:production-processing",
+          "fromRoleSlotCode": "HighlandProduction",
+          "fromH3PatternRef": "h3-candidate:highland-farm",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:highland-farm:egress",
+          "toRoleSlotCode": "HomeProcessing",
+          "toH3PatternRef": "h3-candidate:farm-processing-campus",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:farm-processing-campus:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "gameplayLoop": {
+        "startRoleSlotCode": "HighlandProduction",
+        "resultRoleSlotCode": "SeasonalDispatch",
+        "returnRoleSlotCode": "HighlandProduction",
+        "movementKindCode": "PlayerTraversal"
+      },
+      "relatedWiStableIds": [
+        "WI-FARM-01",
+        "WI-FARM-02",
+        "WI-FARM-03",
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-LOG-01",
+        "WI-LOG-02",
+        "WI-WORLD-04"
+      ],
+      "structureQualificationCode": "AreaSetCompositionStructureQualified",
+      "closureStateCode": "Closed",
+      "compositionPatternHashSha256": "ec8179b01d3f485621356d94e6272584540e4c1266956ec623c5c81e5530d615",
+      "runtimeState": false,
+      "presentationOnly": true
+    },
+    {
+      "compositionPatternStableId": "area-set-composition:farm:seasonal-dispatch-focus",
+      "patternCode": "FARM-ASET-COMP-01-V01",
+      "title": "Farm 변형 01 — 계절 출하 집중형",
+      "areaRoleCode": "Farm",
+      "worldIntentRef": "h4-blueprint:farm-production-processing-region",
+      "gamePlanCode": "FarmProductionSurvival",
+      "patternKindCode": "Variant",
+      "basePatternStableId": "area-set-composition:farm:highland-production-processing",
+      "leadPackCode": "Farm",
+      "supportPackCodes": [
+        "Construction",
+        "Nature"
+      ],
+      "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/farm.md",
+      "documentHashSha256": "8b6f1a6fbaac8b296b5410ff0b6b8bc696b6888e1992f6a16ef3e44b22a85325",
+      "resolvedH3Placements": [
+        {
+          "placementStableId": "placement:area-pattern:farm-v01:dispatch",
+          "roleSlotCode": "SeasonalDispatch",
+          "selectedH3PatternRef": "h3-candidate:farm-seasonal-production-loop",
+          "h3PatternCode": "FARM-H3-REGION-04",
+          "h3DisplayNameKo": "관수 경작지·출하장 구역",
+          "childH2Refs": [
+            "h2-candidate:farm-harvest-throughput",
+            "h2-candidate:farm-irrigation-service",
+            "h2-candidate:farm-processing-shipping"
+          ],
+          "x": 960.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "b75fa67772480909100c071e93117ab7134adf4159a1395286a25dabec91b009"
+        },
+        {
+          "placementStableId": "placement:area-pattern:farm-v01:incident",
+          "roleSlotCode": "IncidentRecovery",
+          "selectedH3PatternRef": "h3-candidate:farm-incident-recovery",
+          "h3PatternCode": "FARM-H3-REGION-03",
+          "h3DisplayNameKo": "격리구획·복구 작업장 구역",
+          "childH2Refs": [
+            "h2-candidate:farm-incident-containment",
+            "h2-candidate:farm-loss-restoration-handoff"
+          ],
+          "x": 0.0,
+          "z": 960.0,
+          "rotationDegrees": 270,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "39f6549c7bae56ca62ea4d0e4e4b592fdc12d43f4d36d828a2db4760011aa9a4"
+        },
+        {
+          "placementStableId": "placement:area-pattern:farm-v01:processing",
+          "roleSlotCode": "HomeProcessing",
+          "selectedH3PatternRef": "h3-candidate:farm-processing-campus",
+          "h3PatternCode": "FARM-H3-REGION-02",
+          "h3DisplayNameKo": "농가·생산·후처리 생활 구역",
+          "childH2Refs": [
+            "h2-candidate:farm-processing-shipping",
+            "h2-candidate:farm-seed-and-tools",
+            "h2-candidate:farm-wash-sort-pack",
+            "h2-candidate:farm-worker-support",
+            "h2-candidate:highland-production"
+          ],
+          "x": 0.0,
+          "z": -960.0,
+          "rotationDegrees": 90,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "770b3ef795a6e31cdd9a4377ecf3771404f5a10e391493463d76dea5a69c2b63"
+        },
+        {
+          "placementStableId": "placement:area-pattern:farm-v01:production",
+          "roleSlotCode": "HighlandProduction",
+          "selectedH3PatternRef": "h3-candidate:highland-farm",
+          "h3PatternCode": "FARM-H3-REGION-01",
+          "h3DisplayNameKo": "고지대 경작지·숲경계 구역",
+          "childH2Refs": [
+            "h2-candidate:farm-processing-shipping",
+            "h2-candidate:forest-edge-farm",
+            "h2-candidate:highland-production"
+          ],
+          "x": -960.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "5b54508e95534ee5e42d7ca9ab3170e37d86c10d5e74ca52289d0408de6061e3"
+        }
+      ],
+      "resolvedH2Overrides": [],
+      "resolvedConnections": [
+        {
+          "connectionStableId": "connection:area-pattern:farm-v01:dispatch-incident",
+          "fromRoleSlotCode": "SeasonalDispatch",
+          "fromH3PatternRef": "h3-candidate:farm-seasonal-production-loop",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:farm-seasonal-production-loop:egress",
+          "toRoleSlotCode": "IncidentRecovery",
+          "toH3PatternRef": "h3-candidate:farm-incident-recovery",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:farm-incident-recovery:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:farm-v01:incident-production",
+          "fromRoleSlotCode": "IncidentRecovery",
+          "fromH3PatternRef": "h3-candidate:farm-incident-recovery",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:farm-incident-recovery:egress",
+          "toRoleSlotCode": "HighlandProduction",
+          "toH3PatternRef": "h3-candidate:highland-farm",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:highland-farm:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:farm-v01:processing-dispatch",
+          "fromRoleSlotCode": "HomeProcessing",
+          "fromH3PatternRef": "h3-candidate:farm-processing-campus",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:farm-processing-campus:egress",
+          "toRoleSlotCode": "SeasonalDispatch",
+          "toH3PatternRef": "h3-candidate:farm-seasonal-production-loop",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:farm-seasonal-production-loop:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:farm-v01:production-processing",
+          "fromRoleSlotCode": "HighlandProduction",
+          "fromH3PatternRef": "h3-candidate:highland-farm",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:highland-farm:egress",
+          "toRoleSlotCode": "HomeProcessing",
+          "toH3PatternRef": "h3-candidate:farm-processing-campus",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:farm-processing-campus:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "gameplayLoop": {
+        "startRoleSlotCode": "HighlandProduction",
+        "resultRoleSlotCode": "SeasonalDispatch",
+        "returnRoleSlotCode": "HighlandProduction",
+        "movementKindCode": "PlayerTraversal"
+      },
+      "relatedWiStableIds": [
+        "WI-FARM-04",
+        "WI-FARM-05",
+        "WI-FARM-06",
+        "WI-LOG-01",
+        "WI-LOG-02"
+      ],
+      "structureQualificationCode": "AreaSetCompositionStructureQualified",
+      "closureStateCode": "Closed",
+      "compositionPatternHashSha256": "7beac03eab8487c161772922f00abff276a63261a5b663f26ff3aa0607960dc7",
+      "runtimeState": false,
+      "presentationOnly": true
+    },
+    {
+      "compositionPatternStableId": "area-set-composition:nature:forest-river-home-loop",
+      "patternCode": "NATURE-ASET-COMP-01",
+      "title": "Nature 기준 구성 01 — 숲·하천 생활핵 순환형",
+      "areaRoleCode": "NatureHome",
+      "worldIntentRef": "h4-blueprint:nature-home-exploration-region",
+      "gamePlanCode": "NatureHomeThreatRecovery",
+      "patternKindCode": "Baseline",
+      "basePatternStableId": "",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/nature.md",
+      "documentHashSha256": "65ec9d4fa141e6b64f3344ca43ec546dc22e0ee5b72fab2c6dae3d9998579361",
+      "resolvedH3Placements": [
+        {
+          "placementStableId": "placement:area-pattern:nature:home",
+          "roleSlotCode": "HomeEncounterDefense",
+          "selectedH3PatternRef": "h3-candidate:nature-home-encounter-defense",
+          "h3PatternCode": "NATURE-H3-REGION-04",
+          "h3DisplayNameKo": "생활핵·조우로·방어환 구역",
+          "childH2Refs": [
+            "h2-candidate:nature-defense-ring",
+            "h2-candidate:nature-encounter-route",
+            "h2-candidate:nature-home-core"
+          ],
+          "x": 0.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "2ffa247b9fc1883229a1e1262108ba3050a41c230e0a44c69bc17dceb085c9fb"
+        },
+        {
+          "placementStableId": "placement:area-pattern:nature:threat",
+          "roleSlotCode": "ThreatRecovery",
+          "selectedH3PatternRef": "h3-candidate:nature-threat-recovery",
+          "h3PatternCode": "NATURE-H3-REGION-02",
+          "h3DisplayNameKo": "생활핵·대피로·복원쉼터 구역",
+          "childH2Refs": [
+            "h2-candidate:nature-restoration-recovery",
+            "h2-candidate:nature-threat-response"
+          ],
+          "x": 960.0,
+          "z": 0.0,
+          "rotationDegrees": 90,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "e3e481fec0c32d67306e657d1a18e40805e17edb8fd6190b0e0522462c4baa58"
+        },
+        {
+          "placementStableId": "placement:area-pattern:nature:trail",
+          "roleSlotCode": "TrailNetwork",
+          "selectedH3PatternRef": "h3-candidate:nature-trail-network",
+          "h3PatternCode": "NATURE-H3-REGION-03",
+          "h3DisplayNameKo": "탐색로·대피망 구역",
+          "childH2Refs": [
+            "h2-candidate:nature-trail-shelter",
+            "h2-candidate:nature-water-buffer"
+          ],
+          "x": -960.0,
+          "z": 960.0,
+          "rotationDegrees": 270,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "cf76bb91086e9e1fa73298ee1241383a43c218b956c2804482b2a6729ae99363"
+        }
+      ],
+      "resolvedH2Overrides": [],
+      "resolvedConnections": [
+        {
+          "connectionStableId": "connection:area-pattern:nature:home-threat",
+          "fromRoleSlotCode": "HomeEncounterDefense",
+          "fromH3PatternRef": "h3-candidate:nature-home-encounter-defense",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:nature-home-encounter-defense:egress",
+          "toRoleSlotCode": "ThreatRecovery",
+          "toH3PatternRef": "h3-candidate:nature-threat-recovery",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:nature-threat-recovery:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:nature:threat-trail",
+          "fromRoleSlotCode": "ThreatRecovery",
+          "fromH3PatternRef": "h3-candidate:nature-threat-recovery",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:nature-threat-recovery:egress",
+          "toRoleSlotCode": "TrailNetwork",
+          "toH3PatternRef": "h3-candidate:nature-trail-network",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:nature-trail-network:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:nature:trail-home",
+          "fromRoleSlotCode": "TrailNetwork",
+          "fromH3PatternRef": "h3-candidate:nature-trail-network",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:nature-trail-network:egress",
+          "toRoleSlotCode": "HomeEncounterDefense",
+          "toH3PatternRef": "h3-candidate:nature-home-encounter-defense",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:nature-home-encounter-defense:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "gameplayLoop": {
+        "startRoleSlotCode": "HomeEncounterDefense",
+        "resultRoleSlotCode": "ThreatRecovery",
+        "returnRoleSlotCode": "HomeEncounterDefense",
+        "movementKindCode": "PlayerTraversal"
+      },
+      "relatedWiStableIds": [
+        "WI-NATURE-01",
+        "WI-NATURE-02",
+        "WI-NATURE-03",
+        "WI-NATURE-04",
+        "WI-WORLD-05",
+        "WI-WORLD-07"
+      ],
+      "structureQualificationCode": "AreaSetCompositionStructureQualified",
+      "closureStateCode": "Closed",
+      "compositionPatternHashSha256": "162f49b1bcaa2ae8fee34c0e37459482da05f5421a9cac088257fe9542c1329d",
+      "runtimeState": false,
+      "presentationOnly": true
+    },
+    {
+      "compositionPatternStableId": "area-set-composition:nature:threat-retreat-detour",
+      "patternCode": "NATURE-ASET-COMP-01-V01",
+      "title": "Nature 변형 01 — 위협 고조·대피 우회형",
+      "areaRoleCode": "NatureHome",
+      "worldIntentRef": "h4-blueprint:nature-home-exploration-region",
+      "gamePlanCode": "NatureHomeThreatRecovery",
+      "patternKindCode": "Variant",
+      "basePatternStableId": "area-set-composition:nature:forest-river-home-loop",
+      "leadPackCode": "Nature",
+      "supportPackCodes": [
+        "Construction"
+      ],
+      "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/nature.md",
+      "documentHashSha256": "65ec9d4fa141e6b64f3344ca43ec546dc22e0ee5b72fab2c6dae3d9998579361",
+      "resolvedH3Placements": [
+        {
+          "placementStableId": "placement:area-pattern:nature-v01:home",
+          "roleSlotCode": "HomeEncounterDefense",
+          "selectedH3PatternRef": "h3-candidate:nature-home-encounter-defense",
+          "h3PatternCode": "NATURE-H3-REGION-04",
+          "h3DisplayNameKo": "생활핵·조우로·방어환 구역",
+          "childH2Refs": [
+            "h2-candidate:nature-defense-ring",
+            "h2-candidate:nature-encounter-route",
+            "h2-candidate:nature-home-core"
+          ],
+          "x": -960.0,
+          "z": -960.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "2ffa247b9fc1883229a1e1262108ba3050a41c230e0a44c69bc17dceb085c9fb"
+        },
+        {
+          "placementStableId": "placement:area-pattern:nature-v01:threat",
+          "roleSlotCode": "ThreatRecovery",
+          "selectedH3PatternRef": "h3-candidate:nature-threat-recovery",
+          "h3PatternCode": "NATURE-H3-REGION-02",
+          "h3DisplayNameKo": "생활핵·대피로·복원쉼터 구역",
+          "childH2Refs": [
+            "h2-candidate:nature-restoration-recovery",
+            "h2-candidate:nature-threat-response"
+          ],
+          "x": 960.0,
+          "z": 960.0,
+          "rotationDegrees": 180,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "e3e481fec0c32d67306e657d1a18e40805e17edb8fd6190b0e0522462c4baa58"
+        },
+        {
+          "placementStableId": "placement:area-pattern:nature-v01:trail",
+          "roleSlotCode": "TrailNetwork",
+          "selectedH3PatternRef": "h3-candidate:nature-trail-network",
+          "h3PatternCode": "NATURE-H3-REGION-03",
+          "h3DisplayNameKo": "탐색로·대피망 구역",
+          "childH2Refs": [
+            "h2-candidate:nature-trail-shelter",
+            "h2-candidate:nature-water-buffer"
+          ],
+          "x": -960.0,
+          "z": 960.0,
+          "rotationDegrees": 90,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "cf76bb91086e9e1fa73298ee1241383a43c218b956c2804482b2a6729ae99363"
+        }
+      ],
+      "resolvedH2Overrides": [],
+      "resolvedConnections": [
+        {
+          "connectionStableId": "connection:area-pattern:nature-v01:home-trail",
+          "fromRoleSlotCode": "HomeEncounterDefense",
+          "fromH3PatternRef": "h3-candidate:nature-home-encounter-defense",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:nature-home-encounter-defense:egress",
+          "toRoleSlotCode": "TrailNetwork",
+          "toH3PatternRef": "h3-candidate:nature-trail-network",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:nature-trail-network:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:nature-v01:threat-home",
+          "fromRoleSlotCode": "ThreatRecovery",
+          "fromH3PatternRef": "h3-candidate:nature-threat-recovery",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:nature-threat-recovery:egress",
+          "toRoleSlotCode": "HomeEncounterDefense",
+          "toH3PatternRef": "h3-candidate:nature-home-encounter-defense",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:nature-home-encounter-defense:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:nature-v01:trail-threat",
+          "fromRoleSlotCode": "TrailNetwork",
+          "fromH3PatternRef": "h3-candidate:nature-trail-network",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:nature-trail-network:egress",
+          "toRoleSlotCode": "ThreatRecovery",
+          "toH3PatternRef": "h3-candidate:nature-threat-recovery",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:nature-threat-recovery:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "gameplayLoop": {
+        "startRoleSlotCode": "HomeEncounterDefense",
+        "resultRoleSlotCode": "ThreatRecovery",
+        "returnRoleSlotCode": "HomeEncounterDefense",
+        "movementKindCode": "PlayerTraversal"
+      },
+      "relatedWiStableIds": [
+        "WI-NATURE-01",
+        "WI-NATURE-02",
+        "WI-NATURE-03",
+        "WI-NATURE-04"
+      ],
+      "structureQualificationCode": "AreaSetCompositionStructureQualified",
+      "closureStateCode": "Closed",
+      "compositionPatternHashSha256": "a0a152742a93f9e05d5bc4ee370e5813af17bca732e218a215fb95e673eec901",
+      "runtimeState": false,
+      "presentationOnly": true
+    },
+    {
+      "compositionPatternStableId": "area-set-composition:town:contamination-relief-detour",
+      "patternCode": "TOWN-ASET-COMP-01-V01",
+      "title": "Town 변형 01 — 오염 통제·구호형",
+      "areaRoleCode": "Town",
+      "worldIntentRef": "h4-blueprint:lowrise-market-region",
+      "gamePlanCode": "TownLivingMarketSafety",
+      "patternKindCode": "Variant",
+      "basePatternStableId": "area-set-composition:town:lowrise-life-market",
+      "leadPackCode": "Town",
+      "supportPackCodes": [
+        "Construction",
+        "Nature"
+      ],
+      "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/town.md",
+      "documentHashSha256": "1b358b36c8519667edb2e505e75d61cb2abd0ad858e9c3127236972497cd9aa1",
+      "resolvedH3Placements": [
+        {
+          "placementStableId": "placement:area-pattern:town-v01:circular",
+          "roleSlotCode": "CircularMarket",
+          "selectedH3PatternRef": "h3-candidate:circular-market-town",
+          "h3PatternCode": "TOWN-H3-VILLAGE-02",
+          "h3DisplayNameKo": "시장·반품집하 구역",
+          "childH2Refs": [
+            "h2-candidate:market-life-commerce",
+            "h2-candidate:town-returns-waste"
+          ],
+          "x": 960.0,
+          "z": -960.0,
+          "rotationDegrees": 90,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "87c7a687a6729790c66cd5c18a9f01f1a52d6e5ab0be8a49cfe321a65999d825"
+        },
+        {
+          "placementStableId": "placement:area-pattern:town-v01:fulfillment",
+          "roleSlotCode": "MarketFulfillment",
+          "selectedH3PatternRef": "h3-candidate:town-market-fulfillment",
+          "h3PatternCode": "TOWN-H3-VILLAGE-05",
+          "h3DisplayNameKo": "마트 입고·주문이행 구역",
+          "childH2Refs": [
+            "h2-candidate:market-life-commerce",
+            "h2-candidate:town-market-receiving",
+            "h2-candidate:town-order-fulfillment"
+          ],
+          "x": 960.0,
+          "z": 960.0,
+          "rotationDegrees": 180,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "492257f10d3b34d0d16fb6b95ede991ddfa2d055378337c4be940e609f29376c"
+        },
+        {
+          "placementStableId": "placement:area-pattern:town-v01:lowrise",
+          "roleSlotCode": "LowriseMarket",
+          "selectedH3PatternRef": "h3-candidate:lowrise-market-town",
+          "h3PatternCode": "TOWN-H3-VILLAGE-01",
+          "h3DisplayNameKo": "저층 주거·마트 구역",
+          "childH2Refs": [
+            "h2-candidate:lowrise-residential",
+            "h2-candidate:market-life-commerce"
+          ],
+          "x": -960.0,
+          "z": -960.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "f11c359dbb8f9deded748b4ce93d3a02af239df55d344602549f44d94d60fc57"
+        },
+        {
+          "placementStableId": "placement:area-pattern:town-v01:relief",
+          "roleSlotCode": "ContaminationRelief",
+          "selectedH3PatternRef": "h3-candidate:town-contamination-relief",
+          "h3PatternCode": "TOWN-H3-VILLAGE-03",
+          "h3DisplayNameKo": "오염격리·주민구호 구역",
+          "childH2Refs": [
+            "h2-candidate:town-contamination-control",
+            "h2-candidate:town-recall-relief"
+          ],
+          "x": 0.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Expanded",
+          "h3TheoryHashSha256": "12c4169f2dedb312ed9ba5c9d7cefbfea678b23aea9c9006c7859f56700518f6"
+        },
+        {
+          "placementStableId": "placement:area-pattern:town-v01:service",
+          "roleSlotCode": "ResidentService",
+          "selectedH3PatternRef": "h3-candidate:town-resident-service-loop",
+          "h3PatternCode": "TOWN-H3-VILLAGE-04",
+          "h3DisplayNameKo": "주거골목·주민지원 구역",
+          "childH2Refs": [
+            "h2-candidate:lowrise-residential",
+            "h2-candidate:town-resident-service",
+            "h2-candidate:town-residential-alley"
+          ],
+          "x": -960.0,
+          "z": 960.0,
+          "rotationDegrees": 270,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "490e2e4d3d5be2c0a48c6eead4740dee135a328faf06bcaa4a16b75ae8b3e278"
+        }
+      ],
+      "resolvedH2Overrides": [],
+      "resolvedConnections": [
+        {
+          "connectionStableId": "connection:area-pattern:town-v01:circular-lowrise",
+          "fromRoleSlotCode": "CircularMarket",
+          "fromH3PatternRef": "h3-candidate:circular-market-town",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:circular-market-town:egress",
+          "toRoleSlotCode": "LowriseMarket",
+          "toH3PatternRef": "h3-candidate:lowrise-market-town",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:lowrise-market-town:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:town-v01:fulfillment-circular",
+          "fromRoleSlotCode": "MarketFulfillment",
+          "fromH3PatternRef": "h3-candidate:town-market-fulfillment",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:town-market-fulfillment:egress",
+          "toRoleSlotCode": "CircularMarket",
+          "toH3PatternRef": "h3-candidate:circular-market-town",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:circular-market-town:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:town-v01:lowrise-relief",
+          "fromRoleSlotCode": "LowriseMarket",
+          "fromH3PatternRef": "h3-candidate:lowrise-market-town",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:lowrise-market-town:egress",
+          "toRoleSlotCode": "ContaminationRelief",
+          "toH3PatternRef": "h3-candidate:town-contamination-relief",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:town-contamination-relief:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:town-v01:relief-service",
+          "fromRoleSlotCode": "ContaminationRelief",
+          "fromH3PatternRef": "h3-candidate:town-contamination-relief",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:town-contamination-relief:egress",
+          "toRoleSlotCode": "ResidentService",
+          "toH3PatternRef": "h3-candidate:town-resident-service-loop",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:town-resident-service-loop:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:town-v01:service-fulfillment",
+          "fromRoleSlotCode": "ResidentService",
+          "fromH3PatternRef": "h3-candidate:town-resident-service-loop",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:town-resident-service-loop:egress",
+          "toRoleSlotCode": "MarketFulfillment",
+          "toH3PatternRef": "h3-candidate:town-market-fulfillment",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:town-market-fulfillment:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "gameplayLoop": {
+        "startRoleSlotCode": "LowriseMarket",
+        "resultRoleSlotCode": "ContaminationRelief",
+        "returnRoleSlotCode": "LowriseMarket",
+        "movementKindCode": "PlayerTraversal"
+      },
+      "relatedWiStableIds": [
+        "WI-MARKET-03",
+        "WI-MARKET-05",
+        "WI-ORDER-05",
+        "WI-ORDER-06"
+      ],
+      "structureQualificationCode": "AreaSetCompositionStructureQualified",
+      "closureStateCode": "Closed",
+      "compositionPatternHashSha256": "1cceafbba55af99d657b812df4998833b41b74250973189decd83bb72cbdb6ad",
+      "runtimeState": false,
+      "presentationOnly": true
+    },
+    {
+      "compositionPatternStableId": "area-set-composition:town:lowrise-life-market",
+      "patternCode": "TOWN-ASET-COMP-01",
+      "title": "Town 기준 구성 01 — 저층 생활광장·시장형",
+      "areaRoleCode": "Town",
+      "worldIntentRef": "h4-blueprint:lowrise-market-region",
+      "gamePlanCode": "TownLivingMarketSafety",
+      "patternKindCode": "Baseline",
+      "basePatternStableId": "",
+      "leadPackCode": "Town",
+      "supportPackCodes": [
+        "Construction",
+        "Nature"
+      ],
+      "documentPath": "eng/world-seedbeds/synty-bottom-up-inventory/authored/area-set-compositions/town.md",
+      "documentHashSha256": "1b358b36c8519667edb2e505e75d61cb2abd0ad858e9c3127236972497cd9aa1",
+      "resolvedH3Placements": [
+        {
+          "placementStableId": "placement:area-pattern:town:circular",
+          "roleSlotCode": "CircularMarket",
+          "selectedH3PatternRef": "h3-candidate:circular-market-town",
+          "h3PatternCode": "TOWN-H3-VILLAGE-02",
+          "h3DisplayNameKo": "시장·반품집하 구역",
+          "childH2Refs": [
+            "h2-candidate:market-life-commerce",
+            "h2-candidate:town-returns-waste"
+          ],
+          "x": 960.0,
+          "z": 0.0,
+          "rotationDegrees": 90,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "87c7a687a6729790c66cd5c18a9f01f1a52d6e5ab0be8a49cfe321a65999d825"
+        },
+        {
+          "placementStableId": "placement:area-pattern:town:fulfillment",
+          "roleSlotCode": "MarketFulfillment",
+          "selectedH3PatternRef": "h3-candidate:town-market-fulfillment",
+          "h3PatternCode": "TOWN-H3-VILLAGE-05",
+          "h3DisplayNameKo": "마트 입고·주문이행 구역",
+          "childH2Refs": [
+            "h2-candidate:market-life-commerce",
+            "h2-candidate:town-market-receiving",
+            "h2-candidate:town-order-fulfillment"
+          ],
+          "x": 0.0,
+          "z": -960.0,
+          "rotationDegrees": 180,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "492257f10d3b34d0d16fb6b95ede991ddfa2d055378337c4be940e609f29376c"
+        },
+        {
+          "placementStableId": "placement:area-pattern:town:lowrise",
+          "roleSlotCode": "LowriseMarket",
+          "selectedH3PatternRef": "h3-candidate:lowrise-market-town",
+          "h3PatternCode": "TOWN-H3-VILLAGE-01",
+          "h3DisplayNameKo": "저층 주거·마트 구역",
+          "childH2Refs": [
+            "h2-candidate:lowrise-residential",
+            "h2-candidate:market-life-commerce"
+          ],
+          "x": 0.0,
+          "z": 0.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "f11c359dbb8f9deded748b4ce93d3a02af239df55d344602549f44d94d60fc57"
+        },
+        {
+          "placementStableId": "placement:area-pattern:town:relief",
+          "roleSlotCode": "ContaminationRelief",
+          "selectedH3PatternRef": "h3-candidate:town-contamination-relief",
+          "h3PatternCode": "TOWN-H3-VILLAGE-03",
+          "h3DisplayNameKo": "오염격리·주민구호 구역",
+          "childH2Refs": [
+            "h2-candidate:town-contamination-control",
+            "h2-candidate:town-recall-relief"
+          ],
+          "x": 0.0,
+          "z": 960.0,
+          "rotationDegrees": 0,
+          "scaleVariantCode": "Compact",
+          "h3TheoryHashSha256": "12c4169f2dedb312ed9ba5c9d7cefbfea678b23aea9c9006c7859f56700518f6"
+        },
+        {
+          "placementStableId": "placement:area-pattern:town:service",
+          "roleSlotCode": "ResidentService",
+          "selectedH3PatternRef": "h3-candidate:town-resident-service-loop",
+          "h3PatternCode": "TOWN-H3-VILLAGE-04",
+          "h3DisplayNameKo": "주거골목·주민지원 구역",
+          "childH2Refs": [
+            "h2-candidate:lowrise-residential",
+            "h2-candidate:town-resident-service",
+            "h2-candidate:town-residential-alley"
+          ],
+          "x": -960.0,
+          "z": 0.0,
+          "rotationDegrees": 270,
+          "scaleVariantCode": "Standard",
+          "h3TheoryHashSha256": "490e2e4d3d5be2c0a48c6eead4740dee135a328faf06bcaa4a16b75ae8b3e278"
+        }
+      ],
+      "resolvedH2Overrides": [],
+      "resolvedConnections": [
+        {
+          "connectionStableId": "connection:area-pattern:town:circular-relief",
+          "fromRoleSlotCode": "CircularMarket",
+          "fromH3PatternRef": "h3-candidate:circular-market-town",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:circular-market-town:egress",
+          "toRoleSlotCode": "ContaminationRelief",
+          "toH3PatternRef": "h3-candidate:town-contamination-relief",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:town-contamination-relief:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:town:fulfillment-lowrise",
+          "fromRoleSlotCode": "MarketFulfillment",
+          "fromH3PatternRef": "h3-candidate:town-market-fulfillment",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:town-market-fulfillment:egress",
+          "toRoleSlotCode": "LowriseMarket",
+          "toH3PatternRef": "h3-candidate:lowrise-market-town",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:lowrise-market-town:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:town:lowrise-circular",
+          "fromRoleSlotCode": "LowriseMarket",
+          "fromH3PatternRef": "h3-candidate:lowrise-market-town",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:lowrise-market-town:egress",
+          "toRoleSlotCode": "CircularMarket",
+          "toH3PatternRef": "h3-candidate:circular-market-town",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:circular-market-town:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:town:relief-service",
+          "fromRoleSlotCode": "ContaminationRelief",
+          "fromH3PatternRef": "h3-candidate:town-contamination-relief",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:town-contamination-relief:egress",
+          "toRoleSlotCode": "ResidentService",
+          "toH3PatternRef": "h3-candidate:town-resident-service-loop",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:town-resident-service-loop:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        },
+        {
+          "connectionStableId": "connection:area-pattern:town:service-fulfillment",
+          "fromRoleSlotCode": "ResidentService",
+          "fromH3PatternRef": "h3-candidate:town-resident-service-loop",
+          "fromConnectorRoleCode": "Egress",
+          "fromConnectorStableId": "connector:h3:town-resident-service-loop:egress",
+          "toRoleSlotCode": "MarketFulfillment",
+          "toH3PatternRef": "h3-candidate:town-market-fulfillment",
+          "toConnectorRoleCode": "Ingress",
+          "toConnectorStableId": "connector:h3:town-market-fulfillment:ingress",
+          "movementKindCode": "PlayerTraversal",
+          "relationDirectionCode": "Directed",
+          "compatibilityRuleCode": "OutputToInputSameFlow"
+        }
+      ],
+      "gameplayLoop": {
+        "startRoleSlotCode": "LowriseMarket",
+        "resultRoleSlotCode": "MarketFulfillment",
+        "returnRoleSlotCode": "LowriseMarket",
+        "movementKindCode": "PlayerTraversal"
+      },
+      "relatedWiStableIds": [
+        "WI-MARKET-02",
+        "WI-MARKET-03",
+        "WI-MARKET-04",
+        "WI-MARKET-05",
+        "WI-ORDER-03",
+        "WI-ORDER-04",
+        "WI-ORDER-05",
+        "WI-ORDER-06"
+      ],
+      "structureQualificationCode": "AreaSetCompositionStructureQualified",
+      "closureStateCode": "Closed",
+      "compositionPatternHashSha256": "17113a5debb758e1753630d15b8b17dca10c31d097f7a8b126252f0a0ef83e50",
+      "runtimeState": false,
+      "presentationOnly": true
+    }
+  ],
+  "authorityBoundary": {
+    "newHierarchyLevelNotCreated": true,
+    "patternIsNotRuntimeState": true,
+    "unityCannotSelectAuthoritatively": true,
+    "publicDataNotBound": true,
+    "e6RemainsSeparate": true
+  },
+  "presentationOnly": true,
+  "isOperationalState": false
+}

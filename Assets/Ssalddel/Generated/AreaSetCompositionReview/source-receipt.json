@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "area-set-composition-unity-source-receipt.v1",
+  "sourceProject": "Hongdal",
+  "sourceRelativePath": "eng/world-seedbeds/generated/area-set-composition-plans.v1.json",
+  "sourceRevision": "simulation-world-area-set-composition-plans.r1",
+  "sourceSha256": "6b072439935b31e780a57d705db7dc59e68a0b0c72ce0ab11ce4348347d4d182",
+  "presentationOnly": true,
+  "isOperationalState": false
+}

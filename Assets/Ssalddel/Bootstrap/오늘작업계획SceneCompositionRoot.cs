@@ -54,6 +54,11 @@ namespace Ssalddel.Unity.Bootstrap
             var client = new SimulationRehearsalUnityWebRequestApiClient(
                 runtimeSettings.ToOptions());
             var repository = new 오늘작업계획ServerRepository(client);
+            var warehouseRepository = new Farm창고건설ServerRepository(client);
+            var natureMindRepository = new Nature심상ServerRepository(client);
+            var areaAccessRepository = new AreaSet접근ServerRepository(client);
+            var hostedRepository = new Hosted비콘ServerRepository(client);
+            var coopRepository = new 협동창고ServerRepository(client);
             Exception? last = null;
             for (var attempt = 0; attempt < 20; attempt++)
             {
@@ -62,6 +67,14 @@ namespace Ssalddel.Unity.Bootstrap
                     await presenter.InitializeAsync(repository,
                         턴마감ServerAuthorityRepository.BootstrapSessionStableId,
                         0);
+                    await presenter.InitializeFarmWarehouseAsync(
+                        warehouseRepository);
+                    await presenter.InitializeNatureMindAsync(
+                        natureMindRepository, "player:session:owner");
+                    await presenter.InitializeAreaAccessAsync(
+                        areaAccessRepository, "player:session:owner");
+                    await presenter.InitializeHostedBeaconAsync(hostedRepository);
+                    await presenter.InitializeCoopStorageAsync(coopRepository);
                     return;
                 }
                 catch (OperationCanceledException) { throw; }

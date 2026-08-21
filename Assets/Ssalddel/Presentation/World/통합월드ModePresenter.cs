@@ -26,10 +26,12 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private Button firstPersonButton = null!;
         [SerializeField] private Button tacticalButton = null!;
         [SerializeField] private Button inboundButton = null!;
+        [SerializeField] private bool startInTacticalMode;
 
         private bool listenersBound;
 
         public string CurrentModeCode { get; private set; } = 통합월드ModeCodes.WorldOverview;
+        public bool StartsInTacticalMode => startInTacticalMode;
         public bool PresentationOnly => true;
 
         public void Configure(
@@ -58,6 +60,13 @@ namespace Ssalddel.Unity.Presentation.World
             BindListeners();
             ApplyButtonState();
         }
+
+        private void Start()
+        {
+            if (startInTacticalMode) ShowFarmTactical();
+        }
+
+        public void SetStartInTacticalMode(bool enabled) => startInTacticalMode = enabled;
 
         private void OnDestroy()
         {

@@ -52,11 +52,36 @@ namespace Ssalddel.Unity.Runtime.World
     public sealed class 타로FrameData
     {
         public string FrameStableId { get; set; } = string.Empty;
+        public string ParentJourneyFrameStableId { get; set; } = string.Empty;
+        public string MetaLayerCode { get; set; } = string.Empty;
         public string CardStableId { get; set; } = string.Empty;
         public string CardCopyStableId { get; set; } = string.Empty;
         public string OrientationCode { get; set; } = string.Empty;
         public string FrameScopeCode { get; set; } = string.Empty;
         public string[] ThemeCodes { get; set; } = Array.Empty<string>();
+    }
+
+    public static class 타로MetaLayerCodes
+    {
+        public const string JourneyRoot = "JourneyRoot";
+        public const string ActiveMajorArcana = "ActiveMajorArcana";
+    }
+
+    public sealed class 타로JourneyRootData
+    {
+        public string FrameStableId { get; set; } = string.Empty;
+        public string CardStableId { get; set; } = string.Empty;
+        public string CardRevision { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
+        public int TraditionalArcanaNumber { get; set; }
+        public int JourneySequenceOrder { get; set; }
+        public string HierarchyTierCode { get; set; } = string.Empty;
+        public string MetaLayerCode { get; set; } = string.Empty;
+        public bool IsAlwaysActive { get; set; }
+        public string[] ThemeCodes { get; set; } = Array.Empty<string>();
+        public string RuleRevision { get; set; } = string.Empty;
+        public string SourceStableId { get; set; } = string.Empty;
     }
 
     public sealed class 타로CardRelationData
@@ -72,6 +97,7 @@ namespace Ssalddel.Unity.Runtime.World
     public sealed class 타로ContextStateData
     {
         public long Revision { get; set; }
+        public 타로JourneyRootData JourneyRoot { get; set; } = new 타로JourneyRootData();
         public 타로FrameData[] ActiveFrames { get; set; } = Array.Empty<타로FrameData>();
         public 타로CardRelationData[] Relations { get; set; } = Array.Empty<타로CardRelationData>();
         public string ContextStateHashSha256 { get; set; } = string.Empty;
@@ -184,6 +210,7 @@ namespace Ssalddel.Unity.Runtime.World
                 CanCloseTurn = true,
                 AvailableCards = Cards.Select(Clone).ToArray(),
                 TarotDraw = 턴마감타로Fixture.CreateDraw(),
+                TarotContext = CreateTarotContext(),
             });
 
         public Task<턴마감PreviewData> PreviewAsync(
@@ -298,6 +325,26 @@ namespace Ssalddel.Unity.Runtime.World
             ValidateCard(card);
             return card;
         }
+        private static 타로ContextStateData CreateTarotContext()
+            => new 타로ContextStateData
+            {
+                JourneyRoot = new 타로JourneyRootData
+                {
+                    FrameStableId = "tarot-journey-root:fool",
+                    CardStableId = 턴마감CardStableIds.Fool,
+                    CardRevision = "evening-hakdang.fixture-r1",
+                    Title = "0. 바보 · 여정의 시작",
+                    Summary = "모름과 가능성을 품고, 현재 아르카나가 바뀌어도 이어지는 여정의 뿌리다.",
+                    TraditionalArcanaNumber = 0,
+                    JourneySequenceOrder = 1,
+                    HierarchyTierCode = "Meta",
+                    MetaLayerCode = 타로MetaLayerCodes.JourneyRoot,
+                    IsAlwaysActive = true,
+                    ThemeCodes = new[] { "Beginning", "Possibility", "Unknown", "Cycle" },
+                    RuleRevision = "tarot-journey-root.r1",
+                    SourceStableId = "source:hongik-hakdang.fool.beginner-mind",
+                },
+            };
         public static void ValidateCard(턴마감CardData card)
         {
             if (card == null || string.IsNullOrWhiteSpace(card.CardStableId)

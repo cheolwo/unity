@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Ssalddel.Unity.Farm;
+using Ssalddel.Unity.Bootstrap;
 using Ssalddel.Unity.Infrastructure.Simulation;
 using Ssalddel.Unity.Presentation.World;
 using Ssalddel.Unity.Runtime.Transport;
@@ -418,6 +419,112 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public async Task Farm선택Http계약은_StableId와ExpectedRevision만업무입력으로보낸다()
+        {
+            var api = new FarmChoiceApiClient();
+            var repository = new 정착지상호작용AuthorityRepository(api);
+
+            var context = await repository.GetFarmChoiceContextAsync(
+                SimulationWorldShellFixture.SessionStableId, CancellationToken.None);
+            var preview = await repository.PreviewFarmChoiceAsync(
+                context.SessionStableId,
+                context.WorldRevision,
+                Farm선택Codes.ReserveStorageChoice,
+                CancellationToken.None);
+            await repository.ConfirmFarmChoiceAsync(
+                context.SessionStableId,
+                context.WorldRevision,
+                Farm선택Codes.ReserveStorageChoice,
+                CancellationToken.None);
+
+            Assert.That(context.Candidates, Has.Length.EqualTo(3));
+            Assert.That(preview.Impact.Quantity, Is.EqualTo(300m));
+            Assert.That(preview.Impact.HarvestLotStableId,
+                Is.EqualTo("harvest-lot:server-potato-001"));
+            Assert.That(api.Requests[0].RelativePath,
+                Does.EndWith("/farm-choice-context"));
+            Assert.That(api.Requests[1].RelativePath,
+                Does.EndWith("/farm-choice-previews"));
+            Assert.That(api.Requests[1].JsonBody,
+                Does.Contain("\"ExpectedRevision\":12"));
+            Assert.That(api.Requests[1].JsonBody,
+                Does.Contain("\"ChoiceStableId\":\""
+                    + Farm선택Codes.ReserveStorageChoice + "\""));
+            Assert.That(api.Requests[1].JsonBody, Does.Not.Contain("Quantity"));
+            Assert.That(api.Requests[1].JsonBody, Does.Not.Contain("HarvestLotStableId"));
+            Assert.That(api.Requests[1].JsonBody, Does.Not.Contain("Impact"));
+            Assert.That(api.Requests[2].RelativePath,
+                Does.EndWith("/farm-choices/confirm"));
+            Assert.That(api.Requests[2].JsonBody,
+                Does.Contain("\"ExpectedRevision\":12"));
+            Assert.That(api.Requests[2].JsonBody,
+                Does.Contain("\"ChoiceStableId\":\""
+                    + Farm선택Codes.ReserveStorageChoice + "\""));
+            Assert.That(api.Requests[2].JsonBody, Does.Not.Contain("Quantity"));
+            Assert.That(api.Requests[2].JsonBody, Does.Not.Contain("HarvestLotStableId"));
+            Assert.That(api.Requests[2].JsonBody, Does.Not.Contain("Impact"));
+        }
+
+        [Test]
+        public async Task Farm선택Confirm은_서버Confirm뒤같은문맥을재조회한다()
+        {
+            var api = new FarmChoiceApiClient();
+            var repository = new 정착지상호작용AuthorityRepository(api);
+            var snapshot = await repository.RefreshAsync(
+                SimulationWorldShellFixture.SessionStableId, CancellationToken.None);
+            var context = await repository.GetFarmChoiceContextAsync(
+                SimulationWorldShellFixture.SessionStableId, CancellationToken.None);
+            var coordinator = new Farm선택Coordinator(
+                repository, repository, snapshot, context);
+
+            await coordinator.PreviewAsync(Farm선택Codes.HubShipmentChoice);
+            await coordinator.ConfirmAsync();
+
+            Assert.That(coordinator.CurrentContext.SituationStateCode,
+                Is.EqualTo(Farm선택Codes.ChoiceConfirmed));
+            Assert.That(coordinator.CurrentContext.AppliedChoiceStableId,
+                Is.EqualTo(Farm선택Codes.HubShipmentChoice));
+            Assert.That(coordinator.CurrentContext.WorldRevision, Is.EqualTo(13));
+            Assert.That(coordinator.CurrentSnapshot.Revision, Is.EqualTo(13));
+            Assert.That(api.Requests[^1].RelativePath,
+                Does.EndWith("/farm-choice-context"));
+            Assert.That(api.Requests.Count(value => value.RelativePath.EndsWith(
+                "/farm-choice-context", StringComparison.Ordinal)), Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task AwaitingHarvest문맥은_수확Revision뒤재조회되어세선택을연다()
+        {
+            var api = new FarmChoiceApiClient(false);
+            var repository = new 정착지상호작용AuthorityRepository(api);
+            var snapshot = await repository.RefreshAsync(
+                SimulationWorldShellFixture.SessionStableId, CancellationToken.None);
+            var context = await repository.GetFarmChoiceContextAsync(
+                SimulationWorldShellFixture.SessionStableId, CancellationToken.None);
+            var coordinator = new Farm선택Coordinator(
+                repository, repository, snapshot, context);
+
+            Assert.That(coordinator.CurrentContext.SituationStateCode,
+                Is.EqualTo(Farm선택Codes.AwaitingHarvest));
+            Assert.That(coordinator.CurrentContext.Candidates, Is.Empty);
+
+            api.PublishHarvest();
+            await coordinator.RefreshAsync();
+
+            Assert.That(coordinator.CurrentContext.SituationStateCode,
+                Is.EqualTo(Farm선택Codes.AwaitingChoice));
+            Assert.That(coordinator.CurrentContext.WorldRevision, Is.EqualTo(12));
+            Assert.That(coordinator.CurrentContext.HarvestLotStableId,
+                Is.EqualTo("harvest-lot:server-potato-001"));
+            Assert.That(coordinator.CurrentContext.Candidates, Has.Length.EqualTo(3));
+            Assert.That(api.Requests[^2].RelativePath,
+                Is.EqualTo("api/simulation/v1/sessions/"
+                    + Uri.EscapeDataString(SimulationWorldShellFixture.SessionStableId)));
+            Assert.That(api.Requests[^1].RelativePath,
+                Does.EndWith("/farm-choice-context"));
+        }
+
+        [Test]
         public void 저장Scene은_HarvestLot판로Card와여섯명시Action을가진다()
         {
             var scene = SceneManager.GetSceneByPath(ScenePath);
@@ -428,6 +535,11 @@ namespace Ssalddel.Unity.Tests.EditMode
                 var presenter = Find(scene).GetComponentInChildren<정착지상호작용Presenter>(true);
                 Assert.That(presenter, Is.Not.Null);
                 Assert.DoesNotThrow(() => presenter!.ValidateWiring());
+                Assert.That(presenter!.자동Fixture시작중, Is.False);
+                var composition = Find(scene).GetComponentInChildren<
+                    정착지상호작용SceneCompositionRoot>(true);
+                Assert.That(composition, Is.Not.Null);
+                Assert.That(composition!.서버기준사용중, Is.True);
                 var card = Find(scene).transform.Find(
                     "PersistentUI/SimulationWorldHud/HarvestDispositionCard");
                 Assert.That(card, Is.Not.Null);
@@ -552,6 +664,166 @@ namespace Ssalddel.Unity.Tests.EditMode
                 UnityApiRequest request,
                 CancellationToken cancellationToken)
                 => Task.FromResult(new UnityApiResponse { StatusCode = 200, Body = body });
+        }
+
+        private sealed class FarmChoiceApiClient : ISimulationRehearsalUnityApiClient
+        {
+            private bool harvested;
+            private bool confirmed;
+            private string selectedChoiceStableId = string.Empty;
+
+            public FarmChoiceApiClient(bool startsWithHarvest = true)
+                => harvested = startsWithHarvest;
+
+            public List<UnityApiRequest> Requests { get; } = new();
+
+            public void PublishHarvest() => harvested = true;
+
+            public Task<UnityApiResponse> SendAsync(
+                UnityApiRequest request,
+                CancellationToken cancellationToken)
+            {
+                Requests.Add(request);
+                string body;
+                if (request.RelativePath.EndsWith(
+                    "/farm-choice-context", StringComparison.Ordinal))
+                {
+                    body = ContextJson(harvested, confirmed, selectedChoiceStableId);
+                }
+                else if (request.RelativePath.EndsWith(
+                    "/farm-choice-previews", StringComparison.Ordinal))
+                {
+                    var choice = ReadChoice(request.JsonBody);
+                    body = PreviewJson(choice);
+                }
+                else if (request.RelativePath.EndsWith(
+                    "/farm-choices/confirm", StringComparison.Ordinal))
+                {
+                    selectedChoiceStableId = ReadChoice(request.JsonBody);
+                    confirmed = true;
+                    body = SnapshotJson(13, true);
+                }
+                else
+                {
+                    body = SnapshotJson(harvested ? 12 : 11, false);
+                }
+                return Task.FromResult(new UnityApiResponse
+                {
+                    StatusCode = 200,
+                    Body = body,
+                });
+            }
+
+            private static string ReadChoice(string json)
+            {
+                foreach (var stableId in new[]
+                         {
+                             Farm선택Codes.ReserveStorageChoice,
+                             Farm선택Codes.HubShipmentChoice,
+                             Farm선택Codes.TownDirectSaleChoice,
+                         })
+                    if (json.Contains(stableId, StringComparison.Ordinal))
+                        return stableId;
+                throw new InvalidOperationException("FarmChoiceTestRequestMissingStableId");
+            }
+
+            private static string ContextJson(
+                bool hasHarvest,
+                bool isConfirmed,
+                string appliedChoice)
+                => "{\"sessionStableId\":\""
+                    + SimulationWorldShellFixture.SessionStableId
+                    + "\",\"situationStableId\":\"" + Farm선택Codes.SituationStableId
+                    + "\",\"situationRevision\":1,\"worldRevision\":"
+                    + (isConfirmed ? "13" : hasHarvest ? "12" : "11")
+                    + ",\"worldTick\":12,"
+                    + "\"areaSetStableId\":\"area-set:sim:pyeongchang:farm-production.v1\","
+                    + "\"productStableId\":\"product:potato\","
+                    + "\"harvestLotStableId\":\""
+                    + (hasHarvest ? "harvest-lot:server-potato-001" : string.Empty)
+                    + "\","
+                    + "\"situationStateCode\":\""
+                    + (isConfirmed ? Farm선택Codes.ChoiceConfirmed
+                        : hasHarvest ? Farm선택Codes.AwaitingChoice
+                        : Farm선택Codes.AwaitingHarvest)
+                    + "\",\"appliedChoiceStableId\":\"" + appliedChoice + "\","
+                    + "\"isSimulationOnly\":true,\"isOperationalState\":false,"
+                    + "\"facts\":[{\"factStableId\":\"farm-fact:lot\","
+                    + "\"factCode\":\"" + (hasHarvest
+                        ? "HarvestLotReady" : "HarvestLotNotReady") + "\","
+                    + "\"targetStableId\":\"" + (hasHarvest
+                        ? "harvest-lot:server-potato-001"
+                        : "area-set:sim:pyeongchang:farm-production.v1") + "\","
+                    + "\"valueCode\":\"" + (hasHarvest ? "300kg" : "NoEligibleHarvestLot")
+                    + "\",\"sourceStableIds\":[\"farm-ledger\"]}],"
+                    + "\"candidates\":[" + (hasHarvest
+                        ? CandidateJson(Farm선택Codes.ReserveStorageChoice,
+                            "ReserveStorage", !isConfirmed)
+                            + "," + CandidateJson(Farm선택Codes.HubShipmentChoice,
+                                "CooperativeShipment", !isConfirmed)
+                            + "," + CandidateJson(Farm선택Codes.TownDirectSaleChoice,
+                                "DirectOnlineSale", !isConfirmed)
+                        : string.Empty)
+                    + "]}";
+
+            private static string CandidateJson(
+                string stableId,
+                string choiceCode,
+                bool available)
+                => "{\"choiceStableId\":\"" + stableId
+                    + "\",\"choiceCode\":\"" + choiceCode
+                    + "\",\"cardFunctionCode\":\"Trade\","
+                    + "\"koreanDisplayName\":\"선택\","
+                    + "\"nextWorkflowCode\":\"Candidate\","
+                    + "\"isAvailable\":" + (available ? "true" : "false")
+                    + ",\"blockReasonCodes\":[],\"candidateReasons\":[]}";
+
+            private static string PreviewJson(string choiceStableId)
+            {
+                var choiceCode = choiceStableId == Farm선택Codes.ReserveStorageChoice
+                    ? "ReserveStorage"
+                    : choiceStableId == Farm선택Codes.HubShipmentChoice
+                        ? "CooperativeShipment"
+                        : "DirectOnlineSale";
+                return "{\"situationStableId\":\"" + Farm선택Codes.SituationStableId
+                    + "\",\"choiceStableId\":\"" + choiceStableId
+                    + "\",\"baseRevision\":12,\"isCandidateOnly\":true,"
+                    + "\"requiresExplicitConfirm\":true,\"impact\":{"
+                    + "\"choiceCode\":\"" + choiceCode + "\","
+                    + "\"nextWorkflowCode\":\"Candidate\","
+                    + "\"harvestLotStableId\":\"harvest-lot:server-potato-001\","
+                    + "\"quantity\":300,\"canonicalQuantityUnitCode\":\"kg\","
+                    + "\"requiredLabor\":6,\"simulationCost\":15000,"
+                    + "\"projectedRevenue\":null,\"durationTicks\":1,"
+                    + "\"foodSecurityDaysBefore\":10,"
+                    + "\"foodSecurityDaysCandidate\":12.94,"
+                    + "\"policyRevision\":\"farm-choice:test-r1\","
+                    + "\"riskCodes\":[\"SimulationOutcomeOnly\"],"
+                    + "\"boundaryCodes\":[\"NoOperationalSale\"],"
+                    + "\"storageCandidate\":{\"expectedStoredQuantity\":294}}}";
+            }
+
+            private static string SnapshotJson(int revision, bool reserved)
+                => "{\"sessionStableId\":\""
+                    + SimulationWorldShellFixture.SessionStableId
+                    + "\",\"currentTick\":12,\"revision\":" + revision
+                    + ",\"worldContext\":{\"worldTick\":12,"
+                    + "\"gameDate\":\"2026-04-12T00:00:00Z\"},"
+                    + "\"tasks\":" + (reserved
+                        ? "[{\"taskStableId\":\"task:farm-choice\",\"stateCode\":\"Scheduled\",\"scheduledStartTick\":13,\"expectedEndTick\":13}]"
+                        : "[]")
+                    + ",\"effects\":[],\"settlement\":{"
+                    + "\"treasuryBalance\":1000000,\"treasuryReserved\":0,"
+                    + "\"laborAvailable\":75,\"laborReserved\":0,"
+                    + "\"storageOccupied\":1200,\"storageReserved\":0,"
+                    + "\"foodReserveEquivalent\":1200,\"foodSecurityDays\":10,"
+                    + "\"activeTaskStableIds\":"
+                    + (reserved ? "[\"task:farm-choice\"]" : "[]")
+                    + ",\"marketSupplyByProduct\":[],\"harvestLotAllocations\":"
+                    + (reserved
+                        ? "[{\"harvestLotStableId\":\"harvest-lot:server-potato-001\",\"taskStableId\":\"task:farm-choice\",\"stateCode\":\"Reserved\"}]"
+                        : "[]")
+                    + "}}";
         }
 
         private sealed class StubApiClient : ISimulationRehearsalUnityApiClient

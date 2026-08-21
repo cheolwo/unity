@@ -26,19 +26,55 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private Button exportButton = null!;
         [SerializeField] private Button confirmButton = null!;
         [SerializeField] private Button advanceButton = null!;
+        [SerializeField, HideInInspector] private bool 자동Fixture시작;
 
         private 정착지상호작용Coordinator coordinator = null!;
+        private Farm선택Coordinator farm선택Coordinator = null!;
         private readonly 수확판로결과Projector 수확판로Projector = new();
         private 수확LotObjectMappingCatalog 수확LotMappingCatalog = DefaultMappingCatalog();
         private bool listenersBound;
         private bool busy;
+        private bool farmContextRefreshPending;
+        private bool farmCardExplicitlyOpened;
+        private long lastFarmContextRefreshShellRevision = long.MinValue;
+        private string lastFarmContextRefreshObjectStableId = string.Empty;
 
-        public string PhaseCode => coordinator?.PhaseCode ?? string.Empty;
-        public string CurrentChoiceCode => coordinator?.CurrentPreview?.ChoiceCode
-            ?? coordinator?.Current수확판로결과?.SelectedChoiceCode
+        public string PhaseCode => farm선택Coordinator?.PhaseCode
+            ?? coordinator?.PhaseCode ?? string.Empty;
+        public string CurrentChoiceCode => farm선택Coordinator != null
+            ? ChoiceCodeForStableId(farm선택Coordinator.CurrentChoiceStableId)
+            : coordinator?.CurrentPreview?.ChoiceCode
+                ?? coordinator?.Current수확판로결과?.SelectedChoiceCode
+                ?? string.Empty;
+        public string CurrentChoiceStableId => farm선택Coordinator?.CurrentChoiceStableId
             ?? string.Empty;
+        public string ActualFarmHarvestLotStableId =>
+            farm선택Coordinator?.CurrentContext.HarvestLotStableId ?? string.Empty;
+        public string FarmChoiceSituationStateCode =>
+            farm선택Coordinator?.CurrentContext.SituationStateCode ?? string.Empty;
+        public bool 서버Farm선택사용중 => farm선택Coordinator != null;
+        public bool 권위연결됨 => farm선택Coordinator != null || coordinator != null;
+        public bool 자동Fixture시작중 => 자동Fixture시작;
         public bool IsCardVisible => cardRoot != null && cardRoot.activeSelf;
         public string PreviewSummary => previewText != null ? previewText.text : string.Empty;
+        public bool CanSelectFarmChoice(string choiceCode)
+        {
+            if (farm선택Coordinator == null) return coordinator != null;
+            var stableId = ChoiceStableIdForInput(choiceCode);
+            return farm선택Coordinator.CurrentContext.Candidates.Any(value =>
+                value.ChoiceStableId == stableId && value.IsAvailable);
+        }
+
+        public string[] FarmChoiceBlockReasons(string choiceCode)
+        {
+            if (farm선택Coordinator == null) return Array.Empty<string>();
+            var stableId = ChoiceStableIdForInput(choiceCode);
+            return farm선택Coordinator.CurrentContext.Candidates
+                .Where(value => value.ChoiceStableId == stableId)
+                .SelectMany(value => value.BlockReasonCodes)
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+        }
         public string 수확판로결과Summary => coordinator?.Current수확판로결과 == null
             ? string.Empty
             : Build수확판로결과Text(coordinator.Current수확판로결과);
@@ -47,6 +83,10 @@ namespace Ssalddel.Unity.Presentation.World
             get
             {
                 if (shellPresenter == null) return string.Empty;
+                if (farm선택Coordinator != null)
+                    return shellPresenter.SelectedObjectStableId == 수확LotObjectStableId
+                        ? farm선택Coordinator.CurrentContext.HarvestLotStableId
+                        : string.Empty;
                 return 수확LotMappingCatalog.TryResolve(
                     shellPresenter.SelectedObjectStableId, out var harvestLotStableId)
                     ? harvestLotStableId : string.Empty;
@@ -58,13 +98,15 @@ namespace Ssalddel.Unity.Presentation.World
             ValidateWiring();
             BindListeners();
             shellPresenter.PresentationChanged += ApplyPresentation;
-            if (coordinator != null)
+            if (coordinator != null || farm선택Coordinator != null)
             {
                 ApplyPresentation();
                 return;
             }
-            var initial = 정착지상호작용FixtureAuthorityClient.CreateInitialSnapshot();
-            InitializeAuthority(new 정착지상호작용FixtureAuthorityClient(initial), initial);
+            if (자동Fixture시작)
+                throw new InvalidOperationException(
+                    "SettlementInteractionImplicitFixtureAuthorityDisabled");
+            ApplyAuthorityUnavailablePresentation();
         }
 
         private void OnDestroy()
@@ -118,6 +160,29 @@ namespace Ssalddel.Unity.Presentation.World
                 _ = TryRefresh수확판로결과목록Async();
         }
 
+        public void InitializeFarm선택Coordinator(Farm선택Coordinator serverCoordinator)
+        {
+            ValidateWiring();
+            farm선택Coordinator = serverCoordinator
+                ?? throw new ArgumentNullException(nameof(serverCoordinator));
+            coordinator = null!;
+            lastFarmContextRefreshShellRevision =
+                farm선택Coordinator.CurrentContext.WorldRevision;
+            lastFarmContextRefreshObjectStableId = shellPresenter.SelectedObjectStableId;
+            shellPresenter.ApplyAuthoritativeSnapshot(
+                farm선택Coordinator.CurrentSnapshot.ToWorldShellSnapshot());
+            lastFarmContextRefreshObjectStableId = shellPresenter.SelectedObjectStableId;
+            ApplyPresentation();
+        }
+
+        public void Set자동Fixture시작(bool enabled)
+        {
+            if (enabled)
+                throw new InvalidOperationException(
+                    "SettlementInteractionImplicitFixtureAuthorityDisabled");
+            자동Fixture시작 = false;
+        }
+
         public void Configure수확LotMappings(params 수확LotObjectMappingData[] mappings)
         {
             수확LotMappingCatalog = new 수확LotObjectMappingCatalog(mappings);
@@ -130,6 +195,15 @@ namespace Ssalddel.Unity.Presentation.World
             busy = true;
             try
             {
+                if (farm선택Coordinator != null)
+                {
+                    await farm선택Coordinator.PreviewAsync(
+                        ChoiceStableIdForInput(choiceCode));
+                    return;
+                }
+                if (coordinator == null)
+                    throw new InvalidOperationException(
+                        "SettlementInteractionAuthorityMissing");
                 var envelope = 정착지상호작용BranchFixture.CreateEnvelope(choiceCode);
                 if (envelope.PreviewRequest.HarvestLotStableId
                     != CurrentMappedHarvestLotStableId)
@@ -153,6 +227,16 @@ namespace Ssalddel.Unity.Presentation.World
             busy = true;
             try
             {
+                if (farm선택Coordinator != null)
+                {
+                    await farm선택Coordinator.ConfirmAsync();
+                    shellPresenter.ApplyAuthoritativeSnapshot(
+                        farm선택Coordinator.CurrentSnapshot.ToWorldShellSnapshot());
+                    return;
+                }
+                if (coordinator == null)
+                    throw new InvalidOperationException(
+                        "SettlementInteractionAuthorityMissing");
                 await coordinator.ConfirmAsync();
                 shellPresenter.ApplyAuthoritativeSnapshot(
                     coordinator.CurrentSnapshot.ToWorldShellSnapshot());
@@ -175,6 +259,16 @@ namespace Ssalddel.Unity.Presentation.World
             busy = true;
             try
             {
+                if (farm선택Coordinator != null)
+                {
+                    await farm선택Coordinator.AdvanceToCompletionAsync();
+                    shellPresenter.ApplyAuthoritativeSnapshot(
+                        farm선택Coordinator.CurrentSnapshot.ToWorldShellSnapshot());
+                    return;
+                }
+                if (coordinator == null)
+                    throw new InvalidOperationException(
+                        "SettlementInteractionAuthorityMissing");
                 await coordinator.AdvanceToCompletionAsync();
                 shellPresenter.ApplyAuthoritativeSnapshot(
                     coordinator.CurrentSnapshot.ToWorldShellSnapshot());
@@ -198,9 +292,46 @@ namespace Ssalddel.Unity.Presentation.World
             await AdvanceToCompletionAsync();
         }
 
+        public async Task RefreshFarm선택ContextAsync()
+        {
+            if (farm선택Coordinator == null || farmContextRefreshPending) return;
+            farmContextRefreshPending = true;
+            var refreshed = false;
+            ApplyPresentation();
+            try
+            {
+                await farm선택Coordinator.RefreshAsync();
+                shellPresenter.ApplyAuthoritativeSnapshot(
+                    farm선택Coordinator.CurrentSnapshot.ToWorldShellSnapshot());
+                refreshed = true;
+            }
+            catch (Exception error)
+            {
+                Debug.LogWarning("FarmChoiceContextRefreshFailed:" + error.Message);
+            }
+            finally
+            {
+                lastFarmContextRefreshShellRevision = refreshed
+                    ? farm선택Coordinator.CurrentContext.WorldRevision
+                    : shellPresenter.WorldRevision;
+                lastFarmContextRefreshObjectStableId =
+                    shellPresenter.SelectedObjectStableId;
+                farmContextRefreshPending = false;
+                ApplyPresentation();
+            }
+        }
+
+        public void SetFarmChoiceCardExplicitlyOpen(bool open)
+        {
+            if (farm선택Coordinator == null)
+                throw new InvalidOperationException("FarmChoiceCoordinatorMissing");
+            farmCardExplicitlyOpened = open;
+            ApplyPresentation();
+        }
+
         public async Task Refresh수확판로결과Async()
         {
-            if (busy || coordinator == null) return;
+            if (busy || coordinator == null || farm선택Coordinator != null) return;
             var harvestLotStableId = coordinator.CurrentPreview?.HarvestLotStableId
                 ?? coordinator.Current수확판로결과?.HarvestLotStableId;
             if (string.IsNullOrWhiteSpace(harvestLotStableId)) return;
@@ -218,7 +349,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         public async Task Refresh수확판로결과목록Async()
         {
-            if (busy || coordinator == null) return;
+            if (busy || coordinator == null || farm선택Coordinator != null) return;
             busy = true;
             try
             {
@@ -261,11 +392,23 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void ApplyPresentation()
         {
-            if (coordinator == null || shellPresenter == null || cardRoot == null) return;
+            if (shellPresenter == null || cardRoot == null) return;
+            if (farm선택Coordinator != null)
+            {
+                ApplyFarm선택Presentation();
+                return;
+            }
+            if (coordinator == null)
+            {
+                ApplyAuthorityUnavailablePresentation();
+                return;
+            }
+            exportButton.gameObject.SetActive(true);
             var selected = 수확LotMappingCatalog.TryResolve(
                 shellPresenter.SelectedObjectStableId, out var mappedHarvestLotStableId);
             cardRoot.SetActive(selected);
             if (!selected) return;
+            cardRoot.transform.SetAsLastSibling();
 
             if (coordinator.Current수확판로결과?.HarvestLotStableId
                     != mappedHarvestLotStableId
@@ -297,6 +440,129 @@ namespace Ssalddel.Unity.Presentation.World
             advanceButton.GetComponentInChildren<Text>().text = coordinator.CanResumeReservedTask
                 ? "WORLD TICK × " + coordinator.CurrentSnapshot.TaskRemainingTicks
                 : "WORLD TICK";
+        }
+
+        private void ApplyAuthorityUnavailablePresentation()
+        {
+            if (cardRoot != null) cardRoot.SetActive(false);
+            if (cooperativeButton != null) cooperativeButton.interactable = false;
+            if (directButton != null) directButton.interactable = false;
+            if (storageButton != null) storageButton.interactable = false;
+            if (exportButton != null) exportButton.interactable = false;
+            if (confirmButton != null) confirmButton.interactable = false;
+            if (advanceButton != null) advanceButton.interactable = false;
+        }
+
+        private void ApplyFarm선택Presentation()
+        {
+            var context = farm선택Coordinator.CurrentContext;
+            var selectedObjectStableId = shellPresenter.SelectedObjectStableId;
+            var selectedAnchor = farmCardExplicitlyOpened
+                || selectedObjectStableId == 수확LotObjectStableId;
+            var shellRevisionChanged = shellPresenter.WorldRevision
+                != lastFarmContextRefreshShellRevision;
+            var harvestLotSelected = selectedAnchor
+                && selectedObjectStableId != lastFarmContextRefreshObjectStableId;
+            if (!farmContextRefreshPending
+                && (shellRevisionChanged || harvestLotSelected))
+            {
+                lastFarmContextRefreshShellRevision = shellPresenter.WorldRevision;
+                lastFarmContextRefreshObjectStableId = selectedObjectStableId;
+                _ = RefreshFarm선택ContextAsync();
+            }
+            else if (!farmContextRefreshPending
+                     && selectedObjectStableId != lastFarmContextRefreshObjectStableId)
+                lastFarmContextRefreshObjectStableId = selectedObjectStableId;
+            var selected = selectedAnchor
+                && !string.IsNullOrWhiteSpace(context.HarvestLotStableId);
+            cardRoot.SetActive(selected);
+            if (!selected) return;
+            cardRoot.transform.SetAsLastSibling();
+
+            exportButton.gameObject.SetActive(false);
+            var preview = farm선택Coordinator.CurrentPreview?.Impact;
+            var quantity = preview != null && preview.Quantity > 0
+                ? Number(preview.Quantity) + " " + preview.UnitCode
+                : context.Facts.FirstOrDefault(value => value.FactCode == "HarvestLotReady")
+                    ?.ValueCode ?? "서버 원장 수량";
+            lotText.text = "감자 수확 Lot · " + quantity
+                + " · " + ChoiceLabel(CurrentChoiceCode)
+                + "\n화면 " + StableTail(shellPresenter.SelectedObjectStableId)
+                + " → 원장 " + StableTail(context.HarvestLotStableId);
+            phaseText.text = PhaseLabel(farm선택Coordinator.PhaseCode)
+                + "\nAuthority revision " + context.WorldRevision
+                + " · WorldTick " + context.WorldTick;
+            previewText.text = BuildFarm선택PreviewText();
+
+            var canChoose = !busy && !farmContextRefreshPending
+                && context.SituationStateCode == Farm선택Codes.AwaitingChoice
+                && (farm선택Coordinator.PhaseCode == 정착지상호작용PhaseCodes.LotSelected
+                    || farm선택Coordinator.PhaseCode
+                        == 정착지상호작용PhaseCodes.PreviewReady);
+            cooperativeButton.interactable = canChoose
+                && IsAvailable(Farm선택Codes.HubShipmentChoice);
+            directButton.interactable = canChoose
+                && IsAvailable(Farm선택Codes.TownDirectSaleChoice);
+            storageButton.interactable = canChoose
+                && IsAvailable(Farm선택Codes.ReserveStorageChoice);
+            exportButton.interactable = false;
+            confirmButton.interactable = !busy
+                && farm선택Coordinator.PhaseCode
+                    == 정착지상호작용PhaseCodes.PreviewReady;
+            advanceButton.interactable = !busy
+                && farm선택Coordinator.CanResumeReservedTask;
+            advanceButton.GetComponentInChildren<Text>().text =
+                farm선택Coordinator.CanResumeReservedTask
+                    ? "WORLD TICK × "
+                        + farm선택Coordinator.CurrentSnapshot.TaskRemainingTicks
+                    : "WORLD TICK";
+        }
+
+        private bool IsAvailable(string choiceStableId)
+            => farm선택Coordinator.CurrentContext.Candidates.Any(value =>
+                value.ChoiceStableId == choiceStableId && value.IsAvailable);
+
+        private string BuildFarm선택PreviewText()
+        {
+            if (farm선택Coordinator.PhaseCode == 정착지상호작용PhaseCodes.Failed)
+                return "차단: " + farm선택Coordinator.ErrorCode;
+            var preview = farm선택Coordinator.CurrentPreview?.Impact;
+            if (preview == null)
+            {
+                if (farm선택Coordinator.CurrentContext.SituationStateCode
+                    == Farm선택Codes.ChoiceConfirmed)
+                    return ChoiceLabel(CurrentChoiceCode)
+                        + " 선택이 서버 원장에 반영되었습니다."
+                        + "\n최신 선택 문맥 재조회 완료 · revision "
+                        + farm선택Coordinator.CurrentContext.WorldRevision;
+                return "세 판로 중 하나를 선택하면 서버 Preview가 표시됩니다."
+                    + "\nUnity는 수확량·비용·결과를 계산하지 않습니다.";
+            }
+
+            var revenue = preview.ProjectedRevenue.HasValue
+                ? Number(preview.ProjectedRevenue.Value) + " KRW"
+                : "없음";
+            var storage = preview.ExpectedStoredQuantity.HasValue
+                ? "\n예상 비축 " + Number(preview.ExpectedStoredQuantity.Value)
+                    + " kg · FoodSecurity " + Number(preview.FoodSecurityDaysBefore)
+                    + " → " + Number(preview.FoodSecurityDaysCandidate) + "일"
+                : string.Empty;
+            var state = farm선택Coordinator.PhaseCode switch
+            {
+                정착지상호작용PhaseCodes.EffectApplied =>
+                    "\nEffect 적용 완료 · 서버 문맥 재조회 완료",
+                정착지상호작용PhaseCodes.TaskReserved =>
+                    "\nAllocation 예약 · 서버 문맥 재조회 완료",
+                _ => "\n후보만 표시 · Confirm 전 무변경",
+            };
+            return ChoiceLabel(preview.ChoiceCode)
+                + "\n비용 " + Number(preview.SimulationCost) + " KRW"
+                + " · 노동 " + Number(preview.RequiredLabor)
+                + " · 기간 " + preview.DurationTicks + " Tick"
+                + "\n예상 Simulation 수입 " + revenue
+                + storage + state
+                + "\n정책 " + preview.PolicyRevision
+                + " · 실제 판매/배송/정산 아님";
         }
 
         private string BuildPreviewText()
@@ -413,7 +679,38 @@ namespace Ssalddel.Unity.Presentation.World
                 HarvestDispositionChoiceCodes.DirectOnlineSale => "온라인 직접 판매",
                 HarvestDispositionChoiceCodes.ReserveStorage => "비축 보관",
                 HarvestDispositionChoiceCodes.ExportAgent => "외부 교역 준비",
+                Farm선택Codes.HubShipmentChoice => "Hub 출하",
+                Farm선택Codes.TownDirectSaleChoice => "Town 직거래",
+                Farm선택Codes.ReserveStorageChoice => "비축 보관",
+                "" => "판로 미결정",
                 _ => choiceCode,
+            };
+
+        private static string ChoiceStableIdForInput(string choiceCode)
+            => choiceCode switch
+            {
+                HarvestDispositionChoiceCodes.CooperativeShipment =>
+                    Farm선택Codes.HubShipmentChoice,
+                HarvestDispositionChoiceCodes.DirectOnlineSale =>
+                    Farm선택Codes.TownDirectSaleChoice,
+                HarvestDispositionChoiceCodes.ReserveStorage =>
+                    Farm선택Codes.ReserveStorageChoice,
+                Farm선택Codes.HubShipmentChoice => Farm선택Codes.HubShipmentChoice,
+                Farm선택Codes.TownDirectSaleChoice => Farm선택Codes.TownDirectSaleChoice,
+                Farm선택Codes.ReserveStorageChoice => Farm선택Codes.ReserveStorageChoice,
+                _ => throw new InvalidOperationException("FarmChoiceStableIdInvalid"),
+            };
+
+        private static string ChoiceCodeForStableId(string choiceStableId)
+            => choiceStableId switch
+            {
+                Farm선택Codes.HubShipmentChoice =>
+                    HarvestDispositionChoiceCodes.CooperativeShipment,
+                Farm선택Codes.TownDirectSaleChoice =>
+                    HarvestDispositionChoiceCodes.DirectOnlineSale,
+                Farm선택Codes.ReserveStorageChoice =>
+                    HarvestDispositionChoiceCodes.ReserveStorage,
+                _ => string.Empty,
             };
 
         private static string Number(decimal value)

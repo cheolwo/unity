@@ -22,7 +22,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             물류이동PreviewRequestData request,
             CancellationToken cancellationToken)
         {
-            var before = await GetAsync(sessionStableId, cancellationToken);
+            var before = await RefreshAsync(sessionStableId, cancellationToken);
             var response = await SendAsync("POST", Route(sessionStableId)
                 + "/freight-dispatch-previews", JsonConvert.SerializeObject(new
                 {
@@ -92,7 +92,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             return ParseSnapshot(response.Body);
         }
 
-        private async Task<물류이동AuthoritySnapshot> GetAsync(
+        public async Task<물류이동AuthoritySnapshot> RefreshAsync(
             string sessionStableId,
             CancellationToken cancellationToken)
             => ParseSnapshot((await SendAsync("GET", Route(sessionStableId), string.Empty,
@@ -167,15 +167,16 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 Revision = wire.Revision,
                 WorldTick = worldTick,
                 GameDateLabel = gameDate,
-                CargoStableId = movement?.CargoStableId ?? 물류이동Fixture.CargoStableId,
+                CargoStableId = movement?.CargoStableId ?? string.Empty,
                 MovementStateCode = movement?.StateCode ?? string.Empty,
                 TaskStateCode = task?.StateCode ?? string.Empty,
-                Quantity = movement?.Quantity ?? 300m,
+                Quantity = movement?.Quantity ?? 0m,
+                UnitCode = movement?.UnitCode ?? string.Empty,
                 ReservedQuantity = movement?.ReservedQuantity ?? 0m,
-                SourceAvailableQuantity = allocation?.AvailableQuantity ?? 300m,
+                SourceAvailableQuantity = allocation?.AvailableQuantity ?? 0m,
                 CompletedRouteTicks = movement?.CompletedRouteTicks ?? 0,
-                RequiredRouteTicks = movement?.RequiredRouteTicks ?? 3,
-                RouteStableId = movement?.RouteStableId ?? "route:sim.farm-hub-1",
+                RequiredRouteTicks = movement?.RequiredRouteTicks ?? 0,
+                RouteStableId = movement?.RouteStableId ?? string.Empty,
                 DestinationStockCandidateStableId = movement?.DestinationStockCandidateStableId ?? string.Empty,
                 TransportRequestStableId = freight?.TransportRequestStableId ?? string.Empty,
                 DispatchStateCode = freight?.DispatchStateCode ?? string.Empty,
@@ -215,7 +216,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         [Serializable] private sealed class SettlementWire { public decimal TreasuryBalance; public decimal TreasuryReserved; public decimal LaborAvailable; public decimal LaborReserved; public decimal StorageOccupied; public decimal StorageReserved; public decimal FoodReserveEquivalent; public decimal FoodSecurityDays; public string[]? ActiveTaskStableIds; public MarketWire[]? MarketSupplyByProduct; public AllocationWire[]? HarvestLotAllocations; }
         [Serializable] private sealed class MarketWire { public string? ProductStableId; public decimal Quantity; }
         [Serializable] private sealed class AllocationWire { public string? AllocationStableId; public string? StateCode; public decimal AvailableQuantity; }
-        [Serializable] private sealed class MovementWire { public string? CargoStableId; public string? StateCode; public string? SourceAllocationStableId; public string? TaskStableId; public decimal Quantity; public decimal ReservedQuantity; public int CompletedRouteTicks; public int RequiredRouteTicks; public string? RouteStableId; public string? DestinationStockCandidateStableId; }
+        [Serializable] private sealed class MovementWire { public string? CargoStableId; public string? StateCode; public string? SourceAllocationStableId; public string? TaskStableId; public decimal Quantity; public decimal ReservedQuantity; public string? UnitCode; public int CompletedRouteTicks; public int RequiredRouteTicks; public string? RouteStableId; public string? DestinationStockCandidateStableId; }
         [Serializable] private sealed class FreightWire { public string? TransportRequestStableId; public string? DispatchStateCode; public string? CarrierCandidateStableId; public string? VehicleStableId; public DispatchDecisionWire? DispatchDecision; }
         [Serializable] private sealed class DispatchDecisionWire { public string? RuleRevision; }
         [Serializable] private sealed class TaskWire { public string? TaskStableId; public string? StateCode; }

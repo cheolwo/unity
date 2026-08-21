@@ -11,7 +11,7 @@ using Ssalddel.Unity.Runtime.World;
 namespace Ssalddel.Unity.Infrastructure.Simulation
 {
     public sealed class 정착지상호작용AuthorityRepository
-        : I정착지상호작용AuthorityClient
+        : I정착지상호작용AuthorityClient, IFarm선택AuthorityClient
     {
         private const string BaseRoute = "api/simulation/v1/sessions/";
         private readonly ISimulationRehearsalUnityApiClient apiClient;
@@ -23,6 +23,71 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             string sessionStableId, CancellationToken cancellationToken)
         {
             var response = await SendAsync("GET", SessionRoute(sessionStableId), string.Empty,
+                cancellationToken);
+            return ParseSnapshot(response.Body);
+        }
+
+        public async Task<Farm선택ContextData> GetFarmChoiceContextAsync(
+            string sessionStableId,
+            CancellationToken cancellationToken)
+        {
+            var response = await SendAsync(
+                "GET",
+                SessionRoute(sessionStableId) + "/farm-choice-context",
+                string.Empty,
+                cancellationToken);
+            var context = JsonConvert.DeserializeObject<Farm선택ContextData>(response.Body)
+                ?? throw new InvalidOperationException("SimulationFarmChoiceContextJsonInvalid");
+            return NormalizeFarmChoiceContext(context);
+        }
+
+        public async Task<Farm선택PreviewData> PreviewFarmChoiceAsync(
+            string sessionStableId,
+            long expectedRevision,
+            string choiceStableId,
+            CancellationToken cancellationToken)
+        {
+            var response = await SendAsync(
+                "POST",
+                SessionRoute(sessionStableId) + "/farm-choice-previews",
+                JsonConvert.SerializeObject(new
+                {
+                    ExpectedRevision = expectedRevision,
+                    ChoiceStableId = RequiredChoiceStableId(choiceStableId),
+                }),
+                cancellationToken);
+            var wire = JsonConvert.DeserializeObject<FarmChoicePreviewWire>(response.Body)
+                ?? throw new InvalidOperationException("SimulationFarmChoicePreviewJsonInvalid");
+            var impact = wire.Impact
+                ?? throw new InvalidOperationException("SimulationFarmChoiceImpactPreviewMissing");
+            return new Farm선택PreviewData
+            {
+                SituationStableId = wire.SituationStableId ?? string.Empty,
+                ChoiceStableId = wire.ChoiceStableId ?? string.Empty,
+                BaseRevision = wire.BaseRevision,
+                IsCandidateOnly = wire.IsCandidateOnly,
+                RequiresExplicitConfirm = wire.RequiresExplicitConfirm,
+                Impact = ParsePreviewImpact(impact),
+            };
+        }
+
+        public async Task<정착지상호작용AuthoritySnapshot> ConfirmFarmChoiceAsync(
+            string sessionStableId,
+            long expectedRevision,
+            string choiceStableId,
+            CancellationToken cancellationToken)
+        {
+            var stableId = RequiredChoiceStableId(choiceStableId);
+            var response = await SendAsync(
+                "POST",
+                SessionRoute(sessionStableId) + "/farm-choices/confirm",
+                JsonConvert.SerializeObject(new
+                {
+                    CommandId = "command:unity.farm-choice.confirm:"
+                        + expectedRevision + ":" + stableId,
+                    ExpectedRevision = expectedRevision,
+                    ChoiceStableId = stableId,
+                }),
                 cancellationToken);
             return ParseSnapshot(response.Body);
         }
@@ -164,6 +229,59 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             return BaseRoute + Uri.EscapeDataString(sessionStableId.Trim());
         }
 
+        private static string RequiredChoiceStableId(string choiceStableId)
+            => !string.IsNullOrWhiteSpace(choiceStableId)
+                ? choiceStableId.Trim()
+                : throw new InvalidOperationException("SimulationFarmChoiceStableIdMissing");
+
+        private static Farm선택ContextData NormalizeFarmChoiceContext(
+            Farm선택ContextData context)
+        {
+            context.Facts ??= Array.Empty<Farm선택FactData>();
+            context.Candidates ??= Array.Empty<Farm선택CandidateData>();
+            foreach (var fact in context.Facts)
+            {
+                if (fact == null)
+                    throw new InvalidOperationException("SimulationFarmChoiceFactJsonInvalid");
+                fact.SourceStableIds ??= Array.Empty<string>();
+            }
+            foreach (var candidate in context.Candidates)
+            {
+                if (candidate == null)
+                    throw new InvalidOperationException("SimulationFarmChoiceCandidateJsonInvalid");
+                candidate.BlockReasonCodes ??= Array.Empty<string>();
+                candidate.CandidateReasons ??= Array.Empty<Farm선택CandidateReasonData>();
+                foreach (var reason in candidate.CandidateReasons)
+                {
+                    if (reason == null)
+                        throw new InvalidOperationException(
+                            "SimulationFarmChoiceCandidateReasonJsonInvalid");
+                    reason.SourceFactStableIds ??= Array.Empty<string>();
+                }
+            }
+            return context;
+        }
+
+        private static 정착지상호작용PreviewData ParsePreviewImpact(PreviewWire wire)
+            => new()
+            {
+                ChoiceCode = wire.ChoiceCode ?? string.Empty,
+                NextWorkflowCode = wire.NextWorkflowCode ?? string.Empty,
+                HarvestLotStableId = wire.HarvestLotStableId ?? string.Empty,
+                Quantity = wire.Quantity,
+                UnitCode = wire.CanonicalQuantityUnitCode ?? string.Empty,
+                RequiredLabor = wire.RequiredLabor,
+                SimulationCost = wire.SimulationCost,
+                ProjectedRevenue = wire.ProjectedRevenue,
+                DurationTicks = wire.DurationTicks,
+                FoodSecurityDaysBefore = wire.FoodSecurityDaysBefore,
+                FoodSecurityDaysCandidate = wire.FoodSecurityDaysCandidate,
+                ExpectedStoredQuantity = wire.StorageCandidate?.ExpectedStoredQuantity,
+                PolicyRevision = wire.PolicyRevision ?? string.Empty,
+                RiskCodes = wire.RiskCodes ?? Array.Empty<string>(),
+                BoundaryCodes = wire.BoundaryCodes ?? Array.Empty<string>(),
+            };
+
         private static 수확판로결과Data NormalizeOutcome(수확판로결과Data result)
         {
             result.Routes ??= Array.Empty<수확판로선택지결과Data>();
@@ -261,6 +379,17 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             public string[]? RiskCodes;
             public string[]? BoundaryCodes;
             public StorageCandidateWire? StorageCandidate;
+        }
+
+        [Serializable]
+        private sealed class FarmChoicePreviewWire
+        {
+            public string? SituationStableId;
+            public string? ChoiceStableId;
+            public long BaseRevision;
+            public bool IsCandidateOnly;
+            public bool RequiresExplicitConfirm;
+            public PreviewWire? Impact;
         }
 
         [Serializable] private sealed class StorageCandidateWire { public decimal ExpectedStoredQuantity; }

@@ -32,6 +32,13 @@ namespace Ssalddel.Unity.Tests.EditMode
                 context.TarotDraw.DrawStableId, CancellationToken.None);
 
             Assert.That(context.TarotDraw.Offers, Has.Length.EqualTo(3));
+            Assert.That(context.TarotContext.JourneyRoot.CardStableId,
+                Is.EqualTo(턴마감CardStableIds.Fool));
+            Assert.That(context.TarotContext.JourneyRoot.TraditionalArcanaNumber,
+                Is.EqualTo(0));
+            Assert.That(context.TarotContext.JourneyRoot.JourneySequenceOrder,
+                Is.EqualTo(1));
+            Assert.That(context.TarotContext.JourneyRoot.IsAlwaysActive, Is.True);
             Assert.That(context.TarotDraw.Offers.Select(value => value.OfferStableId),
                 Is.Unique);
             Assert.That(reactions.IsCandidateOnly, Is.True);
@@ -135,8 +142,21 @@ namespace Ssalddel.Unity.Tests.EditMode
                 => "{\"SessionStableId\":\"" + SessionId
                     + "\",\"TurnNumber\":1,\"GameDate\":\"2026-04-12T00:00:00Z\""
                     + ",\"Revision\":0,\"PendingTaskCount\":0,\"CanCloseTurn\":true"
-                    + ",\"AvailableCards\":[],\"TarotDraw\":{"
-                    + "\"DrawStableId\":\"tarot-draw:test.turn-1\""
+                    + ",\"AvailableCards\":[],\"TarotContext\":{\"FrameSet\":{" +
+                    "\"Revision\":0,\"JourneyRoot\":{\"FrameStableId\":\"tarot-journey-root:fool\""
+                    + ",\"CardStableId\":\"learning:hongik.fool.beginner-mind\""
+                    + ",\"CardRevision\":\"evening-hakdang.fixture-r1\""
+                    + ",\"Title\":\"0. 바보 · 여정의 시작\""
+                    + ",\"Summary\":\"항상 이어지는 여정의 뿌리\""
+                    + ",\"TraditionalArcanaNumber\":0,\"JourneySequenceOrder\":1"
+                    + ",\"HierarchyTierCode\":\"Meta\""
+                    + ",\"MetaLayerCode\":\"JourneyRoot\""
+                    + ",\"IsAlwaysActive\":true"
+                    + ",\"ThemeCodes\":[\"Beginning\",\"Possibility\",\"Unknown\",\"Cycle\"]"
+                    + ",\"RuleRevision\":\"tarot-journey-root.r1\""
+                    + ",\"SourceStableId\":\"source:hongik-hakdang.fool.beginner-mind\"}"
+                    + ",\"ActiveFrames\":[]},\"Relations\":[],\"ContextStateHashSha256\":\"context:test\"}"
+                    + ",\"TarotDraw\":{\"DrawStableId\":\"tarot-draw:test.turn-1\""
                     + ",\"DeckStableId\":\"tarot-deck:starter-12\""
                     + ",\"DeckRevision\":\"tarot-deck:starter-12.r1\""
                     + ",\"DrawRuleRevision\":\"tarot-draw-rule:r1\""

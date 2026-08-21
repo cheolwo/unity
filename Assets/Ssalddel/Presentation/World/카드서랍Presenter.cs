@@ -129,19 +129,20 @@ namespace Ssalddel.Unity.Presentation.World
         private void Render()
         {
             if (titleText == null) return;
-            titleText.text = "C 카드 서랍  ·  의미 → 상황 → 행동 → 지식";
+            titleText.text = "C 카드 서랍  ·  바보의 여정 → 현재 아르카나 → 상황 → 행동 → 지식";
             contentText.text = snapshot.Items.Length == 0
                 ? "서버에서 조회된 카드가 없습니다."
                 : string.Join("\n", snapshot.Items.Select((item, index) =>
                     (index == selectedIndex ? "▶ " : "  ")
-                    + TierLabel(item.HierarchyTierCode) + " / "
+                    + MetaLayerLabel(item.MetaLayerCode, item.HierarchyTierCode) + " / "
                     + FamilyLabel(item.FamilyCode) + "  " + item.Title
                     + (item.IsLocked ? "  [잠김]" : string.Empty)));
             var selected = SelectedItem;
             selectionText.text = selected == null ? "선택 카드 없음"
                 : selected.Title + "\n" + selected.Summary + "\n권위: "
                   + selected.AuthorityCode + " · 실행 소유자: "
-                  + selected.ActionRouteCode;
+                  + selected.ActionRouteCode + " · 의미 층: "
+                  + MetaLayerLabel(selected.MetaLayerCode, selected.HierarchyTierCode);
             var roleCard = selected?.FamilyCode == CardFamilyCodes.TeamRole
                 && !selected.IsLocked;
             directPrimaryButton.interactable = roleCard;
@@ -159,6 +160,14 @@ namespace Ssalddel.Unity.Presentation.World
             CardHierarchyTierCodes.Research => "연구",
             _ => code,
         };
+
+        private static string MetaLayerLabel(string metaLayerCode, string tierCode)
+            => metaLayerCode switch
+            {
+                CardMetaLayerCodes.JourneyRoot => "여정 루트",
+                CardMetaLayerCodes.ActiveMajorArcana => "현재 아르카나",
+                _ => TierLabel(tierCode),
+            };
 
         private static string FamilyLabel(string code) => code switch
         {
