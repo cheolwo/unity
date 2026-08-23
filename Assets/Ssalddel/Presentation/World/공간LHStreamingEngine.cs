@@ -65,6 +65,7 @@ namespace Ssalddel.Unity.Presentation.World
         private string activeSeasonCode = string.Empty;
         private int activeSeasonDay;
         private string activeContentSourceCode = 공간LHWorldCodes.ScenarioProcedural;
+        private 공간AreaSetHandoverPlanData activeAreaSetHandover = null!;
         private string lastError = string.Empty;
         private Vector3 accumulatedOriginShift;
         private int originShiftCount;
@@ -84,6 +85,8 @@ namespace Ssalddel.Unity.Presentation.World
         public int TrackedCellCount => cells.Count;
         public int NpcRouteInterestCount => npcRouteInterestCellKeys.Count;
         public string SourceModeCode => repository?.SourceModeCode ?? string.Empty;
+        public 공간AreaSetHandoverPlanData ActiveAreaSetHandover =>
+            activeAreaSetHandover;
         public int PendingAssemblyCount
         {
             get { lock (assemblyLock) return mainThreadAssembly.Count; }
@@ -345,6 +348,7 @@ namespace Ssalddel.Unity.Presentation.World
                 expectedWorldRevision = response.WorldRevision;
                 profile = response.Profile;
                 activeContentSourceCode = response.ContentSourceCode;
+                activeAreaSetHandover = response.AreaSetHandover;
                 ApplySeason(response.Season);
                 QueueResponse(response, epoch);
                 lastError = string.Empty;

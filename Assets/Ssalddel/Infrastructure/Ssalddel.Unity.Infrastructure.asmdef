@@ -1,7 +1,7 @@
 {
   "name": "Ssalddel.Unity.Infrastructure",
   "rootNamespace": "Ssalddel.Unity.Infrastructure",
-  "references": ["Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Unity.Newtonsoft.Json"],
+  "references": ["Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Ssalddel.Simulation.Contracts", "Ssalddel.Simulation.Domain", "Ssalddel.Simulation.RuntimeCore", "Unity.Newtonsoft.Json"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

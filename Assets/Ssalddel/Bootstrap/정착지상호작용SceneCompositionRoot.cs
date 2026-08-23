@@ -89,19 +89,33 @@ namespace Ssalddel.Unity.Bootstrap
                 throw new InvalidOperationException(
                     "SettlementInteractionAuthorityModeInvalid");
 
+            if (SimulationWorldLocalRuntimeScope.TryGet(out var localScope))
+            {
+                var repository = new LocalFarmChoiceAuthorityRepository(
+                    localScope.Runtime);
+                var localSnapshot = await repository.RefreshAsync(
+                    localScope.SessionStableId, lifetimeCancellation.Token);
+                var localContext = await repository.GetFarmChoiceContextAsync(
+                    localScope.SessionStableId, lifetimeCancellation.Token);
+                presenter.InitializeFarm선택Coordinator(new Farm선택Coordinator(
+                    repository, repository, localSnapshot, localContext));
+                Debug.Log("FarmChoiceLocalSimulationRuntimeReady:network=0", this);
+                return;
+            }
+
             if (runtimeSettings == null)
                 throw new InvalidOperationException("Unity 서버 연결 설정이 없습니다.");
             var sessionStableId = await WaitForAuthoritativeSessionAsync(
                 lifetimeCancellation.Token);
             var apiClient = new SimulationRehearsalUnityWebRequestApiClient(
                 runtimeSettings.ToOptions());
-            var repository = new 정착지상호작용AuthorityRepository(apiClient);
-            var snapshot = await repository.RefreshAsync(
+            var remoteRepository = new 정착지상호작용AuthorityRepository(apiClient);
+            var snapshot = await remoteRepository.RefreshAsync(
                 sessionStableId, lifetimeCancellation.Token);
-            var context = await repository.GetFarmChoiceContextAsync(
+            var context = await remoteRepository.GetFarmChoiceContextAsync(
                 sessionStableId, lifetimeCancellation.Token);
             presenter.InitializeFarm선택Coordinator(new Farm선택Coordinator(
-                repository, repository, snapshot, context));
+                remoteRepository, remoteRepository, snapshot, context));
         }
 
         private async Task<string> WaitForAuthoritativeSessionAsync(

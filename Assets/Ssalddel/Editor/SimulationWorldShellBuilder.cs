@@ -1532,6 +1532,7 @@ namespace Ssalddel.Unity.Editor
             var dailyComposition = runtimeRoot.gameObject
                 .AddComponent<오늘작업계획SceneCompositionRoot>();
             dailyComposition.Configure(dailySettings, dailyPresenter, true);
+            BuildFarm플레이어배치(runtimeRoot, farm, player, dailyComposition);
 
             var previousCombat = runtimeRoot.GetComponent<전투시점Controller>();
             if (previousCombat != null) UnityEngine.Object.DestroyImmediate(previousCombat);
@@ -1568,6 +1569,180 @@ namespace Ssalddel.Unity.Editor
                 .AddComponent<현장전투CompositionRoot>();
             unifiedCombat.Configure(settings, FindPresenter(), player, combat,
                 runtimeRoot, "actor:sim:player-survivor", true);
+        }
+
+        private static void BuildFarm플레이어배치(Transform runtimeRoot,
+            Transform farm, 플레이어경관Controller player,
+            오늘작업계획SceneCompositionRoot dailyComposition)
+        {
+            var previousController = runtimeRoot
+                .GetComponent<Farm플레이어배치Controller>();
+            if (previousController != null)
+                UnityEngine.Object.DestroyImmediate(previousController);
+            var previousPalette = runtimeRoot
+                .GetComponent<Farm플레이어배치PalettePresenter>();
+            if (previousPalette != null)
+                UnityEngine.Object.DestroyImmediate(previousPalette);
+
+            var oldPlacementRoot = farm.Find("PlayerPlacementRoot");
+            if (oldPlacementRoot != null)
+                UnityEngine.Object.DestroyImmediate(oldPlacementRoot.gameObject);
+            var placementRoot = Child(farm, "PlayerPlacementRoot");
+            var candidateRoot = Child(placementRoot, "CandidateRoot");
+            var placedRoot = Child(placementRoot, "CanonicalPlacedObjects");
+            var templates = Child(placementRoot, "VisualTemplates");
+
+            var storage = Primitive(templates, "Template_SmallStorage",
+                PrimitiveType.Cube, new Vector3(0f, 2f, 0f),
+                new Vector3(8f, 4f, 6f), new Color(.58f, .34f, .16f, 1f));
+            var fence = Primitive(templates, "Template_FenceStraight",
+                PrimitiveType.Cube, new Vector3(0f, .6f, 0f),
+                new Vector3(8f, 1.2f, .28f), new Color(.45f, .26f, .12f, 1f));
+            var corner = Child(templates, "Template_FenceCorner");
+            Primitive(corner, "FenceX", PrimitiveType.Cube,
+                new Vector3(2f, .6f, 0f), new Vector3(4f, 1.2f, .28f),
+                new Color(.45f, .26f, .12f, 1f));
+            Primitive(corner, "FenceZ", PrimitiveType.Cube,
+                new Vector3(0f, .6f, 2f), new Vector3(.28f, 1.2f, 4f),
+                new Color(.45f, .26f, .12f, 1f));
+            var gate = Child(templates, "Template_FenceGate");
+            Primitive(gate, "LeftPost", PrimitiveType.Cube,
+                new Vector3(-1.8f, 1f, 0f), new Vector3(.3f, 2f, .3f),
+                new Color(.4f, .23f, .1f, 1f));
+            Primitive(gate, "RightPost", PrimitiveType.Cube,
+                new Vector3(1.8f, 1f, 0f), new Vector3(.3f, 2f, .3f),
+                new Color(.4f, .23f, .1f, 1f));
+            Primitive(gate, "Top", PrimitiveType.Cube,
+                new Vector3(0f, 1.85f, 0f), new Vector3(4f, .25f, .3f),
+                new Color(.4f, .23f, .1f, 1f));
+            var tree = Child(templates, "Template_FarmTree");
+            Primitive(tree, "Trunk", PrimitiveType.Cylinder,
+                new Vector3(0f, 1.2f, 0f), new Vector3(.45f, 1.2f, .45f),
+                new Color(.37f, .2f, .08f, 1f));
+            Primitive(tree, "Canopy", PrimitiveType.Sphere,
+                new Vector3(0f, 3.1f, 0f), new Vector3(2.2f, 2.4f, 2.2f),
+                new Color(.16f, .48f, .18f, 1f));
+
+            var entries = new[]
+            {
+                new Farm배치VisualEntry
+                {
+                    BlueprintStableId = "blueprint:farm-small-storage.v1",
+                    DisplayName = "소형 농장 창고",
+                    PlacementZoneStableId = "placement-zone:farm:processing-south",
+                    TargetH2StableId = "h2:Farm:processing-south",
+                    AccessConnectorStableId = "connector:FarmSouthRoad",
+                    Prefab = storage.gameObject,
+                },
+                new Farm배치VisualEntry
+                {
+                    BlueprintStableId = "blueprint:farm-fence-straight.v1",
+                    DisplayName = "직선 울타리",
+                    PlacementZoneStableId = "placement-zone:farm:north-field-edge",
+                    TargetH2StableId = "h2:Farm:potato-fields",
+                    FenceChainStableId = "fence-chain:farm:north-edge",
+                    HoldToPlaceContinuously = true,
+                    ContinuousSpacingCentimeters = 800,
+                    ContinuousAnchorXCentimeters = -3600,
+                    ContinuousAnchorZCentimeters = 3200,
+                    Prefab = fence.gameObject,
+                },
+                new Farm배치VisualEntry
+                {
+                    BlueprintStableId = "blueprint:farm-fence-corner.v1",
+                    DisplayName = "모서리 울타리",
+                    PlacementZoneStableId = "placement-zone:farm:north-field-edge",
+                    TargetH2StableId = "h2:Farm:potato-fields",
+                    FenceChainStableId = "fence-chain:farm:north-edge",
+                    Prefab = corner.gameObject,
+                },
+                new Farm배치VisualEntry
+                {
+                    BlueprintStableId = "blueprint:farm-fence-gate.v1",
+                    DisplayName = "밭 출입구",
+                    PlacementZoneStableId = "placement-zone:farm:north-entrance",
+                    TargetH2StableId = "h2:Farm:potato-fields",
+                    FenceChainStableId = "fence-chain:farm:north-entrance",
+                    Prefab = gate.gameObject,
+                },
+                new Farm배치VisualEntry
+                {
+                    BlueprintStableId = "blueprint:farm-tree.v1",
+                    DisplayName = "농장 나무",
+                    PlacementZoneStableId = "placement-zone:farm:tree-east",
+                    TargetH2StableId = "h2:Farm:support-east",
+                    HoldToPlaceContinuously = true,
+                    ContinuousSpacingCentimeters = 300,
+                    ContinuousAnchorXCentimeters = 3500,
+                    ContinuousAnchorZCentimeters = -2500,
+                    Prefab = tree.gameObject,
+                },
+            };
+            templates.gameObject.SetActive(false);
+            var controller = runtimeRoot.gameObject
+                .AddComponent<Farm플레이어배치Controller>();
+            controller.Configure(player.PlayerCamera, farm, candidateRoot, placedRoot,
+                player, entries, ~0);
+            dailyComposition.ConfigureFarmPlacement(controller);
+
+            var canvas = Required(Required(RootName).transform,
+                "PersistentUI/SimulationWorldHud");
+            var oldOpen = canvas.Find("FarmPlacementOpenButton");
+            if (oldOpen != null) UnityEngine.Object.DestroyImmediate(oldOpen.gameObject);
+            var oldPanel = canvas.Find("FarmPlacementPanel");
+            if (oldPanel != null) UnityEngine.Object.DestroyImmediate(oldPanel.gameObject);
+            var open = Button(canvas, "FarmPlacementOpenButton", "농장 배치",
+                new Vector2(1120f, -18f), new Vector2(120f, 38f),
+                new Color(.16f, .38f, .25f, .96f));
+            var panel = Panel(canvas, "FarmPlacementPanel",
+                new Vector2(-20f, -78f), new Vector2(360f, 480f),
+                new Vector2(1f, 1f));
+            Text(panel.transform, "Title", new Vector2(18f, -14f),
+                new Vector2(250f, 28f), 19, TextAnchor.MiddleLeft,
+                new Color(.25f, .95f, .78f, 1f)).text = "Farm H1 배치";
+            var close = Button(panel.transform, "CloseButton", "닫기",
+                new Vector2(282f, -12f), new Vector2(60f, 30f),
+                new Color(.25f, .28f, .29f, 1f));
+            var objectButtons = entries.Select((entry, index) => Button(
+                panel.transform, "BlueprintButton_" + index, entry.DisplayName,
+                new Vector2(18f + (index % 2) * 164f,
+                    -58f - (index / 2) * 42f),
+                new Vector2(154f, 34f), new Color(.12f, .31f, .22f, 1f)))
+                .ToArray();
+            var rotate = Button(panel.transform, "RotateButton", "90도 회전 R",
+                new Vector2(18f, -184f), new Vector2(154f, 34f),
+                new Color(.18f, .27f, .32f, 1f));
+            var left = Button(panel.transform, "NudgeLeftButton", "← 25cm",
+                new Vector2(182f, -184f), new Vector2(76f, 34f),
+                new Color(.18f, .27f, .32f, 1f));
+            var right = Button(panel.transform, "NudgeRightButton", "25cm →",
+                new Vector2(266f, -184f), new Vector2(76f, 34f),
+                new Color(.18f, .27f, .32f, 1f));
+            var forward = Button(panel.transform, "NudgeForwardButton", "↑ 25cm",
+                new Vector2(182f, -226f), new Vector2(76f, 34f),
+                new Color(.18f, .27f, .32f, 1f));
+            var back = Button(panel.transform, "NudgeBackButton", "↓ 25cm",
+                new Vector2(266f, -226f), new Vector2(76f, 34f),
+                new Color(.18f, .27f, .32f, 1f));
+            var preview = Button(panel.transform, "PreviewButton", "배치 Preview",
+                new Vector2(18f, -272f), new Vector2(154f, 38f),
+                new Color(.12f, .39f, .48f, 1f));
+            var confirm = Button(panel.transform, "ConfirmButton", "Confirm · 자원 예약",
+                new Vector2(182f, -272f), new Vector2(160f, 38f),
+                new Color(.75f, .36f, .08f, 1f));
+            var tick = Button(panel.transform, "TickButton", "WorldTick +1",
+                new Vector2(18f, -318f), new Vector2(324f, 36f),
+                new Color(.16f, .36f, .24f, 1f));
+            var status = Text(panel.transform, "StatusText",
+                new Vector2(18f, -364f), new Vector2(324f, 96f), 13,
+                TextAnchor.UpperLeft, Color.white);
+            var palette = runtimeRoot.gameObject
+                .AddComponent<Farm플레이어배치PalettePresenter>();
+            palette.Configure(controller, panel, open, close, objectButtons,
+                rotate, left, right, forward, back, preview, confirm, tick, status);
+            EditorUtility.SetDirty(controller);
+            EditorUtility.SetDirty(palette);
+            EditorUtility.SetDirty(dailyComposition);
         }
 
         private static 전술분대Presenter Build전술분대Views(Transform runtimeRoot)

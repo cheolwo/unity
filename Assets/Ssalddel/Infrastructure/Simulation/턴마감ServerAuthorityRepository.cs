@@ -406,7 +406,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 throw new InvalidOperationException("TarotJourneyRootAuthorityMismatch");
         }
 
-        private static 턴마감ResultData ParseSession(string json)
+        internal static 턴마감ResultData ParseSession(
+            string json, string sourceModeCode = "SimulationServer")
         {
             var wire = JsonConvert.DeserializeObject<SessionWire>(json)
                 ?? throw new InvalidOperationException("TurnClosingSessionJsonInvalid");
@@ -435,7 +436,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 settlement.FoodReserveEquivalent,
                 settlement.FoodSecurityDays,
                 settlement.ActiveTaskStableIds?.Length ?? 0,
-                "SimulationServer",
+                sourceModeCode,
                 new[]
                 {
                     new SimulationWorldSettlementNode(
@@ -485,7 +486,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                     ? parsed
                     : throw new InvalidOperationException("TurnClosingCardDateInvalid");
 
-        private static object CreateSessionRequest()
+        internal static object CreateSessionRequest()
             => new
             {
                 ClientRequestId = "706a236b-17e5-44e2-a070-a0785ae42d19",
@@ -601,6 +602,26 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                             },
                         },
                     },
+                    new
+                    {
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-fence.v1",
+                        Revision = "r1",
+                        HashSha256 = "sha256:facility-definition-farm-fence-r1",
+                        FacilityTypeCode = "FarmFence",
+                        CapabilityCodes = Array.Empty<string>(),
+                        Capacities = Array.Empty<object>(),
+                    },
+                    new
+                    {
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-tree.v1",
+                        Revision = "r1",
+                        HashSha256 = "sha256:facility-definition-farm-tree-r1",
+                        FacilityTypeCode = "FarmTree",
+                        CapabilityCodes = Array.Empty<string>(),
+                        Capacities = Array.Empty<object>(),
+                    },
                 },
                 FacilitySeeds = new[]
                 {
@@ -651,6 +672,14 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                         UnitCode = "unit",
                         FacilityStableId = "player:sim.guest-1",
                     },
+                    new
+                    {
+                        LotStableId = "lot:farm:saplings",
+                        ItemCode = "FarmSapling",
+                        Quantity = 12m,
+                        UnitCode = "tree",
+                        FacilityStableId = "facility:unity:hub-workshop",
+                    },
                 },
                 ManufacturingRecipes = new[]
                 {
@@ -694,6 +723,16 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                         SettlementFacilityTypeCode = "Storage",
                         SettlementDistrictStableId = "district:farm",
                         ConstructionTicks = 2,
+                        PlacementKindCode = "Building",
+                        AllowedPlacementZoneTypeCodes = new[]
+                        {
+                            "FarmProcessing", "FarmSupport",
+                        },
+                        FootprintWidthCentimeters = 800,
+                        FootprintDepthCentimeters = 600,
+                        ClearanceCentimeters = 100,
+                        MaxSlopeMilliDegrees = 5000,
+                        RequiresRoadAccess = true,
                         Materials = new[]
                         {
                             new
@@ -714,6 +753,13 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                         SettlementFacilityTypeCode = "Storage",
                         SettlementDistrictStableId = "district:farm",
                         ConstructionTicks = 1,
+                        PlacementKindCode = string.Empty,
+                        AllowedPlacementZoneTypeCodes = Array.Empty<string>(),
+                        FootprintWidthCentimeters = 0,
+                        FootprintDepthCentimeters = 0,
+                        ClearanceCentimeters = 0,
+                        MaxSlopeMilliDegrees = 0,
+                        RequiresRoadAccess = false,
                         Materials = new[]
                         {
                             new
@@ -723,6 +769,164 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                                 UnitCode = "unit",
                             },
                         },
+                    },
+                    new
+                    {
+                        BlueprintStableId = "blueprint:farm-fence-straight.v1",
+                        Revision = "r1",
+                        HashSha256 = "sha256:blueprint-farm-fence-straight-r1",
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-fence.v1",
+                        SettlementFacilityTypeCode = string.Empty,
+                        SettlementDistrictStableId = "district:farm",
+                        ConstructionTicks = 1,
+                        PlacementKindCode = "FenceSegment",
+                        AllowedPlacementZoneTypeCodes = new[] { "FarmFenceEdge" },
+                        FootprintWidthCentimeters = 800,
+                        FootprintDepthCentimeters = 50,
+                        ClearanceCentimeters = 0,
+                        MaxSlopeMilliDegrees = 12000,
+                        RequiresRoadAccess = false,
+                        Materials = new[]
+                        {
+                            new { ItemCode = "FacilityComponent", Quantity = 1m,
+                                UnitCode = "unit" },
+                        },
+                    },
+                    new
+                    {
+                        BlueprintStableId = "blueprint:farm-fence-corner.v1",
+                        Revision = "r1",
+                        HashSha256 = "sha256:blueprint-farm-fence-corner-r1",
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-fence.v1",
+                        SettlementFacilityTypeCode = string.Empty,
+                        SettlementDistrictStableId = "district:farm",
+                        ConstructionTicks = 1,
+                        PlacementKindCode = "FenceCorner",
+                        AllowedPlacementZoneTypeCodes = new[] { "FarmFenceEdge" },
+                        FootprintWidthCentimeters = 400,
+                        FootprintDepthCentimeters = 400,
+                        ClearanceCentimeters = 0,
+                        MaxSlopeMilliDegrees = 12000,
+                        RequiresRoadAccess = false,
+                        Materials = new[]
+                        {
+                            new { ItemCode = "FacilityComponent", Quantity = 1m,
+                                UnitCode = "unit" },
+                        },
+                    },
+                    new
+                    {
+                        BlueprintStableId = "blueprint:farm-fence-gate.v1",
+                        Revision = "r1",
+                        HashSha256 = "sha256:blueprint-farm-fence-gate-r1",
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-fence.v1",
+                        SettlementFacilityTypeCode = string.Empty,
+                        SettlementDistrictStableId = "district:farm",
+                        ConstructionTicks = 1,
+                        PlacementKindCode = "FenceGate",
+                        AllowedPlacementZoneTypeCodes = new[] { "FarmEntrance" },
+                        FootprintWidthCentimeters = 400,
+                        FootprintDepthCentimeters = 100,
+                        ClearanceCentimeters = 0,
+                        MaxSlopeMilliDegrees = 12000,
+                        RequiresRoadAccess = false,
+                        Materials = new[]
+                        {
+                            new { ItemCode = "FacilityComponent", Quantity = 1m,
+                                UnitCode = "unit" },
+                        },
+                    },
+                    new
+                    {
+                        BlueprintStableId = "blueprint:farm-tree.v1",
+                        Revision = "r1",
+                        HashSha256 = "sha256:blueprint-farm-tree-r1",
+                        FacilityDefinitionStableId =
+                            "facility-definition:farm-tree.v1",
+                        SettlementFacilityTypeCode = string.Empty,
+                        SettlementDistrictStableId = "district:farm",
+                        ConstructionTicks = 1,
+                        PlacementKindCode = "Tree",
+                        AllowedPlacementZoneTypeCodes = new[] { "FarmSupport" },
+                        FootprintWidthCentimeters = 200,
+                        FootprintDepthCentimeters = 200,
+                        ClearanceCentimeters = 50,
+                        MaxSlopeMilliDegrees = 7000,
+                        RequiresRoadAccess = false,
+                        Materials = new[]
+                        {
+                            new { ItemCode = "FarmSapling", Quantity = 1m,
+                                UnitCode = "tree" },
+                        },
+                    },
+                },
+                ConstructionPlacementZones = new object[]
+                {
+                    new
+                    {
+                        PlacementZoneStableId =
+                            "placement-zone:farm:processing-south",
+                        TargetH2StableId = "h2:Farm:processing-south",
+                        ZoneTypeCode = "FarmProcessing",
+                        PlacementProfileRevision = "farm-placement-profile.r1",
+                        MinXCentimeters = -3000, MaxXCentimeters = 3000,
+                        MinZCentimeters = -6000, MaxZCentimeters = -4000,
+                        TerrainSlopeMilliDegrees = 2000,
+                        RoadAccessConnectorStableIds = new[]
+                        {
+                            "connector:FarmSouthRoad",
+                        },
+                        FenceChainStableId = string.Empty,
+                        FenceStartXCentimeters = (int?)null,
+                        FenceStartZCentimeters = (int?)null,
+                    },
+                    new
+                    {
+                        PlacementZoneStableId =
+                            "placement-zone:farm:north-field-edge",
+                        TargetH2StableId = "h2:Farm:potato-fields",
+                        ZoneTypeCode = "FarmFenceEdge",
+                        PlacementProfileRevision = "farm-placement-profile.r1",
+                        MinXCentimeters = -4000, MaxXCentimeters = 4000,
+                        MinZCentimeters = 3000, MaxZCentimeters = 3400,
+                        TerrainSlopeMilliDegrees = 3000,
+                        RoadAccessConnectorStableIds = Array.Empty<string>(),
+                        FenceChainStableId = "fence-chain:farm:north-edge",
+                        FenceStartXCentimeters = (int?)-4000,
+                        FenceStartZCentimeters = (int?)3200,
+                    },
+                    new
+                    {
+                        PlacementZoneStableId =
+                            "placement-zone:farm:north-entrance",
+                        TargetH2StableId = "h2:Farm:potato-fields",
+                        ZoneTypeCode = "FarmEntrance",
+                        PlacementProfileRevision = "farm-placement-profile.r1",
+                        MinXCentimeters = -100, MaxXCentimeters = 100,
+                        MinZCentimeters = 2750, MaxZCentimeters = 3250,
+                        TerrainSlopeMilliDegrees = 3000,
+                        RoadAccessConnectorStableIds = Array.Empty<string>(),
+                        FenceChainStableId = "fence-chain:farm:north-entrance",
+                        FenceStartXCentimeters = (int?)0,
+                        FenceStartZCentimeters = (int?)2800,
+                    },
+                    new
+                    {
+                        PlacementZoneStableId =
+                            "placement-zone:farm:tree-east",
+                        TargetH2StableId = "h2:Farm:support-east",
+                        ZoneTypeCode = "FarmSupport",
+                        PlacementProfileRevision = "farm-placement-profile.r1",
+                        MinXCentimeters = 3500, MaxXCentimeters = 6000,
+                        MinZCentimeters = -2500, MaxZCentimeters = 2500,
+                        TerrainSlopeMilliDegrees = 2500,
+                        RoadAccessConnectorStableIds = Array.Empty<string>(),
+                        FenceChainStableId = string.Empty,
+                        FenceStartXCentimeters = (int?)null,
+                        FenceStartZCentimeters = (int?)null,
                     },
                 },
             };

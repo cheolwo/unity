@@ -77,6 +77,20 @@ namespace Ssalddel.Unity.Bootstrap
             }
             if (authorityMode != 물류이동AuthorityMode.Server)
                 throw new InvalidOperationException("LogisticsMovementAuthorityModeInvalid");
+            if (SimulationWorldLocalRuntimeScope.IsInstalled)
+            {
+                if (!SimulationWorldLocalRuntimeScope.TryGet(out var localScope))
+                    throw new InvalidOperationException(
+                        "SimulationLocalRuntimeScopeMissing");
+                var localRepository = new LocalLogisticsMovementAuthorityRepository(
+                    localScope.Runtime);
+                var localSnapshot = await localRepository.RefreshAsync(
+                    localScope.SessionStableId, lifetimeCancellation.Token);
+                presenter.InitializeAuthority(localRepository, localSnapshot);
+                Debug.Log(
+                    "LogisticsMovementLocalSimulationRuntimeReady:network=0", this);
+                return;
+            }
             if (runtimeSettings == null)
                 throw new InvalidOperationException("UnitySimulationServerSettingsMissing");
 

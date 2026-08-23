@@ -42,6 +42,23 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public async Task 로컬엔진은_H5인계Topology가없으면_조용히후퇴하지않고_사용불가를표시한다()
+        {
+            var repository = new 로컬공간LHWorldEngine();
+
+            var response = await repository.PreviewCellsAsync(
+                Request("handover-unavailable", 2801, 4581), CancellationToken.None);
+
+            Assert.That(response.AreaSetHandover.AvailabilityCode,
+                Is.EqualTo(공간AreaSetHandoverCodes.NotAvailable));
+            Assert.That(response.AreaSetHandover.BlockingReasonCodes,
+                Does.Contain("AreaSetHandoverTopologyPackageUnavailable"));
+            Assert.That(response.AreaSetHandover.Candidates, Is.Empty);
+            Assert.That(response.AreaSetHandover.ChangesCurrentAreaSet, Is.False);
+            Assert.That(response.AreaSetHandover.RequiresExplicitTraversalConfirm, Is.True);
+        }
+
+        [Test]
         public async Task L실행해상도는_H주조회단계를_독립적으로_바꿔도_유효하다()
         {
             var repository = new 로컬공간LHWorldEngine();
@@ -164,6 +181,8 @@ namespace Ssalddel.Unity.Tests.EditMode
                 engine.DrainAssemblyForTests();
 
                 Assert.That(engine.SourceModeCode, Is.EqualTo(공간LHWorldCodes.LocalEngine));
+                Assert.That(engine.ActiveAreaSetHandover.AvailabilityCode,
+                    Is.EqualTo(공간AreaSetHandoverCodes.NotAvailable));
                 Assert.That(engine.TrackedCellCount, Is.EqualTo(81));
                 Assert.That(engine.IsPlayerTraversalReady("kr5186:l3:2801:4581"), Is.True);
                 Assert.That(engine.IsPlayerTraversalReady("kr5186:l3:2803:4583"), Is.True);

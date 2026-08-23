@@ -124,7 +124,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             return BaseRoute + Uri.EscapeDataString(sessionStableId.Trim());
         }
 
-        private static 물류이동AuthoritySnapshot ParseSnapshot(string json)
+        internal static 물류이동AuthoritySnapshot ParseSnapshot(
+            string json, string sourceModeCode = "SimulationServer")
         {
             var wire = JsonConvert.DeserializeObject<SessionWire>(json)
                 ?? throw new InvalidOperationException("SimulationSessionSnapshotJsonInvalid");
@@ -159,7 +160,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 ActiveTaskCount = settlement.ActiveTaskStableIds?.Length ?? 0,
                 AllocationStateCode = allocation?.StateCode ?? string.Empty,
                 TaskStateCode = task?.StateCode ?? string.Empty,
-                SourceModeCode = "SimulationServer",
+                SourceModeCode = sourceModeCode,
             };
             return new 물류이동AuthoritySnapshot
             {
@@ -183,7 +184,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 CarrierCandidateStableId = freight?.CarrierCandidateStableId ?? string.Empty,
                 VehicleStableId = freight?.VehicleStableId ?? string.Empty,
                 DispatchRuleRevision = freight?.DispatchDecision?.RuleRevision ?? string.Empty,
-                SourceModeCode = "SimulationServer",
+                SourceModeCode = sourceModeCode,
                 Settlement = settlementSnapshot,
             };
         }

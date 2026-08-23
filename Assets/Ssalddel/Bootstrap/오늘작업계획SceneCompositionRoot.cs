@@ -15,10 +15,14 @@ namespace Ssalddel.Unity.Bootstrap
     {
         [SerializeField] private UnityClientRuntimeSettings runtimeSettings = null!;
         [SerializeField] private 오늘작업계획Presenter presenter = null!;
+        [SerializeField] private Farm플레이어배치Controller farmPlacement = null!;
         [SerializeField] private bool 서버기준사용 = true;
 
         private CancellationTokenSource? lifetimeCancellation;
         public bool 서버기준사용중 => 서버기준사용;
+
+        public void ConfigureFarmPlacement(Farm플레이어배치Controller controller)
+            => farmPlacement = controller;
 
         public void Configure(
             UnityClientRuntimeSettings settings,
@@ -59,6 +63,7 @@ namespace Ssalddel.Unity.Bootstrap
             var areaAccessRepository = new AreaSet접근ServerRepository(client);
             var hostedRepository = new Hosted비콘ServerRepository(client);
             var coopRepository = new 협동창고ServerRepository(client);
+            var placementRepository = new Farm플레이어배치ServerRepository(client);
             Exception? last = null;
             for (var attempt = 0; attempt < 20; attempt++)
             {
@@ -75,6 +80,10 @@ namespace Ssalddel.Unity.Bootstrap
                         areaAccessRepository, "player:session:owner");
                     await presenter.InitializeHostedBeaconAsync(hostedRepository);
                     await presenter.InitializeCoopStorageAsync(coopRepository);
+                    if (farmPlacement != null)
+                        await farmPlacement.InitializeAsync(placementRepository,
+                            턴마감ServerAuthorityRepository.BootstrapSessionStableId,
+                            lifetimeCancellation.Token);
                     return;
                 }
                 catch (OperationCanceledException) { throw; }

@@ -1,23 +1,27 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Ssalddel.Unity.Presentation.World
 {
     /// <summary>
     /// 공식 플레이 Scene의 상태와 상호작용 객체는 유지하면서,
-    /// Game View에는 플레이어 한 명과 시점 전환 UI만 남기는 표현 정책입니다.
+    /// Game View에는 플레이어 한 명, 승인된 환경 Root와 시점 전환 UI만 남기는 표현 정책입니다.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class 단일PlayerViewController : MonoBehaviour
     {
         [SerializeField] private 플레이어경관Controller player = null!;
         [SerializeField] private Canvas modeCanvas = null!;
+        [SerializeField] private Transform[] approvedEnvironmentRoots =
+            Array.Empty<Transform>();
         [SerializeField] private bool applyOnPlay = true;
 
         private int nextRefreshFrame;
 
         public 플레이어경관Controller Player => player;
         public Canvas ModeCanvas => modeCanvas;
+        public Transform[] ApprovedEnvironmentRoots => approvedEnvironmentRoots;
         public bool ApplyOnPlay => applyOnPlay;
         public bool PresentationOnly => true;
 
@@ -32,12 +36,25 @@ namespace Ssalddel.Unity.Presentation.World
             ValidateWiring();
         }
 
+        public void SetApprovedEnvironmentRoots(params Transform[] roots)
+        {
+            approvedEnvironmentRoots = roots?
+                .Where(value => value != null)
+                .Distinct()
+                .ToArray() ?? Array.Empty<Transform>();
+            ValidateWiring();
+        }
+
         public void ValidateWiring()
         {
             if (player == null || modeCanvas == null
                 || !player.transform.IsChildOf(transform)
                 || !modeCanvas.transform.IsChildOf(transform))
                 throw new InvalidOperationException("SinglePlayerViewWiringInvalid");
+            if (approvedEnvironmentRoots.Any(value => value == null
+                || !value.IsChildOf(transform)))
+                throw new InvalidOperationException(
+                    "SinglePlayerViewEnvironmentRootInvalid");
         }
 
         private void Awake()
@@ -62,14 +79,25 @@ namespace Ssalddel.Unity.Presentation.World
             ValidateWiring();
             var visualRoot = player.VisualRoot;
             foreach (var renderer in GetComponentsInChildren<Renderer>(true))
-                renderer.enabled = renderer.transform == visualRoot
-                                   || renderer.transform.IsChildOf(visualRoot);
+            {
+                var isPlayerVisual = renderer.transform == visualRoot
+                                     || renderer.transform.IsChildOf(visualRoot);
+                // 승인된 환경은 표시할 수 있다는 뜻이지, 장면 제작자가 경계선·
+                // 소켓처럼 의도적으로 끈 Renderer까지 다시 켜라는 뜻은 아니다.
+                // 따라서 승인 밖의 표현만 끄고 승인 안의 기존 활성 상태는 보존한다.
+                if (!isPlayerVisual && !IsApprovedEnvironment(renderer.transform))
+                    renderer.enabled = false;
+            }
 
             foreach (var terrain in GetComponentsInChildren<Terrain>(true))
-                terrain.enabled = false;
+                terrain.enabled = IsApprovedEnvironment(terrain.transform);
 
             foreach (var canvas in GetComponentsInChildren<Canvas>(true))
                 canvas.gameObject.SetActive(canvas == modeCanvas);
         }
+
+        private bool IsApprovedEnvironment(Transform candidate) =>
+            approvedEnvironmentRoots.Any(root =>
+                candidate == root || candidate.IsChildOf(root));
     }
 }

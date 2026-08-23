@@ -100,6 +100,7 @@ namespace Ssalddel.Unity.Presentation.World
         private bool _viewTransitionTargetShowsVisual;
         private bool _viewTransitionTargetEnablesFarmManagement;
         private bool _viewTransitionVisualSwitched;
+        private bool _placementInputBlocked;
 
         public 플레이어경관Profile Profile => profile;
         public Camera PlayerCamera => thirdPersonCamera;
@@ -111,6 +112,11 @@ namespace Ssalddel.Unity.Presentation.World
         public bool IsPlayerMode => _currentMode != 플레이어시점Mode.Strategy;
 
         public void SetGuidanceVisible(bool visible) => guidanceVisible = visible;
+        public void SetPlacementInputBlocked(bool blocked)
+        {
+            _placementInputBlocked = blocked;
+            if (blocked) ApplySelectionState(false);
+        }
         public bool IsSelected => _isSelected;
         public bool HasDestination => _hasDestination;
         public Vector3 Destination => _destination;
@@ -129,6 +135,7 @@ namespace Ssalddel.Unity.Presentation.World
         public 농장경영시점Controller FarmManagement => farmManagement;
         public 전투시점Controller Combat => combat;
         public bool IsCameraTransitioning { get; private set; }
+        public bool PlacementInputBlocked => _placementInputBlocked;
         public float CameraTransitionProgress => !IsCameraTransitioning
             ? 1f
             : Mathf.Clamp01(_viewTransitionElapsed / Mathf.Max(.1f, viewTransitionDuration));
@@ -343,9 +350,9 @@ namespace Ssalddel.Unity.Presentation.World
         {
             var mouse = Mouse.current;
             if (mouse == null) return;
-            var farmInputHandled = farmManagement != null
+            var farmInputHandled = !_placementInputBlocked && farmManagement != null
                 && farmManagement.TryHandlePointerInput(mouse, keyboard);
-            if (!farmInputHandled)
+            if (!_placementInputBlocked && !farmInputHandled)
             {
                 if (mouse.leftButton.wasPressedThisFrame)
                     TrySelectPlayer(mouse.position.ReadValue());

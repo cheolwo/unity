@@ -6,12 +6,41 @@
       "source": "local",
       "dependencies": {}
     },
+    "com.ssalddel.simulation.contracts": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Contracts/UnityPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.code-metadata": "0.1.0"
+      }
+    },
     "com.ssalddel.simulation.data": {
       "version": "file:../../source/repos/Hongdal/Ssalddel.Unity",
       "depth": 0,
       "source": "local",
       "dependencies": {
         "com.ssalddel.code-metadata": "0.1.0"
+      }
+    },
+    "com.ssalddel.simulation.domain": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Domain/UnityPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.code-metadata": "0.1.0",
+        "com.ssalddel.simulation.contracts": "0.1.0",
+        "com.ssalddel.workflow-rules.contracts": "0.1.0",
+        "com.ssalddel.workflow-rules": "0.1.0"
+      }
+    },
+    "com.ssalddel.simulation.runtime-core": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Application/RuntimeCore",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.code-metadata": "0.1.0",
+        "com.ssalddel.simulation.contracts": "0.1.0",
+        "com.ssalddel.simulation.domain": "0.1.0"
       }
     },
     "com.ssalddel.workflow-rules": {

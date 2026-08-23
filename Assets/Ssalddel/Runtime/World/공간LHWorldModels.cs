@@ -18,6 +18,8 @@ namespace Ssalddel.Unity.Runtime.World
         public const string ScenarioProcedural = "ScenarioProcedural";
         public const string AuthoritativeWorld = "AuthoritativeWorld";
         public const string AreaSetStableId = "area-set:sim:pyeongchang:farm-hub-town.v1";
+        public const string FarmAreaSetStableId =
+            "area-set:sim:pyeongchang:farm-production.v1";
         public const string RecipeStableId = 공간TileStreamingCodes.RecipeStableId;
         public const string Detail = "Detail";
         public const string Active = "Active";
@@ -124,6 +126,111 @@ namespace Ssalddel.Unity.Runtime.World
         public string OwnershipRuleCode = string.Empty;
     }
 
+    public static class 공간AreaSetHandoverCodes
+    {
+        public const string SchemaVersion = "area-set-handover-plan.v1";
+        public const string PlannerRevision = "area-set-handover-planner.r1";
+        public const string H5Known = "H5Known";
+        public const string NotAvailable = "NotAvailable";
+        public const string PreviewConfirmWorldTick = "PreviewConfirmWorldTick";
+    }
+
+    [Serializable]
+    public sealed class 공간AreaSetHandoverPlanData
+    {
+        public string SchemaVersion = 공간AreaSetHandoverCodes.SchemaVersion;
+        public string PlannerRevision = 공간AreaSetHandoverCodes.PlannerRevision;
+        public string RequestEpoch = string.Empty;
+        public string CurrentAreaSetStableId = string.Empty;
+        public string FocusL3CellKey = string.Empty;
+        public string MovementDirectionCode = 공간LHWorldCodes.None;
+        public string WorldLayoutStableId = string.Empty;
+        public int WorldLayoutRevision;
+        public string WorldLayoutHashSha256 = string.Empty;
+        public string WorldGroundingStateCode = string.Empty;
+        public string AvailabilityCode = 공간AreaSetHandoverCodes.NotAvailable;
+        public string[] BlockingReasonCodes = Array.Empty<string>();
+        public 공간AreaSetHandoverCandidateData[] Candidates =
+            Array.Empty<공간AreaSetHandoverCandidateData>();
+        public string PlanHashSha256 = string.Empty;
+        public bool ChangesCurrentAreaSet;
+        public bool RequiresExplicitTraversalConfirm = true;
+        public bool IsCandidateOnly = true;
+        public bool IsOperationalState;
+
+        public void Validate(string expectedEpoch)
+        {
+            if (SchemaVersion != 공간AreaSetHandoverCodes.SchemaVersion
+                || PlannerRevision != 공간AreaSetHandoverCodes.PlannerRevision
+                || RequestEpoch != expectedEpoch
+                || !공간LHCellKey.TryParseL3(FocusL3CellKey, out _, out _)
+                || BlockingReasonCodes == null || Candidates == null
+                || PlanHashSha256 == null || PlanHashSha256.Length != 64
+                || ChangesCurrentAreaSet || !RequiresExplicitTraversalConfirm
+                || !IsCandidateOnly || IsOperationalState)
+                throw new InvalidOperationException("AreaSetHandoverPlanInvalid");
+            if (AvailabilityCode == 공간AreaSetHandoverCodes.H5Known
+                && (string.IsNullOrWhiteSpace(CurrentAreaSetStableId)
+                    || string.IsNullOrWhiteSpace(WorldLayoutStableId)
+                    || WorldLayoutRevision <= 0
+                    || WorldLayoutHashSha256 == null
+                    || WorldLayoutHashSha256.Length != 64))
+                throw new InvalidOperationException("AreaSetHandoverH5LineageInvalid");
+            if (AvailabilityCode != 공간AreaSetHandoverCodes.H5Known
+                && AvailabilityCode != 공간AreaSetHandoverCodes.NotAvailable)
+                throw new InvalidOperationException("AreaSetHandoverAvailabilityInvalid");
+            foreach (var candidate in Candidates) candidate.Validate();
+        }
+    }
+
+    [Serializable]
+    public sealed class 공간AreaSetHandoverCandidateData
+    {
+        public string TargetAreaSetStableId = string.Empty;
+        public string RelationStableId = string.Empty;
+        public string CorridorInstanceStableId = string.Empty;
+        public string CorridorLandscapeGraphStableId = string.Empty;
+        public string OverlapPolicyCode = string.Empty;
+        public string SpatialRealizationCode = string.Empty;
+        public double DistanceToTransitionMeters;
+        public double HeadingAlignment01;
+        public int Priority;
+        public string PreparationTargetCode = string.Empty;
+        public string SemanticDepthCode = string.Empty;
+        public string ArtifactAvailabilityCode = string.Empty;
+        public string ResidencyStateCode = string.Empty;
+        public string SimulationAccessStateCode = string.Empty;
+        public string ActivationAuthorityCode = string.Empty;
+        public string[] RequiredCapabilityCodes = Array.Empty<string>();
+        public string[] BlockingReasonCodes = Array.Empty<string>();
+        public bool RequiresActualE5Package;
+        public bool RequiresE6Grounding;
+        public bool CanRequestTraversal;
+        public bool CanActivate;
+        public string CandidateHashSha256 = string.Empty;
+
+        public void Validate()
+        {
+            if (string.IsNullOrWhiteSpace(TargetAreaSetStableId)
+                || string.IsNullOrWhiteSpace(RelationStableId)
+                || string.IsNullOrWhiteSpace(CorridorInstanceStableId)
+                || string.IsNullOrWhiteSpace(CorridorLandscapeGraphStableId)
+                || string.IsNullOrWhiteSpace(OverlapPolicyCode)
+                || string.IsNullOrWhiteSpace(SpatialRealizationCode)
+                || DistanceToTransitionMeters < 0d
+                || HeadingAlignment01 < 0d || HeadingAlignment01 > 1d
+                || Priority < 0
+                || (SemanticDepthCode != "H1" && SemanticDepthCode != "H2"
+                    && SemanticDepthCode != "H3" && SemanticDepthCode != "H4")
+                || RequiredCapabilityCodes == null || BlockingReasonCodes == null
+                || ActivationAuthorityCode !=
+                    공간AreaSetHandoverCodes.PreviewConfirmWorldTick
+                || CanActivate
+                || CandidateHashSha256 == null || CandidateHashSha256.Length != 64)
+                throw new InvalidOperationException("AreaSetHandoverCandidateInvalid");
+        }
+    }
+
     [Serializable]
     public sealed class 공간LHCellPreviewRequestData
     {
@@ -149,6 +256,7 @@ namespace Ssalddel.Unity.Runtime.World
         public long WorldRevision;
         public 공간LHSeasonData Season = new();
         public 공간LHWorldProfileData Profile = new();
+        public 공간AreaSetHandoverPlanData AreaSetHandover = new();
         public 공간LHCellPlanData[] Cells = Array.Empty<공간LHCellPlanData>();
         public string[] OutsideCoverageCellKeys = Array.Empty<string>();
         public bool IsCandidateOnly;
@@ -167,6 +275,7 @@ namespace Ssalddel.Unity.Runtime.World
                 || !IsCandidateOnly || !DoesNotApplyResourceLedgers || IsOperationalState)
                 throw new InvalidOperationException("LHWorldCellPreviewInvalid");
             Season.Validate();
+            AreaSetHandover.Validate(expectedEpoch);
             foreach (var cell in Cells)
             {
                 cell.Validate();
@@ -398,6 +507,22 @@ namespace Ssalddel.Unity.Runtime.World
                 WorldRevision = worldRevision,
                 Season = Season(dayNumber),
                 Profile = profile,
+                AreaSetHandover = new 공간AreaSetHandoverPlanData
+                {
+                    RequestEpoch = request.RequestEpoch,
+                    CurrentAreaSetStableId = 공간LHWorldCodes.FarmAreaSetStableId,
+                    FocusL3CellKey = request.FocusL3CellKey,
+                    MovementDirectionCode = request.MovementDirectionCode,
+                    AvailabilityCode = 공간AreaSetHandoverCodes.NotAvailable,
+                    BlockingReasonCodes = new[]
+                    {
+                        "AreaSetHandoverTopologyPackageUnavailable",
+                    },
+                    Candidates = Array.Empty<공간AreaSetHandoverCandidateData>(),
+                    PlanHashSha256 = Hash("local-handover-unavailable|"
+                                          + request.RequestEpoch + "|"
+                                          + request.FocusL3CellKey),
+                },
                 Cells = cells.OrderBy(value => value.Priority)
                     .ThenBy(value => value.CellKey, StringComparer.Ordinal).ToArray(),
                 OutsideCoverageCellKeys = outside.OrderBy(value => value, StringComparer.Ordinal)

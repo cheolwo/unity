@@ -234,7 +234,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 ? choiceStableId.Trim()
                 : throw new InvalidOperationException("SimulationFarmChoiceStableIdMissing");
 
-        private static Farm선택ContextData NormalizeFarmChoiceContext(
+        internal static Farm선택ContextData NormalizeFarmChoiceContext(
             Farm선택ContextData context)
         {
             context.Facts ??= Array.Empty<Farm선택FactData>();
@@ -298,7 +298,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             return result;
         }
 
-        private static 정착지상호작용AuthoritySnapshot ParseSnapshot(string json)
+        internal static 정착지상호작용AuthoritySnapshot ParseSnapshot(
+            string json, string sourceModeCode = "SimulationServer")
         {
             var wire = JsonConvert.DeserializeObject<SessionWire>(json)
                 ?? throw new InvalidOperationException("SimulationSessionSnapshotJsonInvalid");
@@ -348,7 +349,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 FoodSecurityDays = settlement.FoodSecurityDays,
                 ActiveTaskCount = settlement.ActiveTaskStableIds?.Length ?? 0,
                 HarvestLotTasks = lotTasks,
-                SourceModeCode = "SimulationServer",
+                SourceModeCode = sourceModeCode,
             };
             return lotTasks.Length == 1
                 ? snapshot.ForHarvestLot(lotTasks[0].HarvestLotStableId)

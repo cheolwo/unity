@@ -68,6 +68,13 @@ namespace Ssalddel.Unity.Bootstrap
                 return;
             }
 
+            if (SimulationWorldLocalRuntimeScope.IsInstalled)
+            {
+                Debug.LogWarning(
+                    "JinbuInboundLocalSimulationCapabilityWaiting:network=0", this);
+                return;
+            }
+
             if (runtimeSettings == null)
                 throw new InvalidOperationException("UnitySimulationServerSettingsMissing");
             var sessionStableId = await WaitForAuthoritativeSessionAsync(

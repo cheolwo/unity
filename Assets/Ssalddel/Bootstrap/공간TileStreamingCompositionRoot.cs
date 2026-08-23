@@ -95,7 +95,8 @@ namespace Ssalddel.Unity.Bootstrap
             I공간LHWorldRepository lhRepository;
             I실제E5AreaSetNetworkRepository actualE5NetworkRepository = null;
             I공간AreaSetLandscapeGraphRepository graphRepository = null;
-            if (!서버기준사용)
+            var localProcess = SimulationWorldLocalRuntimeScope.IsInstalled;
+            if (!서버기준사용 || localProcess)
             {
                 repository = new 대관령Farm공간TileStreamFixtureRepository();
                 lhRepository = new 로컬공간LHWorldEngine(로컬월드시드, 로컬시작일);
@@ -120,14 +121,14 @@ namespace Ssalddel.Unity.Bootstrap
                 var shell = FindFirstObjectByType<SimulationWorldShellPresenter>(
                     FindObjectsInactive.Include);
                 lhStreamingEngine.ConfigureAuthority(shell);
-                if (서버기준사용)
+                if (서버기준사용 && !localProcess)
                     await WaitForAuthoritativeSessionAsync(shell, CancellationToken.None);
                 await lhStreamingEngine.InitializeAsync(lhRepository);
             }
             if (실제E5NetworkController != null)
             {
                 if ((actualE5NetworkRepository == null || graphRepository == null)
-                    && runtimeSettings != null)
+                    && runtimeSettings != null && !localProcess)
                 {
                     var actualE5Client = new SimulationRehearsalUnityWebRequestApiClient(
                         runtimeSettings.ToOptions());
@@ -139,7 +140,9 @@ namespace Ssalddel.Unity.Bootstrap
                 if (actualE5NetworkRepository == null || graphRepository == null)
                 {
                     실제E5NetworkController.ShowUnavailable(
-                        "실제 E5 서버 설정이 없어 공간 결속을 대기합니다");
+                        localProcess
+                            ? "Solo 로컬 공간은 유지 · 실제 E5 Network 이관 대기"
+                            : "실제 E5 서버 설정이 없어 공간 결속을 대기합니다");
                     return;
                 }
                 try

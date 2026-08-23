@@ -74,15 +74,27 @@ namespace Ssalddel.Unity.Bootstrap
                 return;
             }
 
+            if (SimulationWorldLocalRuntimeScope.TryGet(out var localScope))
+            {
+                var repository = new LocalTurnClosingAuthorityRepository(
+                    localScope.Runtime);
+                var localSession = await repository.RefreshSessionAsync(
+                    localScope.SessionStableId, lifetimeCancellation.Token);
+                shell.ApplyAuthoritativeSnapshot(localSession.WorldSnapshot);
+                await presenter.InitializeAsync(repository);
+                Debug.Log("TurnClosingLocalSimulationRuntimeReady:network=0", this);
+                return;
+            }
+
             if (runtimeSettings == null)
                 throw new InvalidOperationException("Unity 서버 연결 설정이 없습니다.");
             var options = runtimeSettings.ToOptions();
             var apiClient = new SimulationRehearsalUnityWebRequestApiClient(options);
-            var repository = new 턴마감ServerAuthorityRepository(apiClient);
-            var serverSession = await repository.서버기준Session확보Async(
+            var remoteRepository = new 턴마감ServerAuthorityRepository(apiClient);
+            var serverSession = await remoteRepository.서버기준Session확보Async(
                 lifetimeCancellation.Token);
             shell.ApplyAuthoritativeSnapshot(serverSession.WorldSnapshot);
-            await presenter.InitializeAsync(repository);
+            await presenter.InitializeAsync(remoteRepository);
         }
 
         private void OnDestroy()

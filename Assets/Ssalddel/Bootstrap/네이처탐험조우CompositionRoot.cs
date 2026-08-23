@@ -88,6 +88,13 @@ namespace Ssalddel.Unity.Bootstrap
         private async void Start()
         {
             if (!서버기준사용) return;
+            if (SimulationWorldLocalRuntimeScope.IsInstalled)
+            {
+                서버기준사용 = false;
+                Debug.LogWarning(
+                    "NatureExplorationSimulationCapabilityWaiting:network=0", this);
+                return;
+            }
             try
             {
                 lifetime = new CancellationTokenSource();
