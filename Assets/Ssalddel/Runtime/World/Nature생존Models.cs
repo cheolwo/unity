@@ -8,7 +8,7 @@ namespace Ssalddel.Unity.Runtime.World
 {
     public static class Nature생존Codes
     {
-        public const string ProfileRevision = NatureSurvivalProfileCodes.RealtimeR1;
+        public const string ProfileRevision = NatureSurvivalProfileCodes.RealtimeR2;
         public const string SoloLocal = "SoloLocal";
         public const string HostedServer = "HostedServer";
         public const string Standing = "Standing";
@@ -22,6 +22,11 @@ namespace Ssalddel.Unity.Runtime.World
         public const string Resolved = "Resolved";
         public const string Fight = "Fight";
         public const string Retreat = "Retreat";
+        public const string Victory = "Victory";
+        public const string Defeat = "Defeat";
+        public const string Workbench = "Workbench";
+        public const string StorageRack = "StorageRack";
+        public const string Palisade = "Palisade";
         public const string SkeletonPlaceholder = "placeholder:synty-generic-skeleton";
     }
 
@@ -77,6 +82,10 @@ namespace Ssalddel.Unity.Runtime.World
         public int TriggeredCycleIndex;
         public string ResolutionCode = string.Empty;
         public bool CabinDefenseApplied;
+        public int RawThreatTier;
+        public int EffectiveThreatTier;
+        public int HostileCount;
+        public string LinkedCombatStableId = string.Empty;
 
         public Nature생존EncounterState Clone() => (Nature생존EncounterState)MemberwiseClone();
     }
@@ -96,7 +105,16 @@ namespace Ssalddel.Unity.Runtime.World
         public bool ClockPaused;
         public bool HasAxe;
         public int TimberQuantity;
+        public int StoredTimberQuantity;
         public int NoiseEventCount;
+        public int RawThreatTier;
+        public int EffectiveThreatTier;
+        public int RebuildPartQuantity;
+        public string LinkedCombatStableId = string.Empty;
+        public string LastCombatResultCode = string.Empty;
+        public bool Sleeping;
+        public string SelectedExpansionPlanCode = string.Empty;
+        public bool Day2Ready;
         public bool PlayerInsideCabin;
         public Nature생존ResourceNodeState[] ResourceNodes =
             Array.Empty<Nature생존ResourceNodeState>();
@@ -119,7 +137,16 @@ namespace Ssalddel.Unity.Runtime.World
                 ClockPaused = ClockPaused,
                 HasAxe = HasAxe,
                 TimberQuantity = TimberQuantity,
+                StoredTimberQuantity = StoredTimberQuantity,
                 NoiseEventCount = NoiseEventCount,
+                RawThreatTier = RawThreatTier,
+                EffectiveThreatTier = EffectiveThreatTier,
+                RebuildPartQuantity = RebuildPartQuantity,
+                LinkedCombatStableId = LinkedCombatStableId,
+                LastCombatResultCode = LastCombatResultCode,
+                Sleeping = Sleeping,
+                SelectedExpansionPlanCode = SelectedExpansionPlanCode,
+                Day2Ready = Day2Ready,
                 PlayerInsideCabin = PlayerInsideCabin,
                 ResourceNodes = ResourceNodes.Select(value => value.Clone()).ToArray(),
                 ActiveWork = ActiveWork?.Clone(),
@@ -135,9 +162,15 @@ namespace Ssalddel.Unity.Runtime.World
         void BeginHarvest(string resourceStableId);
         void PlaceCabinBlueprint(float localX, float localZ, float yawDegrees);
         void BeginCabinBuild();
+        void EnterCabin();
+        void LeaveCabin();
+        void CancelActiveWork();
         void AdvanceRealtime(int elapsedSeconds, bool workInputHeld,
             bool menuOrApplicationPaused);
         void ResolveEncounter(string choiceCode);
+        void StoreAtCabin();
+        void SleepInCabin();
+        void SelectExpansionPlan(string planCode);
     }
 
     /// <summary>
@@ -215,6 +248,38 @@ namespace Ssalddel.Unity.Runtime.World
             state.Revision++;
         }
 
+        public void EnterCabin()
+        {
+            if (state.Cabin.StateCode != Nature생존Codes.Completed
+                || state.PlayerInsideCabin)
+                throw new InvalidOperationException("NatureCabinEntryBlocked");
+            state.PlayerInsideCabin = true;
+            state.Revision++;
+        }
+
+        public void LeaveCabin()
+        {
+            if (state.Cabin.StateCode != Nature생존Codes.Completed
+                || !state.PlayerInsideCabin)
+                throw new InvalidOperationException("NatureCabinExitBlocked");
+            state.PlayerInsideCabin = false;
+            state.Revision++;
+        }
+
+        public void CancelActiveWork()
+        {
+            if (state.ActiveWork == null)
+                throw new InvalidOperationException("NatureActiveWorkRequired");
+            if (state.ActiveWork.KindCode == Nature생존Codes.CabinBuild)
+            {
+                state.TimberQuantity += state.Cabin.ReservedTimber;
+                state.Cabin.ReservedTimber = 0;
+                state.Cabin.CompletedWorkSeconds = 0;
+            }
+            state.ActiveWork = null;
+            state.Revision++;
+        }
+
         public void AdvanceRealtime(int elapsedSeconds, bool workInputHeld,
             bool menuOrApplicationPaused)
         {
@@ -231,14 +296,55 @@ namespace Ssalddel.Unity.Runtime.World
             var previousSecond = state.ElapsedSecondsInCycle;
             var previousCycle = state.CycleIndex;
             if (workInputHeld) AdvanceWork(elapsedSeconds);
+            var appliedSeconds = state.Sleeping ? elapsedSeconds * 6 : elapsedSeconds;
             var projected = NatureSurvivalRules.AdvanceClock(state.CycleIndex,
-                state.ElapsedSecondsInCycle, elapsedSeconds);
+                state.ElapsedSecondsInCycle, appliedSeconds);
             state.CycleIndex = projected.CycleIndex;
             state.ElapsedSecondsInCycle = projected.ElapsedSecondsInCycle;
             state.ClockPhaseCode = projected.PhaseCode;
+            if (state.Sleeping && state.ClockPhaseCode ==
+                NatureSurvivalClockPhaseCodes.Dawn)
+                state.Sleeping = false;
             state.WorldTick += projected.CompletedCycleCount;
             RegrowTrees();
-            TryTriggerEncounter(previousCycle, previousSecond, elapsedSeconds);
+            TryTriggerEncounter(previousCycle, previousSecond, appliedSeconds);
+            state.Revision++;
+        }
+
+        public void StoreAtCabin()
+        {
+            if (state.Cabin.StateCode != Nature생존Codes.Completed
+                || !state.PlayerInsideCabin)
+                throw new InvalidOperationException("NatureCabinAccessRequired");
+            var quantity = Math.Min(state.TimberQuantity,
+                Math.Max(0, 20 - state.StoredTimberQuantity));
+            if (quantity <= 0)
+                throw new InvalidOperationException("NatureTimberNotCarriedOrStorageFull");
+            state.TimberQuantity -= quantity;
+            state.StoredTimberQuantity += quantity;
+            state.Revision++;
+        }
+
+        public void SleepInCabin()
+        {
+            if (state.Cabin.StateCode != Nature생존Codes.Completed
+                || !state.PlayerInsideCabin
+                || state.ClockPhaseCode != NatureSurvivalClockPhaseCodes.Night)
+                throw new InvalidOperationException("NatureCabinSleepBlocked");
+            state.Sleeping = true;
+            state.Revision++;
+        }
+
+        public void SelectExpansionPlan(string planCode)
+        {
+            if (state.ClockPhaseCode != NatureSurvivalClockPhaseCodes.Dawn
+                || state.Day2Ready
+                || (planCode != Nature생존Codes.Workbench
+                    && planCode != Nature생존Codes.StorageRack
+                    && planCode != Nature생존Codes.Palisade))
+                throw new InvalidOperationException("NatureExpansionPlanBlocked");
+            state.SelectedExpansionPlanCode = planCode;
+            state.Day2Ready = true;
             state.Revision++;
         }
 
@@ -278,6 +384,7 @@ namespace Ssalddel.Unity.Runtime.World
             {
                 state.Cabin.CompletedWorkSeconds = state.ActiveWork.CompletedSeconds;
                 state.Cabin.StateCode = Nature생존Codes.Completed;
+                state.Cabin.ReservedTimber = 0;
                 state.Cabin.RecoveryAvailable = true;
                 state.Cabin.DefenseAvailable = true;
                 state.NoiseEventCount++;
@@ -302,12 +409,13 @@ namespace Ssalddel.Unity.Runtime.World
         private void TryTriggerEncounter(int previousCycle, int previousSecond,
             int elapsedSeconds)
         {
-            if (state.Encounter != null || state.NoiseEventCount <= 0
+            if ((state.Encounter != null && state.Encounter.StateCode !=
+                    Nature생존Codes.Resolved) || state.NoiseEventCount <= 0
                 || !NatureSurvivalRules.CrossedIntoDusk(previousSecond, elapsedSeconds)) return;
             var cycle = previousSecond < NatureSurvivalRules.DaylightEndsAtSecond
                 ? previousCycle : previousCycle + 1;
             if (!evaluatedDuskCycles.Add(cycle)
-                || !NatureSurvivalRules.RollFirstDuskEncounter(state.ScenarioSeed,
+                || !NatureSurvivalRules.ShouldTriggerDuskEncounter(state.ScenarioSeed,
                     state.SessionStableId, cycle, state.NoiseEventCount)) return;
             state.Encounter = new Nature생존EncounterState
             {

@@ -10,6 +10,10 @@ namespace Ssalddel.Unity.Bootstrap
     /// 저장 Scene을 덮어쓰지 않고 canonical SimulationWorldShell의 Play 진입 때만
     /// Solo Nature 생존 세로 조각을 조립합니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public static class Nature생존AutoBootstrap
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -17,7 +21,7 @@ namespace Ssalddel.Unity.Bootstrap
             => SimulationWorldLocalRuntimeScope.Reset();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Install()
+        public static void InstallForCurrentScene()
         {
             if (SceneManager.GetActiveScene().name != "SimulationWorldShell"
                 || Object.FindFirstObjectByType<Nature생존Controller>(
@@ -40,14 +44,32 @@ namespace Ssalddel.Unity.Bootstrap
             var homeAnchor = semanticRoot?.Nodes.FirstOrDefault(value =>
                 value.NodeStableId == "h2-nature-home-core")?.Anchor;
 
-            var root = new GameObject("Nature생존_SoloLocal_r1").transform;
+            var root = new GameObject("Nature생존_SoloLocal_r2").transform;
             root.SetParent(singleView.transform, false);
             root.position = homeAnchor != null ? homeAnchor.position : player.transform.position;
             var controller = root.gameObject.AddComponent<Nature생존Controller>();
             var localScope = SimulationWorldLocalRuntimeScope.Install();
             controller.Configure(player, root, root, authorityEngine:
                 new Nature생존CoreRuntimeAdapter(localScope.Runtime,
-                    localScope.SessionStableId));
+                    localScope.SessionStableId),
+                saveWorldAction: () =>
+                {
+                    var saved = localScope.SaveCurrent();
+                    return $"저장 완료 · Tick {saved.SavedWorldTick} · "
+                        + saved.ReplayHash[..System.Math.Min(10,
+                            saved.ReplayHash.Length)];
+                },
+                profileLabel: localScope.LaunchProfile ==
+                    Nature생존LaunchProfile.E7Validation
+                    ? "E7 검증 프로필" : "기본 Solo");
+            if (localScope.RestoredFromSlot)
+                controller.SetStartupStatus(localScope.RecoveredFromBackup
+                    ? "백업 슬롯에서 세계를 복원했습니다."
+                    : "저장된 세계를 복원했습니다.");
+            else if (localScope.LaunchProfile ==
+                     Nature생존LaunchProfile.E7Validation)
+                controller.SetStartupStatus(
+                    "E7 검증 프로필 · 황혼 90초 전부터 실제 입력을 검증합니다.");
             var combat = Object.FindFirstObjectByType<전투시점Controller>(
                 FindObjectsInactive.Include);
             var battle = Object.FindFirstObjectByType<현장전투CompositionRoot>(
@@ -69,7 +91,7 @@ namespace Ssalddel.Unity.Bootstrap
                 if (character != null) character.enabled = true;
             }
             Debug.Log("NatureSurvivalLocalSimulationRuntimeReady:"
-                + "nature-survival.realtime.r1:network=0");
+                + "nature-survival.realtime.r2:network=0");
         }
     }
 
@@ -87,7 +109,7 @@ namespace Ssalddel.Unity.Bootstrap
             combat = combatController;
             battle = battleRoot;
             controller.EncounterFightRequested += OnFightRequested;
-            battle.WorldLocalBattleResolved += OnBattleResolved;
+            battle.WorldLocalBattleResultResolved += OnBattleResolved;
             battle.WorldLocalBattleRequestFailed += OnBattleRequestFailed;
         }
 
@@ -98,8 +120,8 @@ namespace Ssalddel.Unity.Bootstrap
                     ? "전투 시점 전환 대기" : "전투 권위 준비 대기");
         }
 
-        private void OnBattleResolved(string encounterStableId)
-            => controller.ResolveFightVictory(encounterStableId);
+        private void OnBattleResolved(string encounterStableId, string resultCode)
+            => controller.RefreshAfterBattle(encounterStableId, resultCode);
 
         private void OnBattleRequestFailed(string encounterStableId, string reasonCode)
             => controller.AllowFightRetry(reasonCode);
@@ -110,7 +132,7 @@ namespace Ssalddel.Unity.Bootstrap
                 controller.EncounterFightRequested -= OnFightRequested;
             if (battle != null)
             {
-                battle.WorldLocalBattleResolved -= OnBattleResolved;
+                battle.WorldLocalBattleResultResolved -= OnBattleResolved;
                 battle.WorldLocalBattleRequestFailed -= OnBattleRequestFailed;
             }
         }

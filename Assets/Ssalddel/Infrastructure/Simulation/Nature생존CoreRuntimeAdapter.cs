@@ -10,11 +10,16 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
     /// Unity 표현 계약을 공통 Session Aggregate 명령으로 번역합니다.
     /// 상태 계산은 하지 않고 Core Snapshot만 Unity 모델로 옮깁니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class Nature생존CoreRuntimeAdapter : INature생존Engine, IDisposable
     {
         private readonly LocalSimulationRuntime runtime;
         private readonly string sessionStableId;
         private readonly bool ownsRuntime;
+        private readonly string playerStableId;
         private long revision;
         private int commandSequence;
 
@@ -41,6 +46,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                     existingSessionStableId!));
                 sessionStableId = existing.SessionStableId;
                 revision = existing.Revision;
+                playerStableId = Await(runtime.Nature.GetAsync(sessionStableId))
+                    .PlayerStableId;
             }
             else if (string.IsNullOrWhiteSpace(loadSlotStableId))
             {
@@ -48,12 +55,16 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 var created = Await(runtime.Sessions.CreateAsync(CreateRequest(fixture)));
                 sessionStableId = created.SessionStableId;
                 revision = created.Revision;
+                playerStableId = Await(runtime.Nature.GetAsync(sessionStableId))
+                    .PlayerStableId;
             }
             else
             {
                 var loaded = Await(runtime.Sessions.LoadSlotAsync(loadSlotStableId!));
                 sessionStableId = loaded.Restore.Session.SessionStableId;
                 revision = loaded.Restore.Session.Revision;
+                playerStableId = Await(runtime.Nature.GetAsync(sessionStableId))
+                    .PlayerStableId;
             }
         }
 
@@ -91,6 +102,18 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             => Confirm(SimulationNatureSurvivalCodes.BeginCabinBuild,
                 "facility:nature-cabin");
 
+        public void EnterCabin()
+            => Confirm(SimulationNatureSurvivalCodes.EnterCabin,
+                "facility:nature-cabin");
+
+        public void LeaveCabin()
+            => Confirm(SimulationNatureSurvivalCodes.LeaveCabin,
+                "facility:nature-cabin");
+
+        public void CancelActiveWork()
+            => Confirm(SimulationNatureSurvivalCodes.CancelActiveWork,
+                Snapshot().ActiveWork?.TargetStableId ?? string.Empty);
+
         public void AdvanceRealtime(int elapsedSeconds, bool workInputHeld,
             bool menuOrApplicationPaused)
         {
@@ -120,6 +143,18 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 encounter.StableId, choiceCode);
         }
 
+        public void StoreAtCabin()
+            => Confirm(SimulationNatureSurvivalCodes.StoreAtCabin,
+                SimulationNatureSurvivalCodes.CabinStorageContainerStableId);
+
+        public void SleepInCabin()
+            => Confirm(SimulationNatureSurvivalCodes.SleepInCabin,
+                "facility:nature-cabin");
+
+        public void SelectExpansionPlan(string planCode)
+            => Confirm(SimulationNatureSurvivalCodes.SelectExpansionPlan,
+                "plan:nature:day2", planCode);
+
         private void Confirm(string actionCode, string targetStableId,
             string choiceCode = "", double localX = 0, double localZ = 0,
             double yawDegrees = 0)
@@ -131,7 +166,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                     {
                         CommandId = NextCommand(actionCode),
                         ExpectedRevision = revision,
-                        PlayerStableId = "player:solo",
+                        PlayerStableId = playerStableId,
                         ActionCode = actionCode,
                         TargetStableId = targetStableId,
                         ChoiceCode = choiceCode,
@@ -144,7 +179,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         }
 
         private string NextCommand(string kind)
-            => $"unity-local:{kind}:{++commandSequence}";
+            => $"unity-local:{kind}:revision-{revision}:{++commandSequence}";
 
         private static void Execute(Action action)
         {
@@ -176,6 +211,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             },
             NatureSurvival = new SimulationNatureSurvivalInitialStateRequest
             {
+                ProfileRevision = SimulationNatureSurvivalCodes.ProfileRevisionR2,
                 PlayerStableId = "player:solo",
                 StartsWithAxe = false,
                 ResourceNodes = fixture.ResourceNodes.Select(node =>
@@ -205,7 +241,16 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             ClockPaused = state.ClockPaused,
             HasAxe = state.HasAxe,
             TimberQuantity = state.TimberQuantity,
+            StoredTimberQuantity = state.StoredTimberQuantity,
             NoiseEventCount = state.NoiseEventCount,
+            RawThreatTier = state.RawThreatTier,
+            EffectiveThreatTier = state.EffectiveThreatTier,
+            RebuildPartQuantity = state.RebuildPartQuantity,
+            LinkedCombatStableId = state.LinkedCombatStableId,
+            LastCombatResultCode = state.LastCombatResultCode,
+            Sleeping = state.Sleeping,
+            SelectedExpansionPlanCode = state.SelectedExpansionPlanCode,
+            Day2Ready = state.Day2Ready,
             PlayerInsideCabin = state.PlayerInsideCabin,
             ResourceNodes = state.ResourceNodes.Select(node =>
                 new Nature생존ResourceNodeState
@@ -247,6 +292,10 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 TriggeredCycleIndex = state.Encounter.TriggeredCycleIndex,
                 ResolutionCode = state.Encounter.ResolutionCode,
                 CabinDefenseApplied = state.Encounter.CabinDefenseApplied,
+                RawThreatTier = state.Encounter.RawThreatTier,
+                EffectiveThreatTier = state.Encounter.EffectiveThreatTier,
+                HostileCount = state.Encounter.HostileCount,
+                LinkedCombatStableId = state.Encounter.LinkedCombatStableId,
             },
         };
 
