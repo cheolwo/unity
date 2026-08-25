@@ -36,6 +36,20 @@ namespace Ssalddel.Unity.Bootstrap
 
         private async void Start()
         {
+            if (!서버기준사용)
+            {
+                enabled = false;
+                return;
+            }
+            if (SimulationWorldLocalRuntimeScope.IsInstalled)
+            {
+                서버기준사용 = false;
+                enabled = false;
+                Debug.Log(
+                    "DailyWorkPlanLocalSimulationCapabilityWaiting:network=0",
+                    this);
+                return;
+            }
             try { await InitializeAsync(); }
             catch (OperationCanceledException) { }
             catch (Exception exception)
