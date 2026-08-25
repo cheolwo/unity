@@ -61,7 +61,9 @@ namespace Ssalddel.Unity.Presentation.World
         private string launchProfileLabel = "기본 Solo";
         private Func<string>? saveWorld;
         private Mouse? activeWorkMouse;
+        private Nature생존상호작용표식? assistedApproachTarget;
         private bool cabinPlacementMode;
+        private bool workHoldRequested;
         private bool primaryWasHeld;
         private bool buildKeyWasHeld;
         private bool fightKeyWasHeld;
@@ -80,6 +82,8 @@ namespace Ssalddel.Unity.Presentation.World
         public bool CurrentPrimaryInputPressedForTest
             => Mouse.current?.leftButton.isPressed == true;
         public bool UsesSkeletonPlaceholder => skeletonPlaceholderPrefab != null;
+        public bool AssistedApproachActive => assistedApproachTarget != null;
+        public bool WorkHoldRequested => workHoldRequested;
         public event Action<string> EncounterFightRequested = delegate { };
 
         public void Configure(플레이어경관Controller playerController,
@@ -231,11 +235,14 @@ namespace Ssalddel.Unity.Presentation.World
             if (!ValidateWiring()) return;
             var inputBlockReason = HigherPriorityInputReason();
             var higherPriority = !string.IsNullOrEmpty(inputBlockReason);
+            if (!higherPriority) TickAssistedApproach();
             var inputMouse = State.ActiveWork != null && activeWorkMouse != null
                 ? activeWorkMouse : Mouse.current;
-            var mouseHeld = inputMouse?.leftButton.isPressed == true;
-            var primaryPressed = mouseHeld && !primaryWasHeld;
-            primaryWasHeld = mouseHeld;
+            var physicalMouseHeld = inputMouse?.leftButton.isPressed == true;
+            var mouseHeld = physicalMouseHeld
+                            || workHoldRequested && State.ActiveWork != null;
+            var primaryPressed = physicalMouseHeld && !primaryWasHeld;
+            primaryWasHeld = physicalMouseHeld;
             var paused = (!UnityEngine.Application.isFocused
                           && !UnityEngine.Application.isBatchMode)
                          || Time.timeScale <= 0f;
@@ -245,7 +252,11 @@ namespace Ssalddel.Unity.Presentation.World
                 realtimeAccumulator -= 1f;
                 engine.AdvanceRealtime(1, mouseHeld && !higherPriority, paused);
                 RenderState();
-                if (State.ActiveWork == null) activeWorkMouse = null;
+                if (State.ActiveWork == null)
+                {
+                    activeWorkMouse = null;
+                    workHoldRequested = false;
+                }
             }
 
             var keyboard = Keyboard.current;
@@ -280,10 +291,7 @@ namespace Ssalddel.Unity.Presentation.World
             plan2KeyWasHeld = plan2Held;
             plan3KeyWasHeld = plan3Held;
             if (buildPressed && !higherPriority)
-            {
-                cabinPlacementMode = true;
-                status = "오두막 도면 배치 · 안전 빈터 안의 지면을 클릭하세요.";
-            }
+                BeginCabinPlacementMode();
             if (fightPressed
                 && State.Encounter?.StateCode == Nature생존Codes.Pending)
             {
@@ -353,6 +361,21 @@ namespace Ssalddel.Unity.Presentation.World
                 if (State.ActiveWork != null) CancelActiveWork();
                 return true;
             }
+            if (ApproachButtonGuiRect().Contains(point))
+            {
+                BeginAssistedApproach();
+                return true;
+            }
+            if (BlueprintButtonGuiRect().Contains(point))
+            {
+                HandleCabinHudAction();
+                return true;
+            }
+            if (WorkHoldButtonGuiRect().Contains(point))
+            {
+                ToggleWorkHold();
+                return true;
+            }
             return false;
         }
 
@@ -362,6 +385,9 @@ namespace Ssalddel.Unity.Presentation.World
             if (플레이어경관Controller.IsPointerOverUnityUi()) return true;
             if (플레이어경관Controller.IsPointerInPersistentModeBand(
                     Mouse.current.position.ReadValue(), Screen.height)) return true;
+            if (플레이어경관Controller.IsPointerInPersistentHudControls(
+                    Mouse.current.position.ReadValue(), Screen.width,
+                    Screen.height)) return true;
             if (player.CurrentMode == 플레이어시점Mode.FirstPerson) return false;
             if (Screen.width < 560 || Screen.height < 200) return false;
             return HudGuiRect().Contains(ToGuiPoint(
@@ -372,13 +398,148 @@ namespace Ssalddel.Unity.Presentation.World
             => new(inputSystemPoint.x, Screen.height - inputSystemPoint.y);
 
         private static Rect HudGuiRect()
-            => new(16f, 16f, 430f, 206f);
+            => new(16f, 16f, 430f, 240f);
 
         private static Rect SaveButtonGuiRect()
             => new(28f, 154f, 120f, 26f);
 
         private static Rect CancelButtonGuiRect()
             => new(156f, 154f, 140f, 26f);
+
+        private static Rect ApproachButtonGuiRect()
+            => new(304f, 154f, 120f, 26f);
+
+        private static Rect BlueprintButtonGuiRect()
+            => new(28f, 184f, 120f, 26f);
+
+        private static Rect WorkHoldButtonGuiRect()
+            => new(156f, 184f, 140f, 26f);
+
+        private void HandleCabinHudAction()
+        {
+            var state = State;
+            if (state.ActiveWork != null)
+            {
+                status = "오두막 행동 대기 · 진행 작업을 먼저 끝내거나 취소하세요.";
+                return;
+            }
+            if (state.PlayerInsideCabin)
+            {
+                try
+                {
+                    engine.LeaveCabin();
+                    RenderState();
+                    status = "오두막 퇴장 · 안전 빈터로 돌아왔습니다.";
+                }
+                catch (InvalidOperationException error)
+                {
+                    status = "오두막 퇴장 차단 · " + error.Message;
+                }
+                return;
+            }
+            if (state.Cabin.StateCode == Nature생존Codes.Planned)
+            {
+                BeginCabinPlacementMode();
+                return;
+            }
+
+            var cabinMarker = cabinVisual != null && cabinVisual.activeInHierarchy
+                ? cabinVisual.GetComponent<Nature생존상호작용표식>() : null;
+            if (cabinMarker == null)
+            {
+                status = "오두막 접근 대기 · 배치 표현을 찾을 수 없습니다.";
+                return;
+            }
+            cabinPlacementMode = false;
+            assistedApproachTarget = cabinMarker;
+            status = "오두막 접근 중 · 남은 나무보다 생활 거점을 우선합니다.";
+        }
+
+        private void BeginCabinPlacementMode()
+        {
+            if (State.ActiveWork != null)
+            {
+                status = "오두막 도면 배치 대기 · 진행 작업을 먼저 끝내거나 취소하세요.";
+                return;
+            }
+            cabinPlacementMode = true;
+            assistedApproachTarget = null;
+            status = "오두막 도면 배치 · 안전 빈터 안의 지면을 클릭하세요.";
+        }
+
+        private void BeginAssistedApproach()
+        {
+            if (State.ActiveWork != null)
+            {
+                assistedApproachTarget = null;
+                status = "목표 접근 대기 · 진행 작업을 먼저 끝내거나 취소하세요.";
+                return;
+            }
+            assistedApproachTarget = ResolveNextApproachTarget();
+            if (assistedApproachTarget == null)
+            {
+                status = "목표 접근 대기 · 현재 접근할 배치 객체가 없습니다.";
+                return;
+            }
+            cabinPlacementMode = false;
+            status = "다음 목표 접근 중 · 이동과 조준은 Unity 표현만 변경합니다.";
+        }
+
+        private Nature생존상호작용표식? ResolveNextApproachTarget()
+        {
+            var state = State;
+            if (!state.HasAxe && axeVisual != null && axeVisual.activeInHierarchy)
+                return axeVisual.GetComponent<Nature생존상호작용표식>();
+            var tree = FindObjectsByType<Nature생존상호작용표식>(
+                    FindObjectsInactive.Exclude)
+                .Where(value => value.Kind == Nature생존상호작용Kind.HarvestTree)
+                .OrderBy(value => Vector3.Distance(player.transform.position,
+                    MarkerAimPoint(value)))
+                .ThenBy(value => value.StableId, StringComparer.Ordinal)
+                .FirstOrDefault();
+            if (tree != null) return tree;
+            return cabinVisual != null && cabinVisual.activeInHierarchy
+                ? cabinVisual.GetComponent<Nature생존상호작용표식>() : null;
+        }
+
+        private void TickAssistedApproach()
+        {
+            if (assistedApproachTarget == null) return;
+            if (!assistedApproachTarget.gameObject.activeInHierarchy)
+            {
+                assistedApproachTarget = null;
+                return;
+            }
+            var stopDistance = assistedApproachTarget.Kind ==
+                               Nature생존상호작용Kind.Cabin
+                ? Mathf.Max(1f, interactionDistance * .94f)
+                : Mathf.Max(1f, interactionDistance * .72f);
+            if (!player.TickPresentationApproach(
+                    MarkerApproachPoint(assistedApproachTarget), stopDistance,
+                    Time.unscaledDeltaTime,
+                    assistedApproachTarget.Kind ==
+                    Nature생존상호작용Kind.Cabin)) return;
+            status = assistedApproachTarget.Kind == Nature생존상호작용Kind.HarvestTree
+                ? "나무 접근 완료 · 조준선에서 왼쪽 버튼으로 벌목하세요."
+                : assistedApproachTarget.Kind == Nature생존상호작용Kind.Cabin
+                    ? "오두막 접근 완료 · 조준선에서 왼쪽 버튼으로 사용하세요."
+                    : "도끼 접근 완료 · 조준선에서 왼쪽 버튼으로 획득하세요.";
+            assistedApproachTarget = null;
+        }
+
+        private void ToggleWorkHold()
+        {
+            if (State.ActiveWork == null)
+            {
+                workHoldRequested = false;
+                status = "작업 유지 대기 · 조준선에서 작업을 먼저 시작하세요.";
+                return;
+            }
+            workHoldRequested = !workHoldRequested;
+            status = workHoldRequested
+                ? "작업 유지 켬 · C 또는 진행 작업 취소 버튼으로 중단할 수 있습니다."
+                : "작업 유지 끔 · 진행하려면 왼쪽 버튼을 누르세요.";
+        }
 
         private void HandlePrimaryPressed()
         {
@@ -459,6 +620,7 @@ namespace Ssalddel.Unity.Presentation.World
                 var kindCode = State.ActiveWork?.KindCode ?? string.Empty;
                 engine.CancelActiveWork();
                 activeWorkMouse = null;
+                workHoldRequested = false;
                 RenderState();
                 status = kindCode == Nature생존Codes.CabinBuild
                     ? "건설 취소 · 예약 통나무를 인벤토리에 반환했습니다."
@@ -523,6 +685,17 @@ namespace Ssalddel.Unity.Presentation.World
         {
             var collider = marker.GetComponentInChildren<Collider>();
             return collider != null ? collider.bounds.center : marker.transform.position;
+        }
+
+        private static Vector3 MarkerApproachPoint(
+            Nature생존상호작용표식 marker)
+        {
+            var point = MarkerAimPoint(marker);
+            if (marker.Kind != Nature생존상호작용Kind.Cabin) return point;
+
+            point.x = marker.transform.position.x;
+            point.z = marker.transform.position.z;
+            return point;
         }
 
         private string HigherPriorityInputReason()
@@ -721,7 +894,7 @@ namespace Ssalddel.Unity.Presentation.World
             GUI.Label(new Rect(28f, 46f, 402f, 20f),
                 $"도끼 {(state.HasAxe ? "보유" : "미보유")} · 통나무 소지 {state.TimberQuantity} / 보관 {state.StoredTimberQuantity}/20 · 부품 {state.RebuildPartQuantity}");
             GUI.Label(new Rect(28f, 68f, 402f, 20f),
-                $"소음 {state.NoiseEventCount} · 위협 {state.RawThreatTier}→{state.EffectiveThreatTier} · {(state.Sleeping ? "수면 중" : state.Day2Ready ? "Day2 준비" : "활동 중")}");
+                $"오두막 {CabinStateKorean(state)} · 소음 {state.NoiseEventCount} · 위협 {state.RawThreatTier}→{state.EffectiveThreatTier}");
             GUI.Label(new Rect(28f, 90f, 402f, 20f), status);
             GUI.Label(new Rect(28f, 112f, 402f, 20f),
                 "Nature 탐험 · LMB 상호작용 · G 보관 · T 수면 · 1/2/3 확장");
@@ -731,8 +904,21 @@ namespace Ssalddel.Unity.Presentation.World
             GUI.Button(SaveButtonGuiRect(), "현재 세계 저장");
             GUI.enabled = state.ActiveWork != null;
             GUI.Button(CancelButtonGuiRect(), "진행 작업 취소");
+            GUI.enabled = state.ActiveWork == null && ResolveNextApproachTarget() != null;
+            GUI.Button(ApproachButtonGuiRect(), "다음 목표 접근");
+            GUI.enabled = state.ActiveWork == null
+                          && (state.PlayerInsideCabin
+                              || state.Cabin.StateCode == Nature생존Codes.Planned
+                              || cabinVisual != null && cabinVisual.activeInHierarchy);
+            GUI.Button(BlueprintButtonGuiRect(), state.PlayerInsideCabin
+                ? "안전 빈터로 퇴장"
+                : state.Cabin.StateCode == Nature생존Codes.Planned
+                    ? "오두막 도면" : "오두막 접근");
+            GUI.enabled = state.ActiveWork != null;
+            GUI.Button(WorkHoldButtonGuiRect(),
+                workHoldRequested ? "작업 유지 끄기" : "작업 유지 켜기");
             GUI.enabled = true;
-            GUI.Label(new Rect(28f, 184f, 402f, 20f),
+            GUI.Label(new Rect(28f, 216f, 402f, 20f),
                 "저장 후 Play Mode 재진입 시 같은 세계를 복원합니다.");
         }
 
@@ -761,6 +947,18 @@ namespace Ssalddel.Unity.Presentation.World
             NatureSurvivalClockPhaseCodes.Dawn => "새벽",
             _ => phaseCode,
         };
+
+        private static string CabinStateKorean(Nature생존State state)
+        {
+            if (state.PlayerInsideCabin) return "내부";
+            return state.Cabin.StateCode switch
+            {
+                Nature생존Codes.Planned => "미배치",
+                Nature생존Codes.Building => "건설 중",
+                Nature생존Codes.Completed => "완성",
+                _ => state.Cabin.StateCode,
+            };
+        }
 
         public void ResolveFightVictory(string encounterStableId)
         {

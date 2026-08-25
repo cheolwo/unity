@@ -65,7 +65,44 @@ namespace Ssalddel.Unity.Tests.PlayMode
                              Nature생존상호작용표식>(FindObjectsInactive.Include)
                          .Where(value => value.Kind ==
                              Nature생존상호작용Kind.HarvestTree)
+                         .OrderBy(value => Vector3.Distance(
+                             player.transform.position, value.transform.position))
+                         .ThenBy(value => value.StableId,
+                             StringComparer.Ordinal)
                          .Take(3).ToArray();
+                var revisionBeforeApproach = controller.State.Revision;
+                var cycleBeforeApproach = controller.State.CycleIndex;
+                var elapsedBeforeApproach = controller.State.ElapsedSecondsInCycle;
+                var timberBeforeApproach = controller.State.TimberQuantity;
+                var resourcesBeforeApproach = string.Join("|",
+                    controller.State.ResourceNodes
+                        .OrderBy(value => value.StableId, StringComparer.Ordinal)
+                        .Select(value => value.StableId + ":" + value.StateCode));
+                yield return Click(controller, mouse,
+                    new Vector2(364f, Screen.height - 167f));
+                Assert.That(controller.AssistedApproachActive, Is.True);
+                var approachDeadline = Time.unscaledTime + 8f;
+                while (controller.AssistedApproachActive
+                       && Time.unscaledTime < approachDeadline)
+                    yield return null;
+                Assert.That(controller.AssistedApproachActive, Is.False,
+                    "다음 목표 접근이 제한 시간 안에 끝나야 한다.");
+                Assert.That(controller.State.CycleIndex,
+                    Is.EqualTo(cycleBeforeApproach));
+                Assert.That(controller.State.Revision - revisionBeforeApproach,
+                    Is.EqualTo(controller.State.ElapsedSecondsInCycle
+                               - elapsedBeforeApproach),
+                    "목표 접근 중 revision 변화는 기존 실시간 시계 진행분뿐이어야 한다.");
+                Assert.That(controller.State.TimberQuantity,
+                    Is.EqualTo(timberBeforeApproach),
+                    "목표 접근은 자원 상태를 직접 변경하면 안 된다.");
+                Assert.That(controller.State.ActiveWork, Is.Null);
+                Assert.That(string.Join("|", controller.State.ResourceNodes
+                        .OrderBy(value => value.StableId, StringComparer.Ordinal)
+                        .Select(value => value.StableId + ":" + value.StateCode)),
+                    Is.EqualTo(resourcesBeforeApproach));
+                Assert.That(Vector3.Distance(player.transform.position,
+                        trees[0].transform.position), Is.LessThan(3.3f));
                 yield return ClickMarker(controller, player, trees[0], mouse);
                 Assert.That(controller.State.ActiveWork?.TargetStableId,
                     Is.EqualTo(trees[0].StableId));
@@ -76,7 +113,21 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     value.StableId == trees[0].StableId).StateCode,
                     Is.EqualTo(Nature생존Codes.Standing));
 
-                foreach (var tree in trees)
+                yield return HoldPrimaryOnMarker(controller, player, trees[0], mouse,
+                    NatureSurvivalRules.HarvestWorkSeconds + .25f);
+                yield return ClickMarker(controller, player, trees[1], mouse);
+                yield return Click(controller, mouse,
+                    new Vector2(226f, Screen.height - 197f));
+                Assert.That(controller.WorkHoldRequested, Is.True);
+                var workHoldDeadline = Time.unscaledTime
+                                       + NatureSurvivalRules.HarvestWorkSeconds + 3f;
+                while (controller.State.ActiveWork != null
+                       && Time.unscaledTime < workHoldDeadline)
+                    yield return null;
+                Assert.That(controller.State.ActiveWork, Is.Null,
+                    "작업 유지 입력으로 벌목이 완료돼야 한다.");
+                Assert.That(controller.WorkHoldRequested, Is.False);
+                foreach (var tree in trees.Skip(2))
                 {
                     yield return HoldPrimaryOnMarker(controller, player, tree, mouse,
                         NatureSurvivalRules.HarvestWorkSeconds + .25f);
@@ -87,7 +138,8 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 }
                 Assert.That(controller.State.TimberQuantity, Is.EqualTo(6));
 
-                yield return PressKey(controller, keyboard, Key.B);
+                yield return Click(controller, mouse,
+                    new Vector2(88f, Screen.height - 197f));
                 var placementGround = GameObject.CreatePrimitive(PrimitiveType.Plane);
                 placementGround.name = "Nature_E7_ValidationPlacementGround";
                 placementGround.transform.position = controller.transform.position;
@@ -104,6 +156,22 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     Is.Not.EqualTo(Nature생존Codes.Planned));
 
                 var cabin = Marker(Nature생존상호작용Kind.Cabin);
+                yield return Click(controller, mouse,
+                    new Vector2(88f, Screen.height - 197f));
+                Assert.That(controller.AssistedApproachActive
+                            || controller.Status.Contains("오두막 접근"), Is.True,
+                    "도면 배치 뒤 같은 HUD 버튼은 남은 나무보다 오두막 접근을 우선해야 한다."
+                    + $" status={controller.Status}");
+                var cabinApproachDeadline = Time.unscaledTime + 8f;
+                while (controller.AssistedApproachActive
+                       && Time.unscaledTime < cabinApproachDeadline)
+                    yield return null;
+                Assert.That(controller.AssistedApproachActive, Is.False);
+                Assert.That(Vector3.Distance(player.transform.position,
+                    cabin.transform.position), Is.LessThan(3.3f));
+                Assert.That(Vector3.Distance(player.transform.position,
+                    cabin.transform.position), Is.GreaterThan(2.7f),
+                    "오두막 접근은 카메라가 외벽 안으로 파고들지 않는 거리에서 끝나야 한다.");
                 yield return HoldPrimaryOnMarker(controller, player, cabin, mouse,
                     NatureSurvivalRules.CabinWorkSeconds + 1.25f);
                 Assert.That(controller.State.Cabin.StateCode,
@@ -112,7 +180,8 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     + controller.State.ActiveWork?.RequiredSeconds);
                 yield return ClickMarker(controller, player, cabin, mouse);
                 Assert.That(controller.State.PlayerInsideCabin, Is.True);
-                yield return PressKey(controller, keyboard, Key.E);
+                yield return Click(controller, mouse,
+                    new Vector2(88f, Screen.height - 197f));
                 Assert.That(controller.State.PlayerInsideCabin, Is.False);
 
                 yield return Click(controller, mouse,
@@ -174,6 +243,14 @@ namespace Ssalddel.Unity.Tests.PlayMode
             InputSystem.Update();
             mouse.MakeCurrent();
             PointAt(player, marker);
+            Assert.That(플레이어경관Controller.IsPointerInPersistentModeBand(
+                screenPoint, Screen.height), Is.False,
+                $"배치 객체 조준점이 하단 모드 영역과 겹칩니다: {screenPoint}");
+            Assert.That(플레이어경관Controller.IsPointerInPersistentHudControls(
+                screenPoint, Screen.width, Screen.height), Is.False,
+                $"배치 객체 조준점이 HUD 버튼 영역과 겹칩니다: {screenPoint}");
+            Assert.That(플레이어경관Controller.IsPointerOverUnityUi(), Is.False,
+                $"배치 객체 조준점 위에 Unity UI가 입력을 가립니다: {screenPoint}");
             controller.ProcessCurrentInputForTest();
             yield return null;
             InputSystem.QueueStateEvent(mouse,

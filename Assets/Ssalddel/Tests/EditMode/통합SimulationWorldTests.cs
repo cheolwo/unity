@@ -28,6 +28,11 @@ namespace Ssalddel.Unity.Tests.EditMode
                 new Vector2(400f, 24f), 900f), Is.True);
             Assert.That(플레이어경관Controller.IsPointerInPersistentModeBand(
                 new Vector2(400f, 180f), 900f), Is.False);
+            Assert.That(플레이어경관Controller.IsPointerInPersistentHudControls(
+                new Vector2(220f, 733f), 1280f, 900f), Is.True);
+            Assert.That(플레이어경관Controller.IsPointerInPersistentHudControls(
+                new Vector2(363f, 235f), 726f, 470f), Is.False,
+                "작은 Game View의 중앙 조준선은 HUD 버튼 영역이 아니다.");
         }
 
         private const string ScenePath = "Assets/Ssalddel/Scenes/SimulationWorldShell.unity";

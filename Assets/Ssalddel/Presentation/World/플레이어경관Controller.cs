@@ -333,7 +333,9 @@ namespace Ssalddel.Unity.Presentation.World
             var mousePosition = Mouse.current?.position.ReadValue() ?? Vector2.zero;
             var pointerOverUi = IsPointerOverUnityUi()
                                 || IsPointerInPersistentModeBand(
-                                    mousePosition, Screen.height);
+                                    mousePosition, Screen.height)
+                                || IsPointerInPersistentHudControls(
+                                    mousePosition, Screen.width, Screen.height);
             if (ShouldCaptureFirstPersonCursor(primaryPressed, pointerOverUi))
             {
                 Cursor.lockState = CursorLockMode.Locked;
@@ -458,7 +460,8 @@ namespace Ssalddel.Unity.Presentation.World
             destinationMarker.SetActive(true);
         }
 
-        private void MoveCharacter(Vector3 direction, bool run, float deltaTime)
+        private void MoveCharacter(Vector3 direction, bool run, float deltaTime,
+            float maximumHorizontalDistance = float.PositiveInfinity)
         {
             var isMoving = direction.sqrMagnitude > .0001f;
             var speed = profile.WalkSpeed * (run ? profile.RunMultiplier : 1f);
@@ -467,6 +470,9 @@ namespace Ssalddel.Unity.Presentation.World
             else
                 _verticalVelocity += Physics.gravity.y * deltaTime;
             var horizontalMovement = direction * (speed * deltaTime);
+            if (!float.IsPositiveInfinity(maximumHorizontalDistance))
+                horizontalMovement = Vector3.ClampMagnitude(
+                    horizontalMovement, Mathf.Max(0f, maximumHorizontalDistance));
             MovementBlockedByStreaming = movementGate != null
                 && horizontalMovement.sqrMagnitude > .000001f
                 && !movementGate.CanEnter(transform.position + horizontalMovement);
@@ -600,6 +606,49 @@ namespace Ssalddel.Unity.Presentation.World
             }
         }
 
+        /// <summary>
+        /// 플레이어가 화면에서 요청한 다음 목표 접근을 표현 계층에서만 진행한다.
+        /// Simulation 상태와 WorldTick은 변경하지 않으며 기존 CharacterController와
+        /// 공간 안전 Gate를 그대로 통과한다.
+        /// </summary>
+        public bool TickPresentationApproach(Vector3 worldTarget,
+            float stopDistance, float deltaTime,
+            bool enforceMinimumDistance = false)
+        {
+            if (!ValidateWiring() || stopDistance <= 0f || deltaTime <= 0f)
+                return false;
+
+            const float completionTolerance = .05f;
+            var offset = worldTarget - transform.position;
+            offset.y = 0f;
+            AimFirstPersonAtPresentationTarget(worldTarget);
+            if (enforceMinimumDistance
+                && offset.magnitude < stopDistance - completionTolerance)
+            {
+                var retreatDirection = offset.sqrMagnitude > .0001f
+                    ? -offset.normalized
+                    : Vector3.back;
+                MoveCharacter(retreatDirection, true, deltaTime,
+                    stopDistance - offset.magnitude);
+                var retreated = worldTarget - transform.position;
+                retreated.y = 0f;
+                AimFirstPersonAtPresentationTarget(worldTarget);
+                return retreated.magnitude
+                       >= stopDistance - completionTolerance;
+            }
+            if (offset.magnitude <= stopDistance + completionTolerance)
+            {
+                MoveCharacter(Vector3.zero, false, deltaTime);
+                return true;
+            }
+
+            MoveCharacter(offset.normalized, true, deltaTime,
+                offset.magnitude - stopDistance);
+            var remaining = worldTarget - transform.position;
+            remaining.y = 0f;
+            return remaining.magnitude <= stopDistance + completionTolerance;
+        }
+
         public static bool ShouldCaptureFirstPersonCursor(
             bool primaryPressed, bool pointerOverUi)
             => primaryPressed && !pointerOverUi;
@@ -609,6 +658,15 @@ namespace Ssalddel.Unity.Presentation.World
             => screenHeight > 0f
                && pointerPosition.y >= 0f
                && pointerPosition.y <= Mathf.Min(96f, screenHeight * .15f);
+
+        public static bool IsPointerInPersistentHudControls(
+            Vector2 pointerPosition, float screenWidth, float screenHeight)
+        {
+            if (screenWidth < 560f || screenHeight < 200f) return false;
+            var guiY = screenHeight - pointerPosition.y;
+            return pointerPosition.x >= 28f && pointerPosition.x <= 424f
+                   && guiY >= 154f && guiY <= 210f;
+        }
 
         public static bool IsPointerOverUnityUi()
         {

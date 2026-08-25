@@ -24,7 +24,7 @@ namespace Ssalddel.Unity.Editor
         private const string EvidenceDirectory =
             "Assets/Documentation/Changes/2026-08-26-nature-e7-entry";
         private const string EvidencePath =
-            EvidenceDirectory + "/nature-e7-axe-acquired-game-view.png";
+            EvidenceDirectory + "/nature-e7-restored-closed-loop-game-view.png";
         private static double captureImportDeadline;
 
         [MenuItem("Ssalddel/검증/NATURE-E7 집중 Play Mode 검증")]
