@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Ssalddel.Unity.Infrastructure.Simulation;
+using Ssalddel.Unity.PlayerActivities;
 using Ssalddel.Unity.Presentation.World;
 using Ssalddel.Unity.Runtime.Transport;
 using Ssalddel.Unity.Runtime.World;
@@ -11,6 +12,10 @@ using UnityEngine;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class 대관령L2창고아이템Tests
     {
         [Test]
@@ -153,6 +158,20 @@ namespace Ssalddel.Unity.Tests.EditMode
                 플레이어시점Mode.ThirdPerson, false, true), Is.False);
             Assert.That(일인칭창고상호작용Controller.CanScan(
                 플레이어시점Mode.FirstPerson, false, false), Is.False);
+        }
+
+        [Test]
+        public void 창고시선탐색은Farm업무문맥에서만허용된다()
+        {
+            Assert.That(일인칭창고상호작용Controller.CanScanWarehouse(
+                플레이어시점Mode.FirstPerson, false, true,
+                PlayerActivityCodes.FarmManagement), Is.True);
+            Assert.That(일인칭창고상호작용Controller.CanScanWarehouse(
+                플레이어시점Mode.FirstPerson, false, true,
+                PlayerActivityCodes.Exploration), Is.False);
+            Assert.That(일인칭창고상호작용Controller.CanScanWarehouse(
+                플레이어시점Mode.ThirdPerson, false, true,
+                PlayerActivityCodes.FarmManagement), Is.False);
         }
 
         private static UnityApiResponse Ok(string body)

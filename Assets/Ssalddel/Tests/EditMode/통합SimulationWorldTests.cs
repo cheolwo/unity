@@ -11,6 +11,10 @@ using UnityEngine.UI;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class 통합SimulationWorldTests
     {
         private const string ScenePath = "Assets/Ssalddel/Scenes/SimulationWorldShell.unity";
@@ -95,6 +99,7 @@ namespace Ssalddel.Unity.Tests.EditMode
                     .Select(value => value.name), Is.EquivalentTo(new[]
                     {
                         "WorldOverviewButton", "FarmFirstPersonButton", "FarmTacticalButton",
+                        "NatureExplorationButton",
                     }));
 
                 var singlePlayerView = root.GetComponent<단일PlayerViewController>();
@@ -134,6 +139,9 @@ namespace Ssalddel.Unity.Tests.EditMode
 
                 mode.ShowFarmFirstPerson();
                 Assert.That(player.CurrentMode, Is.EqualTo(플레이어시점Mode.FirstPerson));
+                mode.ShowNatureExploration();
+                Assert.That(player.CurrentMode, Is.EqualTo(플레이어시점Mode.FirstPerson));
+                Assert.That(player.CurrentActivityCode, Is.EqualTo("Exploration"));
                 mode.ShowFarmTactical();
                 Assert.That(player.CurrentMode, Is.EqualTo(플레이어시점Mode.ThirdPerson));
                 mode.ShowJinbuInbound();

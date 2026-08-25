@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ssalddel.Unity.PlayerActivities;
 using Ssalddel.Unity.Runtime.World;
 using Ssalddel.WorkflowRules;
 using Ssalddel.WorkflowRules.Contracts;
@@ -133,6 +134,38 @@ namespace Ssalddel.Unity.Presentation.World
         {
             engine.AcquireAxe();
             RenderState();
+        }
+
+        /// <summary>
+        /// Nature 탐험 진입 직후 아직 필요한 첫 행동 대상을 조준한다.
+        /// 권위 상태는 읽기만 하며 카메라 표현 외에는 변경하지 않는다.
+        /// </summary>
+        public bool PreparePlayerEntryView()
+        {
+            if (!ValidateWiring()) return false;
+            var state = engine.Snapshot();
+            Nature생존상호작용표식? marker = null;
+            if (!state.HasAxe && axeVisual != null && axeVisual.activeInHierarchy)
+                marker = axeVisual.GetComponent<Nature생존상호작용표식>();
+            marker ??= FindObjectsByType<Nature생존상호작용표식>(
+                    FindObjectsInactive.Exclude)
+                .Where(value => value.Kind == Nature생존상호작용Kind.HarvestTree)
+                .OrderBy(value => Vector3.Distance(
+                    player.transform.position, MarkerAimPoint(value)))
+                .ThenBy(value => value.StableId, StringComparer.Ordinal)
+                .FirstOrDefault();
+            marker ??= cabinVisual == null
+                ? null
+                : cabinVisual.GetComponent<Nature생존상호작용표식>();
+            if (marker == null) return false;
+
+            player.AimFirstPersonAtPresentationTarget(MarkerAimPoint(marker));
+            status = marker.Kind == Nature생존상호작용Kind.Axe
+                ? "안전 빈터 · 조준선의 도끼를 왼쪽 버튼으로 획득하세요."
+                : marker.Kind == Nature생존상호작용Kind.HarvestTree
+                    ? "수확 구역 · 조준선의 나무를 왼쪽 버튼으로 벌목하세요."
+                    : "생활 거점 · 조준선의 오두막을 왼쪽 버튼으로 사용하세요.";
+            return true;
         }
 
         public void BeginHarvestForTest(string stableId) => BeginHarvest(stableId);
@@ -336,13 +369,13 @@ namespace Ssalddel.Unity.Presentation.World
             => new(inputSystemPoint.x, Screen.height - inputSystemPoint.y);
 
         private static Rect HudGuiRect()
-            => new(20f, Screen.height - 260f, 560f, 234f);
+            => new(16f, 16f, 430f, 206f);
 
         private static Rect SaveButtonGuiRect()
-            => new(34f, Screen.height - 102f, 132f, 28f);
+            => new(28f, 154f, 120f, 26f);
 
         private static Rect CancelButtonGuiRect()
-            => new(178f, Screen.height - 102f, 150f, 28f);
+            => new(156f, 154f, 140f, 26f);
 
         private void HandlePrimaryPressed()
         {
@@ -491,6 +524,8 @@ namespace Ssalddel.Unity.Presentation.World
 
         private string HigherPriorityInputReason()
         {
+            if (!CanUseNatureInput(player.CurrentActivityCode))
+                return "Nature 탐험 문맥 대기";
             if (player.Combat != null && player.Combat.HasActiveUnifiedBattle)
                 return "전투 입력 사용 중";
             var placement = FindFirstObjectByType<Farm플레이어배치Controller>(
@@ -498,6 +533,10 @@ namespace Ssalddel.Unity.Presentation.World
             return placement != null && placement.PlacementModeActive
                 ? "Farm 배치 입력 사용 중" : string.Empty;
         }
+
+        public static bool CanUseNatureInput(string activityCode)
+            => string.Equals(activityCode, PlayerActivityCodes.Exploration,
+                StringComparison.Ordinal);
 
         private void RebuildVisuals()
         {
@@ -669,27 +708,28 @@ namespace Ssalddel.Unity.Presentation.World
         private void OnGUI()
         {
             if (!ValidateWiring()) return;
+            if (!CanUseNatureInput(player.CurrentActivityCode)) return;
             var state = engine.Snapshot();
             GUI.color = new Color(.035f, .055f, .035f, .9f);
             GUI.DrawTexture(HudGuiRect(), Texture2D.whiteTexture);
             GUI.color = Color.white;
-            GUI.Label(new Rect(34f, Screen.height - 252f, 530f, 22f),
+            GUI.Label(new Rect(28f, 24f, 402f, 20f),
                 $"Nature 생존 · {launchProfileLabel} · {PhaseKorean(state.ClockPhaseCode)} · Day {state.CycleIndex + 1}");
-            GUI.Label(new Rect(34f, Screen.height - 228f, 530f, 22f),
+            GUI.Label(new Rect(28f, 46f, 402f, 20f),
                 $"도끼 {(state.HasAxe ? "보유" : "미보유")} · 통나무 소지 {state.TimberQuantity} / 보관 {state.StoredTimberQuantity}/20 · 부품 {state.RebuildPartQuantity}");
-            GUI.Label(new Rect(34f, Screen.height - 204f, 530f, 22f),
+            GUI.Label(new Rect(28f, 68f, 402f, 20f),
                 $"소음 {state.NoiseEventCount} · 위협 {state.RawThreatTier}→{state.EffectiveThreatTier} · {(state.Sleeping ? "수면 중" : state.Day2Ready ? "Day2 준비" : "활동 중")}");
-            GUI.Label(new Rect(34f, Screen.height - 180f, 530f, 22f), status);
-            GUI.Label(new Rect(34f, Screen.height - 156f, 530f, 22f),
-                "LMB 상호작용 · G 보관 · T 수면 · 1 작업대 / 2 보관대 / 3 방책");
-            GUI.Label(new Rect(34f, Screen.height - 132f, 530f, 22f),
+            GUI.Label(new Rect(28f, 90f, 402f, 20f), status);
+            GUI.Label(new Rect(28f, 112f, 402f, 20f),
+                "Nature 탐험 · LMB 상호작용 · G 보관 · T 수면 · 1/2/3 확장");
+            GUI.Label(new Rect(28f, 134f, 402f, 20f),
                 "B 도면 · C 취소 · E 퇴장 · F 전투 / R 후퇴");
             GUI.enabled = saveWorld != null;
             GUI.Button(SaveButtonGuiRect(), "현재 세계 저장");
             GUI.enabled = state.ActiveWork != null;
             GUI.Button(CancelButtonGuiRect(), "진행 작업 취소");
             GUI.enabled = true;
-            GUI.Label(new Rect(34f, Screen.height - 66f, 520f, 22f),
+            GUI.Label(new Rect(28f, 184f, 402f, 20f),
                 "저장 후 Play Mode 재진입 시 같은 세계를 복원합니다.");
         }
 

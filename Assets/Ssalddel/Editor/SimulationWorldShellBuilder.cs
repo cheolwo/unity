@@ -19,6 +19,10 @@ using UnityEngine.UI;
 
 namespace Ssalddel.Unity.Editor
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class SimulationWorldShellBuilder
     {
         public const string ScenePath = 통합WorldScenePolicy.CanonicalScenePath;
@@ -271,7 +275,7 @@ namespace Ssalddel.Unity.Editor
             if (rect == null || rect.anchorMin != new Vector2(.5f, 0f)
                 || rect.anchorMax != new Vector2(.5f, 0f))
                 throw new InvalidOperationException("MinimalPlayHudModeBarPositionInvalid");
-            if (bar.GetComponentsInChildren<Button>(false).Length != 3)
+            if (bar.GetComponentsInChildren<Button>(false).Length != 4)
                 throw new InvalidOperationException("MinimalPlayHudModeButtonCountInvalid");
             RequireInactive(bar, "JinbuInboundButton");
 
@@ -334,11 +338,12 @@ namespace Ssalddel.Unity.Editor
             rect.anchorMax = new Vector2(.5f, 0f);
             rect.pivot = new Vector2(.5f, 0f);
             rect.anchoredPosition = new Vector2(0f, 18f);
-            rect.sizeDelta = new Vector2(274f, 52f);
+            rect.sizeDelta = new Vector2(398f, 52f);
 
-            ConfigureMinimalModeButton(bar, "WorldOverviewButton", "전략 시점", 8f);
-            ConfigureMinimalModeButton(bar, "FarmFirstPersonButton", "1인칭", 96f);
-            ConfigureMinimalModeButton(bar, "FarmTacticalButton", "3인칭", 184f);
+            ConfigureMinimalModeButton(bar, "WorldOverviewButton", "전략", 8f);
+            ConfigureMinimalModeButton(bar, "NatureExplorationButton", "Nature 탐험", 106f);
+            ConfigureMinimalModeButton(bar, "FarmFirstPersonButton", "Farm 1P", 204f);
+            ConfigureMinimalModeButton(bar, "FarmTacticalButton", "Farm 3P", 302f);
             SetInactiveIfPresent(bar, "JinbuInboundButton");
 
             var players = root.GetComponentsInChildren<플레이어경관Controller>(true);
@@ -364,12 +369,12 @@ namespace Ssalddel.Unity.Editor
             var rect = button.GetComponent<RectTransform>()
                        ?? throw new InvalidOperationException("MinimalPlayHudButtonRectMissing:" + name);
             rect.anchoredPosition = new Vector2(x, -8f);
-            rect.sizeDelta = new Vector2(82f, 36f);
+            rect.sizeDelta = new Vector2(92f, 36f);
             button.gameObject.SetActive(true);
             var text = button.GetComponentInChildren<Text>(true)
                        ?? throw new InvalidOperationException("MinimalPlayHudButtonTextMissing:" + name);
             text.text = label;
-            text.fontSize = 13;
+            text.fontSize = 12;
         }
 
         private static void SetInactiveIfPresent(Transform parent, string name)
@@ -1416,14 +1421,16 @@ namespace Ssalddel.Unity.Editor
             scaler.referenceResolution = new Vector2(1600f, 900f);
 
             var bar = Panel(canvas.transform, "UnifiedWorldModeBar",
-                new Vector2(0f, 18f), new Vector2(274f, 52f), new Vector2(.5f, 0f));
+                new Vector2(0f, 18f), new Vector2(398f, 52f), new Vector2(.5f, 0f));
             bar.GetComponent<Image>().color = new Color(.04f, .055f, .06f, .94f);
-            var world = Button(bar.transform, "WorldOverviewButton", "전략 시점",
-                new Vector2(8f, -8f), new Vector2(82f, 36f), Rgb(.94f, .42f, .05f));
-            var firstPerson = Button(bar.transform, "FarmFirstPersonButton", "1인칭",
-                new Vector2(96f, -8f), new Vector2(82f, 36f), Rgb(.15f, .19f, .20f));
-            var tactical = Button(bar.transform, "FarmTacticalButton", "3인칭",
-                new Vector2(184f, -8f), new Vector2(82f, 36f), Rgb(.15f, .19f, .20f));
+            var world = Button(bar.transform, "WorldOverviewButton", "전략",
+                new Vector2(8f, -8f), new Vector2(92f, 36f), Rgb(.94f, .42f, .05f));
+            var nature = Button(bar.transform, "NatureExplorationButton", "Nature 탐험",
+                new Vector2(106f, -8f), new Vector2(92f, 36f), Rgb(.15f, .19f, .20f));
+            var firstPerson = Button(bar.transform, "FarmFirstPersonButton", "Farm 1P",
+                new Vector2(204f, -8f), new Vector2(92f, 36f), Rgb(.15f, .19f, .20f));
+            var tactical = Button(bar.transform, "FarmTacticalButton", "Farm 3P",
+                new Vector2(302f, -8f), new Vector2(92f, 36f), Rgb(.15f, .19f, .20f));
             var inboundButton = Button(bar.transform, "JinbuInboundButton", "진부 입고",
                 new Vector2(0f, 0f), new Vector2(78f, 36f), Rgb(.15f, .19f, .20f));
             inboundButton.gameObject.SetActive(false);
@@ -1433,7 +1440,7 @@ namespace Ssalddel.Unity.Editor
             Build농장경영시점(runtimeRoot, player);
             var presenter = runtimeRoot.gameObject.AddComponent<통합월드ModePresenter>();
             presenter.Configure(
-                shell, player, inbound, world, firstPerson, tactical, inboundButton);
+                shell, player, inbound, world, nature, firstPerson, tactical, inboundButton);
             presenter.SetStartInTacticalMode(true);
             EditorUtility.SetDirty(presenter);
         }

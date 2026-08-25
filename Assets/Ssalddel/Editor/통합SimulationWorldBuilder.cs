@@ -8,6 +8,10 @@ using UnityEngine.UI;
 
 namespace Ssalddel.Unity.Editor
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class 통합SimulationWorldBuilder
     {
         private const string ShellScenePath = 통합WorldScenePolicy.CanonicalScenePath;
@@ -71,7 +75,7 @@ namespace Ssalddel.Unity.Editor
             var modeCanvas = bar.GetComponentInParent<Canvas>();
             if (modeCanvas == null || modeCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
                 throw new InvalidOperationException("UnifiedWorldModeCanvasMustBeOverlay");
-            if (bar.GetComponentsInChildren<Button>(false).Length != 3)
+            if (bar.GetComponentsInChildren<Button>(false).Length != 4)
                 throw new InvalidOperationException("UnifiedWorldModeButtonCountInvalid");
             var inboundButton = bar.transform.Find("JinbuInboundButton");
             if (inboundButton == null || inboundButton.gameObject.activeSelf)

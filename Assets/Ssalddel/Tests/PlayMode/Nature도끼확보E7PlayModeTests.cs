@@ -46,7 +46,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     Nature생존Controller>(FindObjectsInactive.Include)!;
                 var player = UnityEngine.Object.FindAnyObjectByType<
                     플레이어경관Controller>(FindObjectsInactive.Include)!;
-                player.EnterFirstPersonMode();
+                player.EnterExplorationFirstPersonMode();
                 player.TickCameraTransition(player.ViewTransitionDuration);
                 player.enabled = false;
                 Time.timeScale = 1f;

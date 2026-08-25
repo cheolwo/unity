@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Ssalddel.Unity.PlayerActivities;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +13,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// Collider와 상자 표시는 업무 상태를 만들지 않는다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 대관령L2창고상호작용TargetView : MonoBehaviour
     {
         [SerializeField] private string buildingStableId =
@@ -88,6 +93,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 실제 획득은 Presenter가 서버 Confirm 뒤 원장을 다시 조회한 경우에만 표시한다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 일인칭창고상호작용Controller : MonoBehaviour
     {
         [SerializeField] private 플레이어경관Controller player = null!;
@@ -126,22 +135,36 @@ namespace Ssalddel.Unity.Presentation.World
             Subscribe();
         }
 
-        public bool ValidateWiring()
-            => player != null
-               && firstPersonCamera != null
-               && firstPersonCamera == player.FirstPersonCamera
-               && presenter != null
-               && presenter.ValidateWiring()
-               && target != null
-               && target.ValidateWiring()
-               && maximumDistance >= .5f
-               && presentationOnly;
+        public bool ValidateWiring() => WiringDiagnosticCode == "Ready";
+
+        public string WiringDiagnosticCode
+        {
+            get
+            {
+                if (player == null) return "PlayerMissing";
+                if (firstPersonCamera == null) return "FirstPersonCameraMissing";
+                if (firstPersonCamera != player.FirstPersonCamera)
+                    return "FirstPersonCameraMismatch";
+                if (presenter == null) return "PresenterMissing";
+                if (!presenter.ValidateWiring()) return "PresenterWiringInvalid";
+                if (target == null) return "TargetMissing";
+                if (!target.ValidateWiring()) return "TargetWiringInvalid";
+                if (maximumDistance < .5f) return "MaximumDistanceInvalid";
+                return presentationOnly ? "Ready" : "AuthorityBoundaryInvalid";
+            }
+        }
 
         public static bool CanScan(플레이어시점Mode mode,
             bool cameraTransitioning, bool presenterReady)
             => mode == 플레이어시점Mode.FirstPerson
                && !cameraTransitioning
                && presenterReady;
+
+        public static bool CanScanWarehouse(플레이어시점Mode mode,
+            bool cameraTransitioning, bool presenterReady, string activityCode)
+            => string.Equals(activityCode, PlayerActivityCodes.FarmManagement,
+                   StringComparison.Ordinal)
+               && CanScan(mode, cameraTransitioning, presenterReady);
 
         public bool TryResolveTarget(Ray ray)
         {
@@ -223,11 +246,13 @@ namespace Ssalddel.Unity.Presentation.World
 #if UNITY_EDITOR
             if (Time.unscaledTime >= nextEditorDiagnosticAt
                 && player != null
+                && string.Equals(player.CurrentActivityCode,
+                    PlayerActivityCodes.FarmManagement, StringComparison.Ordinal)
                 && player.CurrentMode == 플레이어시점Mode.FirstPerson)
             {
                 nextEditorDiagnosticAt = Time.unscaledTime + 2f;
                 Debug.Log($"DaegwallyeongWarehouseScan:{editorScanDiagnostic}"
-                          + $":Wiring={ValidateWiring()}"
+                          + $":Wiring={WiringDiagnosticCode}"
                           + $":Ready={presenter != null && presenter.IsReady}"
                           + $":Focused={focused}");
             }
@@ -239,13 +264,16 @@ namespace Ssalddel.Unity.Presentation.World
 #endif
                 return;
             }
-            if (!CanScan(player.CurrentMode, player.IsCameraTransitioning,
-                    presenter.IsReady))
+            if (!CanScanWarehouse(player.CurrentMode, player.IsCameraTransitioning,
+                    presenter.IsReady, player.CurrentActivityCode))
             {
 #if UNITY_EDITOR
-                editorScanDiagnostic = presenter.IsReady
-                    ? "1인칭 전환 완료 대기"
-                    : "Fixture 상태 사본 준비 대기";
+                editorScanDiagnostic = !string.Equals(player.CurrentActivityCode,
+                    PlayerActivityCodes.FarmManagement, StringComparison.Ordinal)
+                    ? "Farm 업무 문맥 대기"
+                    : presenter.IsReady
+                        ? "1인칭 전환 완료 대기"
+                        : "Fixture 상태 사본 준비 대기";
 #endif
                 SetFocused(false, cancelPreview: true);
                 return;
@@ -309,7 +337,10 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnGUI()
         {
-            if (player == null || player.CurrentMode != 플레이어시점Mode.FirstPerson)
+            if (player == null
+                || !string.Equals(player.CurrentActivityCode,
+                    PlayerActivityCodes.FarmManagement, StringComparison.Ordinal)
+                || player.CurrentMode != 플레이어시점Mode.FirstPerson)
                 return;
             GUI.color = focused ? new Color(1f, .75f, .2f, 1f) : Color.white;
             GUI.Label(new Rect(Screen.width * .5f - 8f, Screen.height * .5f - 12f,

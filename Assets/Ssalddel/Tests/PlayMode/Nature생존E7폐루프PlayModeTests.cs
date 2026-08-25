@@ -49,7 +49,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     Nature생존Controller>(FindObjectsInactive.Include)!;
                 var player = UnityEngine.Object.FindAnyObjectByType<
                     플레이어경관Controller>(FindObjectsInactive.Include)!;
-                player.EnterFirstPersonMode();
+                player.EnterExplorationFirstPersonMode();
                 player.TickCameraTransition(player.ViewTransitionDuration);
                 player.enabled = false;
                 Time.timeScale = 1f;
@@ -116,7 +116,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 Assert.That(controller.State.PlayerInsideCabin, Is.False);
 
                 yield return Click(controller, mouse,
-                    new Vector2(100f, 88f));
+                    new Vector2(88f, Screen.height - 167f));
                 Assert.That(controller.Status, Does.StartWith("저장 완료"));
                 var savedSession = controller.State.SessionStableId;
                 var savedRevision = controller.State.Revision;

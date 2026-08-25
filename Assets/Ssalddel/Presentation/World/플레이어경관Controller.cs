@@ -49,6 +49,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterController))]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 플레이어경관Controller : MonoBehaviour
     {
         [SerializeField] private 플레이어경관Profile profile = new();
@@ -547,6 +551,47 @@ namespace Ssalddel.Unity.Presentation.World
         public void EnterExplorationMode()
             => ApplyActivityViewDecision(_activityViewPolicies.Resolve(
                 PlayerActivityCodes.Exploration));
+
+        public void EnterExplorationFirstPersonMode()
+            => ApplyActivityViewDecision(_activityViewPolicies.Resolve(
+                PlayerActivityCodes.Exploration,
+                PlayerActivityViewModeCodes.FirstPerson));
+
+        /// <summary>
+        /// 첫 진입에서 플레이어가 다음 표현 대상을 즉시 발견하도록 1인칭 시선만 맞춘다.
+        /// 위치·Simulation 상태·WorldTick은 변경하지 않는다.
+        /// </summary>
+        public void AimFirstPersonAtPresentationTarget(Vector3 worldTarget)
+        {
+            if (!ValidateWiring())
+                throw new System.InvalidOperationException(
+                    "PlayerLandscapeWiringInvalid");
+            var direction = worldTarget - firstPersonPivot.position;
+            if (direction.sqrMagnitude <= .0001f)
+                throw new System.ArgumentException(
+                    "PlayerPresentationLookTargetInvalid",
+                    nameof(worldTarget));
+
+            var planarDistance = new Vector2(direction.x, direction.z).magnitude;
+            _yaw = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            _pitch = Mathf.Clamp(
+                -Mathf.Atan2(direction.y, Mathf.Max(.001f, planarDistance))
+                * Mathf.Rad2Deg,
+                -12f,
+                52f);
+            ApplyLookRotation();
+
+            if (IsCameraTransitioning && _viewTransitionTarget == firstPersonCamera)
+            {
+                _viewTransitionEndPosition = firstPersonCamera.transform.position;
+                _viewTransitionEndRotation = firstPersonCamera.transform.rotation;
+                _viewTransitionControlPoint =
+                    카메라시점전환Math.CreateSharedControlPoint(
+                        _viewTransitionStartPosition,
+                        _viewTransitionEndPosition,
+                        viewTransitionArcHeight);
+            }
+        }
 
         public void EnterCombatMode(string perspectiveCode)
         {

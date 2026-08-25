@@ -139,7 +139,8 @@ namespace Ssalddel.Unity.Presentation.World
         }
 
         private bool CanReadAuthoritySnapshot()
-            => IsConfigured && controller.isActiveAndEnabled
+            => IsConfigured && controller.ValidateWiring()
+                            && controller.isActiveAndEnabled
                             && gameObject.activeInHierarchy;
 
         private void RefreshFromAuthoritySnapshot()
@@ -407,7 +408,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void UpdateToolVisibility()
         {
-            if (controller == null) return;
+            if (controller == null || !controller.ValidateWiring()) return;
             var hasAxe = controller.State.HasAxe;
             if (firstPersonToolRoot != null)
                 firstPersonToolRoot.gameObject.SetActive(hasAxe

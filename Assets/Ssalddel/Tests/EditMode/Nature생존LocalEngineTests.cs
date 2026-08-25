@@ -1,5 +1,7 @@
 using System;
 using NUnit.Framework;
+using Ssalddel.Unity.PlayerActivities;
+using Ssalddel.Unity.Presentation.World;
 using Ssalddel.Unity.Runtime.World;
 using Ssalddel.WorkflowRules;
 using Ssalddel.WorkflowRules.Contracts;
@@ -12,6 +14,17 @@ namespace Ssalddel.Unity.Tests.EditMode
         Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class Nature생존LocalEngineTests
     {
+        [Test]
+        public void Nature입력은_탐험문맥에서만허용된다()
+        {
+            Assert.That(Nature생존Controller.CanUseNatureInput(
+                PlayerActivityCodes.Exploration), Is.True);
+            Assert.That(Nature생존Controller.CanUseNatureInput(
+                PlayerActivityCodes.FarmManagement), Is.False);
+            Assert.That(Nature생존Controller.CanUseNatureInput(
+                PlayerActivityCodes.WorldOverview), Is.False);
+        }
+
         [Test]
         public void Solo는_서버없이_도끼획득과_누르기벌목을완료한다()
         {

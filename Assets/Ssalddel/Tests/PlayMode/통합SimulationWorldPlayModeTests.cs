@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Ssalddel.Unity.Bootstrap;
@@ -14,6 +15,10 @@ using UnityEngine.UI;
 
 namespace Ssalddel.Unity.Tests.PlayMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class 통합SimulationWorldPlayModeTests
     {
         [UnityTest]
@@ -84,6 +89,8 @@ namespace Ssalddel.Unity.Tests.PlayMode
             SceneManager.sceneLoaded += RemoveLiveServerCompositions;
             yield return SceneManager.LoadSceneAsync("SimulationWorldShell", LoadSceneMode.Single);
             SceneManager.sceneLoaded -= RemoveLiveServerCompositions;
+            Nature생존AutoBootstrap.InstallForCurrentScene();
+            yield return null;
 
             var shell = Object.FindAnyObjectByType<SimulationWorldShellPresenter>(
                 FindObjectsInactive.Include);
@@ -106,9 +113,30 @@ namespace Ssalddel.Unity.Tests.PlayMode
             var bar = GameObject.Find(
                 "SimulationWorldShell/PersistentUI/UnifiedWorldModeCanvas/UnifiedWorldModeBar");
             Assert.That(bar, Is.Not.Null);
-            RequiredButton(bar, "FarmFirstPersonButton").onClick.Invoke();
+            RequiredButton(bar, "NatureExplorationButton").onClick.Invoke();
             Assert.That(player.IsCameraTransitioning, Is.True);
             yield return WaitForCameraTransition(player);
+            Assert.That(player.CurrentMode, Is.EqualTo(플레이어시점Mode.FirstPerson));
+            Assert.That(player.CurrentActivityCode, Is.EqualTo("Exploration"));
+            var entryAimAngle = Object.FindObjectsByType<
+                    Nature생존상호작용표식>(FindObjectsInactive.Exclude)
+                .Select(value =>
+                {
+                    var collider = value.GetComponentInChildren<Collider>();
+                    var aimPoint = collider == null
+                        ? value.transform.position : collider.bounds.center;
+                    return Vector3.Angle(
+                        player.FirstPersonCamera.transform.forward,
+                        aimPoint - player.FirstPersonCamera.transform.position);
+                })
+                .DefaultIfEmpty(180f)
+                .Min();
+            Assert.That(entryAimAngle, Is.LessThan(.5f),
+                "Nature 첫 진입은 현재 진행 상태의 다음 행동 대상을 조준해야 한다.");
+
+            RequiredButton(bar, "FarmFirstPersonButton").onClick.Invoke();
+            Assert.That(player.IsCameraTransitioning, Is.False,
+                "같은 1인칭 카메라에서는 활동 문맥만 즉시 바꾼다.");
             Assert.That(player.CurrentMode, Is.EqualTo(플레이어시점Mode.FirstPerson));
             Assert.That(player.CurrentActivityCode,
                 Is.EqualTo("FarmManagement"));
@@ -118,7 +146,9 @@ namespace Ssalddel.Unity.Tests.PlayMode
             Assert.That(player.IsCameraTransitioning, Is.True);
             Assert.That(farmManagement.IsActive, Is.False,
                 "전환 중에는 두 시점의 입력 규칙을 모두 잠근다.");
-            yield return WaitForCameraTransition(player);
+            player.TickCameraTransition(player.ViewTransitionDuration);
+            yield return null;
+            Assert.That(player.IsCameraTransitioning, Is.False);
             Assert.That(player.CurrentMode, Is.EqualTo(플레이어시점Mode.ThirdPerson));
             Assert.That(player.CurrentActivityCode,
                 Is.EqualTo("FarmManagement"));
