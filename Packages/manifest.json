@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "com.ssalddel.code-metadata": "file:../../source/repos/Hongdal/Ssalddel.CodeMetadata",
+    "com.ssalddel.interior.contracts": "file:../../source/repos/Hongdal/Ssalddel.Interior.Contracts/UnityPackage",
+    "com.ssalddel.interior.domain": "file:../../source/repos/Hongdal/Ssalddel.Interior.Domain/UnityPackage",
     "com.ssalddel.simulation.contracts": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Contracts/UnityPackage",
     "com.ssalddel.simulation.domain": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Domain/UnityPackage",
     "com.ssalddel.simulation.runtime-core": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Application/RuntimeCore",

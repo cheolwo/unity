@@ -6,6 +6,23 @@
       "source": "local",
       "dependencies": {}
     },
+    "com.ssalddel.interior.contracts": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.Interior.Contracts/UnityPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.code-metadata": "0.1.0"
+      }
+    },
+    "com.ssalddel.interior.domain": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.Interior.Domain/UnityPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.code-metadata": "0.1.0",
+        "com.ssalddel.interior.contracts": "0.1.0"
+      }
+    },
     "com.ssalddel.simulation.contracts": {
       "version": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Contracts/UnityPackage",
       "depth": 0,
@@ -19,7 +36,8 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.ssalddel.code-metadata": "0.1.0"
+        "com.ssalddel.code-metadata": "0.1.0",
+        "com.ssalddel.interior.contracts": "0.1.0"
       }
     },
     "com.ssalddel.simulation.domain": {
