@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Ssalddel.Unity.PresentationContracts;
 using UnityEngine;
 
 namespace Ssalddel.Unity.Presentation.World
@@ -38,6 +39,15 @@ namespace Ssalddel.Unity.Presentation.World
         public bool CreatesSpatialInstance;
     }
 
+    [Serializable]
+    public sealed class 감각표현ChannelRecord
+    {
+        public string DomainCode = string.Empty;
+        public string ResponsibilityCode = string.Empty;
+        public bool MutatesCanonicalState;
+        public bool ConfirmsBusinessCompletion;
+    }
+
     /// <summary>
     /// H1~H5의 의미 계층과 별개로, Player 실측 크기에서 시작해 H1 발자국이
     /// H2 블록·H3 경관·AreaSet 외곽 안에 놓였는지를 통제하는 표현 전용 기록입니다.
@@ -56,10 +66,18 @@ namespace Ssalddel.Unity.Presentation.World
             "placement-composition:simulation-world-shell.hub-warehouse.v3";
         public const string CompositionRevision =
             "placement-control-hierarchy.v3";
+        public const string SensoryPresentationStableId =
+            "placement-composition:simulation-world-shell.sensory-presentation.v4";
+        public const string SensoryPresentationRevision =
+            "placement-control-hierarchy.v4";
         public const string BottomUpCompositionDirection =
             "BottomUp:H1-H2-H3-H4Readiness";
         public const string TopDownConstraintDirection =
             "TopDown:WorldEnvelope-H1-Interior";
+        public const string SensoryPresentationDirection =
+            "CrossCutting:Graphics-Camera-Animation-Lighting-Audio-UI";
+        public const string SensoryPresentationBindingSchema =
+            "placement-presentation-bindings.v1";
 
         [SerializeField] private string stableId = string.Empty;
         [SerializeField] private string revision = string.Empty;
@@ -72,8 +90,14 @@ namespace Ssalddel.Unity.Presentation.World
             string.Empty;
         [SerializeField] private string constraintEvaluationDirectionCode =
             string.Empty;
+        [SerializeField] private string presentationEvaluationDirectionCode =
+            string.Empty;
+        [SerializeField] private string presentationBindingSchemaCode =
+            string.Empty;
         [SerializeField] private H공간성립단계Record[] compositionSteps =
             Array.Empty<H공간성립단계Record>();
+        [SerializeField] private 감각표현ChannelRecord[] presentationChannels =
+            Array.Empty<감각표현ChannelRecord>();
         [SerializeField] private 배치통제계층LevelRecord[] levels =
             Array.Empty<배치통제계층LevelRecord>();
         [SerializeField] private Player상대ScaleBandRecord[] scaleBands =
@@ -91,7 +115,12 @@ namespace Ssalddel.Unity.Presentation.World
             primaryCompositionDirectionCode;
         public string ConstraintEvaluationDirectionCode =>
             constraintEvaluationDirectionCode;
+        public string PresentationEvaluationDirectionCode =>
+            presentationEvaluationDirectionCode;
+        public string PresentationBindingSchemaCode =>
+            presentationBindingSchemaCode;
         public H공간성립단계Record[] CompositionSteps => compositionSteps;
+        public 감각표현ChannelRecord[] PresentationChannels => presentationChannels;
         public 배치통제계층LevelRecord[] Levels => levels;
         public Player상대ScaleBandRecord[] ScaleBands => scaleBands;
         public bool PresentationOnly => presentationOnly;
@@ -136,6 +165,31 @@ namespace Ssalddel.Unity.Presentation.World
                 });
         }
 
+        /// <summary>
+        /// v3의 상향식 성립과 하향식 제약을 보존한 채, 배치가 플레이어에게
+        /// 보이고 들리며 조작 가능한지를 검사하는 감각 표현축을 교차 결속합니다.
+        /// 표현축은 H 단계가 아니고 Simulation 상태를 만들거나 완료하지 않습니다.
+        /// </summary>
+        public void ConfigureSensoryPresentationV4(Transform world,
+            플레이어경관Controller player, float measuredPlayerHeight)
+        {
+            ApplyProfile(SensoryPresentationStableId,
+                SensoryPresentationRevision,
+                "H1Formation-H4Readiness-WithSensoryPresentation", world,
+                player, measuredPlayerHeight, InteriorLevels(),
+                InteriorScaleBands(), BottomUpCompositionDirection,
+                TopDownConstraintDirection, new[]
+                {
+                    CompositionStep("H1", "H2",
+                        "FormFromOperationalChildren", true),
+                    CompositionStep("H2", "H3",
+                        "FormFromQualifiedChildren", true),
+                    CompositionStep("H3", "H4",
+                        "AssessAreaSetReadiness", false),
+                }, SensoryPresentationDirection,
+                SensoryPresentationBindingSchema, SensoryChannels());
+        }
+
         public Player상대ScaleBandRecord FindBand(string code) =>
             scaleBands.Single(value => value.ScaleBandCode == code);
 
@@ -149,15 +203,23 @@ namespace Ssalddel.Unity.Presentation.World
                                && revision == InteriorRevision;
             var isCompositionV3 = stableId == CompositionStableId
                                   && revision == CompositionRevision;
-            var isInterior = isInteriorV2 || isCompositionV3;
+            var isSensoryPresentationV4 = stableId ==
+                SensoryPresentationStableId
+                && revision == SensoryPresentationRevision;
+            var isInterior = isInteriorV2 || isCompositionV3
+                             || isSensoryPresentationV4;
+            var isComposition = isCompositionV3 || isSensoryPresentationV4;
             var expectedLevelCount = isInterior ? 12 : 6;
             var expectedBandCount = isInterior ? 7 : 5;
-            var expectedPolicy = isCompositionV3
-                ? "H1Evidence-H2Formation-H3Formation-H4Readiness"
+            var expectedPolicy = isSensoryPresentationV4
+                ? "H1Formation-H4Readiness-WithSensoryPresentation"
+                : isCompositionV3
+                    ? "H1Evidence-H2Formation-H3Formation-H4Readiness"
                 : isInteriorV2
                     ? "H3Axis-H2Block-H1Zone-InteriorFixtureAssembly"
                     : "H3Axis-H2Frontage-H1ModuleAssembly";
-            if ((!isExteriorV1 && !isInteriorV2 && !isCompositionV3)
+            if ((!isExteriorV1 && !isInteriorV2 && !isCompositionV3
+                    && !isSensoryPresentationV4)
                 || worldEnvelope == null || playerReference == null
                 || playerReference.VisualRoot == null
                 || playerReferenceHeight is < .8f or > 3f
@@ -181,7 +243,7 @@ namespace Ssalddel.Unity.Presentation.World
                     || !levelCodes.Contains("FixtureWrapper")
                     || !levelCodes.Contains("SourcePrefab")
                     || !levelCodes.Contains("PlacementReceipt"))
-                || isCompositionV3
+                || isComposition
                 && (primaryCompositionDirectionCode
                         != BottomUpCompositionDirection
                     || constraintEvaluationDirectionCode
@@ -196,6 +258,27 @@ namespace Ssalddel.Unity.Presentation.World
                     || compositionSteps[2].SourceLevelCode != "H3"
                     || compositionSteps[2].TargetLevelCode != "H4"
                     || compositionSteps[2].CreatesSpatialInstance)
+                || isSensoryPresentationV4
+                && (presentationEvaluationDirectionCode
+                        != SensoryPresentationDirection
+                    || presentationBindingSchemaCode
+                        != SensoryPresentationBindingSchema
+                    || presentationChannels.Length
+                        != 표현규칙영역Codes.All.Length
+                    || presentationChannels.Select(value => value.DomainCode)
+                        .Distinct(StringComparer.Ordinal).Count()
+                        != 표현규칙영역Codes.All.Length
+                    || 표현규칙영역Codes.All.Any(domain =>
+                        !presentationChannels.Any(value =>
+                            value.DomainCode == domain))
+                    || presentationChannels.Any(value =>
+                        string.IsNullOrWhiteSpace(value.ResponsibilityCode)
+                        || value.MutatesCanonicalState
+                        || value.ConfirmsBusinessCompletion))
+                || !isSensoryPresentationV4
+                && (!string.IsNullOrEmpty(presentationEvaluationDirectionCode)
+                    || !string.IsNullOrEmpty(presentationBindingSchemaCode)
+                    || presentationChannels.Length != 0)
                 || scaleBands.Length != expectedBandCount
                 || scaleBands.Select(value => value.ScaleBandCode)
                     .Distinct(StringComparer.Ordinal).Count()
@@ -250,7 +333,10 @@ namespace Ssalddel.Unity.Presentation.World
             Player상대ScaleBandRecord[] profileScaleBands,
             string compositionDirection = "",
             string constraintDirection = "",
-            H공간성립단계Record[]? profileCompositionSteps = null)
+            H공간성립단계Record[]? profileCompositionSteps = null,
+            string presentationDirection = "",
+            string presentationSchema = "",
+            감각표현ChannelRecord[]? profilePresentationChannels = null)
         {
             stableId = profileStableId;
             revision = profileRevision;
@@ -260,8 +346,12 @@ namespace Ssalddel.Unity.Presentation.World
             moduleOrchestrationPolicyCode = policyCode;
             primaryCompositionDirectionCode = compositionDirection;
             constraintEvaluationDirectionCode = constraintDirection;
+            presentationEvaluationDirectionCode = presentationDirection;
+            presentationBindingSchemaCode = presentationSchema;
             compositionSteps = profileCompositionSteps
                                ?? Array.Empty<H공간성립단계Record>();
+            presentationChannels = profilePresentationChannels
+                                   ?? Array.Empty<감각표현ChannelRecord>();
             levels = profileLevels;
             scaleBands = profileScaleBands;
             presentationOnly = true;
@@ -309,5 +399,28 @@ namespace Ssalddel.Unity.Presentation.World
                 Band("InteriorFixture", .05f, 1.8f, .05f, 2.5f),
                 Band("WarehouseAisle", .01f, .5f, .6f, 8f),
             }).ToArray();
+
+        private static 감각표현ChannelRecord[] SensoryChannels() => new[]
+        {
+            Channel(표현규칙영역Codes.Graphics,
+                "Renderer-FX-LOD-ObjectState"),
+            Channel(표현규칙영역Codes.Camera,
+                "Focus-Framing-Occlusion-Cutaway"),
+            Channel(표현규칙영역Codes.Animation,
+                "Actor-Tool-Work-StatePlayback"),
+            Channel(표현규칙영역Codes.Lighting,
+                "Light-Ambient-Fog-TimeOfDay"),
+            Channel(표현규칙영역Codes.Audio,
+                "SpatialSfx-Ambient-MusicRouting"),
+            Channel(표현규칙영역Codes.UI,
+                "Prompt-Progress-BlockedReason"),
+        };
+
+        private static 감각표현ChannelRecord Channel(string domain,
+            string responsibility) => new()
+        {
+            DomainCode = domain,
+            ResponsibilityCode = responsibility,
+        };
     }
 }

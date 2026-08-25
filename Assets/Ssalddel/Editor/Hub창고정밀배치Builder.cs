@@ -112,7 +112,7 @@ namespace Ssalddel.Unity.Editor
             var hierarchyRoot = Child(module.transform,
                 "PlacementControlHierarchy");
             hierarchyRoot.gameObject.AddComponent<배치통제계층Root>()
-                .ConfigureCompositionV3(module.transform, player,
+                .ConfigureSensoryPresentationV4(module.transform, player,
                     MeasurePlayerHeight(player));
 
             BuildStructure(module.transform, out var roofRoot);

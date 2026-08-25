@@ -43,6 +43,46 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public void SensoryPresentationV4_KeepsBothPlacementAxesAndAddsCrossCuttingChannels()
+        {
+            EditorSceneManager.OpenScene(SimulationWorldShellBuilder.ScenePath);
+            var player = UnityEngine.Object.FindFirstObjectByType<
+                플레이어경관Controller>(FindObjectsInactive.Include);
+            Assert.That(player, Is.Not.Null);
+            var root = new GameObject("PlacementSensoryPresentationV4Test");
+            try
+            {
+                var hierarchy = root.AddComponent<배치통제계층Root>();
+                hierarchy.ConfigureSensoryPresentationV4(root.transform,
+                    player!, 1.939f);
+
+                Assert.That(hierarchy.Revision,
+                    Is.EqualTo(배치통제계층Root.SensoryPresentationRevision));
+                Assert.That(hierarchy.PrimaryCompositionDirectionCode,
+                    Is.EqualTo(배치통제계층Root.BottomUpCompositionDirection));
+                Assert.That(hierarchy.ConstraintEvaluationDirectionCode,
+                    Is.EqualTo(배치통제계층Root.TopDownConstraintDirection));
+                Assert.That(hierarchy.PresentationEvaluationDirectionCode,
+                    Is.EqualTo(배치통제계층Root.SensoryPresentationDirection));
+                Assert.That(hierarchy.PresentationBindingSchemaCode,
+                    Is.EqualTo(배치통제계층Root.SensoryPresentationBindingSchema));
+                Assert.That(hierarchy.PresentationChannels.Select(value =>
+                        value.DomainCode),
+                    Is.EquivalentTo(Ssalddel.Unity.PresentationContracts
+                        .표현규칙영역Codes.All));
+                Assert.That(hierarchy.PresentationChannels,
+                    Has.All.Matches<감각표현ChannelRecord>(value =>
+                        !value.MutatesCanonicalState
+                        && !value.ConfirmsBusinessCompletion));
+                Assert.DoesNotThrow(hierarchy.Validate);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
         public void CompositionV3_UsesBottomUpH1ToH4ReadinessAsPrimaryAxis()
         {
             EditorSceneManager.OpenScene(SimulationWorldShellBuilder.ScenePath);
@@ -85,7 +125,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
-        public void HubBuilder_EmitsCompositionV3WithoutChangingSimulationState()
+        public void HubBuilder_EmitsSensoryPresentationV4WithoutChangingSimulationState()
         {
             EditorSceneManager.OpenScene(SimulationWorldShellBuilder.ScenePath);
             var player = UnityEngine.Object.FindFirstObjectByType<
@@ -101,9 +141,11 @@ namespace Ssalddel.Unity.Tests.EditMode
 
                 Assert.That(hierarchy, Is.Not.Null);
                 Assert.That(hierarchy!.Revision,
-                    Is.EqualTo(배치통제계층Root.CompositionRevision));
+                    Is.EqualTo(배치통제계층Root.SensoryPresentationRevision));
                 Assert.That(hierarchy.PrimaryCompositionDirectionCode,
                     Is.EqualTo(배치통제계층Root.BottomUpCompositionDirection));
+                Assert.That(hierarchy.PresentationEvaluationDirectionCode,
+                    Is.EqualTo(배치통제계층Root.SensoryPresentationDirection));
                 Assert.That(warehouse.PresentationOnly, Is.True);
                 Assert.DoesNotThrow(warehouse.Validate);
             }
