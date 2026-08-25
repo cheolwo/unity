@@ -17,6 +17,19 @@ namespace Ssalddel.Unity.Tests.EditMode
         Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class 통합SimulationWorldTests
     {
+        [Test]
+        public void 일인칭커서는_UI버튼입력으로_다시잠기지않는다()
+        {
+            Assert.That(플레이어경관Controller.ShouldCaptureFirstPersonCursor(
+                primaryPressed: true, pointerOverUi: true), Is.False);
+            Assert.That(플레이어경관Controller.ShouldCaptureFirstPersonCursor(
+                primaryPressed: true, pointerOverUi: false), Is.True);
+            Assert.That(플레이어경관Controller.IsPointerInPersistentModeBand(
+                new Vector2(400f, 24f), 900f), Is.True);
+            Assert.That(플레이어경관Controller.IsPointerInPersistentModeBand(
+                new Vector2(400f, 180f), 900f), Is.False);
+        }
+
         private const string ScenePath = "Assets/Ssalddel/Scenes/SimulationWorldShell.unity";
 
         [Test]

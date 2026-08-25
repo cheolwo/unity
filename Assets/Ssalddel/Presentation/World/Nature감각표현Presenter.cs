@@ -74,6 +74,7 @@ namespace Ssalddel.Unity.Presentation.World
         public string DiagnosticCode => diagnosticCode;
         public bool AxePlacementNormalized => axePlacementNormalized;
         public bool PresentationOnly => presentationOnly;
+        public int ProceduralActionCueCount => clips.Count;
         public bool OptionalAreaAudioAvailable =>
             optionalAreaAmbientSource != null
             && optionalAreaAmbientSource.clip != null

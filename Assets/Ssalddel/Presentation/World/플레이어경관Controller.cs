@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using Ssalddel.Unity.Runtime.World;
 using Ssalddel.Unity.PlayerActivities;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace Ssalddel.Unity.Presentation.World
@@ -327,7 +329,12 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void UpdateFirstPersonInput(Keyboard keyboard)
         {
-            if (Mouse.current?.leftButton.wasPressedThisFrame == true)
+            var primaryPressed = Mouse.current?.leftButton.wasPressedThisFrame == true;
+            var mousePosition = Mouse.current?.position.ReadValue() ?? Vector2.zero;
+            var pointerOverUi = IsPointerOverUnityUi()
+                                || IsPointerInPersistentModeBand(
+                                    mousePosition, Screen.height);
+            if (ShouldCaptureFirstPersonCursor(primaryPressed, pointerOverUi))
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
@@ -591,6 +598,31 @@ namespace Ssalddel.Unity.Presentation.World
                         _viewTransitionEndPosition,
                         viewTransitionArcHeight);
             }
+        }
+
+        public static bool ShouldCaptureFirstPersonCursor(
+            bool primaryPressed, bool pointerOverUi)
+            => primaryPressed && !pointerOverUi;
+
+        public static bool IsPointerInPersistentModeBand(
+            Vector2 pointerPosition, float screenHeight)
+            => screenHeight > 0f
+               && pointerPosition.y >= 0f
+               && pointerPosition.y <= Mathf.Min(96f, screenHeight * .15f);
+
+        public static bool IsPointerOverUnityUi()
+        {
+            var eventSystem = EventSystem.current;
+            var mouse = Mouse.current;
+            if (eventSystem == null || mouse == null) return false;
+
+            var pointer = new PointerEventData(eventSystem)
+            {
+                position = mouse.position.ReadValue(),
+            };
+            var hits = new List<RaycastResult>();
+            eventSystem.RaycastAll(pointer, hits);
+            return hits.Count > 0;
         }
 
         public void EnterCombatMode(string perspectiveCode)

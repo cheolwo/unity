@@ -359,6 +359,9 @@ namespace Ssalddel.Unity.Presentation.World
         private bool PointerOverHud()
         {
             if (Mouse.current == null) return false;
+            if (플레이어경관Controller.IsPointerOverUnityUi()) return true;
+            if (플레이어경관Controller.IsPointerInPersistentModeBand(
+                    Mouse.current.position.ReadValue(), Screen.height)) return true;
             if (player.CurrentMode == 플레이어시점Mode.FirstPerson) return false;
             if (Screen.width < 560 || Screen.height < 200) return false;
             return HudGuiRect().Contains(ToGuiPoint(

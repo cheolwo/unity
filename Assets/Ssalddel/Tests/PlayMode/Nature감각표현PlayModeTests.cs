@@ -38,6 +38,8 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 Assert.That(presenter!.IsConfigured, Is.True);
                 Assert.That(presenter.PresentationOnly, Is.True);
                 Assert.That(presenter.AxePlacementNormalized, Is.True);
+                Assert.That(presenter.ProceduralActionCueCount, Is.EqualTo(4),
+                    "도끼 획득·타격·취소·나무 낙하 절차형 대체 효과음이 필요하다.");
                 Assert.That(presenter.Receipt.QualificationStatusCode,
                     Is.EqualTo("WiringAccepted"));
                 Assert.That(presenter.Receipt.RuntimeObserved, Is.False,
