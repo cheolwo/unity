@@ -983,6 +983,30 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     Is.EqualTo(Nature생존Codes.Retreat));
                 Assert.That(controller.Status, Does.Contain("후퇴"));
 
+                controller.SaveWorldForTest();
+                var savedSession = controller.State.SessionStableId;
+                var savedRevision = controller.LastSavedRevision;
+                Assert.That(savedRevision, Is.Not.Null,
+                    "후퇴 결과 저장은 전투 결과가 반영된 WorldRevision을 남겨야 한다.");
+
+                controller.enabled = false;
+                SimulationWorldLocalRuntimeScope.Reset();
+                Time.timeScale = 1f;
+                yield return SceneManager.LoadSceneAsync(
+                    "SimulationWorldShell", LoadSceneMode.Single);
+                Nature생존AutoBootstrap.InstallForCurrentScene();
+                yield return WaitForNatureController();
+                var restored = UnityEngine.Object.FindAnyObjectByType<
+                    Nature생존Controller>(FindObjectsInactive.Include)!;
+                Assert.That(restored.State.SessionStableId,
+                    Is.EqualTo(savedSession));
+                Assert.That(restored.State.Revision,
+                    Is.EqualTo(savedRevision!.Value));
+                Assert.That(restored.State.Encounter?.StateCode,
+                    Is.EqualTo(Nature생존Codes.Resolved));
+                Assert.That(restored.State.LastCombatResultCode,
+                    Is.EqualTo(Nature생존Codes.Retreat));
+
                 var evidenceDirectory = Path.Combine(Path.GetFullPath(
                     Path.Combine(UnityEngine.Application.dataPath, "..")),
                     "artifacts", "local", "validation", "nature-twilight");
@@ -1133,6 +1157,31 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 Assert.That(controller.State.LastCombatResultCode,
                     Is.Not.Empty);
                 Assert.That(controller.Status, Does.Contain("거점으로 복귀"));
+
+                var completedResultCode = controller.State.LastCombatResultCode;
+                controller.SaveWorldForTest();
+                var savedSession = controller.State.SessionStableId;
+                var savedRevision = controller.LastSavedRevision;
+                Assert.That(savedRevision, Is.Not.Null,
+                    "직접 개입 결과 저장은 전투 결과가 반영된 WorldRevision을 남겨야 한다.");
+
+                controller.enabled = false;
+                SimulationWorldLocalRuntimeScope.Reset();
+                Time.timeScale = 1f;
+                yield return SceneManager.LoadSceneAsync(
+                    "SimulationWorldShell", LoadSceneMode.Single);
+                Nature생존AutoBootstrap.InstallForCurrentScene();
+                yield return WaitForNatureController();
+                var restored = UnityEngine.Object.FindAnyObjectByType<
+                    Nature생존Controller>(FindObjectsInactive.Include)!;
+                Assert.That(restored.State.SessionStableId,
+                    Is.EqualTo(savedSession));
+                Assert.That(restored.State.Revision,
+                    Is.EqualTo(savedRevision!.Value));
+                Assert.That(restored.State.Encounter?.StateCode,
+                    Is.EqualTo(Nature생존Codes.Resolved));
+                Assert.That(restored.State.LastCombatResultCode,
+                    Is.EqualTo(completedResultCode));
 
                 var evidenceDirectory = Path.Combine(Path.GetFullPath(
                     Path.Combine(UnityEngine.Application.dataPath, "..")), "artifacts",
