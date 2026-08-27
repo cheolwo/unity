@@ -9,6 +9,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// Game View에는 플레이어 한 명, 승인된 환경 Root와 시점 전환 UI만 남기는 표현 정책입니다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 단일PlayerViewController : MonoBehaviour
     {
         [SerializeField] private 플레이어경관Controller player = null!;
@@ -96,8 +100,17 @@ namespace Ssalddel.Unity.Presentation.World
                 canvas.gameObject.SetActive(canvas == modeCanvas);
         }
 
-        private bool IsApprovedEnvironment(Transform candidate) =>
-            approvedEnvironmentRoots.Any(root =>
-                candidate == root || candidate.IsChildOf(root));
+        private bool IsApprovedEnvironment(Transform candidate)
+        {
+            if (approvedEnvironmentRoots.Any(root =>
+                    candidate == root || candidate.IsChildOf(root)))
+                return true;
+
+            // LH가 Play 중 만든 Cell·실외/실내 배치도 승인된 세계 표현이다.
+            // 저장 Scene에 아직 존재하지 않는 동적 자식이므로 고정 Root 목록만으로
+            // 판정하면 다음 저빈도 ApplyView에서 Renderer가 다시 꺼진다.
+            return candidate.GetComponentInParent<공간LHStreamingEngine>(true)
+                   != null;
+        }
     }
 }

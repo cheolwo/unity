@@ -9,6 +9,10 @@ using UnityEngine.SceneManagement;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class H계층실증ShellTests
     {
         [Test]
@@ -40,6 +44,13 @@ namespace Ssalddel.Unity.Tests.EditMode
                     !value.H3Boundaries.gameObject.activeSelf
                     && !value.H2Boundaries.gameObject.activeSelf
                     && value.SyntyPresentation.gameObject.activeSelf), Is.True);
+                Assert.That(evidence.AreaSetRoots.SelectMany(value =>
+                        value.SyntyPresentation
+                            .GetComponentsInChildren<Renderer>(true))
+                    .Where(value => value.name.Contains("Skybox",
+                        StringComparison.OrdinalIgnoreCase))
+                    .All(value => !value.enabled), Is.True,
+                    "H1마다 복제된 전역 배경 Mesh는 실제 플레이 전경을 가리면 안 된다.");
                 Assert.That(evidence.AreaSetRoots.All(value =>
                     value.transform.Find("H3TerrainUnderlay") != null), Is.True);
 
@@ -151,6 +162,23 @@ namespace Ssalddel.Unity.Tests.EditMode
                                     && !value.transform.IsChildOf(
                                         policy.Player.VisualRoot));
                 Assert.That(unrelated.enabled, Is.False);
+
+                var lh = shell.GetComponentInChildren<공간LHStreamingEngine>(true);
+                Assert.That(lh, Is.Not.Null);
+                var streamed = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                streamed.name = "SinglePlayerView_LH_Runtime_Probe";
+                streamed.transform.SetParent(lh!.transform, false);
+                try
+                {
+                    policy.ApplyView();
+                    Assert.That(streamed.GetComponent<Renderer>().enabled,
+                        Is.True,
+                        "Play 중 LH가 만든 배치 표현은 단일 Player View가 다시 꺼서는 안 된다.");
+                }
+                finally
+                {
+                    UnityEngine.Object.DestroyImmediate(streamed);
+                }
             }
             finally
             {

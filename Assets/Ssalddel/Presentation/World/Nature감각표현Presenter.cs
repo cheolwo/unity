@@ -181,8 +181,9 @@ namespace Ssalddel.Unity.Presentation.World
                     PlayFx(frame.FxCueCode, frame.TargetStableId);
                 }
                 if (frame.PhaseCode == 감각표현단계Codes.Completed
-                    && markers.TryGetValue(frame.TargetStableId, out var marker))
-                    StartCoroutine(AnimateTreeFall(marker));
+                    && markers.TryGetValue(frame.TargetStableId, out var marker)
+                    && TryCreateTreeFallVisual(marker, out var pivot))
+                    StartCoroutine(AnimateTreeFall(pivot));
             }
 
             UpdateToolVisibility();
@@ -448,19 +449,38 @@ namespace Ssalddel.Unity.Presentation.World
             system.Emit(cueCode == 감각표현CueCodes.TreeFallDust ? 18 : 7);
         }
 
-        private IEnumerator AnimateTreeFall(Nature생존상호작용표식 marker)
+        private bool TryCreateTreeFallVisual(
+            Nature생존상호작용표식 marker, out Transform pivot)
         {
-            var pivot = new GameObject("TreeFallPresentation_" +
+            pivot = null!;
+            if (marker == null)
+                return false;
+            try
+            {
+                pivot = new GameObject("TreeFallPresentation_" +
                                        SafeName(marker.StableId)).transform;
-            pivot.SetParent(transform, true);
-            var bounds = RendererBounds(marker.gameObject);
-            pivot.position = new Vector3(bounds.center.x, bounds.min.y,
-                bounds.center.z);
-            pivot.rotation = marker.transform.rotation;
-            var clone = BuildStaticVisualClone(marker.gameObject, pivot,
-                "TreeFallVisual");
-            clone.SetPositionAndRotation(marker.transform.position,
-                marker.transform.rotation);
+                pivot.SetParent(transform, true);
+                var bounds = RendererBounds(marker.gameObject);
+                pivot.position = new Vector3(bounds.center.x, bounds.min.y,
+                    bounds.center.z);
+                pivot.rotation = marker.transform.rotation;
+                var clone = BuildStaticVisualClone(marker.gameObject, pivot,
+                    "TreeFallVisual");
+                clone.SetPositionAndRotation(marker.transform.position,
+                    marker.transform.rotation);
+                return true;
+            }
+            catch (MissingReferenceException)
+            {
+                if (pivot != null)
+                    Destroy(pivot.gameObject);
+                pivot = null!;
+                return false;
+            }
+        }
+
+        private IEnumerator AnimateTreeFall(Transform pivot)
+        {
             var elapsed = 0f;
             const float duration = .9f;
             while (elapsed < duration)

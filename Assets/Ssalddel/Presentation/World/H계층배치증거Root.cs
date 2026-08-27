@@ -93,11 +93,25 @@ namespace Ssalddel.Unity.Presentation.World
         {
             foreach (var root in areaSetRoots)
                 if (root != null)
+                {
                     root.ApplyVisibility(showHierarchyOverlayOnPlay,
                         showHierarchyOverlayOnPlay,
                         showHierarchyOverlayOnPlay,
                         showHierarchyOverlayOnPlay,
                         true);
+                    DisableDuplicatedGlobalBackdrops(root);
+                }
+        }
+
+        private static void DisableDuplicatedGlobalBackdrops(
+            AreaSet구성패턴검토Root root)
+        {
+            if (root.SyntyPresentation == null) return;
+            foreach (var renderer in root.SyntyPresentation
+                         .GetComponentsInChildren<Renderer>(true))
+                if (renderer.name.Contains("Skybox",
+                        StringComparison.OrdinalIgnoreCase))
+                    renderer.enabled = false;
         }
 
         public void Validate()
