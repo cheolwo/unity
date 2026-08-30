@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "ai.undream.llm": "https://github.com/undreamai/LLMUnity.git#9931a9ea46906b1f43adaf9498c05ccf227b5d0b",
     "com.ssalddel.code-metadata": "file:../../source/repos/Hongdal/Ssalddel.CodeMetadata",
     "com.ssalddel.interior.contracts": "file:../../source/repos/Hongdal/Ssalddel.Interior.Contracts/UnityPackage",
     "com.ssalddel.interior.domain": "file:../../source/repos/Hongdal/Ssalddel.Interior.Domain/UnityPackage",

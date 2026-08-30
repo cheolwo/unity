@@ -1,0 +1,7 @@
+{
+  "name": "Ssalddel.LocalNpcDialogue.LLMUnity",
+  "rootNamespace": "Ssalddel.LocalNpcDialogue",
+  "references": ["Ssalddel.LocalNpcDialogue.Core", "GUID:cf7c06d97d9c3b7db881733f839f5ae3", "Unity.Nuget.Newtonsoft-Json"],
+  "autoReferenced": false,
+  "noEngineReferences": false
+}

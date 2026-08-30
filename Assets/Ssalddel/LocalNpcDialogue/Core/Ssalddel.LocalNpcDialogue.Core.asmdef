@@ -1,0 +1,7 @@
+{
+  "name": "Ssalddel.LocalNpcDialogue.Core",
+  "rootNamespace": "Ssalddel.LocalNpcDialogue",
+  "references": [],
+  "autoReferenced": false,
+  "noEngineReferences": true
+}

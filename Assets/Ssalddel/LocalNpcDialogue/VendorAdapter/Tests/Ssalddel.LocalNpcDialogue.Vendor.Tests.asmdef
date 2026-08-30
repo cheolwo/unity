@@ -1,0 +1,7 @@
+{
+  "name": "Ssalddel.LocalNpcDialogue.Vendor.Tests",
+  "references": ["Ssalddel.LocalNpcDialogue.Core", "Ssalddel.LocalNpcDialogue.LLMUnity"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

@@ -1,0 +1,8 @@
+# Hand-authored verification projects are source, not Unity-generated projects.
+**/bin/
+**/obj/
+**/bin.meta
+**/obj.meta
+!Tests/LocalNpcDialogue.Core.Compatibility.csproj
+!Tests/LocalNpcDialogue.FixtureTests.csproj
+!VendorAdapter/Tests/VendorSmoke.csproj
