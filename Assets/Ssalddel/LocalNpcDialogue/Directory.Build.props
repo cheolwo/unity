@@ -1,0 +1,9 @@
+<Project>
+  <!-- 수동 .NET 검증 산출물은 Unity 자산이 아니다. SDK 초기 평가부터 프로젝트별로 분리한다. -->
+  <PropertyGroup>
+    <DialogueVerificationRoot>$(MSBuildThisFileDirectory)../../../artifacts/local/local-npc-dialogue-dotnet/</DialogueVerificationRoot>
+    <BaseOutputPath>$(DialogueVerificationRoot)bin/$(MSBuildProjectName)/</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(DialogueVerificationRoot)obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+</Project>
