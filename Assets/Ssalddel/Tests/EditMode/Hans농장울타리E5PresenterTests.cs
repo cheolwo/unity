@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 using Ssalddel.Simulation.Contracts;
@@ -58,7 +59,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             }
             finally
             {
-                Object.DestroyImmediate(root);
+                UnityEngine.Object.DestroyImmediate(root);
             }
         }
 
@@ -89,7 +90,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             }
             finally
             {
-                Object.DestroyImmediate(root);
+                UnityEngine.Object.DestroyImmediate(root);
             }
         }
 
