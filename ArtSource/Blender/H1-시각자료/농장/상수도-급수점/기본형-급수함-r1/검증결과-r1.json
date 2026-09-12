@@ -1,0 +1,80 @@
+{
+  "candidateRevision": "farm-water-service-point.r1",
+  "h1StableId": "h1-proposal:farm-pressurized-water-service-point",
+  "displayNameKo": "농장 상수도 급수점",
+  "ownership": "ProjectOwnedBlenderModel",
+  "dimensionsMetersIncludingBase": [
+    1.25,
+    1.0225,
+    1.105
+  ],
+  "anchors": [
+    {
+      "name": "Anchor_WaterMainIn",
+      "role": "BuriedWaterMainInput",
+      "location": [
+        0.4,
+        0.1,
+        0.0
+      ]
+    },
+    {
+      "name": "Anchor_HoseOut",
+      "role": "PressurizedHoseOutput",
+      "location": [
+        0.4,
+        -0.56,
+        0.82
+      ]
+    },
+    {
+      "name": "Anchor_Service",
+      "role": "PlayerOrNpcServiceInteraction",
+      "location": [
+        -0.17,
+        -0.3,
+        0.68
+      ]
+    }
+  ],
+  "styleReferenceAssets": [
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonCity\\Models\\SM_Prop_Pipe_Part_Connect_01.fbx",
+      "sha256": "95136B41FB36BA10E66D1C8BC30F9E2DCDDAF7747EEE1634AE61494E8C1DBDAF"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonCity\\Models\\SM_Prop_Pipe_Part_Straight_01.fbx",
+      "sha256": "8A64610CB3384B11B9E02D2B28346E906F4A96B91B70D601A02AFF200F7AFA0D"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonCity\\Models\\SM_Prop_Pipe_Part_T_01.fbx",
+      "sha256": "46F4D68AB0CA66F1DF0DA53AFEDE379E79DE6C5F34D459ABC343909373C88E21"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Models\\Props\\SM_Prop_HoseReel_01.fbx",
+      "sha256": "C167C4566DA28678B5F69EE90B3E5D359607D5DE37CB9E3AE168EB724B2F213D"
+    }
+  ],
+  "files": {
+    "image": "농장-상수도-급수점-H1-r1.png",
+    "imageSha256": "E11570C0B3D1C8B398A412EBE48094558E8D360637618A439122606A58DE4EE7",
+    "blend": "농장-상수도-급수점-H1-r1.blend",
+    "blendSha256": "CDC9D7E2BD6422F55490096BE0725581AC778A4F889E63BEA04E337CF61B9891",
+    "fbx": "농장-상수도-급수점-H1-r1.fbx",
+    "fbxSha256": "08DCBB27FE78CB69C2A85465A0B04CEF50B9D15D268E25DCAB4E4EC6F1BC0313"
+  },
+  "excludedFunctions": [
+    "Drainage",
+    "Sewerage",
+    "WaterTreatment",
+    "AuthoritativeFlowSimulation"
+  ],
+  "evidenceBoundary": {
+    "presentation": "E4VisualCandidate",
+    "unityPrefab": false,
+    "unityScene": false,
+    "playMode": false,
+    "gameView": false,
+    "e5": false
+  }
+}

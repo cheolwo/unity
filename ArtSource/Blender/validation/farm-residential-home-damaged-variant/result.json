@@ -1,0 +1,90 @@
+{
+  "projectId": "farm-residential-home-damaged-variant",
+  "hStableId": "h1-stock:farm-residential-home",
+  "status": "BlenderValidatedCopy",
+  "source": {
+    "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Bld_Farmhouse_02.fbx",
+    "guid": "ea1ba4b74f4bce84d977ef4f2cdaceb3",
+    "sha256": "8dbfc93740cf59125fca4263334c408e81afd55c03291a07335b07e9476a58d7",
+    "mutated": false
+  },
+  "damageCue": "MarkedRoofPatchesScatteredOpeningsAndBrownDustVisibleFromForestTrail",
+  "weathering": {
+    "treatment": "ProceduralBrownDustWash",
+    "scope": "ProjectOwnedVariantMaterialOnly",
+    "roughness": 0.9
+  },
+  "meshEdit": {
+    "mainMeshFacesBefore": 5618,
+    "mainMeshFacesAfter": 5646,
+    "addedDamageObjects": [
+      "Damage_RoofCavity",
+      "Damage_RoofCavity_Secondary",
+      "Damage_RoofCavity_Tertiary",
+      "Damage_RoofCavity_MarkedCenter",
+      "Damage_RoofCavity_MarkedRight",
+      "Damage_RoofCavity_MarkedLower",
+      "Damage_LooseRoofBoard_01",
+      "Damage_LooseRoofBoard_02",
+      "Damage_LooseRoofBoard_03"
+    ]
+  },
+  "outputs": {
+    "blend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\source\\farm-residential-home-damaged-variant\\farm-residential-home-damaged-variant.blend",
+    "fbx": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\exports\\farm-residential-home-damaged-variant\\farm-residential-home-damaged-variant.fbx",
+    "before": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\farm-residential-home-damaged-variant\\before.png",
+    "after": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\farm-residential-home-damaged-variant\\after.png",
+    "closeup": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\farm-residential-home-damaged-variant\\damage-closeup.png"
+  },
+  "evidenceLimit": "Blender derived-asset and render evidence only; no Unity import, Scene placement, Game View, or E5 claim.",
+  "reopenValidation": {
+    "passed": true,
+    "blendVersion": "5.2.1 LTS",
+    "requiredObjects": [
+      "Damage_LooseRoofBoard_01",
+      "Damage_LooseRoofBoard_02",
+      "Damage_LooseRoofBoard_03",
+      "Damage_RoofCavity",
+      "Damage_RoofCavity_MarkedCenter",
+      "Damage_RoofCavity_MarkedLower",
+      "Damage_RoofCavity_MarkedRight",
+      "Damage_RoofCavity_Secondary",
+      "Damage_RoofCavity_Tertiary",
+      "VARIANT_SM_Bld_Farmhouse_02"
+    ],
+    "fbxBytes": 298428
+  },
+  "fbxRoundTripValidation": {
+    "passed": true,
+    "meshObjectCount": 12,
+    "boundsMin": [
+      -4.292187690734863,
+      -4.604425430297852,
+      -4.897799499303801e-09
+    ],
+    "boundsMax": [
+      4.292187690734863,
+      4.604425430297852,
+      6.794301986694336
+    ],
+    "dimensions": [
+      8.584375381469727,
+      9.208850860595703,
+      6.794301986694336
+    ],
+    "objectNames": [
+      "Damage_LooseRoofBoard_01",
+      "Damage_LooseRoofBoard_02",
+      "Damage_LooseRoofBoard_03",
+      "Damage_RoofCavity",
+      "Damage_RoofCavity_MarkedCenter",
+      "Damage_RoofCavity_MarkedLower",
+      "Damage_RoofCavity_MarkedRight",
+      "Damage_RoofCavity_Secondary",
+      "Damage_RoofCavity_Tertiary",
+      "VARIANT_SM_Bld_Farmhouse_02",
+      "VARIANT_SM_Bld_Farmhouse_02_Door_01",
+      "VARIANT_SM_Bld_Farmhouse_02_Glass"
+    ]
+  }
+}

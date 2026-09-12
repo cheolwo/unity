@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NUnit.Framework;
 using Ssalddel.Unity.PlayerActivities;
 using Ssalddel.Unity.Presentation.World;
@@ -26,7 +27,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
-        public void Solo는_서버없이_도끼획득과_누르기벌목을완료한다()
+        public void Solo는_서버없이_벌목결과를_지면통나무로남기고_별도로줍는다()
         {
             var engine = new Nature생존LocalEngine(
                 Nature생존LocalEngine.CreateDefaultFixture());
@@ -37,9 +38,18 @@ namespace Ssalddel.Unity.Tests.EditMode
             engine.AdvanceRealtime(NatureSurvivalRules.HarvestWorkSeconds,
                 true, false);
 
+            var harvested = engine.Snapshot();
+            Assert.That(harvested.TimberQuantity, Is.Zero);
+            Assert.That(harvested.DroppedTimber, Has.Length.EqualTo(1));
+            Assert.That(harvested.DroppedTimber[0].StateCode,
+                Is.EqualTo(Nature생존Codes.DroppedTimberAvailable));
+            engine.CollectDroppedTimber(harvested.DroppedTimber[0].StableId);
+
             var state = engine.Snapshot();
             Assert.That(state.TimberQuantity,
                 Is.EqualTo(NatureSurvivalRules.HarvestTimberQuantity));
+            Assert.That(state.DroppedTimber[0].StateCode,
+                Is.EqualTo(Nature생존Codes.DroppedTimberCollected));
             Assert.That(state.ResourceNodes[0].StateCode,
                 Is.EqualTo(Nature생존Codes.Stump));
             Assert.That(state.ActiveWork, Is.Null);
@@ -72,6 +82,9 @@ namespace Ssalddel.Unity.Tests.EditMode
             {
                 engine.BeginHarvest($"resource:nature-tree:{index:00}");
                 engine.AdvanceRealtime(4, true, false);
+                var dropped = engine.Snapshot().DroppedTimber.Single(value =>
+                    value.StateCode == Nature생존Codes.DroppedTimberAvailable);
+                engine.CollectDroppedTimber(dropped.StableId);
             }
             engine.PlaceCabinBlueprint(3f, -2f, 90f);
             engine.BeginCabinBuild();

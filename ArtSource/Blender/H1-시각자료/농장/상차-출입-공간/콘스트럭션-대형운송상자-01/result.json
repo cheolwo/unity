@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-loading-gate",
+  "displayName": "상차 출입 공간 - Construction 대형 운송 상자",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonConstruction\\Models\\SM_Prop_Crate_Large_01.fbx",
+  "sourceSha256": "F6B05F436E22502CB06579F13D38EA3C06AFC6FD4D626690AB5A5B29F5EB544B",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\콘스트럭션-대형운송상자-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\콘스트럭션-대형운송상자-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonConstruction\\Textures\\PolygonConstruction_Texture_01_A.png",
+  "reviewScale": 1.0,
+  "meshObjects": [
+    "SM_Prop_Crate_Large_01"
+  ],
+  "dimensions": [
+    1.084,
+    1.45676,
+    0.9536
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

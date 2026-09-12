@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-proposal:farm-water-distribution-point",
+  "displayName": "농장 스프링클러 01",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Sprinkler_01.fbx",
+  "sourceSha256": "6D4D25212996CC2AE752C26CE7989BB2BF7585D2F4B21BAB3EAF8EB866DFF69F",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\급수-연결-검토\\후보-농장스프링클러-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\급수-연결-검토\\후보-농장스프링클러-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_Sprinkler_01"
+  ],
+  "dimensions": [
+    0.14441,
+    0.26754,
+    1.60199
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

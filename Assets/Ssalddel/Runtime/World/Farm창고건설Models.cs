@@ -58,6 +58,10 @@ namespace Ssalddel.Unity.Runtime.World
         public Farm창고건설ContextData Restored = new();
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public interface IFarm창고건설AuthorityClient
     {
         Task<Farm창고건설ContextData> RefreshAsync(
@@ -82,6 +86,10 @@ namespace Ssalddel.Unity.Runtime.World
             CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class Farm창고건설Coordinator
     {
         private readonly IFarm창고건설AuthorityClient authority;

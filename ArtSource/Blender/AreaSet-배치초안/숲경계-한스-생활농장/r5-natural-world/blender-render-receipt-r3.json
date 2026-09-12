@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "status": "Rendered",
+  "evidenceKind": "BlenderReviewRender",
+  "notGameView": true,
+  "postProcessingApplied": false,
+  "coordinateMapping": "Unity (X,Y,Z) -> Blender (X,-Z,Y); Unity yaw -> negative Blender Z rotation",
+  "draftHashSha256": "3F1A275C722351C21345541CC1C7590F6870FA9F5D7F5729A40B3D0734C98C92",
+  "resolvedPlacementCount": 83,
+  "instantiatedPlacementCount": 83,
+  "sourceFiles": {
+    "validatedPlacementPlan": "F392FEE0A40EF9C68C507A9A81837340CE5041226B78210EF68B77D86A14AE85",
+    "placementDraft": "A5BCDB56E8C287AE4B376C8DC0618BC1078CF05A87AAD43A28713349CC0D3FE6",
+    "assetCalibrations": "0FA485B08BFBFBF77D53C9D155F530E401AF589B70DD63AE70AE3218F8451C65",
+    "surfaceSnapshot": "DA583E613E258FFCEA0C2E0972FE5460EBF270ECD6623C0F6092F3F8CD884D75"
+  },
+  "importFailures": [],
+  "outputs": {
+    "blend": {
+      "path": "forest-edge-hans-farm-natural-world-r5-r3.blend",
+      "sha256": "F8EBF3D769536BCF9F39609A0E6E4BA0F0ACDC09F3CD5D3804F875FBC3FBB08A"
+    },
+    "overview": {
+      "path": "blender-overview-r3.png",
+      "sha256": "1E8B51EB53F0871C65F7279BF63702B74704E3E60082FD8B0F0C4B37B70854B7"
+    },
+    "eyeLevel": {
+      "path": "blender-eye-level-r3.png",
+      "sha256": "110866F4A639B3F6432770EA85A4605AB5DCF47E26E44192818228B94FF063AA"
+    }
+  },
+  "limits": [
+    "Static review render only; no Unity runtime, traversal, interaction, or authority evidence.",
+    "Terrain is the frozen surface snapshot and is not flattened.",
+    "Imported FBX geometry is used; review lighting and atlas materials are presentation-only."
+  ]
+}

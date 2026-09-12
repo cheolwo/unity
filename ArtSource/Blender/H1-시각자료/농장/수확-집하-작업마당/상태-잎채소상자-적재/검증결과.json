@@ -1,0 +1,17 @@
+{
+  "status": "BlenderH1CropPayloadRendered",
+  "h1StableId": "h1-stock:farm-work-yard",
+  "skeletonSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Bld_ProduceStand_01.fbx",
+  "skeletonSha256": "E96F2C5C330A0E62667B70658E2199A8C04CD2E943DF1A94E8FE8C57FE353C75",
+  "payloadCode": "crop-payload:leafy-cabbage-crate.v1",
+  "payloadSources": [
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Cabbage_01_L.fbx"
+  ],
+  "payloadSha256": [
+    "C04F411510028F09A70CBD39B637CE9F58F929BEAECC97EFBAFDF62BE425F130"
+  ],
+  "payloadInstances": 3,
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\상태-잎채소상자-적재\\잎채소-적재-상태.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\상태-잎채소상자-적재\\잎채소-적재-상태.blend",
+  "boundary": "E4 visual review only; no Unity prefab, state authority, interaction, or E5 evidence."
+}

@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-seed-preparation",
+  "displayName": "종자 준비 공간 보조 대안",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_GrainBag_01.fbx",
+  "sourceSha256": "582B06B7E5BFF39CAB19DB4B95DFF2C3750011228D65063F5A42CF2CB13A89C8",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\종자-준비-공간\\대안-곡물자루-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\종자-준비-공간\\대안-곡물자루-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_GrainBag_01"
+  ],
+  "dimensions": [
+    0.84502,
+    0.57246,
+    0.31994
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-proposal:farm-water-distribution-point",
+  "displayName": "호스 릴 01",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Models\\Props\\SM_Prop_HoseReel_01.fbx",
+  "sourceSha256": "C167C4566DA28678B5F69EE90B3E5D359607D5DE37CB9E3AE168EB724B2F213D",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\급수-연결-검토\\후보-호스릴-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\급수-연결-검토\\후보-호스릴-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Textures\\Alts\\PolygonTown_01_A.png",
+  "meshObjects": [
+    "SM_Prop_HoseReel_01"
+  ],
+  "dimensions": [
+    0.56765,
+    0.83036,
+    0.5408
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

@@ -1,0 +1,19 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-production",
+  "displayName": "경작 구획 H1 2.5m 왕복",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-cultivation-plot-module\\farm-cultivation-plot-2_5m.fbx",
+  "sourceSha256": "715BE89AC9C2824D2B1B254DCFF936BA821961793135A47021F010F46E0B84A3",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-cultivation-plot-module\\roundtrip\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-cultivation-plot-module\\roundtrip\\candidate-review.blend",
+  "meshObjects": [
+    "Farm_CultivationPlot_2_5m"
+  ],
+  "dimensions": [
+    2.5,
+    2.5,
+    0.18834
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-washing",
+  "displayName": "반통 세척조 01",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Barrel_Half_01.fbx",
+  "sourceSha256": "14CC9F2448EE7ECE7E76001B9264643A43D9BE0FA643EEB980429977BC841F85",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-반통세척조-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-반통세척조-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_Barrel_Half_01"
+  ],
+  "dimensions": [
+    0.90569,
+    0.90569,
+    0.5651
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

@@ -1,0 +1,95 @@
+{
+  "candidateRevision": "cultivation-plot-state-sample.r2",
+  "h1StableId": "h1-stock:farm-production",
+  "variantCode": "cultivation-plot-2.5x2.5m",
+  "dimensionsMeters": [
+    2.5,
+    2.5,
+    0.18834
+  ],
+  "visualCropExample": "potato",
+  "states": [
+    {
+      "code": "01",
+      "nameKo": "빈고랑",
+      "plantedRootCount": 0,
+      "harvestedPayloadRootCount": 0,
+      "image": "01-빈고랑.png",
+      "imageSha256": "E4A662E1721EAF2928C036531DBF1D8EA0A41778D1A640D18DA6EA4C0C88B82C"
+    },
+    {
+      "code": "02",
+      "nameKo": "파종초기발아",
+      "plantedRootCount": 9,
+      "harvestedPayloadRootCount": 0,
+      "image": "02-파종초기발아.png",
+      "imageSha256": "8D8B12223B95FBEFC208F9C6DE1D59E7B9690CF41A0A699C5AC332537D7A2A89"
+    },
+    {
+      "code": "03",
+      "nameKo": "성숙",
+      "plantedRootCount": 9,
+      "harvestedPayloadRootCount": 0,
+      "image": "03-성숙.png",
+      "imageSha256": "F7518AAACAE267A67F2795C67546745EA29F327FE4A43C40D4B3F828AE3510F0"
+    },
+    {
+      "code": "04",
+      "nameKo": "부분수확",
+      "plantedRootCount": 6,
+      "harvestedPayloadRootCount": 3,
+      "image": "04-부분수확.png",
+      "imageSha256": "6BCAF24C3F2644A71CDF445C5951D4D5CF28FDA2866568587132D429E9037B7E"
+    }
+  ],
+  "placementRule": {
+    "cropAlignment": "RidgeCenterLines",
+    "ridgeCenterX": [
+      -0.78,
+      0.0,
+      0.78
+    ],
+    "rowY": [
+      -0.72,
+      0.0,
+      0.72
+    ],
+    "plotPivot": "Center"
+  },
+  "sources": [
+    {
+      "path": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\경작구획-2.5x2.5m\\경작구획-H1-2.5x2.5m.fbx",
+      "sha256": "5AEC262999F9CE2B1CA6C266E4490BF1FA7030898A11EE15032B7859ADABD265"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Plant_Potato_01_S.fbx",
+      "sha256": "D08F96639D331F7C5AA1C226E62AF9AADF280C5DD7CCC7A2C1C38849904B3DF6"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Plant_Potato_01_L.fbx",
+      "sha256": "F82DF2259149FEE4789B9E2BC427B73FADDEE3DF2AA012126B150B0D0F4A96AC"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Potato_01_Group.fbx",
+      "sha256": "45259A1E9574DA267A610FFC0707740803B7529F5FE0352B0E1E8895CAD7E09C"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+      "sha256": "AE59540EFAD76DE089C17059762D627CAFF3A74BC30B64DC497F0A5D855322DD"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\Leaves_01_Diff.tga",
+      "sha256": "6361754FA68B51BFB18020C5FE32C2241389414904FACC914CB65888909A7733"
+    }
+  ],
+  "blend": "경작구획-H1-상태표본-r2.blend",
+  "blendSha256": "8BE04CA30E843F276FC489D37EA54AFFCE53A4294D1554DD511007FECB905EA7",
+  "evidenceBoundary": {
+    "presentation": "E4VisualCandidate",
+    "unityPrefab": false,
+    "unityScene": false,
+    "playMode": false,
+    "gameView": false,
+    "e5": false
+  }
+}

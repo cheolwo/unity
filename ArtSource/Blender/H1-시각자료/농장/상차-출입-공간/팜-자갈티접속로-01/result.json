@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-loading-gate",
+  "displayName": "상차 출입 공간 - Farm 자갈 T 접속로",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Env_Road_Gravel_T_Section_01.fbx",
+  "sourceSha256": "B804A1A8C7B014232496CF8952006A2CB69E3963DFFB102B6FBCB8AFF5066BDF",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\팜-자갈티접속로-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\팜-자갈티접속로-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "reviewScale": 1.0,
+  "meshObjects": [
+    "SM_Env_Road_Gravel_T_Section_01"
+  ],
+  "dimensions": [
+    15.66832,
+    12.36069,
+    0.3155
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

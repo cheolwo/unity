@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-proposal:farm-wastewater-drain-point",
+  "displayName": "C 콘크리트 배수관",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonConstruction\\Models\\SM_Prop_Pipe_Concrete_01.fbx",
+  "sourceSha256": "6C2F01644B223796C44CC354BC8D44441F1AD27D62978A3BD87A57161226A065",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\배수-오수처리점\\후보-C-콘크리트배수관\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\배수-오수처리점\\후보-C-콘크리트배수관\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonConstruction\\Textures\\PolygonConstruction_Texture_01_A.png",
+  "reviewScale": 1.0,
+  "meshObjects": [
+    "SM_Prop_Pipe_Concrete_01"
+  ],
+  "dimensions": [
+    0.78417,
+    5.64517,
+    0.78417
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

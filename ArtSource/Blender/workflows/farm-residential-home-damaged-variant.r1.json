@@ -1,0 +1,63 @@
+{
+  "schemaRevision": "blender-project-owned-variant.r1",
+  "projectId": "farm-residential-home-damaged-variant",
+  "status": "BlenderValidatedCopy",
+  "source": {
+    "provider": "Synty",
+    "ownership": "SupplierOriginalReadOnly",
+    "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Bld_Farmhouse_02.fbx",
+    "guid": "ea1ba4b74f4bce84d977ef4f2cdaceb3",
+    "sha256": "8dbfc93740cf59125fca4263334c408e81afd55c03291a07335b07e9476a58d7",
+    "licenseEvidenceRef": "User-confirmed owned Synty POLYGON Farm package in the local Unity project; redistribution remains prohibited"
+  },
+  "lineage": {
+    "planningRefs": [
+      "C:/Users/user/source/repos/Hongdal/docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md"
+    ],
+    "wiIds": [
+      "NotApplicable: this is a reusable H1 presentation state, not a WI authority"
+    ],
+    "hIds": [
+      "h1-stock:farm-residential-home"
+    ],
+    "visualKeys": [
+      "FarmResidentialHome.Damaged.ScatteredRoofHolesAndDust"
+    ]
+  },
+  "intent": {
+    "reuseDecision": "BlenderValidatedCopy",
+    "changeBudget": "Subtle",
+    "playerReadableDifference": "숲길 사선 시야에서 곳곳의 작은 지붕 결손, 노출 판재와 불균일한 갈색 먼지 풍화가 읽히되 생활 가능한 농장 주택의 실루엣과 출입구는 유지된다.",
+    "allowedChanges": [
+      "MeshDamageState",
+      "MeshAddition",
+      "MaterialSlotReuse"
+    ],
+    "forbiddenChanges": [
+      "SupplierOriginalOverwrite",
+      "ExternalAiUpload",
+      "UnapprovedBulkAutomation"
+    ]
+  },
+  "outputs": {
+    "blendPath": "ArtSource/Blender/source/farm-residential-home-damaged-variant/farm-residential-home-damaged-variant.blend",
+    "exportPath": "ArtSource/Blender/exports/farm-residential-home-damaged-variant/farm-residential-home-damaged-variant.fbx",
+    "validationPath": "ArtSource/Blender/validation/farm-residential-home-damaged-variant/result.json",
+    "unityCandidatePath": "Assets/SsalddelGenerated/ProjectOwnedVariants/farm-residential-home-damaged-variant/farm-residential-home-damaged-variant.fbx"
+  },
+  "executionPolicy": {
+    "mode": "ManualLocalEditOnly",
+    "externalUploadAllowed": false,
+    "supplierOriginalMutationAllowed": false,
+    "autoexecAllowed": false
+  },
+  "acceptance": {
+    "preserveUnitScale": true,
+    "preserveMaterialSlots": true,
+    "preserveRigWhenPresent": true,
+    "requireBlendReopen": true,
+    "requireFbxRoundTrip": true,
+    "requireUnityImportReview": true,
+    "requireGameViewReview": true
+  }
+}

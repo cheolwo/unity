@@ -1,0 +1,37 @@
+{
+  "status": "BlenderE4RiggedPoseStudyRendered",
+  "revision": "nature-woodcutting-rigged-pose-samples.r2",
+  "states": [
+    {
+      "state": "ready",
+      "image": "01-안정된준비자세.png",
+      "blend": "01-안정된준비자세.blend",
+      "rig": "벌목검토리그",
+      "bones": 15
+    },
+    {
+      "state": "backswing",
+      "image": "02-하체로받치는백스윙.png",
+      "blend": "02-하체로받치는백스윙.blend",
+      "rig": "벌목검토리그",
+      "bones": 15
+    },
+    {
+      "state": "contact",
+      "image": "03-골반회전타격접촉.png",
+      "blend": "03-골반회전타격접촉.blend",
+      "rig": "벌목검토리그",
+      "bones": 15
+    }
+  ],
+  "biomechanics": [
+    "wide_stance",
+    "knee_flexion",
+    "hip_hinge",
+    "hip_rotation",
+    "torso_follow_through",
+    "two_hand_grip"
+  ],
+  "supersedes": "nature-woodcutting-pose-samples.r1 as visual acceptance candidate; r1 remains initial blocking history",
+  "boundary": "Presentation E4 rigged pose study only; not a final skinned Synty actor, authored animation clip, Unity playback, or E5 evidence."
+}

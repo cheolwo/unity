@@ -29,6 +29,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
         {
             var savesRoot = Path.Combine(Path.GetTempPath(),
                 "ssalddel-nature-e7-playmode-" + Guid.NewGuid().ToString("N"));
+            var 생활거점GameViewEvidencePath = string.Empty;
             Environment.SetEnvironmentVariable(
                 "SSALDDEL_NATURE_E7_VALIDATION", "1");
             Environment.SetEnvironmentVariable(
@@ -361,13 +362,37 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 Assert.That(restored.State.ResourceNodes.Count(value =>
                     value.StateCode == Nature생존Codes.Stump), Is.EqualTo(3));
                 Assert.That(restored.State.PlayerInsideCabin, Is.False);
+                var restoredCabinCompleted = restored.State.Cabin.StateCode ==
+                    Nature생존Codes.Completed;
+                var restoredStumpCount = restored.State.ResourceNodes.Count(value =>
+                    value.StateCode == Nature생존Codes.Stump);
 
                 var restoredPlayer = UnityEngine.Object.FindAnyObjectByType<
                     플레이어경관Controller>(FindObjectsInactive.Include)!;
+                var restoredModePresenter = UnityEngine.Object.FindAnyObjectByType<
+                    통합월드ModePresenter>(FindObjectsInactive.Include)!;
+                restoredModePresenter.ShowNatureExploration();
+                Assert.That(restoredModePresenter.CurrentModeCode,
+                    Is.EqualTo(통합월드ModeCodes.NatureExploration));
                 restoredPlayer.EnterExplorationFirstPersonMode();
                 restoredPlayer.TickCameraTransition(
                     restoredPlayer.ViewTransitionDuration);
                 restoredPlayer.enabled = false;
+                yield return WaitForMarker(restored,
+                    Nature생존상호작용Kind.Cabin);
+                if (restored.DiagnosticHudExpanded)
+                    yield return PressKey(restored, keyboard, Key.F8);
+                var restoredCabin = Marker(restored,
+                    Nature생존상호작용Kind.Cabin);
+                FrameForEvidence(restoredPlayer, restoredCabin, 8f);
+                for (var captureFrame = 0; captureFrame < 5; captureFrame++)
+                    yield return null;
+                생활거점GameViewEvidencePath = CreateTimestampedEvidencePath(
+                    "nature-shelter-e8",
+                    "SimulationWorldShell-nature-shelter-restored");
+                ScreenCapture.CaptureScreenshot(
+                    생활거점GameViewEvidencePath, 1);
+                yield return WaitForEvidenceFile(생활거점GameViewEvidencePath);
                 var twilightTree = UnityEngine.Object.FindObjectsByType<
                         Nature생존상호작용표식>(FindObjectsInactive.Include)
                     .Where(value => value.Kind ==
@@ -454,6 +479,9 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 Assert.That(restored.State.LastCombatResultCode,
                     Is.Not.Empty);
                 Assert.That(restored.Status, Does.Contain("거점으로 복귀"));
+                WriteShelterE8Receipt(생활거점GameViewEvidencePath,
+                    savedSession, savedRevision.Value,
+                    restoredCabinCompleted, restoredStumpCount);
             }
             finally
             {
@@ -1222,6 +1250,13 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     FindObjectsInactive.Include)
                 .First(value => value.Kind == kind);
 
+        private static Nature생존상호작용표식 Marker(
+            Nature생존Controller owner, Nature생존상호작용Kind kind)
+            => UnityEngine.Object.FindObjectsByType<Nature생존상호작용표식>(
+                    FindObjectsInactive.Include)
+                .First(value => value.Kind == kind
+                    && value.GetComponentInParent<Nature생존Controller>() == owner);
+
         private static IEnumerator WaitForMarker(
             Nature생존상호작용Kind kind, float timeoutSeconds = 5f)
         {
@@ -1245,6 +1280,34 @@ namespace Ssalddel.Unity.Tests.PlayMode
             }
 
             Assert.Fail($"LH 재조립 뒤 {kind} 상호작용 표식이 준비되지 않았습니다.");
+        }
+
+        private static IEnumerator WaitForMarker(Nature생존Controller owner,
+            Nature생존상호작용Kind kind, float timeoutSeconds = 5f)
+        {
+            var deadline = Time.realtimeSinceStartup + timeoutSeconds;
+            var stableFrames = 0;
+            while (Time.realtimeSinceStartup < deadline)
+            {
+                if (UnityEngine.Object.FindObjectsByType<
+                        Nature생존상호작용표식>(FindObjectsInactive.Exclude)
+                    .Any(value => value.Kind == kind
+                        && value.GetComponentInParent<Nature생존Controller>() ==
+                        owner))
+                {
+                    stableFrames++;
+                    if (stableFrames >= 2)
+                        yield break;
+                }
+                else
+                {
+                    stableFrames = 0;
+                }
+                yield return null;
+            }
+
+            Assert.Fail($"현재 Nature controller의 {kind} 표식이 "
+                + "LH 재조립 뒤 준비되지 않았습니다.");
         }
 
         private static IEnumerator WaitForInteriorOverlay(
@@ -1493,6 +1556,75 @@ namespace Ssalddel.Unity.Tests.PlayMode
             Assert.That(File.Exists(evidencePath), Is.True);
             Assert.That(new FileInfo(evidencePath).Length,
                 Is.GreaterThan(1024));
+        }
+
+        private static string CreateTimestampedEvidencePath(
+            string directoryName, string fileNamePrefix)
+        {
+            var evidenceDirectory = Path.Combine(Path.GetFullPath(
+                    Path.Combine(UnityEngine.Application.dataPath, "..")),
+                "artifacts", "local", "validation", directoryName);
+            Directory.CreateDirectory(evidenceDirectory);
+            return Path.Combine(evidenceDirectory, fileNamePrefix + "-"
+                + DateTime.UtcNow.ToString("yyyyMMdd-HHmmssfff") + ".png");
+        }
+
+        private static IEnumerator WaitForEvidenceFile(string evidencePath)
+        {
+            yield return new WaitForEndOfFrame();
+            var captureDeadline = Time.realtimeSinceStartup + 10f;
+            while (!File.Exists(evidencePath)
+                   && Time.realtimeSinceStartup < captureDeadline)
+                yield return null;
+            Assert.That(File.Exists(evidencePath), Is.True,
+                "canonical Game View 캡처가 제한 시간 안에 생성되어야 한다.");
+            Assert.That(new FileInfo(evidencePath).Length,
+                Is.GreaterThan(1024));
+        }
+
+        private static void WriteShelterE8Receipt(string gameViewEvidencePath,
+            string sessionStableId, long restoredRevision,
+            bool completedCabinRestored, int restoredStumpCount)
+        {
+            var evidenceDirectory = Path.GetDirectoryName(gameViewEvidencePath)!;
+            var receipt = new NatureShelterE8Receipt
+            {
+                schema = "nature-shelter-e8-playmode-receipt.v1",
+                testFullName = TestContext.CurrentContext.Test.FullName,
+                executedAtUtc = DateTime.UtcNow.ToString("O"),
+                canonicalScene = "SimulationWorldShell",
+                actualInputPassed = true,
+                saveReentryPassed = true,
+                completedCabinRestored = completedCabinRestored,
+                restoredStumpCount = restoredStumpCount,
+                sessionStableId = sessionStableId,
+                restoredRevision = restoredRevision,
+                gameViewEvidencePath = gameViewEvidencePath.Replace('\\', '/'),
+            };
+            var receiptPath = Path.Combine(evidenceDirectory,
+                "nature-shelter-e8-playmode-"
+                + DateTime.UtcNow.ToString("yyyyMMdd-HHmmssfff") + ".json");
+            File.WriteAllText(receiptPath, JsonUtility.ToJson(receipt, true),
+                new System.Text.UTF8Encoding(false));
+            TestContext.Progress.WriteLine(
+                "GameViewEvidence=" + gameViewEvidencePath);
+            TestContext.Progress.WriteLine("PlayModeReceipt=" + receiptPath);
+        }
+
+        [Serializable]
+        private sealed class NatureShelterE8Receipt
+        {
+            public string schema = string.Empty;
+            public string testFullName = string.Empty;
+            public string executedAtUtc = string.Empty;
+            public string canonicalScene = string.Empty;
+            public bool actualInputPassed;
+            public bool saveReentryPassed;
+            public bool completedCabinRestored;
+            public int restoredStumpCount;
+            public string sessionStableId = string.Empty;
+            public long restoredRevision;
+            public string gameViewEvidencePath = string.Empty;
         }
 
         private static Vector3 MarkerAimPoint(Nature생존상호작용표식 marker)

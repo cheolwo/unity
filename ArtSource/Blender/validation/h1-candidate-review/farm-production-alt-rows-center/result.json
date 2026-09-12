@@ -1,0 +1,19 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-production",
+  "displayName": "농업 생산구획 대안-중앙 고랑",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Env_Dirt_Rows_Center_01.fbx",
+  "sourceSha256": "D74A40009C77E5AAD34FFF8449E96EF25CF292B419A75355AA3ADB50C9914527",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-production-alt-rows-center\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-production-alt-rows-center\\candidate-review.blend",
+  "meshObjects": [
+    "SM_Env_Dirt_Rows_Center_01"
+  ],
+  "dimensions": [
+    5.0,
+    5.0,
+    0.19451
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

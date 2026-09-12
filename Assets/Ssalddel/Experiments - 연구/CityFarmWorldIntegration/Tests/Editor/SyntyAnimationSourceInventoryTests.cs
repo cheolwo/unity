@@ -6,15 +6,18 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor.Tests
     public sealed class SyntyAnimationSourceInventoryTests
     {
         [Test]
-        public void 현재SyntyImport는_HumanoidRig와Fx를제공하지만ClipController는없다()
+        public void 현재SyntyImport는_기존HumanoidRig와Fx외에_구매AnimationClip도제공한다()
         {
             var report = SyntyAnimationSourceInventory.Inspect();
 
-            Assert.That(report.StandaloneAnimationClipCount, Is.Zero);
-            Assert.That(report.AnimatorControllerCount, Is.Zero);
+            Assert.That(report.StandaloneAnimationClipCount, Is.EqualTo(5));
+            Assert.That(report.AnimatorControllerCount, Is.EqualTo(176));
             Assert.That(report.AnimatorOverrideControllerCount, Is.Zero);
             Assert.That(report.HumanoidRigPaths.Count, Is.EqualTo(5));
             Assert.That(report.ImportedCharacterClipPaths, Is.Empty);
+            Assert.That(report.PurchasedAnimationClipCounts["base-locomotion"], Is.EqualTo(823));
+            Assert.That(report.PurchasedAnimationClipCounts["emotes-and-taunts"], Is.EqualTo(280));
+            Assert.That(report.PurchasedAnimationClipCounts["sword-combat"], Is.EqualTo(363));
             Assert.That(report.ParticleSystemPrefabCounts["farm"], Is.EqualTo(11));
             Assert.That(report.ParticleSystemPrefabCounts["city"], Is.EqualTo(2));
             Assert.That(report.ParticleSystemPrefabCounts["generic"], Is.EqualTo(17));

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "h2-local-composition-visual-library.v1",
+  "revision": "h2-local-composition-visual-library.r2",
+  "authorityBoundary": "Connected Blender layout proposals only; not canonical H registration, Unity placement or E5 authority.",
+  "items": [
+    {
+      "proposalId": "h2-proposal:farm-produce-washing-area",
+      "koreanName": "농산물 세척 공간",
+      "state": "DraftConnectedComposition",
+      "requiredH1Roles": [
+        "PressurizedWaterSourceH1",
+        "HoseReelAndHandleH1",
+        "HoseH1",
+        "WashPointH1",
+        "DrainagePointH1"
+      ],
+      "graphEdgeRoles": [
+        "SuppliesWaterTo",
+        "DrainsWaterTo"
+      ],
+      "e4Meaning": "ConnectedTopologyOnly_NotFixedDistanceAngleOrCurve",
+      "e5Requirements": [
+        "WorldAnchorEndpoints",
+        "DynamicHoseShape",
+        "RequiredAndMaximumLength",
+        "GroundFollowing",
+        "ObstacleAndTraversalInterference",
+        "WaterSupplyState"
+      ],
+      "image": "농장/농산물-세척-공간/H2-연결시안.png",
+      "blend": "농장/농산물-세척-공간/H2-연결시안.blend",
+      "result": "농장/농산물-세척-공간/검증결과.json"
+    },
+    {
+      "proposalId": "h2-proposal:farm-furrow-irrigation-area",
+      "koreanName": "고랑 관수 공간",
+      "state": "DraftConnectedComposition_OptionalSprinklerShown",
+      "requiredH1Roles": [
+        "PressurizedWaterSourceH1",
+        "HoseReelAndHandleH1",
+        "HoseH1",
+        "CultivationPlotH1"
+      ],
+      "optionalH1Roles": [
+        "IrrigationEndpointH1"
+      ],
+      "graphEdgeRoles": [
+        "SuppliesWaterTo"
+      ],
+      "e4Meaning": "ConnectedTopologyOnly_NotFixedDistanceAngleOrCurve",
+      "e5Requirements": [
+        "WorldAnchorEndpoints",
+        "DynamicHoseShape",
+        "RequiredAndMaximumLength",
+        "GroundFollowing",
+        "ObstacleAndTraversalInterference",
+        "IrrigationReach"
+      ],
+      "image": "농장/고랑-관수-공간-스프링클러선택/H2-연결시안.png",
+      "blend": "농장/고랑-관수-공간-스프링클러선택/H2-연결시안.blend",
+      "result": "농장/고랑-관수-공간-스프링클러선택/검증결과.json"
+    }
+  ]
+}

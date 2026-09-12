@@ -1,0 +1,19 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-production",
+  "displayName": "농업 생산구획 대안-감자",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Potato_01.fbx",
+  "sourceSha256": "287FDB6BE49533BA10BAE6308B5246C2C25EE3DA96B05C70B0F69BA5471FB013",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-production-alt-potato\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-production-alt-potato\\candidate-review.blend",
+  "meshObjects": [
+    "SM_Prop_Potato_01"
+  ],
+  "dimensions": [
+    0.11014,
+    0.16068,
+    0.07789
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

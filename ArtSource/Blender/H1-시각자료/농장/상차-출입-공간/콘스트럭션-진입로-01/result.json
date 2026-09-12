@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-loading-gate",
+  "displayName": "상차 출입 공간 - Construction 진입로",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonConstruction\\Models\\SM_Env_DirtRoad_Driveway_01.fbx",
+  "sourceSha256": "9FD03382C4B3E8127DFEDA4468C8773D49F483422076A3415AC38BA11E575931",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\콘스트럭션-진입로-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\콘스트럭션-진입로-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonConstruction\\Textures\\PolygonConstruction_Texture_01_A.png",
+  "reviewScale": 1.0,
+  "meshObjects": [
+    "SM_Env_DirtRoad_Driveway_01"
+  ],
+  "dimensions": [
+    11.47996,
+    15.44735,
+    0.85728
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

@@ -22,6 +22,8 @@ namespace Ssalddel.Unity.Presentation.World
         DroppedTimber,
         Cabin,
         Workbench,
+        HansBrokenAxe,
+        HansFarmFence,
     }
 
     [DisallowMultipleComponent]
@@ -107,6 +109,7 @@ namespace Ssalddel.Unity.Presentation.World
         private bool workbenchPlacementMode;
         private bool workHoldRequested;
         private bool primaryWasHeld;
+        private int primaryConsumedFrame = -1;
         private bool buildKeyWasHeld;
         private bool fightKeyWasHeld;
         private bool retreatKeyWasHeld;
@@ -118,19 +121,26 @@ namespace Ssalddel.Unity.Presentation.World
         private bool plan1KeyWasHeld;
         private bool plan2KeyWasHeld;
         private bool plan3KeyWasHeld;
-        private bool diagnosticKeyWasHeld;
+        private int diagnosticConsumedFrame = -1;
         private bool inventoryKeyWasHeld;
         private bool escapeKeyWasHeld;
         private bool diagnosticHudExpanded;
         private bool equipmentPanelOpen;
-        private int equipmentPointerHandledFrame = -1;
+        private int equipmentUiTransitionFrame = -1;
         private SimulationActorEquipmentStateSnapshot? equipmentState;
         private bool legacyWorldVisualsMigrated;
         private Nature위협관찰PresentationDecision? threatObservation;
         private long? lastSavedRevision;
+        private long presentationObservationEpoch;
+        private Hans농장울타리E5Presenter? hansFencePresenter;
 
         public bool SoloLocalAuthority => soloLocalAuthority;
         public Nature생존State State => engine.Snapshot();
+        public long PresentationObservationEpoch => presentationObservationEpoch;
+        // 표시 제어만 읽으며 작업 진행/취소 명령이나 추가 상태 조회를 만들지 않는다.
+        public bool PresentationWorkInputHeld => player != null
+            && string.IsNullOrEmpty(HigherPriorityInputReason())
+            && ((activeWorkMouse ?? Mouse.current)?.leftButton.isPressed == true || workHoldRequested);
         public Vector3 PlayerWorldPosition => player != null
             ? player.transform.position : transform.position;
         /// <summary>
@@ -160,6 +170,26 @@ namespace Ssalddel.Unity.Presentation.World
         public float ApprovedSurfaceWorldY => approvedSurfaceWorldY;
         public bool DiagnosticHudExpanded => diagnosticHudExpanded;
         public bool EquipmentPanelOpen => equipmentPanelOpen;
+        private bool NatureHudVisible => isActiveAndEnabled && player != null
+            && player.OwnsNatureHud(this) && CanUseNatureInput(player.CurrentActivityCode);
+        public bool BlocksWorldPointerForEquipment => NatureHudVisible
+            && (equipmentPanelOpen || equipmentUiTransitionFrame == Time.frameCount
+                || EquipmentKeyTransitionPending());
+        public bool IsPresentationPointerBlocked(Vector2 screenPoint)
+            => NatureHudVisible && (BlocksWorldPointerForEquipment
+                || HudGuiRect().Contains(ToGuiPoint(screenPoint)));
+
+        private bool EquipmentKeyTransitionPending()
+        {
+            var keyboard = Keyboard.current;
+            // Update와 같은 눌림 경계를 읽기만 한다. 키 상태를 여기서 소비하지 않는다.
+            return EquipmentKeyTransitionPending(keyboard?.iKey.isPressed == true,
+                keyboard?.escapeKey.isPressed == true);
+        }
+
+        private bool EquipmentKeyTransitionPending(bool inventoryHeld, bool escapeHeld)
+            => inventoryHeld && !inventoryKeyWasHeld
+                || equipmentPanelOpen && escapeHeld && !escapeKeyWasHeld;
         public bool AssistedApproachActive => assistedApproachTarget != null;
         public bool WorkHoldRequested => workHoldRequested;
         public bool WorkbenchPlacementMode => workbenchPlacementMode;
@@ -180,6 +210,10 @@ namespace Ssalddel.Unity.Presentation.World
             Func<string>? saveWorldAction = null,
             string profileLabel = "기본 Solo")
         {
+            if (!playerController.TryBindNatureHud(this))
+                throw new InvalidOperationException("NatureHudOwnerConflict");
+            if (player != null && player != playerController) player.ReleaseNatureHud(this);
+            presentationObservationEpoch = checked(presentationObservationEpoch + 1);
             player = playerController;
             visualRoot = root;
             semanticOrigin = origin;
@@ -217,7 +251,6 @@ namespace Ssalddel.Unity.Presentation.World
             plan1KeyWasHeld = false;
             plan2KeyWasHeld = false;
             plan3KeyWasHeld = false;
-            diagnosticKeyWasHeld = false;
             inventoryKeyWasHeld = false;
             escapeKeyWasHeld = false;
             Update();
@@ -367,7 +400,19 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnDestroy()
         {
+            if (player != null) player.ReleaseNatureHud(this);
             if (engine is IDisposable disposable) disposable.Dispose();
+        }
+
+        private void OnEnable()
+        {
+            if (player != null && !player.TryBindNatureHud(this))
+                status = "Nature UI 연결 차단 · 다른 상태창 소유자가 있습니다.";
+        }
+
+        private void OnDisable()
+        {
+            if (player != null) player.ReleaseNatureHud(this);
         }
 
         private void Update()
@@ -380,9 +425,9 @@ namespace Ssalddel.Unity.Presentation.World
             var escapePressed = escapeHeld && !escapeKeyWasHeld;
             inventoryKeyWasHeld = inventoryHeld;
             escapeKeyWasHeld = escapeHeld;
-            if (inventoryPressed)
+            if (inventoryPressed && player.OwnsNatureHud(this))
                 SetEquipmentPanelOpen(!equipmentPanelOpen);
-            if (escapePressed && equipmentPanelOpen)
+            if (escapePressed && equipmentPanelOpen && player.OwnsNatureHud(this))
                 SetEquipmentPanelOpen(false);
             var inputBlockReason = HigherPriorityInputReason();
             var higherPriority = !string.IsNullOrEmpty(inputBlockReason);
@@ -392,7 +437,11 @@ namespace Ssalddel.Unity.Presentation.World
             var physicalMouseHeld = inputMouse?.leftButton.isPressed == true;
             var mouseHeld = physicalMouseHeld
                             || workHoldRequested && State.ActiveWork != null;
-            var primaryPressed = physicalMouseHeld && !primaryWasHeld;
+            // 같은 입력 갱신 안에서 down/up가 끝나도 눌림 edge는 남는다.
+            // 작업 진행은 위의 실제 held 값만 사용하며 click을 유지 입력으로 합성하지 않는다.
+            var primaryPressed = TryConsumePrimaryPress(
+                inputMouse?.leftButton.wasPressedThisFrame == true,
+                Time.frameCount, ref primaryConsumedFrame);
             primaryWasHeld = physicalMouseHeld;
             var paused = (!UnityEngine.Application.isFocused
                           && !UnityEngine.Application.isBatchMode)
@@ -410,6 +459,10 @@ namespace Ssalddel.Unity.Presentation.World
                 }
             }
 
+            // 재활성 결속 실패한 이전 Controller는 자연 시간 조회/갱신과 별개로
+            // 현재 Player의 키·포인터 명령을 중복 소비하지 않는다.
+            if (!player.OwnsNatureHud(this)) return;
+
             var buildHeld = keyboard?.bKey.isPressed == true;
             var fightHeld = keyboard?.fKey.isPressed == true;
             var retreatHeld = keyboard?.rKey.isPressed == true;
@@ -421,7 +474,13 @@ namespace Ssalddel.Unity.Presentation.World
             var plan1Held = keyboard?.digit1Key.isPressed == true;
             var plan2Held = keyboard?.digit2Key.isPressed == true;
             var plan3Held = keyboard?.digit3Key.isPressed == true;
-            var diagnosticHeld = keyboard?.f8Key.isPressed == true;
+            var diagnosticRequested = NatureHudVisible && keyboard != null
+                && 월드진단단축키Policy.ShouldToggleNature(
+                    keyboard.f8Key.wasPressedThisFrame,
+                    keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed,
+                    keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed,
+                    keyboard.leftAltKey.isPressed || keyboard.rightAltKey.isPressed,
+                    keyboard.leftMetaKey.isPressed || keyboard.rightMetaKey.isPressed);
             var buildPressed = buildHeld && !buildKeyWasHeld;
             var fightPressed = fightHeld && !fightKeyWasHeld;
             var retreatPressed = retreatHeld && !retreatKeyWasHeld;
@@ -433,7 +492,8 @@ namespace Ssalddel.Unity.Presentation.World
             var plan1Pressed = plan1Held && !plan1KeyWasHeld;
             var plan2Pressed = plan2Held && !plan2KeyWasHeld;
             var plan3Pressed = plan3Held && !plan3KeyWasHeld;
-            var diagnosticPressed = diagnosticHeld && !diagnosticKeyWasHeld;
+            var diagnosticPressed = 월드진단단축키Policy.TryConsume(
+                diagnosticRequested, Time.frameCount, ref diagnosticConsumedFrame);
             buildKeyWasHeld = buildHeld;
             fightKeyWasHeld = fightHeld;
             retreatKeyWasHeld = retreatHeld;
@@ -445,14 +505,8 @@ namespace Ssalddel.Unity.Presentation.World
             plan1KeyWasHeld = plan1Held;
             plan2KeyWasHeld = plan2Held;
             plan3KeyWasHeld = plan3Held;
-            diagnosticKeyWasHeld = diagnosticHeld;
             if (diagnosticPressed)
-            {
-                diagnosticHudExpanded = !diagnosticHudExpanded;
-                status = diagnosticHudExpanded
-                    ? "진단 상태판 펼침 · F8로 다시 접을 수 있습니다."
-                    : "진단 상태판 접힘 · 플레이 문맥 안내만 표시합니다.";
-            }
+                ToggleDiagnosticHud();
             if (buildPressed && !higherPriority)
                 BeginCabinPlacementMode();
             if (observePressed && !higherPriority
@@ -536,20 +590,59 @@ namespace Ssalddel.Unity.Presentation.World
             }
             if (!primaryPressed)
                 return;
-            if (TryHandleHudPrimaryPressed()) return;
-            if (PointerOverHud()) return;
+            // 닫기/I/Esc/진단 전이와 같은 프레임의 눌림을 월드에 재사용하지 않는다.
+            if (BlocksWorldPointerForEquipment) return;
+            if (!UsesLockedNatureAim(player.CurrentMode == 플레이어시점Mode.FirstPerson,
+                    Cursor.lockState == CursorLockMode.Locked, BlocksWorldPointerForEquipment,
+                    cabinPlacementMode || workbenchPlacementMode))
+            {
+                if (TryHandleHudPrimaryPressed()) return;
+                if (PointerOverHud()) return;
+            }
             HandlePrimaryPressed();
+        }
+
+        public static bool TryConsumePrimaryPress(bool pressedThisFrame, int frame,
+            ref int consumedFrame)
+        {
+            if (!pressedThisFrame || frame < 0 || consumedFrame == frame) return false;
+            consumedFrame = frame;
+            return true;
+        }
+
+        public static bool UsesLockedNatureAim(bool firstPerson, bool locked,
+            bool uiBlocked, bool placementMode)
+            => firstPerson && locked && !uiBlocked && !placementMode;
+
+        private void ToggleDiagnosticHud()
+        {
+            diagnosticHudExpanded = !diagnosticHudExpanded;
+            equipmentUiTransitionFrame = Time.frameCount;
+            player.NotifyNatureHudTransition(this);
+            status = diagnosticHudExpanded
+                ? "진단 상태판 펼침 · F8 또는 접기 버튼으로 닫을 수 있습니다."
+                : "진단 상태판 접힘 · 플레이 문맥 안내만 표시합니다.";
         }
 
         private bool TryHandleHudPrimaryPressed()
         {
             if (Mouse.current == null) return false;
             var point = ToGuiPoint(Mouse.current.position.ReadValue());
+            return HandleHudPrimaryPressed(point);
+        }
+
+        private bool HandleHudPrimaryPressed(Vector2 point)
+        {
+            if (!NatureHudVisible) return false;
+            if (!equipmentPanelOpen && DiagnosticToggleButtonGuiRect().Contains(point))
+            {
+                ToggleDiagnosticHud();
+                return true;
+            }
             if (!diagnosticHudExpanded)
             {
                 if (!EquipmentToggleButtonGuiRect().Contains(point))
                     return false;
-                equipmentPointerHandledFrame = Time.frameCount;
                 SetEquipmentPanelOpen(!equipmentPanelOpen);
                 return true;
             }
@@ -583,10 +676,18 @@ namespace Ssalddel.Unity.Presentation.World
 
         private bool TryHandleEquipmentPrimaryPressed()
         {
-            if (Mouse.current == null
-                || engine is not IActor장착Engine actorEquipment)
-                return false;
+            if (Mouse.current == null) return false;
             var point = ToGuiPoint(Mouse.current.position.ReadValue());
+            return HandleEquipmentPrimaryPressed(point);
+        }
+
+        private bool HandleEquipmentPrimaryPressed(Vector2 point)
+        {
+            if (!equipmentPanelOpen || !NatureHudVisible) return false;
+            // 열린 패널은 higherPriority 경로로 오므로 상단 닫기도 여기서 소비한다.
+            if (!diagnosticHudExpanded && EquipmentToggleButtonGuiRect().Contains(point))
+                return HandleHudPrimaryPressed(point);
+            if (engine is not IActor장착Engine actorEquipment) return false;
             if (!EquipmentPanelGuiRect().Contains(point)) return false;
 
             equipmentState ??= actorEquipment.ActorEquipmentSnapshot();
@@ -598,7 +699,6 @@ namespace Ssalddel.Unity.Presentation.World
                         slot.EquippedItemInstanceStableId)
                     || !EquipmentSlotButtonGuiRect(index).Contains(point))
                     continue;
-                equipmentPointerHandledFrame = Time.frameCount;
                 TryChangeEquipment(() => actorEquipment.Unequip(
                     slot.EquippedItemInstanceStableId), "장착 해제");
                 return true;
@@ -612,7 +712,6 @@ namespace Ssalddel.Unity.Presentation.World
             {
                 if (!EquipmentInventoryButtonGuiRect(index).Contains(point))
                     continue;
-                equipmentPointerHandledFrame = Time.frameCount;
                 var item = inventory[index];
                 var definition = state.ItemDefinitions.First(value =>
                     value.ItemDefinitionStableId ==
@@ -671,6 +770,10 @@ namespace Ssalddel.Unity.Presentation.World
 
         private static Rect EquipmentToggleButtonGuiRect()
             => new(28f, 112f, 140f, 26f);
+
+        private Rect DiagnosticToggleButtonGuiRect()
+            => diagnosticHudExpanded ? new Rect(304f, 184f, 120f, 26f)
+                : new Rect(176f, 112f, 120f, 26f);
 
         private static Rect EquipmentSlotButtonGuiRect(int slotIndex)
         {
@@ -878,11 +981,8 @@ namespace Ssalddel.Unity.Presentation.World
         private void SetEquipmentPanelOpen(bool open)
         {
             equipmentPanelOpen = open;
-            if (open)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
+            equipmentUiTransitionFrame = Time.frameCount;
+            if (player != null) player.NotifyNatureHudTransition(this);
             if (open && engine is IActor장착Engine actorEquipment)
                 equipmentState = actorEquipment.ActorEquipmentSnapshot();
             status = open
@@ -923,11 +1023,9 @@ namespace Ssalddel.Unity.Presentation.World
                 GUI.Label(new Rect(rect.x + 20f, y, 185f, 22f),
                     $"{SlotKorean(slot.SlotCode)} · "
                     + (item?.KoreanName ?? "비어 있음"));
-                if (item != null && GUI.Button(EquipmentSlotButtonGuiRect(
-                        Array.IndexOf(state.Slots, slot)), "해제")
-                    && equipmentPointerHandledFrame != Time.frameCount)
-                    TryChangeEquipment(() => actorEquipment.Unequip(
-                        item.ItemInstanceStableId), "장착 해제");
+                if (item != null)
+                    GUI.Button(EquipmentSlotButtonGuiRect(
+                        Array.IndexOf(state.Slots, slot)), "해제");
                 y += 25f;
             }
 
@@ -943,17 +1041,7 @@ namespace Ssalddel.Unity.Presentation.World
                 var item = inventory[index];
                 GUI.Label(new Rect(rect.x + 20f, y, 225f, 22f),
                     item.KoreanName);
-                if (GUI.Button(EquipmentInventoryButtonGuiRect(index), "장착")
-                    && equipmentPointerHandledFrame != Time.frameCount)
-                {
-                    var definition = state.ItemDefinitions.First(value =>
-                        value.ItemDefinitionStableId ==
-                        item.ItemDefinitionStableId);
-                    var targetSlot = definition.AllowedSlotCodes.FirstOrDefault()
-                                     ?? SimulationActorEquipmentCodes.MainHand;
-                    TryChangeEquipment(() => actorEquipment.Equip(
-                        item.ItemInstanceStableId, targetSlot), "장착 완료");
-                }
+                GUI.Button(EquipmentInventoryButtonGuiRect(index), "장착");
                 y += 25f;
             }
         }
@@ -1061,6 +1149,18 @@ namespace Ssalddel.Unity.Presentation.World
                     equipmentState = engine is IActor장착Engine actorEquipment
                         ? actorEquipment.ActorEquipmentSnapshot() : null;
                     status = "기본 도끼 획득 · I 상태창에서 주손에 장착하세요.";
+                }
+                else if (marker.Kind == Nature생존상호작용Kind.HansBrokenAxe
+                         && engine is IHans농장울타리Engine hansPickup)
+                {
+                    hansPickup.AcquireHansBrokenAxe();
+                    status = "부러진 농장 손도끼 회수 · 개인 손도끼와는 별도 물품입니다.";
+                }
+                else if (marker.Kind == Nature생존상호작용Kind.HansFarmFence
+                         && engine is IHans농장울타리Engine hansRepair)
+                {
+                    hansRepair.RepairHansFarmFence();
+                    status = "목재 2개로 울타리 세 구간을 복구했습니다. · 머물거나 떠날 수 있습니다.";
                 }
                 else if (marker.Kind == Nature생존상호작용Kind.HarvestTree)
                     BeginHarvest(marker.StableId);
@@ -1204,6 +1304,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private string HigherPriorityInputReason()
         {
+            if (player != null && !player.OwnsNatureHud(this)) return "Nature UI 소유권 없음";
             if (equipmentPanelOpen) return "장착 상태창 사용 중";
             if (!CanUseNatureInput(player.CurrentActivityCode))
                 return "Nature 탐험 문맥 대기";
@@ -1290,6 +1391,18 @@ namespace Ssalddel.Unity.Presentation.World
                 RenderWorkbench(state);
             }
             RenderNightAndDawn(state);
+            if (engine is IHans농장울타리Engine hans
+                && hans.LastAuthoritySnapshot?.HansFarmFenceRestoration != null)
+            {
+                if (hansFencePresenter == null)
+                {
+                    var root = new GameObject("한스농장_첫울타리복구");
+                    root.transform.SetParent(visualRoot, false);
+                    hansFencePresenter = root.AddComponent<Hans농장울타리E5Presenter>();
+                    hansFencePresenter.Configure(root.transform);
+                }
+                hansFencePresenter.Render(hans.LastAuthoritySnapshot);
+            }
             RenderEncounter(state);
             SyncEquippedAxeVisual();
             var lh = FindFirstObjectByType<공간LHStreamingEngine>(
@@ -1891,7 +2004,7 @@ namespace Ssalddel.Unity.Presentation.World
         private void OnGUI()
         {
             if (!ValidateWiring()) return;
-            if (!CanUseNatureInput(player.CurrentActivityCode)) return;
+            if (!NatureHudVisible) return;
             var state = engine.Snapshot();
             if (state.Sleeping)
             {
@@ -1915,10 +2028,12 @@ namespace Ssalddel.Unity.Presentation.World
             {
                 GUI.Label(new Rect(28f, 90f, 402f, 20f),
                     "I 장착 상태창 · F8 진단 · 조준선 대상에 왼쪽 버튼 상호작용");
-                if (GUI.Button(EquipmentToggleButtonGuiRect(),
-                        equipmentPanelOpen ? "장착 상태창 닫기" : "장착 상태창 열기")
-                    && equipmentPointerHandledFrame != Time.frameCount)
-                    SetEquipmentPanelOpen(!equipmentPanelOpen);
+                // 동작은 Update의 mouse-down에서만 소비한다. GUI.Button의 mouse-up
+                // 반환값까지 처리하면 서로 다른 프레임에서 열기/닫기 또는 장착이 중복된다.
+                GUI.Button(EquipmentToggleButtonGuiRect(),
+                    equipmentPanelOpen ? "장착 상태창 닫기" : "장착 상태창 열기");
+                if (!equipmentPanelOpen)
+                    GUI.Button(DiagnosticToggleButtonGuiRect(), "진단 펼치기 · F8");
                 DrawEquipmentPanel();
                 return;
             }
@@ -1946,6 +2061,8 @@ namespace Ssalddel.Unity.Presentation.World
             GUI.Button(WorkHoldButtonGuiRect(),
                 workHoldRequested ? "작업 유지 끄기" : "작업 유지 켜기");
             GUI.enabled = true;
+            if (!equipmentPanelOpen)
+                GUI.Button(DiagnosticToggleButtonGuiRect(), "진단 접기 · F8");
             var observation = threatObservation;
             GUI.Label(new Rect(28f, 216f, 402f, 20f), observation == null
                 ? "저장 후 Play Mode 재진입 시 같은 세계를 복원합니다."

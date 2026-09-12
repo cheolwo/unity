@@ -1,0 +1,21 @@
+{
+  "status": "BlenderE4CompositionRendered",
+  "revision": "farm-wastewater-drain-composition.r1",
+  "flow": [
+    "DrainEntryH1",
+    "WastewaterDrainRouteEdge",
+    "DischargeOutletH1"
+  ],
+  "inputs": {
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Models\\Props\\SM_Prop_Drain_01.fbx": "30E89AD2014B84EA3F786A0A7F00EC1ACB5B6E48C8EFDF4D43E45A76042E79AB",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonConstruction\\Models\\SM_Prop_Pipe_Concrete_01.fbx": "6C2F01644B223796C44CC354BC8D44441F1AD27D62978A3BD87A57161226A065",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonCity\\Models\\SM_Env_WaterEdge_Pipe_01.fbx": "A25B09204FEC69EF6142D4E042E17D5C53500A90201AA44C09551ECBF76A1F96"
+  },
+  "images": [
+    "01-배수체계-공간조감도.png",
+    "02-배수체계-절개측면.png"
+  ],
+  "blend": "농장-배수체계-E4-연결시안-r1.blend",
+  "flowMarkersAreDiagrammatic": true,
+  "boundary": "Presentation E4 spatial composition only; no hydraulic simulation, discharge permission, Unity placement, or E5 evidence."
+}

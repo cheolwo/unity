@@ -1,0 +1,26 @@
+{
+  "status": "BlenderE4PoseSamplesRendered",
+  "revision": "nature-woodcutting-pose-samples.r1",
+  "poses": [
+    {
+      "pose": "carry",
+      "image": "01-도끼휴대준비.png",
+      "blend": "01-도끼휴대준비.blend"
+    },
+    {
+      "pose": "strike",
+      "image": "02-나무타격순간.png",
+      "blend": "02-나무타격순간.blend"
+    }
+  ],
+  "inputs": {
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\AnimationBaseLocomotion\\Meshes\\PolygonSyntyCharacter.fbx": "4E0387308ACC2AFEC1935DF06025D83CFE964D0F241C5E818E944DEB81153779",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\AnimationBaseLocomotion\\Samples\\Textures\\T_Polygon_Dummy_01.png": "C5A3307E4197DD0C680B196276CC1BA5BFB360F6DCDC67BD5FF6979B6801F8E4",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\AnimationSwordCombat\\Animations\\Polygon\\Attack\\HeavyCombo01\\A_Attack_HeavyCombo01A_Sword.fbx": "58E5D031CB15D58965599BFD0545B3FE56E2E9743A4737C252D5D30325A6B32B",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Tool_Axe_01.fbx": "EED54DA5C2AF1C7F9DA84C5E02E25BB734BC70CBD25F52060D37DEB07EE48CA9",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Generic_Tree_01.fbx": "13391B23FD761560288F91143BCAB3962ABFB875891BB8F55A482E9B511351C2"
+  },
+  "animationUse": "Existing clip was inspected but not bound because the available character bind pose was incompatible; source files remain unchanged.",
+  "actorRepresentation": "Project-owned low-poly pose blocking mannequin with supplier axe and tree.",
+  "boundary": "Presentation E4 pose-blocking samples only; not a final character model, animation clip, grip/contact approval, Unity playback, or E5 evidence."
+}

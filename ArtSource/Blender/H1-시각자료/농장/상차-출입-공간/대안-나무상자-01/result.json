@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-loading-gate",
+  "displayName": "농장 상차 출입 공간 - 나무 상자",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Crate_01.fbx",
+  "sourceSha256": "23266BED82E89847E85BC0DC0C8F05B9205B4EB9410D97F822647D0B3185286A",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\대안-나무상자-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\대안-나무상자-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_Crate_01"
+  ],
+  "dimensions": [
+    0.82705,
+    0.81465,
+    0.87337
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

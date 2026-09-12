@@ -1,0 +1,988 @@
+{
+  "schemaVersion": "h1-local-visual-library.v1",
+  "revision": "h1-local-visual-library.r37",
+  "authorityBoundary": "Local visual review catalog only; not Unity placement or E5 authority.",
+  "items": [
+    {
+      "h1StableId": "h1-node-candidate:farm-loading-point",
+      "koreanName": "농장 상차 지점",
+      "category": "농장",
+      "planningState": "StandaloneEmptyCandidatePrepared",
+      "visualReviewState": "PendingUserReview",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "빈 상차 지점 01",
+          "accepted": false,
+          "suggestedRole": "EmptyLoadingPointBase",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Bld_ConcreteBase_01.fbx",
+          "dimensionsMeters": [
+            4.49882,
+            4.49882,
+            0.98644
+          ],
+          "image": "농장/농장-상차-지점/빈-상차지점-H1-01/candidate.png",
+          "blend": "농장/농장-상차-지점/빈-상차지점-H1-01/candidate-review.blend"
+        }
+      ],
+      "compatibilityRef": "h1-stock:farm-loading-gate",
+      "boundary": "Standalone H1 visual candidate only; cargo props, roads, other H1 nodes, Unity placement and E5 are excluded."
+    },
+    {
+      "h1StableId": "h1-stock:farm-loading-gate",
+      "koreanName": "농장 상차·출입 공간",
+      "category": "농장",
+      "planningState": "NodeDefinitionDraft_IndividualH1VisualReview",
+      "visualReviewState": "PartiallyAccepted",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "팔레트 상자 01",
+          "accepted": true,
+          "visualReviewState": "AcceptedAsCargoCandidate",
+          "suggestedRole": "ShipmentWaitingContainer",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_PalletCrate_01.fbx",
+          "image": "농장/상차-출입-공간/주후보-팔레트상자-01/candidate.png"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "빈 팔레트 01",
+          "accepted": true,
+          "visualReviewState": "AcceptedAsCargoCandidate",
+          "suggestedRole": "LoadBaseOrEmptySlotMarker",
+          "sourceAssetPath": "Assets/Synty/PolygonCity/Models/SM_Prop_Pallet_01.fbx",
+          "reviewScale": 50,
+          "image": "농장/상차-출입-공간/대안-빈팔레트-01/candidate.png"
+        },
+        {
+          "candidateCode": "C",
+          "displayName": "나무 상자 01",
+          "accepted": false,
+          "suggestedRole": "SmallCargoOrReturnContainer",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Crate_01.fbx",
+          "image": "농장/상차-출입-공간/대안-나무상자-01/candidate.png"
+        },
+        {
+          "candidateCode": "D",
+          "displayName": "Construction 팔레트 01",
+          "accepted": true,
+          "visualReviewState": "AcceptedAsCargoCandidate",
+          "suggestedRole": "LoadBaseOrEmptySlotMarker",
+          "sourceAssetPath": "Assets/Synty/PolygonConstruction/Models/SM_Prop_Pallet_01.fbx",
+          "image": "농장/상차-출입-공간/콘스트럭션-팔레트-01/candidate.png"
+        },
+        {
+          "candidateCode": "E",
+          "displayName": "Construction 대형 운송 상자 01",
+          "accepted": true,
+          "visualReviewState": "AcceptedAsCargoCandidate",
+          "suggestedRole": "LargeCargoContainer",
+          "sourceAssetPath": "Assets/Synty/PolygonConstruction/Models/SM_Prop_Crate_Large_01.fbx",
+          "image": "농장/상차-출입-공간/콘스트럭션-대형운송상자-01/candidate.png"
+        },
+        {
+          "candidateCode": "F",
+          "displayName": "Construction 진입로 지형 01",
+          "accepted": false,
+          "visualReviewState": "RejectedAsStandaloneVehicleEntryPath",
+          "suggestedRole": "TerrainTransitionPatchOnly",
+          "sourceAssetPath": "Assets/Synty/PolygonConstruction/Models/SM_Env_DirtRoad_Driveway_01.fbx",
+          "image": "농장/상차-출입-공간/콘스트럭션-진입로-01/candidate.png"
+        },
+        {
+          "candidateCode": "G",
+          "displayName": "Construction 돌망태 방호물 01",
+          "accepted": false,
+          "visualReviewState": "RejectedAsAccessControlMarker",
+          "suggestedRole": "EdgeProtectionOrBallastContainer",
+          "sourceAssetPath": "Assets/Synty/PolygonConstruction/Models/SM_Prop_Barrier_01.fbx",
+          "image": "농장/상차-출입-공간/콘스트럭션-출입바리어-01/candidate.png"
+        },
+        {
+          "candidateCode": "H",
+          "displayName": "Town 넓은 진입로 01",
+          "accepted": false,
+          "visualReviewState": "ReservedForDevelopedTownVariant",
+          "suggestedRole": "DevelopedTownAdjacentVehicleEntrySurface",
+          "sourceAssetPath": "Assets/Synty/PolygonTown/Models/Environment/SM_Env_Driveway_Wide_PathBoth_01.fbx",
+          "image": "농장/상차-출입-공간/타운-넓은진입로-01/candidate.png"
+        },
+        {
+          "candidateCode": "I",
+          "displayName": "Town 정차 도로 01",
+          "accepted": false,
+          "visualReviewState": "ReservedForDevelopedTownVariant",
+          "suggestedRole": "DevelopedTownVehicleStopOrLoadingBaySurface",
+          "sourceAssetPath": "Assets/Synty/PolygonTown/Models/Environment/SM_Env_Road_Parking_01.fbx",
+          "image": "농장/상차-출입-공간/타운-정차도로-01/candidate.png"
+        },
+        {
+          "candidateCode": "J",
+          "displayName": "City 기본 도로면 01",
+          "accepted": false,
+          "visualReviewState": "PendingUserReview",
+          "suggestedRole": "CityAdjacentVehicleEntrySurface",
+          "sourceAssetPath": "Assets/Synty/PolygonCity/Models/SM_Env_Road_Bare_01.fbx",
+          "reviewScale": 100,
+          "image": "농장/상차-출입-공간/시티-기본도로면-01/candidate.png"
+        },
+        {
+          "candidateCode": "K",
+          "displayName": "City 지하철 입구 표지 01",
+          "accepted": false,
+          "visualReviewState": "RejectedForFarmLoadingGate",
+          "suggestedRole": "NotApplicable_SubwayEntranceSign",
+          "sourceAssetPath": "Assets/Synty/PolygonCity/Models/SM_Prop_Sign_Entrance_01.fbx",
+          "reviewScale": 100,
+          "image": "농장/상차-출입-공간/시티-입구표지-01/candidate.png"
+        },
+        {
+          "candidateCode": "L",
+          "displayName": "Farm 자갈 직선로 01",
+          "accepted": false,
+          "visualReviewState": "PendingMaterialAndUserReview",
+          "suggestedRole": "BaseFarmVehicleEntrySurface",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Road_Gravel_Straight_01.fbx",
+          "image": "농장/상차-출입-공간/팜-자갈직선로-01/candidate.png"
+        },
+        {
+          "candidateCode": "M",
+          "displayName": "Farm 자갈 T 접속로 01",
+          "accepted": false,
+          "visualReviewState": "PendingMaterialAndUserReview",
+          "suggestedRole": "BaseFarmEntryToWorkYardJunction",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Road_Gravel_T_Section_01.fbx",
+          "image": "농장/상차-출입-공간/팜-자갈티접속로-01/candidate.png"
+        },
+        {
+          "candidateCode": "N",
+          "displayName": "Construction 흙길 직선로 01",
+          "accepted": false,
+          "visualReviewState": "PendingUserReview",
+          "suggestedRole": "BaseFarmUnpavedVehicleEntrySurface",
+          "sourceAssetPath": "Assets/Synty/PolygonConstruction/Models/SM_Env_DirtRoad_Straight_01.fbx",
+          "image": "농장/상차-출입-공간/콘스트럭션-흙길직선로-01/candidate.png"
+        }
+      ],
+      "missingSpatialRoles": [
+        "VehicleEntryPath",
+        "BoundaryMarker",
+        "StopAnchor",
+        "TurningClearance",
+        "PedestrianClearance"
+      ],
+      "boundary": "Node-first review only. Cargo candidates attach to the proposed loading-point node; road candidates are deferred edge or placement representations. No H hierarchy rewrite, Unity placement or E5 evidence."
+    },
+    {
+      "h1StableId": "h1-stock:farm-work-yard",
+      "koreanName": "수확·집하 작업마당",
+      "category": "농장",
+      "planningState": "PrimaryCandidatePrepared",
+      "visualReviewState": "PendingUserReview",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "차양형 농산물 작업대 01",
+          "accepted": false,
+          "suggestedRole": "PrimaryCoveredHandlingPoint",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Bld_ProduceStand_01.fbx",
+          "localFolder": "농장/수확-집하-작업마당/주후보-농산물판매대-01",
+          "image": "농장/수확-집하-작업마당/주후보-농산물판매대-01/candidate.png"
+        }
+      ],
+      "cropPayloadSamples": [
+        {
+          "payloadCode": "crop-payload:potato-box.v1",
+          "displayName": "감자 상자 적재 상태",
+          "accepted": true,
+          "visualReviewState": "AcceptedForE4Composition",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Box_Potato_01.fbx",
+          "instanceCount": 3,
+          "compositionRule": "SharedWorkYardSkeletonPlusReplaceableCropPayload",
+          "image": "농장/수확-집하-작업마당/상태-감자상자-적재/감자-적재-상태.png",
+          "blend": "농장/수확-집하-작업마당/상태-감자상자-적재/감자-적재-상태.blend"
+        },
+        {
+          "payloadCode": "crop-payload:leafy-cabbage-crate.v1",
+          "displayName": "배추형 잎채소 상자 적재 상태",
+          "accepted": true,
+          "visualReviewState": "AcceptedForE4Composition",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Cabbage_01_L.fbx",
+          "derivedContainer": "ProjectOwnedReusableWoodHarvestCrate",
+          "instanceCount": 3,
+          "cropUnitsPerContainer": 3,
+          "compositionRule": "SharedWorkYardSkeletonPlusReplaceableCropPayload",
+          "image": "농장/수확-집하-작업마당/상태-잎채소상자-적재/잎채소-적재-상태.png",
+          "blend": "농장/수확-집하-작업마당/상태-잎채소상자-적재/잎채소-적재-상태.blend"
+        },
+        {
+          "payloadCode": "crop-payload:carrot-box.v1",
+          "displayName": "당근 상자 적재 상태",
+          "accepted": true,
+          "visualReviewState": "AcceptedForE4Composition",
+          "visualArchetype": "ElongatedVegetable",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Box_Carrot_01.fbx",
+          "instanceCount": 3,
+          "compositionRule": "SharedWorkYardSkeletonPlusReplaceableCropPayload",
+          "image": "농장/수확-집하-작업마당/상태-당근상자-적재/당근-적재-상태.png",
+          "blend": "농장/수확-집하-작업마당/상태-당근상자-적재/당근-적재-상태.blend"
+        },
+        {
+          "payloadCode": "crop-payload:cucumber-box.v1",
+          "displayName": "오이 상자 적재 상태",
+          "accepted": true,
+          "visualReviewState": "AcceptedForE4Composition",
+          "visualArchetype": "ElongatedVegetable",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Box_Cucumber_01.fbx",
+          "instanceCount": 3,
+          "compositionRule": "SharedWorkYardSkeletonPlusReplaceableCropPayload",
+          "image": "농장/수확-집하-작업마당/상태-오이상자-적재/오이-적재-상태.png",
+          "blend": "농장/수확-집하-작업마당/상태-오이상자-적재/오이-적재-상태.blend"
+        },
+        {
+          "payloadCode": "crop-payload:apple-box.v1",
+          "displayName": "사과 상자 적재 상태",
+          "accepted": true,
+          "visualReviewState": "AcceptedForE4Composition",
+          "visualArchetype": "RoundFruit",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Box_Apple_01.fbx",
+          "instanceCount": 3,
+          "compositionRule": "SharedWorkYardSkeletonPlusReplaceableCropPayload",
+          "image": "농장/수확-집하-작업마당/상태-사과상자-적재/사과-적재-상태.png",
+          "blend": "농장/수확-집하-작업마당/상태-사과상자-적재/사과-적재-상태.blend"
+        },
+        {
+          "payloadCode": "crop-payload:pear-crate.v1",
+          "displayName": "배 상자 적재 상태",
+          "accepted": true,
+          "visualReviewState": "AcceptedForE4Composition",
+          "visualArchetype": "RoundFruit",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Pear_01.fbx",
+          "derivedContainer": "ProjectOwnedReusableWoodHarvestCrate",
+          "instanceCount": 3,
+          "cropUnitsPerContainer": 6,
+          "compositionRule": "SharedWorkYardSkeletonPlusReplaceableCropPayload",
+          "image": "농장/수확-집하-작업마당/상태-배상자-적재/배-적재-상태.png",
+          "blend": "농장/수확-집하-작업마당/상태-배상자-적재/배-적재-상태.blend"
+        },
+        {
+          "payloadCode": "crop-payload:grain-bag-closed.v1",
+          "displayName": "곡물 밀봉 포대 적재 상태",
+          "accepted": false,
+          "visualReviewState": "PendingUserReview",
+          "visualArchetype": "GrainOrSeedBag",
+          "suggestedAuthorityState": "StoredOrReadyForShipment",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_GrainBag_01.fbx",
+          "instanceCount": 3,
+          "image": "농장/수확-집하-작업마당/상태-곡물밀봉포대-적재/곡물-밀봉포대-적재-상태.png",
+          "blend": "농장/수확-집하-작업마당/상태-곡물밀봉포대-적재/곡물-밀봉포대-적재-상태.blend"
+        },
+        {
+          "payloadCode": "crop-payload:grain-bag-open.v1",
+          "displayName": "곡물 개봉 포대 취급 상태",
+          "accepted": false,
+          "visualReviewState": "PendingUserReview",
+          "visualArchetype": "GrainOrSeedBag",
+          "suggestedAuthorityState": "HandlingMeasuringOrDistributing",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_GrainBag_Open_01.fbx",
+          "instanceCount": 3,
+          "image": "농장/수확-집하-작업마당/상태-곡물개봉포대-취급/곡물-개봉포대-취급-상태.png",
+          "blend": "농장/수확-집하-작업마당/상태-곡물개봉포대-취급/곡물-개봉포대-취급-상태.blend"
+        }
+      ],
+      "stateTransitionReview": "EmptyToHandlingToLoadedOrTransferred",
+      "boundary": "Covered work-point candidate only; crates, produce, tools and workers remain state-driven props. No H2 assembly, Unity placement or E5 authority."
+    },
+    {
+      "h1StableId": "h1-stock:farm-production",
+      "koreanName": "경작 구획",
+      "category": "농장",
+      "variantCode": "cultivation-plot-2.5x2.5m",
+      "dimensionsMeters": [
+        2.5,
+        2.5,
+        0.18834
+      ],
+      "planningState": "PlayerPlaceableConfirmed",
+      "visualReviewState": "PendingFinalVisualApproval",
+      "playerPlacement": {
+        "allowedByPlanning": true,
+        "requiresBlueprintOrPlacementMode": true,
+        "requiresPlacementValidation": true,
+        "worldMutationBeforeConfirmation": false
+      },
+      "composition": {
+        "unitRole": "H1",
+        "aggregateRole": "여러 경작 구획 H1을 연결해 논밭 H2를 구성"
+      },
+      "source": {
+        "ownership": "SupplierOriginalReadOnly",
+        "assetPath": "Assets/Synty/PolygonFarm/Models/SM_Env_Dirt_Rows_01.fbx",
+        "sha256": "95A5DBDB718C842AEFCC511462EED42202F1C019651885B2EB071CD3AEBFAFE5"
+      },
+      "localFolder": "농장/경작구획-2.5x2.5m",
+      "image": "농장/경작구획-2.5x2.5m/경작구획-H1-2.5x2.5m-검토.png",
+      "blend": "농장/경작구획-2.5x2.5m/경작구획-H1-2.5x2.5m.blend",
+      "fbx": "농장/경작구획-2.5x2.5m/경작구획-H1-2.5x2.5m.fbx",
+      "stateCandidateSet": {
+        "candidateRevision": "cultivation-plot-state-sample.r2",
+        "visualCropExample": "potato",
+        "visualReviewState": "PendingUserReview",
+        "blend": "농장/경작구획-2.5x2.5m/상태표본-r2/경작구획-H1-상태표본-r2.blend",
+        "validation": "농장/경작구획-2.5x2.5m/상태표본-r2/검증결과-r2.json",
+        "states": [
+          {
+            "code": "EmptyGrooves",
+            "image": "농장/경작구획-2.5x2.5m/상태표본-r2/01-빈고랑.png"
+          },
+          {
+            "code": "SownEarlySprout",
+            "image": "농장/경작구획-2.5x2.5m/상태표본-r2/02-파종초기발아.png"
+          },
+          {
+            "code": "Mature",
+            "image": "농장/경작구획-2.5x2.5m/상태표본-r2/03-성숙.png"
+          },
+          {
+            "code": "PartiallyHarvested",
+            "image": "농장/경작구획-2.5x2.5m/상태표본-r2/04-부분수확.png"
+          }
+        ],
+        "placementRule": "작물은 세 고랑 중심선에 정렬하고 중앙에서 대칭 확장한다.",
+        "boundary": "Potato visual state sample only; authoritative crop state, Unity Prefab/Scene and E5 remain unverified."
+      },
+      "stateTransitionReview": "CandidateSetPreparedPendingUserReview"
+    },
+    {
+      "h1StableId": "h1-stock:farm-seed-preparation",
+      "koreanName": "종자 준비 공간",
+      "category": "농장",
+      "planningState": "CandidateSetAccepted",
+      "visualReviewState": "AcceptedForE4Composition",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "종자 봉투 01",
+          "accepted": true,
+          "assignedRole": "SmallSeedPacketByCropOrWorkUnit",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_SeedPacket_01.fbx",
+          "localFolder": "농장/종자-준비-공간/주후보-종자봉투-01",
+          "image": "농장/종자-준비-공간/주후보-종자봉투-01/candidate.png"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "종자 봉투 02",
+          "accepted": true,
+          "assignedRole": "SmallSeedPacketByCropOrWorkUnit",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_SeedPacket_02.fbx",
+          "localFolder": "농장/종자-준비-공간/대안-종자봉투-02",
+          "image": "농장/종자-준비-공간/대안-종자봉투-02/candidate.png"
+        },
+        {
+          "candidateCode": "C",
+          "displayName": "곡물 자루 01",
+          "accepted": true,
+          "assignedRole": "BulkOrSharedSeedStorage",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_GrainBag_01.fbx",
+          "localFolder": "농장/종자-준비-공간/대안-곡물자루-01",
+          "image": "농장/종자-준비-공간/대안-곡물자루-01/candidate.png"
+        }
+      ],
+      "stateTransitionReview": "Pending",
+      "boundary": "Candidate images only; no Unity assignment or E5 authority."
+    },
+    {
+      "h1StableId": "h1-stock:farm-tool-storage",
+      "koreanName": "농기구 보관 공간",
+      "category": "농장",
+      "planningState": "CandidateSetAccepted",
+      "visualReviewState": "AcceptedForE4Composition",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "팔레트 상자 01",
+          "accepted": true,
+          "assignedRole": "SupportingLargeOrLongToolStorage",
+          "localFolder": "농장/농기구-보관-공간/주후보-팔레트상자-01",
+          "image": "농장/농기구-보관-공간/주후보-팔레트상자-01/candidate.png"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "나무 상자 01",
+          "accepted": true,
+          "assignedRole": "ConsumableOrSparePartStorage",
+          "localFolder": "농장/농기구-보관-공간/대안-나무상자-01",
+          "image": "농장/농기구-보관-공간/대안-나무상자-01/candidate.png"
+        },
+        {
+          "candidateCode": "C",
+          "displayName": "도구 상자 01",
+          "accepted": true,
+          "assignedRole": "PrimaryToolProp",
+          "localFolder": "농장/농기구-보관-공간/대안-도구상자-01",
+          "image": "농장/농기구-보관-공간/대안-도구상자-01/candidate.png"
+        }
+      ],
+      "stateTransitionReview": "Pending",
+      "boundary": "Candidate images only; no Unity assignment or E5 authority."
+    },
+    {
+      "h1StableId": "h1-stock:farm-harvest-staging",
+      "koreanName": "수확물 임시 적치 공간",
+      "category": "농장",
+      "planningState": "CandidateSetAccepted",
+      "visualReviewState": "AcceptedForE4Composition",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "팔레트 상자 01",
+          "accepted": true,
+          "assignedRole": "PrimaryStagingContainer",
+          "localFolder": "농장/수확물-임시-적치-공간/주후보-팔레트상자-01",
+          "image": "농장/수확물-임시-적치-공간/주후보-팔레트상자-01/candidate.png"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "나무 상자 01",
+          "accepted": true,
+          "assignedRole": "SortedOrPackedContainer",
+          "localFolder": "농장/수확물-임시-적치-공간/대안-나무상자-01",
+          "image": "농장/수확물-임시-적치-공간/대안-나무상자-01/candidate.png"
+        },
+        {
+          "candidateCode": "C",
+          "displayName": "도구 상자 01",
+          "accepted": true,
+          "assignedRole": "StagingAreaMaintenanceTool",
+          "localFolder": "농장/수확물-임시-적치-공간/대안-도구상자-01",
+          "image": "농장/수확물-임시-적치-공간/대안-도구상자-01/candidate.png"
+        }
+      ],
+      "stateTransitionReview": "Pending",
+      "boundary": "Candidate images only; no Unity assignment or E5 authority."
+    },
+    {
+      "h1StableId": "h1-stock:farm-sorting",
+      "koreanName": "농산물 선별 공간",
+      "category": "농장",
+      "planningState": "CandidateSetAccepted",
+      "visualReviewState": "AcceptedForE4Composition",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "판재형 선별 작업대 01",
+          "accepted": true,
+          "assignedRole": "SortingWorkbench",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Table_01.fbx",
+          "localFolder": "농장/농산물-선별-공간/주후보-선별작업대-01",
+          "image": "농장/농산물-선별-공간/주후보-선별작업대-01/candidate.png"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "평판형 선별 작업대 02",
+          "accepted": true,
+          "assignedRole": "SortingWorkbench",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Table_02.fbx",
+          "localFolder": "농장/농산물-선별-공간/대안-선별작업대-02",
+          "image": "농장/농산물-선별-공간/대안-선별작업대-02/candidate.png"
+        },
+        {
+          "candidateCode": "C",
+          "displayName": "분류 상자 01",
+          "accepted": true,
+          "assignedRole": "SortedProduceContainer",
+          "contentStateReview": "EmptyConfirmed_FilledProduceVariantPending",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Crate_01.fbx",
+          "localFolder": "농장/농산물-선별-공간/보조-분류상자-01",
+          "image": "농장/농산물-선별-공간/보조-분류상자-01/candidate.png"
+        }
+      ],
+      "stateTransitionReview": "Pending",
+      "boundary": "Candidate images only; no Unity assignment or E5 authority."
+    },
+    {
+      "h1StableId": "h1-stock:farm-washing",
+      "koreanName": "농산물 세척 공간",
+      "category": "농장",
+      "planningState": "WaterPointWellToPipedSupplyConfirmed_ProjectCandidatePrepared",
+      "visualReviewState": "CandidateSetPrepared",
+      "hierarchyProposal": {
+        "h1Role": "농산물 세척 작업점",
+        "proposedSupportingH1Roles": [
+          "농장 급수점",
+          "배수·오수 처리점"
+        ],
+        "proposedH2Role": "농산물 세척 공간",
+        "existingBroaderH2": "h2-candidate:farm-wash-sort-pack"
+      },
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "우물 급수점 01",
+          "suggestedRole": "WaterSourceH1Candidate",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Well_01.fbx",
+          "image": "농장/농산물-세척-공간/후보-우물-급수점-01/candidate.png"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "공급사 급수탑 01 — 식량 저장탑 시각 후보",
+          "suggestedRole": "GrainStorageSiloVisualCandidate_NotWaterPoint",
+          "visualReviewState": "RejectedForWaterPoint_ReclassificationPending",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Bld_WaterTower_01.fbx",
+          "image": "농장/농산물-세척-공간/후보-급수탑-01/candidate.png"
+        },
+        {
+          "candidateCode": "C",
+          "displayName": "자연 수로 01",
+          "suggestedRole": "WaterAccessEdgeCandidate_NotStandaloneFixture",
+          "visualReviewState": "ExcludedFromStandaloneWaterPoint_RequiresIntakeEquipment",
+          "sourceAssetPath": "Assets/Synty/PolygonNature/Models/River_Plane_01.fbx",
+          "image": "농장/농산물-세척-공간/후보-자연수로-01/candidate.png"
+        },
+        {
+          "candidateCode": "D",
+          "displayName": "긴 세척 수조 01",
+          "acceptedAsFormCandidate": true,
+          "suggestedRole": "PrimaryWashPointCandidate",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Trough_01.fbx",
+          "image": "농장/농산물-세척-공간/후보-세척수조-01/candidate.png",
+          "stateFamily": {
+            "revision": "farm-wash-trough-states.r1",
+            "visualReviewState": "AcceptedAsE4StateFamily",
+            "independentFilesPerState": true,
+            "localFolder": "농장/세척작업점-긴수조/상태표본-r1",
+            "states": [
+              {
+                "code": "Empty",
+                "image": "농장/세척작업점-긴수조/상태표본-r1/01-빈수조.png",
+                "blend": "농장/세척작업점-긴수조/상태표본-r1/01-빈수조.blend"
+              },
+              {
+                "code": "CleanWaterReady",
+                "image": "농장/세척작업점-긴수조/상태표본-r1/02-물채움.png",
+                "blend": "농장/세척작업점-긴수조/상태표본-r1/02-물채움.blend"
+              },
+              {
+                "code": "ProduceWashing",
+                "image": "농장/세척작업점-긴수조/상태표본-r1/03-농산물세척중.png",
+                "blend": "농장/세척작업점-긴수조/상태표본-r1/03-농산물세척중.blend"
+              },
+              {
+                "code": "DirtyWaterAwaitingDrain",
+                "image": "농장/세척작업점-긴수조/상태표본-r1/04-오염수배출대기.png",
+                "blend": "농장/세척작업점-긴수조/상태표본-r1/04-오염수배출대기.blend"
+              }
+            ],
+            "validation": "농장/세척작업점-긴수조/상태표본-r1/검증결과-r1.json"
+          }
+        },
+        {
+          "candidateCode": "E",
+          "displayName": "반통 세척조 01",
+          "acceptedAsFormCandidate": true,
+          "suggestedRole": "CompactWashPointCandidate",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Barrel_Half_01.fbx",
+          "image": "농장/농산물-세척-공간/후보-반통세척조-01/candidate.png",
+          "stateFamily": {
+            "revision": "farm-half-barrel-wash-states.r1",
+            "visualReviewState": "AcceptedAsE4StateFamily",
+            "independentFilesPerState": true,
+            "derivedModification": "FlattenedInnerBasinForWashStates_SourceAssetUnchanged",
+            "localFolder": "농장/세척작업점-반통/상태표본-r1",
+            "states": [
+              {
+                "code": "Empty",
+                "image": "농장/세척작업점-반통/상태표본-r1/01-빈반통.png",
+                "blend": "농장/세척작업점-반통/상태표본-r1/01-빈반통.blend"
+              },
+              {
+                "code": "CleanWaterReady",
+                "image": "농장/세척작업점-반통/상태표본-r1/02-물채움.png",
+                "blend": "농장/세척작업점-반통/상태표본-r1/02-물채움.blend"
+              },
+              {
+                "code": "ProduceWashing",
+                "image": "농장/세척작업점-반통/상태표본-r1/03-농산물세척중.png",
+                "blend": "농장/세척작업점-반통/상태표본-r1/03-농산물세척중.blend"
+              },
+              {
+                "code": "DirtyWaterAwaitingDrain",
+                "image": "농장/세척작업점-반통/상태표본-r1/04-오염수배출대기.png",
+                "blend": "농장/세척작업점-반통/상태표본-r1/04-오염수배출대기.blend"
+              }
+            ],
+            "validation": "농장/세척작업점-반통/상태표본-r1/검증결과-r1.json"
+          }
+        },
+        {
+          "candidateCode": "F",
+          "displayName": "물뿌리개 01",
+          "suggestedRole": "WashPointSupportingProp",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Watering_Can_01.fbx",
+          "image": "농장/농산물-세척-공간/보조-물뿌리개-01/candidate.png"
+        }
+      ],
+      "waterPointProgressionProposal": [
+        "ManualWell",
+        "PoweredWellOrPumpStation",
+        "PressurizedSupplyPipeNetwork"
+      ],
+      "drainageBoundary": "Drain and sewer pipes carry used water away and are not an upgrade state of potable or irrigation water supply.",
+      "stateTransitionReview": "WellToPipedSupplyConfirmed_CandidateSelectionPending",
+      "boundary": "Hierarchy proposal and candidate images only; canonical H definitions, Unity assignment and E5 remain unchanged."
+    },
+    {
+      "h1StableId": "h1-proposal:farm-wastewater-drain-point",
+      "koreanName": "농장 배수·오수 처리점",
+      "category": "농장",
+      "planningState": "DrainEntryRouteOutletRolesSeparated_CandidateSetPrepared",
+      "visualReviewState": "PendingUserReview",
+      "graphProposal": {
+        "nodeRoles": [
+          "DrainEntryH1",
+          "DischargeOutletH1"
+        ],
+        "edgeRole": "WastewaterDrainRoute",
+        "requiredFlowDirection": "DrainEntryToDischargeOutlet",
+        "requiredChecks": [
+          "SlopeOrPumpCondition",
+          "RouteContinuity",
+          "NoPotableWaterCrossConnection",
+          "DischargeDestinationSuitability"
+        ]
+      },
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "바닥 배수구",
+          "suggestedRole": "DrainEntryH1Candidate",
+          "sourceAssetPath": "Assets/Synty/PolygonTown/Models/Props/SM_Prop_Drain_01.fbx",
+          "dimensionsMeters": [0.63009, 0.37753, 0.125],
+          "image": "농장/배수-오수처리점/후보-A-바닥배수구/candidate.png",
+          "blend": "농장/배수-오수처리점/후보-A-바닥배수구/candidate-review.blend",
+          "validation": "농장/배수-오수처리점/후보-A-바닥배수구/result.json"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "수변 방류관",
+          "suggestedRole": "DischargeOutletH1Candidate",
+          "sourceAssetPath": "Assets/Synty/PolygonCity/Models/SM_Env_WaterEdge_Pipe_01.fbx",
+          "sourceScaleReview": "RequiredBeforeUnityUse",
+          "image": "농장/배수-오수처리점/후보-B-수변방류관/candidate.png",
+          "blend": "농장/배수-오수처리점/후보-B-수변방류관/candidate-review.blend",
+          "validation": "농장/배수-오수처리점/후보-B-수변방류관/result.json"
+        },
+        {
+          "candidateCode": "C",
+          "displayName": "콘크리트 배수관",
+          "suggestedRole": "WastewaterDrainRouteEdgeCandidate_NotStandalonePoint",
+          "sourceAssetPath": "Assets/Synty/PolygonConstruction/Models/SM_Prop_Pipe_Concrete_01.fbx",
+          "dimensionsMeters": [0.78417, 5.64517, 0.78417],
+          "image": "농장/배수-오수처리점/후보-C-콘크리트배수관/candidate.png",
+          "blend": "농장/배수-오수처리점/후보-C-콘크리트배수관/candidate-review.blend",
+          "validation": "농장/배수-오수처리점/후보-C-콘크리트배수관/result.json"
+        }
+      ],
+      "compositionSample": {
+        "revision": "farm-wastewater-drain-composition.r1",
+        "visualReviewState": "PreparedForUserReview",
+        "flow": [
+          "DrainEntryH1",
+          "WastewaterDrainRouteEdge",
+          "DischargeOutletH1"
+        ],
+        "localFolder": "../H2-시각자료/농장/배수체계-연결시안-r1",
+        "overviewImage": "../H2-시각자료/농장/배수체계-연결시안-r1/01-배수체계-공간조감도.png",
+        "sectionImage": "../H2-시각자료/농장/배수체계-연결시안-r1/02-배수체계-절개측면.png",
+        "blend": "../H2-시각자료/농장/배수체계-연결시안-r1/농장-배수체계-E4-연결시안-r1.blend",
+        "validation": "../H2-시각자료/농장/배수체계-연결시안-r1/검증결과-r1.json",
+        "boundary": "Diagrammatic E4 composition; actual grade, flow, discharge permission and Unity placement remain unverified."
+      },
+      "boundary": "Presentation E4 candidate-role survey only; no discharge permission, hydraulic simulation, canonical H registration, Unity placement, or E5 evidence."
+    },
+    {
+      "h1StableId": "h1-visual-candidate:nature-woodcutting-work-point",
+      "koreanName": "벌목 작업 자세 표본",
+      "category": "네이처",
+      "planningState": "RiggedBackswingAndStrikePoseStudyPrepared",
+      "visualReviewState": "PendingUserReview",
+      "relatedWorldInteraction": "WI-NATURE-06",
+      "supersededPoseFamilies": [
+        {
+          "revision": "nature-woodcutting-pose-samples.r1",
+          "reason": "Initial low-poly blocking lacked convincing hip, knee and torso linkage."
+        },
+        {
+          "revision": "nature-woodcutting-rigged-pose-samples.r2",
+          "reason": "Project-owned segmented rig study was superseded by a compatible same-pack skinned character rig."
+        }
+      ],
+      "poseFamily": {
+        "revision": "nature-woodcutting-synty-rig-pose-samples.r3",
+        "actorRepresentation": "SamePackSyntySkinnedCharacterWithActualArmature",
+        "supplierAssets": [
+          "Assets/Synty/AnimationSwordCombat/Samples/Meshes/PolygonSyntyCharacter.fbx",
+          "Assets/Synty/AnimationSwordCombat/Animations/Polygon/Attack/HeavyCombo01/A_Attack_HeavyCombo01A_Sword.fbx"
+        ],
+        "localFolder": "네이처/벌목-도끼자세/상태표본-r3",
+        "poses": [
+          {
+            "code": "HipRotationBackswing",
+            "image": "네이처/벌목-도끼자세/상태표본-r3/01-골반회전백스윙.png",
+            "blend": "네이처/벌목-도끼자세/상태표본-r3/01-골반회전백스윙.blend"
+          },
+          {
+            "code": "WideStanceStrikeFollowThrough",
+            "image": "네이처/벌목-도끼자세/상태표본-r3/02-보폭과감속을쓴타격.png",
+            "blend": "네이처/벌목-도끼자세/상태표본-r3/02-보폭과감속을쓴타격.blend"
+          }
+        ],
+        "validation": "네이처/벌목-도끼자세/상태표본-r3/검증결과-r3.json"
+      },
+      "boundary": "Rig-pose E4 study only; source sword motion is adapted for review and is not a final logging clip, exact contact approval, Unity playback, or E5 evidence."
+    },
+    {
+      "h1StableId": "h1-proposal:farm-pressurized-water-service-point",
+      "koreanName": "농장 상수도 급수점",
+      "category": "농장",
+      "planningState": "H1OpenSocketR2Accepted_ManualIrrigationR1Prepared",
+      "visualReviewState": "AcceptedAsH1VisualBaseline",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "기본형 상수도 급수함 r1",
+          "acceptedAsConcept": true,
+          "visualReviewState": "SupersededByOpenSocketR2",
+          "ownership": "ProjectOwnedBlenderModel",
+          "suggestedRole": "PressurizedWaterServicePointH1",
+          "dimensionsMeters": [
+            1.25,
+            1.0225,
+            1.105
+          ],
+          "anchors": [
+            "Anchor_WaterMainIn",
+            "Anchor_HoseOut",
+            "Anchor_Service"
+          ],
+          "localFolder": "농장/상수도-급수점/기본형-급수함-r1",
+          "image": "농장/상수도-급수점/기본형-급수함-r1/농장-상수도-급수점-H1-r1.png",
+          "blend": "농장/상수도-급수점/기본형-급수함-r1/농장-상수도-급수점-H1-r1.blend",
+          "fbx": "농장/상수도-급수점/기본형-급수함-r1/농장-상수도-급수점-H1-r1.fbx",
+          "validation": "농장/상수도-급수점/기본형-급수함-r1/검증결과-r1.json"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "개방형 호스 소켓 급수함 r2",
+          "accepted": true,
+          "visualReviewState": "AcceptedAsH1VisualBaseline",
+          "ownership": "ProjectOwnedBlenderModel",
+          "suggestedRole": "PressurizedWaterServicePointH1",
+          "dimensionsMeters": [
+            1.25,
+            1.02665,
+            1.105
+          ],
+          "anchors": [
+            "Anchor_WaterMainIn",
+            "Anchor_HoseOut",
+            "Anchor_Service"
+          ],
+          "localFolder": "농장/상수도-급수점/기본형-급수함-r2",
+          "image": "농장/상수도-급수점/기본형-급수함-r2/농장-상수도-급수점-H1-r2.png",
+          "blend": "농장/상수도-급수점/기본형-급수함-r2/농장-상수도-급수점-H1-r2.blend",
+          "fbx": "농장/상수도-급수점/기본형-급수함-r2/농장-상수도-급수점-H1-r2.fbx",
+          "validation": "농장/상수도-급수점/기본형-급수함-r2/검증결과-r2.json"
+        }
+      ],
+      "graphConnectionProposal": {
+        "nodeSequence": [
+          "h1-proposal:farm-pressurized-water-service-point",
+          "HoseH1",
+          "h1-stock:farm-production"
+        ],
+        "stateSequence": [
+          "Disconnected",
+          "HoseConnected",
+          "WateringCultivationPlot"
+        ],
+        "e4NextVisual": "호스가 Anchor_HoseOut에 결속되어 경작 구획의 고랑 중심 방향으로 이어지는 연결 시안",
+        "valveInteraction": "빨간 차단 밸브를 닫힘 기준에서 45도 돌리면 수동 관수 상태가 시각적으로 열린다"
+      },
+      "connectionCompositionSamples": [
+        {
+          "revision": "farm-manual-irrigation-connection.r1",
+          "state": "ValveClosedHoseConnected",
+          "image": "../H2-시각자료/농장/상수도-수동관수-연결-r1/01-밸브닫힘-호스연결.png",
+          "blend": "../H2-시각자료/농장/상수도-수동관수-연결-r1/01-밸브닫힘-호스연결.blend",
+          "waterVisible": false,
+          "visualReviewState": "SupersededByFullWrapCouplingR2"
+        },
+        {
+          "revision": "farm-manual-irrigation-connection.r1",
+          "state": "ValveOpenManualWatering",
+          "image": "../H2-시각자료/농장/상수도-수동관수-연결-r1/02-밸브열림-수동관수.png",
+          "blend": "../H2-시각자료/농장/상수도-수동관수-연결-r1/02-밸브열림-수동관수.blend",
+          "waterVisible": true,
+          "visualReviewState": "SupersededByFullWrapCouplingR2"
+        },
+        {
+          "revision": "farm-manual-irrigation-connection.r2",
+          "state": "ValveClosedHoseConnected",
+          "image": "../H2-시각자료/농장/상수도-수동관수-연결-r2/01-밸브닫힘-호스연결.png",
+          "blend": "../H2-시각자료/농장/상수도-수동관수-연결-r2/01-밸브닫힘-호스연결.blend",
+          "waterVisible": false,
+          "wetSoilVisible": false,
+          "outletCoupling": "FullWrapSleeveAndReducer",
+          "visualReviewState": "AcceptedAsE4CompositionDraft"
+        },
+        {
+          "revision": "farm-manual-irrigation-connection.r2",
+          "state": "ValveOpenManualWatering",
+          "image": "../H2-시각자료/농장/상수도-수동관수-연결-r2/02-밸브열림-수동관수.png",
+          "blend": "../H2-시각자료/농장/상수도-수동관수-연결-r2/02-밸브열림-수동관수.blend",
+          "waterVisible": true,
+          "wetSoilVisible": true,
+          "outletCoupling": "FullWrapSleeveAndReducer",
+          "visualReviewState": "AcceptedAsE4CompositionDraft"
+        }
+      ],
+      "excludedFunctions": [
+        "Drainage",
+        "Sewerage",
+        "WaterTreatment",
+        "AuthoritativeFlowSimulation"
+      ],
+      "boundary": "Project-owned H1 visual baseline and E4 connection composition only; canonical H registration, Unity Prefab/Scene, dynamic hose, authoritative water flow and E5 remain unverified."
+    },
+    {
+      "h1StableId": "h1-proposal:farm-water-distribution-point",
+      "koreanName": "농장 급수 연결점",
+      "category": "농장",
+      "planningState": "ReusableH1BundleAccepted_OptionalSprinklerConfirmed_SimultaneousUseRulePending",
+      "visualReviewState": "AcceptedForE4Composition",
+      "graphProposal": {
+        "nodeRoles": [
+          "WaterSourceH1",
+          "HoseH1",
+          "HoseReelAndHandleH1",
+          "IrrigationOrWashConsumerH1"
+        ],
+        "reusableBundle": {
+          "bundleCode": "farm-water-hose-kit",
+          "members": [
+            "HoseH1",
+            "HoseReelAndHandleH1"
+          ],
+          "countsAsHierarchyLevel": false
+        },
+        "h2Compositions": [
+          "farm-water-hose-kit + WashPointH1 + DrainagePointH1 = ProduceWashingAreaH2",
+          "farm-water-hose-kit + CultivationPlotH1 = ManualFurrowIrrigationAreaH2",
+          "ManualFurrowIrrigationAreaH2 + OptionalIrrigationEndpointH1 = SprinklerEnhancedIrrigation"
+        ],
+        "edgeRoles": [
+          "ConnectedTo",
+          "SuppliesWaterTo",
+          "CurrentlyOccupiesRoute"
+        ],
+        "requiredEdgeProperties": [
+          "sourceAnchor",
+          "hoseReelAnchor",
+          "hoseStartAnchor",
+          "hoseEndAnchor",
+          "consumerAnchor",
+          "hoseLength",
+          "flowRate",
+          "pressure",
+          "openState",
+          "damageOrLeak",
+          "traversalInterference"
+        ]
+      },
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "농장 호스 01",
+          "accepted": true,
+          "assignedRole": "HoseH1",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Sprinkler_Hose_01.fbx",
+          "image": "농장/급수-연결-검토/후보-농장호스-01/candidate.png"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "농장 스프링클러 01",
+          "accepted": true,
+          "assignedRole": "OptionalIrrigationEndpointH1",
+          "installationRequirement": "Optional",
+          "sourceAssetPath": "Assets/Synty/PolygonFarm/Models/SM_Prop_Sprinkler_01.fbx",
+          "image": "농장/급수-연결-검토/후보-농장스프링클러-01/candidate.png"
+        },
+        {
+          "candidateCode": "C",
+          "displayName": "호스 릴 01",
+          "accepted": true,
+          "assignedRole": "HoseReelAndHandleH1",
+          "sourceAssetPath": "Assets/Synty/PolygonTown/Models/Props/SM_Prop_HoseReel_01.fbx",
+          "image": "농장/급수-연결-검토/후보-호스릴-01/candidate.png"
+        }
+      ],
+      "boundary": "Proposed H1 and Graph Map edge model only; no canonical H registration, Unity connection or E5 authority."
+    },
+    {
+      "h1StableId": "h1-node-candidate:farm-fence-defense-chokepoint",
+      "koreanName": "울타리 방어 병목 지점",
+      "category": "농장",
+      "planningState": "IntegratedFenceExtensionCandidatePrepared",
+      "visualReviewState": "PendingUserReview",
+      "currentReviewCandidateCode": "B",
+      "candidateSet": [
+        {
+          "candidateCode": "A",
+          "displayName": "나무 울타리·출입문 병목형",
+          "accepted": false,
+          "visualReviewState": "SupersededByR2ForReview",
+          "suggestedRole": "EnemyDelayAndJointDefensePoint",
+          "sourceAssetPaths": [
+            "Assets/Synty/PolygonFarm/Models/SM_Prop_Fence_Wood_01.fbx",
+            "Assets/Synty/PolygonFarm/Models/SM_Prop_Fence_Wood_Gate_01.fbx"
+          ],
+          "image": "농장/울타리-방어-병목지점/울타리-방어-병목지점-H1.png",
+          "blend": "농장/울타리-방어-병목지점/울타리-방어-병목지점-H1.blend",
+          "result": "농장/울타리-방어-병목지점/검증결과.json"
+        },
+        {
+          "candidateCode": "B",
+          "displayName": "좌우 연장·4m 통과폭 병목형 r2",
+          "accepted": false,
+          "visualReviewState": "PendingUserReview",
+          "suggestedRole": "EnemyDelayAndJointDefensePoint",
+          "sourceAssetPaths": [
+            "Assets/Synty/PolygonFarm/Models/SM_Prop_Fence_Wood_01.fbx",
+            "Assets/Synty/PolygonFarm/Models/SM_Prop_Fence_Wood_Gate_01.fbx"
+          ],
+          "clearPassageMeters": 4.0,
+          "fenceShouldersMeters": [
+            2.5,
+            2.5
+          ],
+          "placementFootprintMeters": [
+            11.0,
+            4.25
+          ],
+          "cleanImage": "농장/울타리-방어-병목지점/울타리-방어-병목지점-H1-r2-clean.png",
+          "overlayImage": "농장/울타리-방어-병목지점/울타리-방어-병목지점-H1-r2-overlay.png",
+          "blend": "농장/울타리-방어-병목지점/울타리-방어-병목지점-H1-r2.blend",
+          "result": "농장/울타리-방어-병목지점/검증결과-r2.json"
+        }
+      ],
+      "visualLegend": {
+        "red": "적 주 접근선",
+        "blue": "플레이어 방어 위치와 내부 복귀선",
+        "green": "한스 방어 위치"
+      },
+      "proposedRule": "중앙 4m 통과 폭과 좌우 2.5m 울타리 연장을 하나의 배치 가능한 H1 후보로 보고, 문은 농장 안쪽으로 열린다. 울타리는 완전 차단물이 아니라 진입 폭과 이동 속도를 줄이는 병목이며 플레이어와 한스는 안쪽의 서로 겹치지 않는 두 방어 위치를 사용한다.",
+      "boundary": "Integrated H1 plus fence-extension Presentation E4 visual candidate only; no Graph authority, Unity placement, runtime defense, or E5 evidence."
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "schemaRevision": "blender-variant-planning-backlog.r2",
+  "authority": "PresentationE4PlanningReferenceOnly",
+  "purpose": "상태 변화의 시작·진행·결과·중단 또는 회복을 자연스럽게 판독할 최소 표현 수단을 찾고, Unity 조립으로 부족한 부분만 Blender 프로젝트 소유 파생형으로 준비한다.",
+  "fiveElementMetadataPolicy": "OptionalDiagnosticMetadataOnly",
+  "items": [
+    {
+      "projectId": "farm-residential-home-damaged-variant",
+      "state": "BlenderValidatedCopy",
+      "e4TransitionRefs": ["presentation-transition:farm-residential-home-repair.v1"],
+      "planningRefs": ["C:/Users/user/source/repos/Hongdal/docs/AI/한스농장-첫벌목과울타리수리-기획-2026-09-02.md"],
+      "intendedDifference": "같은 농장 생활주택의 수리 전 지붕 결손·노출 판재·갈색 먼지 풍화 상태",
+      "representationFirst": ["ExistingPrefab", "UnityComposition", "BlenderOwnedVariant"],
+      "exactSources": ["Assets/Synty/PolygonFarm/Models/SM_Bld_Farmhouse_02.fbx#ea1ba4b74f4bce84d977ef4f2cdaceb3"],
+      "allowedChangeCandidates": ["MeshDamageState", "MeshAddition", "MaterialSlotReuse"],
+      "continuityRequirements": ["SameFacilityIdentity", "SamePlacementTransform", "EntrancePreserved", "ReadableDamageDifference"],
+      "nextGate": "Unity 프로젝트 소유 후보 Import와 손상/복구 동일 위치 교체·Collider·Bounds·Game View 검토"
+    },
+    {
+      "projectId": "nature-woodcutting-contact-adjustment",
+      "state": "ConditionalOnUnityAssemblyFailure",
+      "e4TransitionRefs": ["presentation-transition:nature-woodcutting-contact.v1"],
+      "planningRefs": [
+        "C:/Users/user/source/repos/Hongdal/docs/Architecture/PlayableLoops/Nature벌목동작-Blender제작승인.md",
+        "C:/Users/user/source/repos/Hongdal/docs/Architecture/PlayableLoops/Nature벌목동작-애니메이션적용연구.md"
+      ],
+      "intendedDifference": "기존 동작을 보존하면서 손·도끼·나무 접촉, 발 고정, 중단 뒤 Idle 복귀만 제한 보정",
+      "representationFirst": ["ExistingClip", "UnityRetargetOrIK", "BlenderOwnedVariant"],
+      "exactSources": ["PendingCurrentActorAvatarAxeClipRebind"],
+      "allowedChangeCandidates": ["RigKeyframeAdjustment"],
+      "continuityRequirements": ["SameActorIdentity", "MainHandGrip", "AxeTreeContact", "FootLock", "SafeInterrupt", "ReturnIdle"],
+      "nextGate": "현재 Actor·Avatar·도끼·Clip 경로/GUID/hash를 재결속하고 Unity 조립 실패를 먼저 입증"
+    },
+    {
+      "projectId": "nature-tree-fall-state-transition",
+      "state": "BlockedByApprovalOrContract",
+      "e4TransitionRefs": ["presentation-transition:nature-tree-fall.v1"],
+      "planningRefs": ["C:/Users/user/source/repos/Hongdal/docs/Architecture/PlayableLoops/Nature벌목타격음-나무넘어짐-적용연구.md"],
+      "intendedDifference": "같은 나무가 마지막 접촉 뒤 밑동 기준으로 넘어지고 통나무 결과로 이어지는 오브젝트 변화",
+      "representationFirst": ["ExistingUnityObjectTransition", "BlenderOwnedVariant"],
+      "exactSources": ["Assets/Synty/PolygonNature/Prefabs/Trees/SM_Tree_Pine_01.prefab#fc9f550802bde56499ac8b64cac565f0"],
+      "allowedChangeCandidates": ["ObjectAnimation", "PivotAdjustment", "CutSurfaceVariant"],
+      "continuityRequirements": ["SameTreeIdentity", "InitialWorldTransform", "StumpPivot", "NoGroundPenetration", "TimberResultContinuity"],
+      "nextGate": "Accepted A1/A2a의 실제 Pine 읽기·marker preflight 후 Unity 방식이 부족할 때만 Blender B 승인"
+    },
+    {
+      "projectId": "farm-residential-home-repair-hammer-motion",
+      "state": "PlanningOnly",
+      "e4TransitionRefs": ["presentation-transition:farm-residential-home-repair.v1"],
+      "planningRefs": ["C:/Users/user/source/repos/Hongdal/docs/Reports/24절기-생활작업-Synty-Animation-Blender-개발조사-2026-09-02.md"],
+      "intendedDifference": "한손 망치 grip과 수리 대상 접촉, 반대손 안정, 지지발, 반복과 안전 복귀를 갖춘 수리 동작",
+      "representationFirst": ["ExistingClipSurvey", "UnityRetargetOrIK", "BlenderOwnedVariant"],
+      "exactSources": [
+        "Assets/Synty/PolygonConstruction/Prefabs/Tools/SM_Tool_Hammer_Claw.prefab#981d75f5d4ad7be4bbf819361ad1fa3d",
+        "Assets/Synty/PolygonConstruction/Prefabs/Characters/Attachments/SM_Chr_Attach_BeltLoop_Hammer_01.prefab#b35adbc5dd80bdb4fbbe2710a7f5a296",
+        "PendingRepairActorAvatarAndClip"
+      ],
+      "allowedChangeCandidates": ["RigKeyframeAdjustment", "NewProjectOwnedWorkClip"],
+      "continuityRequirements": ["HandHammerMutualExclusion", "HammerRepairContact", "SupportFoot", "SafeInterrupt", "ToolReturn", "ReturnIdle"],
+      "nextGate": "수리 Actor·Avatar와 상태 교체 경계를 동결하고 기존 Clip 부재를 정확 재검사"
+    },
+    {
+      "projectId": "farm-tilling-work-motion",
+      "state": "ConditionalOnUnityAssemblyFailure",
+      "e4TransitionRefs": [],
+      "planningRefs": ["C:/Users/user/source/repos/Hongdal/docs/Reports/24절기-생활작업-Synty-Animation-Blender-개발조사-2026-09-02.md"],
+      "intendedDifference": "양손 괭이 grip, 토양 접점, 지지발과 반복을 갖춘 한 구획 밭갈이 동작",
+      "representationFirst": ["ExistingClipSurvey", "UnityRetargetOrIK", "BlenderOwnedVariant"],
+      "exactSources": ["PendingFarmActorAvatarAndTillingTarget"],
+      "allowedChangeCandidates": ["RigKeyframeAdjustment", "NewProjectOwnedWorkClip"],
+      "continuityRequirements": ["TwoHandGrip", "HoeSoilContact", "SupportFoot", "SafeInterrupt", "ReturnIdle"],
+      "nextGate": "WI-FARM-01의 정확 Actor·괭이·고랑·작업 기준점을 동결하고 Unity 조립을 먼저 시험"
+    },
+    {
+      "projectId": "town-unloading-push-motion",
+      "state": "ConditionalOnUnityAssemblyFailure",
+      "e4TransitionRefs": [],
+      "planningRefs": ["C:/Users/user/source/repos/Hongdal/docs/Reports/24절기-생활작업-Synty-Animation-Blender-개발조사-2026-09-02.md"],
+      "intendedDifference": "손수레 양손 grip과 Walk 하체, 바퀴 회전, 화물 attach/release가 이어지는 하역 동작",
+      "representationFirst": ["UnityLayerAndIK", "BlenderOwnedVariant"],
+      "exactSources": ["PendingTownWorkerAvatarTrolleyAndCargoAnchors"],
+      "allowedChangeCandidates": ["RigKeyframeAdjustment", "ObjectAnimation"],
+      "continuityRequirements": ["TwoHandGrip", "RootMotionOff", "CargoLifetime", "WheelRotation", "SafePause", "ReturnIdle"],
+      "nextGate": "Town 주문 폐루프와 작업자·손수레·화물 기준점을 승인한 뒤 upper-body 조립 한계를 검사"
+    },
+    {
+      "projectId": "seasonal-resident-wardrobe-variant",
+      "state": "BlockedByAssetSelection",
+      "e4TransitionRefs": [],
+      "planningRefs": ["C:/Users/user/source/repos/Hongdal/docs/AI/24절기-제철자료-조사와기획연결-2026-08-31.md"],
+      "intendedDifference": "대표 절기 주민 복장에서 Unity 조립으로 해결되지 않는 작은 실루엣·겹침 차이",
+      "representationFirst": ["ExistingPrefab", "UnityComposition", "BlenderOwnedVariant"],
+      "exactSources": ["PendingRepresentativeSolarTermResidentRoleAndClothingPrefabs"],
+      "allowedChangeCandidates": ["MeshProportion", "MeshAddition", "MaterialSlotReuse"],
+      "continuityRequirements": ["SameActorIdentity", "SameAvatar", "NoBodyClipping", "NoSharedAtlasMutation"],
+      "nextGate": "대표 절기·주민 역할 하나와 정확 의복 Prefab을 먼저 선정"
+    },
+    {
+      "projectId": "seasonal-birch-dormant-variant",
+      "state": "BlockedByAssetSelection",
+      "e4TransitionRefs": [],
+      "planningRefs": ["C:/Users/user/source/repos/Hongdal/docs/Reports/24절기-주민복장-식생-Synty-Blender보완-개발조사-2026-09-02.md"],
+      "intendedDifference": "죽은 나무가 아니라 같은 Birch의 겨울 휴면 실루엣으로 읽히는 계절 상태",
+      "representationFirst": ["ExistingPrefab", "MaterialTransition", "BlenderOwnedVariant"],
+      "exactSources": ["PendingExactBirchLOD0LOD1AndDeadComparison"],
+      "allowedChangeCandidates": ["MeshProportion", "MeshAddition", "MaterialSlotReuse"],
+      "continuityRequirements": ["SameSpeciesIdentity", "TrunkAndPivotPreserved", "ColliderPreserved", "LodThresholdsPreserved", "UvAndNormalsPreserved"],
+      "nextGate": "Birch LOD0/LOD1과 Dead 비교를 동결하고 재질·Unity Profile로 해결되지 않을 때만 제작 승인"
+    }
+  ],
+  "nonEvidenceNotice": "이 목록은 Presentation E4의 변화 표현 후보 대기열이다. Blender 계획·검증·FBX 존재는 Unity Import, World 배치, WI 입력, Game View 또는 Evidence 승격이 아니다."
+}

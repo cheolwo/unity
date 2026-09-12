@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-work-yard",
+  "displayName": "배추형상검토",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Cabbage_01_L.fbx",
+  "sourceSha256": "C04F411510028F09A70CBD39B637CE9F58F929BEAECC97EFBAFDF62BE425F130",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\임시-배추형상검토\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\임시-배추형상검토\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_Cabbage_01_L"
+  ],
+  "dimensions": [
+    0.43755,
+    0.4985,
+    0.28955
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

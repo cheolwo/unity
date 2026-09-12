@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "resultCode": "Passed",
+  "targetH4BlueprintStableId": "h4-blueprint:forest-edge-living-farm-defense-region",
+  "confirmedPlacementCount": 31,
+  "placeholderCount": 3,
+  "routeCount": 5,
+  "viewLayerCount": 3,
+  "checks": [
+    "H4AndH3Collections",
+    "ConfirmedVersusPlaceholderDistinction",
+    "FiveRouteRoles",
+    "ConditionalBreachTrigger",
+    "PresentationE4AuthorityBoundary"
+  ],
+  "authorityBoundary": "Blender structure validation only; no Unity Scene, Play Mode, Game View, runtime route, or E5 evidence."
+}

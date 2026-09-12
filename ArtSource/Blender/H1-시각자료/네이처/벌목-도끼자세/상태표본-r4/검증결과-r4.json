@@ -1,0 +1,202 @@
+{
+  "status": "Failed",
+  "revision": "nature-woodcutting-experienced-rig-samples.r4",
+  "skillBaseline": "ExperiencedLumberjack",
+  "states": [
+    {
+      "state": "ready",
+      "frame": 10,
+      "image": "01-숙련벌목-준비.png",
+      "blend": "01-숙련벌목-준비.blend",
+      "actualSyntyAxe": "실제Synty벌목도끼",
+      "armature": "벌목작업자_실제리그",
+      "bones": 52,
+      "constraints": [
+        "보조손_손잡이IK",
+        "R_발접지IK",
+        "L_발접지IK"
+      ],
+      "anchors": [
+        "도끼_주손그립점",
+        "도끼_보조손그립점",
+        "도끼날_접촉점",
+        "도끼_손잡이축"
+      ],
+      "metrics": {
+        "primaryGripErrorMeters": 0.0,
+        "secondaryGripErrorMeters": 0.001232,
+        "footHeightDeltaMeters": 0.0,
+        "footGroundErrorMeters": {
+          "left": 0.0,
+          "right": 0.0
+        },
+        "groundedFootCount": 2,
+        "contactToTreeSurfaceErrorMeters": 0.595569
+      },
+      "treeLocation": [
+        -1.18595,
+        -0.02636,
+        1.575
+      ]
+    },
+    {
+      "state": "backswing",
+      "frame": 30,
+      "image": "02-숙련벌목-백스윙.png",
+      "blend": "02-숙련벌목-백스윙.blend",
+      "actualSyntyAxe": "실제Synty벌목도끼",
+      "armature": "벌목작업자_실제리그",
+      "bones": 52,
+      "constraints": [
+        "보조손_손잡이IK",
+        "R_발접지IK",
+        "L_발접지IK"
+      ],
+      "anchors": [
+        "도끼_주손그립점",
+        "도끼_보조손그립점",
+        "도끼날_접촉점",
+        "도끼_손잡이축"
+      ],
+      "metrics": {
+        "primaryGripErrorMeters": 0.0,
+        "secondaryGripErrorMeters": 0.001233,
+        "footHeightDeltaMeters": 0.029344,
+        "footGroundErrorMeters": {
+          "left": 0.0,
+          "right": 0.029344
+        },
+        "groundedFootCount": 1,
+        "contactToTreeSurfaceErrorMeters": 1.568618
+      },
+      "treeLocation": [
+        -1.18595,
+        -0.02636,
+        1.575
+      ]
+    },
+    {
+      "state": "contact",
+      "frame": 40,
+      "image": "03-숙련벌목-타격접촉.png",
+      "blend": "03-숙련벌목-타격접촉.blend",
+      "actualSyntyAxe": "실제Synty벌목도끼",
+      "armature": "벌목작업자_실제리그",
+      "bones": 52,
+      "constraints": [
+        "보조손_손잡이IK",
+        "R_발접지IK",
+        "L_발접지IK"
+      ],
+      "anchors": [
+        "도끼_주손그립점",
+        "도끼_보조손그립점",
+        "도끼날_접촉점",
+        "도끼_손잡이축"
+      ],
+      "metrics": {
+        "primaryGripErrorMeters": 0.0,
+        "secondaryGripErrorMeters": 0.043459,
+        "footHeightDeltaMeters": 0.005072,
+        "footGroundErrorMeters": {
+          "left": 0.0,
+          "right": 0.005072
+        },
+        "groundedFootCount": 2,
+        "contactToTreeSurfaceErrorMeters": 0.0
+      },
+      "treeLocation": [
+        -1.18595,
+        -0.02636,
+        1.575
+      ]
+    },
+    {
+      "state": "recovery",
+      "frame": 42,
+      "image": "04-숙련벌목-감속회수.png",
+      "blend": "04-숙련벌목-감속회수.blend",
+      "actualSyntyAxe": "실제Synty벌목도끼",
+      "armature": "벌목작업자_실제리그",
+      "bones": 52,
+      "constraints": [
+        "보조손_손잡이IK",
+        "R_발접지IK",
+        "L_발접지IK"
+      ],
+      "anchors": [
+        "도끼_주손그립점",
+        "도끼_보조손그립점",
+        "도끼날_접촉점",
+        "도끼_손잡이축"
+      ],
+      "metrics": {
+        "primaryGripErrorMeters": 1e-06,
+        "secondaryGripErrorMeters": 0.012721,
+        "footHeightDeltaMeters": 0.002597,
+        "footGroundErrorMeters": {
+          "left": 0.0,
+          "right": 0.002597
+        },
+        "groundedFootCount": 2,
+        "contactToTreeSurfaceErrorMeters": 0.218673
+      },
+      "treeLocation": [
+        -1.18595,
+        -0.02636,
+        1.575
+      ]
+    }
+  ],
+  "thresholds": {
+    "gripErrorMetersMax": 0.02,
+    "contactErrorMetersMax": 0.03,
+    "footHeightDeltaMetersMax": 0.01
+  },
+  "checks": [
+    {
+      "state": "ready",
+      "primaryGrip": true,
+      "secondaryGrip": true,
+      "feet": true,
+      "requiredGroundedFootCount": 1,
+      "contact": true
+    },
+    {
+      "state": "backswing",
+      "primaryGrip": true,
+      "secondaryGrip": true,
+      "feet": true,
+      "requiredGroundedFootCount": 1,
+      "contact": true
+    },
+    {
+      "state": "contact",
+      "primaryGrip": true,
+      "secondaryGrip": false,
+      "feet": true,
+      "requiredGroundedFootCount": 2,
+      "contact": true
+    },
+    {
+      "state": "recovery",
+      "primaryGrip": true,
+      "secondaryGrip": true,
+      "feet": true,
+      "requiredGroundedFootCount": 1,
+      "contact": true
+    }
+  ],
+  "inputs": {
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\AnimationSwordCombat\\Samples\\Meshes\\PolygonSyntyCharacter.fbx": "A3D9B8DD69DC35DD9E42479B1B4CBB430F3267F582A637335DD2D85A7B2DC62F",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\AnimationSwordCombat\\Animations\\Polygon\\Attack\\HeavyCombo01\\A_Attack_HeavyCombo01A_Sword.fbx": "58E5D031CB15D58965599BFD0545B3FE56E2E9743A4737C252D5D30325A6B32B",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Tool_Axe_01.fbx": "EED54DA5C2AF1C7F9DA84C5E02E25BB734BC70CBD25F52060D37DEB07EE48CA9",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png": "AE59540EFAD76DE089C17059762D627CAFF3A74BC30B64DC497F0A5D855322DD"
+  },
+  "supersedesAsAcceptanceCandidate": [
+    "r1",
+    "r2",
+    "r3"
+  ],
+  "boundary": "Presentation E4 Blender rig-and-grip candidate only; no final AnimationClip, Unity playback, Game View, or E5 evidence."
+}

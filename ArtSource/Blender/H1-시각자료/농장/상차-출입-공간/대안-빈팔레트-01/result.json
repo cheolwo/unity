@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-loading-gate",
+  "displayName": "농장 상차 출입 공간 - 빈 팔레트",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonCity\\Models\\SM_Prop_Pallet_01.fbx",
+  "sourceSha256": "82F7DC3D0B8DE61BD0E59CDD05FA1B5DF6710835EEDA65655A4CEB363CEAD390",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\대안-빈팔레트-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\대안-빈팔레트-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonCity\\Textures\\PolygonCity_01_A.png",
+  "reviewScale": 50.0,
+  "meshObjects": [
+    "SM_Prop_Pallet_01"
+  ],
+  "dimensions": [
+    1.13092,
+    1.02961,
+    0.19464
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

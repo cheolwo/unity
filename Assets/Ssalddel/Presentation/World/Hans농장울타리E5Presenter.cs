@@ -28,6 +28,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private readonly List<GameObject> segmentObjects = new();
         private GameObject? brokenAxeObject;
+        private string? renderedSignature;
 
         public IReadOnlyList<GameObject> SegmentObjects => segmentObjects;
         public GameObject? BrokenAxeObject => brokenAxeObject;
@@ -36,6 +37,8 @@ namespace Ssalddel.Unity.Presentation.World
         public void Configure(Transform placementRoot,
             GameObject? segmentPrefab = null, GameObject? axePrefab = null)
         {
+            ClearChildren();
+            renderedSignature = null;
             worldPlacementRoot = placementRoot != null
                 ? placementRoot
                 : throw new ArgumentNullException(nameof(placementRoot));
@@ -50,6 +53,14 @@ namespace Ssalddel.Unity.Presentation.World
                 ?? throw new InvalidOperationException(
                     "HansFarmFenceRestorationStateMissing");
             ValidateSource(state, source);
+            var signature = source.FenceStateCode + ":" + source.BrokenAxeStateCode
+                + string.Join(";", source.Segments.OrderBy(s => s.SegmentStableId,
+                    StringComparer.Ordinal).Select(s => FormattableString.Invariant(
+                    $"{s.SegmentStableId}:{s.LocalX:R}:{s.LocalZ:R}:{s.YawDegrees:R}")));
+            if (renderedSignature == signature && segmentObjects.Count == 3
+                && segmentObjects.All(value => value != null && value.activeSelf)
+                && (source.BrokenAxeStateCode != SimulationNatureSurvivalCodes.Available
+                    || brokenAxeObject != null)) return;
             if (worldPlacementRoot == null)
                 worldPlacementRoot = transform;
 
@@ -62,6 +73,7 @@ namespace Ssalddel.Unity.Presentation.World
             if (source.BrokenAxeStateCode ==
                 SimulationNatureSurvivalCodes.Available)
                 brokenAxeObject = CreateBrokenAxe(source);
+            renderedSignature = signature;
         }
 
         private static void ValidateSource(
@@ -152,6 +164,10 @@ namespace Ssalddel.Unity.Presentation.World
             instance.transform.localRotation = Quaternion.Euler(0f,
                 (float)source.YawDegrees, 0f);
             EnsureCollider(instance);
+            var interaction = instance.GetComponent<Nature생존상호작용표식>()
+                ?? instance.AddComponent<Nature생존상호작용표식>();
+            interaction.Kind = Nature생존상호작용Kind.HansFarmFence;
+            interaction.StableId = SimulationNatureSurvivalCodes.HansFarmFenceAggregateStableId;
             var marker = instance.GetComponent<Hans농장울타리E5표식>()
                 ?? instance.AddComponent<Hans농장울타리E5표식>();
             marker.Bind(source.SegmentStableId,
@@ -173,6 +189,10 @@ namespace Ssalddel.Unity.Presentation.World
             instance.transform.localPosition = new Vector3(-3.1f, 0.14f, 0.9f);
             instance.transform.localRotation = Quaternion.Euler(8f, 24f, 82f);
             EnsureCollider(instance);
+            var interaction = instance.GetComponent<Nature생존상호작용표식>()
+                ?? instance.AddComponent<Nature생존상호작용표식>();
+            interaction.Kind = Nature생존상호작용Kind.HansBrokenAxe;
+            interaction.StableId = source.BrokenAxePickupStableId;
             var marker = instance.GetComponent<Hans농장울타리E5표식>()
                 ?? instance.AddComponent<Hans농장울타리E5표식>();
             marker.Bind(source.BrokenAxePickupStableId, BrokenAxeVisualKey,
@@ -186,13 +206,16 @@ namespace Ssalddel.Unity.Presentation.World
         {
             var root = new GameObject("FenceSegmentFallback");
             root.transform.SetParent(parent, false);
-            var upper = CreateCube("UpperRail", root.transform,
+            var visualAxis = new GameObject("VisualAxisCorrection");
+            visualAxis.transform.SetParent(root.transform, false);
+            visualAxis.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
+            var upper = CreateCube("UpperRail", visualAxis.transform,
                 new Vector3(0f, 0.32f, 0f), new Vector3(2.2f, 0.16f, 0.18f));
-            var lower = CreateCube("LowerRail", root.transform,
+            var lower = CreateCube("LowerRail", visualAxis.transform,
                 new Vector3(0f, -0.25f, 0f), new Vector3(2.2f, 0.16f, 0.18f));
-            CreateCube("LeftPost", root.transform,
+            CreateCube("LeftPost", visualAxis.transform,
                 new Vector3(-0.95f, 0f, 0f), new Vector3(0.18f, 1.3f, 0.18f));
-            CreateCube("RightPost", root.transform,
+            CreateCube("RightPost", visualAxis.transform,
                 new Vector3(0.95f, 0f, 0f), new Vector3(0.18f, 1.3f, 0.18f));
             upper.transform.localRotation = Quaternion.Euler(0f, 0f, -4f);
             lower.transform.localRotation = Quaternion.Euler(0f, 0f, 3f);
@@ -265,9 +288,13 @@ namespace Ssalddel.Unity.Presentation.World
 
         private static void DestroyObject(GameObject value)
         {
+            if (value == null) return;
+            value.SetActive(false);
             if (UnityEngine.Application.isPlaying) Destroy(value);
             else DestroyImmediate(value);
         }
+
+        private void OnDestroy() => ClearChildren();
     }
 
     public sealed class Hans농장울타리E5표식 : MonoBehaviour

@@ -1,0 +1,60 @@
+{
+  "status": "BlenderE4SyntyRigPoseStudyRendered",
+  "revision": "nature-woodcutting-synty-rig-pose-samples.r3",
+  "states": [
+    {
+      "state": "backswing",
+      "frame": 20,
+      "image": "01-골반회전백스윙.png",
+      "blend": "01-골반회전백스윙.blend",
+      "rig": "벌목작업자_실제리그",
+      "bones": 52,
+      "contactPoint": [
+        0.5386,
+        0.646,
+        1.6762
+      ],
+      "treeLocation": [
+        -1.18,
+        -0.02,
+        1.575
+      ]
+    },
+    {
+      "state": "contact_follow_through",
+      "frame": 44,
+      "image": "02-보폭과감속을쓴타격.png",
+      "blend": "02-보폭과감속을쓴타격.blend",
+      "rig": "벌목작업자_실제리그",
+      "bones": 52,
+      "contactPoint": [
+        -0.0826,
+        -1.106,
+        1.2713
+      ],
+      "treeLocation": [
+        -1.18,
+        -0.02,
+        1.575
+      ]
+    }
+  ],
+  "inputs": {
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\AnimationSwordCombat\\Samples\\Meshes\\PolygonSyntyCharacter.fbx": "A3D9B8DD69DC35DD9E42479B1B4CBB430F3267F582A637335DD2D85A7B2DC62F",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\AnimationSwordCombat\\Animations\\Polygon\\Attack\\HeavyCombo01\\A_Attack_HeavyCombo01A_Sword.fbx": "58E5D031CB15D58965599BFD0545B3FE56E2E9743A4737C252D5D30325A6B32B"
+  },
+  "improvements": [
+    "same-pack skinned character",
+    "actual armature",
+    "hip rotation",
+    "knee flexion",
+    "wide stance",
+    "torso follow-through",
+    "two-hand axe composition"
+  ],
+  "supersedes": [
+    "nature-woodcutting-pose-samples.r1",
+    "nature-woodcutting-rigged-pose-samples.r2 as acceptance candidates"
+  ],
+  "boundary": "Presentation E4 rig-pose study only; the source is a sword-combat motion adapted for a woodcutting review. It is not an authored logging clip, Unity playback, or E5 evidence."
+}

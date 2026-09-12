@@ -35,6 +35,10 @@ namespace Ssalddel.Unity.Presentation.World
     }
 
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 농장경영선택대상View : MonoBehaviour
     {
         [SerializeField] private string stableId = string.Empty;
@@ -111,6 +115,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 초안은 서버 Preview나 Confirm이 아니며 업무 완료를 확정하지 않습니다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 농장경영시점Controller : MonoBehaviour
     {
         [SerializeField] private 플레이어경관Controller player = null!;
@@ -344,7 +352,7 @@ namespace Ssalddel.Unity.Presentation.World
             GUI.color = new Color(.035f, .055f, .045f, .92f);
             GUI.DrawTexture(new Rect(18f, 84f, 330f, 176f), Texture2D.whiteTexture);
             GUI.color = Color.white;
-            GUI.Label(new Rect(32f, 96f, 300f, 24f), "농장 경영 · 전술 3인칭 (기본)");
+            GUI.Label(new Rect(32f, 96f, 300f, 24f), "농장 관리 · 기존 표현 검토 / 작업 미연결");
             GUI.Label(new Rect(32f, 122f, 300f, 22f),
                 "Shift+좌클릭 다중 선택 · 1~4 작업 · 우클릭 초안");
             GUI.Label(new Rect(32f, 148f, 300f, 22f),

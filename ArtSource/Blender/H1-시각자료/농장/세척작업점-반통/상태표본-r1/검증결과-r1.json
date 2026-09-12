@@ -1,0 +1,55 @@
+{
+  "candidateRevision": "farm-half-barrel-wash-states.r1",
+  "h1Role": "농산물 세척 작업점",
+  "formRole": "CompactHalfBarrelWashPoint",
+  "sourceBlend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-반통세척조-01\\candidate-review.blend",
+  "sourceBlendSha256": "627DF9EFD267B0EFFCD813533CE6F075134683FB2349A57F3AE25A913E40379C",
+  "states": [
+    {
+      "code": "빈반통",
+      "image": "01-빈반통.png",
+      "blend": "01-빈반통.blend",
+      "imageSha256": "970C4B5E1B2C61386B881365BA948565E5848F6FABB75A4D55DB88EC20EA70F9",
+      "blendSha256": "DEDB3460D8D703AD93A1A2F4B200FF87186EA07C2537810D774193F44503FF7E"
+    },
+    {
+      "code": "물채움",
+      "image": "02-물채움.png",
+      "blend": "02-물채움.blend",
+      "imageSha256": "13658CE8EA2CEC63CEA96F14BBAE3B4B9E887A6A0928C5600604E8F3C171AF53",
+      "blendSha256": "E007743C38B97F64444766F2DC71B32C96DEF892596A455C4DACC7D3B5ABC6DB"
+    },
+    {
+      "code": "농산물세척중",
+      "image": "03-농산물세척중.png",
+      "blend": "03-농산물세척중.blend",
+      "imageSha256": "814DFF0FA8ADC05D5EC24EB89498B7D7125D6A842BAAB8692B54B44FCE7E5C09",
+      "blendSha256": "B49CF53ED4F2E561A03ECC2D4D64839D8497AD07E0D0FDB1E56EAE205B2DA0F1"
+    },
+    {
+      "code": "오염수배출대기",
+      "image": "04-오염수배출대기.png",
+      "blend": "04-오염수배출대기.blend",
+      "imageSha256": "E0DBF1AF1F7CED18A2E85CC71F281A03BB5AAC6571962A38E7726B00D7CEA717",
+      "blendSha256": "A9A97ED05E3DC8BF097877D01B80AB4F7E781C9EB6C1156E55DCD977454327CC"
+    }
+  ],
+  "independentFilesPerState": true,
+  "derivedModification": "FlattenedInnerBasinForWashStates_SourceAssetUnchanged",
+  "stateSequence": [
+    "Empty",
+    "CleanWaterReady",
+    "ProduceWashing",
+    "DirtyWaterAwaitingDrain"
+  ],
+  "evidenceBoundary": {
+    "presentation": "E4StateSamples",
+    "canonicalHChanged": false,
+    "unityScene": false,
+    "waterSimulation": false,
+    "drainageSimulation": false,
+    "playMode": false,
+    "gameView": false,
+    "e5": false
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "stableId": "h1-node-candidate:farm-fence-defense-chokepoint",
+  "title": "울타리 방어 병목 지점 H1",
+  "sourceBlend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\AreaSet-배치초안\\숲경계-한스-생활농장\\r3\\forest-edge-farm-area-set-draft-r3.blend",
+  "sourceBlendSha256": "20492EB0892B908C9BBCBDCF57ADA64303622EA9144A7D4BB7C4FD6A7E2267CF",
+  "blend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\울타리-방어-병목지점\\울타리-방어-병목지점-H1.blend",
+  "blendSha256": "93B35AAD3D97AB39E7CCC06ED9C58682B3A8B435AFFBD22245766B7040EF71FF",
+  "image": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\울타리-방어-병목지점\\울타리-방어-병목지점-H1.png",
+  "imageSha256": "9A72C927330981415C97C06E59818769CD5FF265CD493EEBBF6494E26975234D",
+  "sourceAssetKeys": [
+    "wood-fence",
+    "wood-gate"
+  ],
+  "visualLegend": {
+    "red": "적 주 접근선",
+    "blue": "플레이어 방어 위치와 내부 복귀선",
+    "green": "한스 방어 위치"
+  },
+  "reviewStateCode": "VisualCandidatePendingUserApproval",
+  "authorityBoundary": "Standalone H1 Presentation E4 visual candidate only; not Graph authority, Unity placement, runtime defense, or E5 evidence."
+}

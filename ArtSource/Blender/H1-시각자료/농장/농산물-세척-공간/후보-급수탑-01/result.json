@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-washing",
+  "displayName": "급수탑 01",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Bld_WaterTower_01.fbx",
+  "sourceSha256": "97A84D1A335568322B95905ED8A2AB77017EE742050C75549953B1346D8A8893",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-급수탑-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-급수탑-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Bld_WaterTower_01"
+  ],
+  "dimensions": [
+    2.68195,
+    2.84929,
+    8.42104
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

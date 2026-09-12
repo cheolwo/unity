@@ -1,0 +1,66 @@
+{
+  "candidateRevision": "farm-manual-irrigation-connection.r1",
+  "composition": [
+    "h1-proposal:farm-pressurized-water-service-point",
+    "HoseReelAndHandleH1",
+    "HoseH1",
+    "h1-stock:farm-production"
+  ],
+  "states": [
+    {
+      "code": "ValveClosedHoseConnected",
+      "image": "01-밸브닫힘-호스연결.png",
+      "blend": "01-밸브닫힘-호스연결.blend"
+    },
+    {
+      "code": "ValveOpenManualWatering",
+      "image": "02-밸브열림-수동관수.png",
+      "blend": "02-밸브열림-수동관수.blend"
+    }
+  ],
+  "valveOpenVisualRotationDegrees": 45,
+  "waterVisibleOnlyWhenOpen": true,
+  "connectionAnchors": [
+    "Anchor_HoseOut",
+    "HoseReelInputCandidate",
+    "ManualNozzle",
+    "CultivationPlotFurrowCenter"
+  ],
+  "sources": [
+    {
+      "path": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상수도-급수점\\기본형-급수함-r2\\농장-상수도-급수점-H1-r2.fbx",
+      "sha256": "897ABE03A758C41C662F28DA9DA53E01333699FE9AB968923F119830FA612B3E"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Models\\Props\\SM_Prop_HoseReel_01.fbx",
+      "sha256": "C167C4566DA28678B5F69EE90B3E5D359607D5DE37CB9E3AE168EB724B2F213D"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\경작구획-2.5x2.5m\\경작구획-H1-2.5x2.5m.fbx",
+      "sha256": "5AEC262999F9CE2B1CA6C266E4490BF1FA7030898A11EE15032B7859ADABD265"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Sprinkler_Hose_01.fbx",
+      "sha256": "485E0B8BBD1ADF6B423D2A79F28F1400F1C4E73C480D7BD90CB0A80FF37F94A2"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Textures\\Alts\\PolygonTown_01_A.png",
+      "sha256": "141B1AD20BDC9DDA0B187378FB9F55B1C00939358283D47A8E6EDDD0BD07B07C"
+    }
+  ],
+  "files": {
+    "closedImageSha256": "2A4F950B3F357AD1CC2ABAF85899B2E2577295FFCC5410EF13BDDE222686EA55",
+    "closedBlendSha256": "E2DEC7B43383A1C1E376F2B3EE6086D36DBB737F3E88B89E5388178BFA98B480",
+    "openImageSha256": "5F26E8BC7A60B9C07D5E47F06117FA928EC5022F1C11DB9BAABCF969B836E2F8",
+    "openBlendSha256": "22C94055781C6AE17F76FC6004742FE4F70D557605234A766E64DFB282BEEE1C"
+  },
+  "evidenceBoundary": {
+    "presentation": "E4CompositionCandidate",
+    "unityScene": false,
+    "dynamicHose": false,
+    "waterSimulation": false,
+    "playMode": false,
+    "gameView": false,
+    "e5": false
+  }
+}

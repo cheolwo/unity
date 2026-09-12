@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-washing",
+  "displayName": "물뿌리개 01",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Watering_Can_01.fbx",
+  "sourceSha256": "9FA9612E2B3055DBA029A73FA3FB8C5406970B3AAA62552CDAC06F0C9AF2EC06",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\보조-물뿌리개-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\보조-물뿌리개-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_Watering_Can_Top",
+    "SM_Prop_Watering_Can_01"
+  ],
+  "dimensions": [
+    0.22248,
+    0.73677,
+    0.47055
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

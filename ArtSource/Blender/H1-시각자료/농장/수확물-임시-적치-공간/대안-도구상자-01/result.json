@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-harvest-staging",
+  "displayName": "수확물 임시 적치 공간 대안 검증",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_ToolBox_01.fbx",
+  "sourceSha256": "EA133AA30C70C1881F6903A096A245A80BCC078ED323BD5809F6DBD5FE6DA51D",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확물-임시-적치-공간\\대안-도구상자-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확물-임시-적치-공간\\대안-도구상자-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_ToolBox_Lid_01",
+    "SM_Prop_ToolBox_01"
+  ],
+  "dimensions": [
+    0.26548,
+    0.71855,
+    0.32984
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

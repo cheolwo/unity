@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-loading-gate",
+  "displayName": "상차 출입 공간 - Town 넓은 진입로",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Models\\Environment\\SM_Env_Driveway_Wide_PathBoth_01.fbx",
+  "sourceSha256": "9F09DD7BBFCD0C25C04CBF38F06616A37E639B17132380F585BC2DF2628E2DB2",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\타운-넓은진입로-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\타운-넓은진입로-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Textures\\Misc\\Road_01.png",
+  "reviewScale": 1.0,
+  "meshObjects": [
+    "SM_Env_Driveway_Wide_PathBoth_01"
+  ],
+  "dimensions": [
+    5.00001,
+    5.00002,
+    0.02983
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

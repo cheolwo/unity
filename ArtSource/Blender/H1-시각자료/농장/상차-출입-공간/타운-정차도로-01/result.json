@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-loading-gate",
+  "displayName": "상차 출입 공간 - Town 정차 도로",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Models\\Environment\\SM_Env_Road_Parking_01.fbx",
+  "sourceSha256": "7DAF78F896019992E441FCC0A19E7B24E74D23E49A90A11A5FAFD12EB92031FC",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\타운-정차도로-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상차-출입-공간\\타운-정차도로-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Textures\\Misc\\Road_01.png",
+  "reviewScale": 1.0,
+  "meshObjects": [
+    "SM_Env_Road_Parking_01"
+  ],
+  "dimensions": [
+    10.0,
+    4.99999,
+    0.0
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

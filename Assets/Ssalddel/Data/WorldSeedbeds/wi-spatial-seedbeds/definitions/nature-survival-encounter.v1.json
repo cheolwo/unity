@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-seedbed.v1",
+  "stableId": "wi-spatial-seedbed:nature-survival-encounter.v1",
+  "revision": 5,
+  "title": "Nature 생존 탐사·조우 공간 모판",
+  "summary": "벌목과 황혼 조우 대응을 생활핵 밖 탐사 경로에서 수행하고 안전 생활핵으로 복귀시키는 위치 독립 공간 모판이다.",
+  "authoredDocument": "authored/nature-survival-encounter.v1.md",
+  "includedWiIds": ["WI-NATURE-01", "WI-NATURE-06", "WI-NATURE-18", "WI-NATURE-11"],
+  "internalSpaces": [
+    {
+      "spaceCode": "threat-watch",
+      "spatialRoleCode": "NatureThreatWatchArea",
+      "capabilityCodes": ["Spatial.Traversable", "Spatial.ObservationArea", "Spatial.ThreatMonitoringArea"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" },
+        { "capacityCode": "Actor", "quantity": 1, "unitCode": "player" },
+        { "capacityCode": "MonitoredThreatRoute", "quantity": 1, "unitCode": "route" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "nature:고지대 노출지:A", "nature:고지대 노출지:B", "nature:고지대 노출지:C",
+        "nature:산 능선:A", "nature:산 능선:B", "nature:산 능선:C"
+      ]
+    },
+    {
+      "spaceCode": "harvest-grove",
+      "spatialRoleCode": "NatureSurvivalHarvestGrove",
+      "capabilityCodes": ["Spatial.Traversable", "Spatial.WorkerAccessible", "Spatial.HarvestResourceWorkArea", "Spatial.DroppedTimberPickupAnchor"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" },
+        { "capacityCode": "ResourceNode", "quantity": 3, "unitCode": "tree" },
+        { "capacityCode": "Actor", "quantity": 1, "unitCode": "player" },
+        { "capacityCode": "Tool", "quantity": 1, "unitCode": "EA" },
+        { "capacityCode": "DroppedTimber", "quantity": 3, "unitCode": "bundle" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "nature:침엽수림 군집:A", "nature:침엽수림 군집:B", "nature:침엽수림 군집:C"
+      ]
+    },
+    {
+      "spaceCode": "encounter-edge",
+      "spatialRoleCode": "NatureSurvivalEncounterEdge",
+      "capabilityCodes": ["Spatial.Traversable", "Spatial.EncounterDecisionArea", "Spatial.RetreatRoute"],
+      "baseCapacities": [
+        { "capacityCode": "EncounterArea", "quantity": 1, "unitCode": "encounter" },
+        { "capacityCode": "RetreatRoute", "quantity": 1, "unitCode": "route" },
+        { "capacityCode": "Actor", "quantity": 1, "unitCode": "player" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "nature:숲 가장자리:A", "nature:숲 가장자리:B", "nature:숲 가장자리:C",
+        "nature:산길·바위 길목:A", "nature:산길·바위 길목:B", "nature:산길·바위 길목:C"
+      ]
+    }
+  ],
+  "wiBindings": [
+    { "worldInteractionId": "WI-NATURE-01", "internalSpaceCode": "threat-watch" },
+    { "worldInteractionId": "WI-NATURE-06", "internalSpaceCode": "harvest-grove" },
+    { "worldInteractionId": "WI-NATURE-18", "internalSpaceCode": "harvest-grove" },
+    { "worldInteractionId": "WI-NATURE-11", "internalSpaceCode": "encounter-edge" }
+  ],
+  "internalRelations": [
+    { "relationCode": "ThreatApproach", "fromSpaceCode": "harvest-grove", "toSpaceCode": "threat-watch", "connectorTypeCode": "player-traversal" },
+    { "relationCode": "EncounterDecision", "fromSpaceCode": "threat-watch", "toSpaceCode": "encounter-edge", "connectorTypeCode": "player-traversal" }
+  ],
+  "externalConnectorStubs": [
+    { "stubCode": "home-input", "internalSpaceCode": "harvest-grove", "connectorTypeCode": "player-traversal", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-NATURE-05" },
+    { "stubCode": "field-supply-input", "internalSpaceCode": "harvest-grove", "connectorTypeCode": "player-traversal", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-NATURE-17" },
+    { "stubCode": "home-return", "internalSpaceCode": "harvest-grove", "connectorTypeCode": "player-traversal", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-NATURE-07" },
+    { "stubCode": "timber-storage-return", "internalSpaceCode": "harvest-grove", "connectorTypeCode": "player-traversal", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-NATURE-13" },
+    { "stubCode": "cancel-to-home", "internalSpaceCode": "harvest-grove", "connectorTypeCode": "player-traversal", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-NATURE-12" },
+    { "stubCode": "threat-retreat-output", "internalSpaceCode": "threat-watch", "connectorTypeCode": "emergency-return", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-NATURE-02" },
+    { "stubCode": "threat-restoration-output", "internalSpaceCode": "threat-watch", "connectorTypeCode": "player-traversal", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-NATURE-03" },
+    { "stubCode": "retreat-output", "internalSpaceCode": "encounter-edge", "connectorTypeCode": "emergency-return", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-NATURE-09" },
+    { "stubCode": "stored-supply-input", "internalSpaceCode": "encounter-edge", "connectorTypeCode": "player-traversal", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-NATURE-13" },
+    { "stubCode": "resolved-encounter-to-sleep", "internalSpaceCode": "encounter-edge", "connectorTypeCode": "emergency-return", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-NATURE-14" },
+    { "stubCode": "resolved-encounter-to-field-supply", "internalSpaceCode": "encounter-edge", "connectorTypeCode": "emergency-return", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-NATURE-17" }
+  ],
+  "transformConstraint": {
+    "allowedRotationCodes": ["0", "90", "180", "270"],
+    "scaleModeCode": "Uniform",
+    "minimumWidthMeters": 24,
+    "minimumDepthMeters": 18,
+    "preferredWidthMeters": 40,
+    "preferredDepthMeters": 28,
+    "maximumWidthMeters": 64,
+    "maximumDepthMeters": 48
+  },
+  "reviewStatusCode": "ApprovedForSimulation",
+  "evidenceRefs": ["wi-catalog:simulation-world-interactions.r17", "work-order:nature-survival-solo-placement.e9.r1", "work-order:nature-dual-combat-participation.e9.r1", "work-order:nature-area-building-progression.e9.r1", "test:SimulationNaturePlayFlowCycleTests:NatureNpc현장보급위임"],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

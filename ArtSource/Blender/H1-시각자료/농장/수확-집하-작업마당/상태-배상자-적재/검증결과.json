@@ -1,0 +1,17 @@
+{
+  "status": "BlenderH1CropPayloadRendered",
+  "h1StableId": "h1-stock:farm-work-yard",
+  "skeletonSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Bld_ProduceStand_01.fbx",
+  "skeletonSha256": "E96F2C5C330A0E62667B70658E2199A8C04CD2E943DF1A94E8FE8C57FE353C75",
+  "payloadCode": "crop-payload:pear-crate.v1",
+  "payloadSources": [
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Pear_01.fbx"
+  ],
+  "payloadSha256": [
+    "4885CE961C2BDDC34DA892333C71B7034BC11F702AAD051FFBAF6D4A7D2D69B0"
+  ],
+  "payloadInstances": 3,
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\상태-배상자-적재\\배-적재-상태.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\상태-배상자-적재\\배-적재-상태.blend",
+  "boundary": "E4 visual review only; no Unity prefab, state authority, interaction, or E5 evidence."
+}

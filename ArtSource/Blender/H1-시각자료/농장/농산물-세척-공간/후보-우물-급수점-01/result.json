@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-washing",
+  "displayName": "우물 급수점 01",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Well_01.fbx",
+  "sourceSha256": "C2BABC77A410EE7201B73E9E2717D868B01D8B0F12E84050D34F354FF197517E",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-우물-급수점-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-우물-급수점-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_Well_Handle_01",
+    "SM_Prop_Well_01"
+  ],
+  "dimensions": [
+    1.60189,
+    1.41473,
+    1.67541
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

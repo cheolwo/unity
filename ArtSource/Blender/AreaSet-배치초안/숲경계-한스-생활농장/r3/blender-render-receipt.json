@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "draftStableId": "area-set-placement-draft:forest-edge-farm:hans-living-farm.r3",
+  "draftRevision": "draft-r1-blender",
+  "draftFileSha256": "3F37C905AB9DB5AF65807D6CEDBD66644D89A15C3B95B2B9C867608BDA8320B4",
+  "surfaceHashSha256": "E64F60A21B0A87201214C234B66D035E851BFEB4F518CE14D18721C909F3B80F",
+  "calibrationCatalogHashSha256": "0102ADDB0EA5C9CD01907EC135FC67ACBD44E1726CD569F73FAFA881AC2A2947",
+  "coordinateSpaceCode": "ScenarioLocalMeters",
+  "axisCode": "XRightYUpZForward",
+  "metersPerUnit": 1.0,
+  "placementCount": 31,
+  "placements": [
+    {
+      "placementStableId": "farmhouse-01",
+      "surfaceHeightMeters": 0.69738,
+      "resolvedUnityY": 0.814813
+    },
+    {
+      "placementStableId": "work-yard-01",
+      "surfaceHeightMeters": 1.286118,
+      "resolvedUnityY": 1.286118
+    },
+    {
+      "placementStableId": "loading-point-01",
+      "surfaceHeightMeters": 1.523043,
+      "resolvedUnityY": 1.611663
+    },
+    {
+      "placementStableId": "cultivation-plot-01",
+      "surfaceHeightMeters": 0.883329,
+      "resolvedUnityY": 0.883329
+    },
+    {
+      "placementStableId": "cultivation-plot-02",
+      "surfaceHeightMeters": 1.01557,
+      "resolvedUnityY": 1.01557
+    },
+    {
+      "placementStableId": "cultivation-plot-03",
+      "surfaceHeightMeters": 0.829432,
+      "resolvedUnityY": 0.829432
+    },
+    {
+      "placementStableId": "cultivation-plot-04",
+      "surfaceHeightMeters": 0.961673,
+      "resolvedUnityY": 0.961673
+    },
+    {
+      "placementStableId": "cultivation-plot-05",
+      "surfaceHeightMeters": 0.715151,
+      "resolvedUnityY": 0.715151
+    },
+    {
+      "placementStableId": "cultivation-plot-06",
+      "surfaceHeightMeters": 0.847391,
+      "resolvedUnityY": 0.847391
+    },
+    {
+      "placementStableId": "rural-road-01",
+      "surfaceHeightMeters": 1.356619,
+      "resolvedUnityY": 1.321489
+    },
+    {
+      "placementStableId": "rural-road-02",
+      "surfaceHeightMeters": 1.819447,
+      "resolvedUnityY": 1.784318
+    },
+    {
+      "placementStableId": "rural-road-03",
+      "surfaceHeightMeters": 1.6906,
+      "resolvedUnityY": 1.65547
+    },
+    {
+      "placementStableId": "wood-gate-01",
+      "surfaceHeightMeters": 1.216683,
+      "resolvedUnityY": 1.554785
+    },
+    {
+      "placementStableId": "south-fence-01",
+      "surfaceHeightMeters": 0.254226,
+      "resolvedUnityY": 0.105765
+    },
+    {
+      "placementStableId": "south-fence-02",
+      "surfaceHeightMeters": 0.192649,
+      "resolvedUnityY": 0.044189
+    },
+    {
+      "placementStableId": "south-fence-03",
+      "surfaceHeightMeters": 0.172794,
+      "resolvedUnityY": 0.024333
+    },
+    {
+      "placementStableId": "south-fence-04",
+      "surfaceHeightMeters": 0.21958,
+      "resolvedUnityY": 0.071119
+    },
+    {
+      "placementStableId": "south-fence-05",
+      "surfaceHeightMeters": 0.334365,
+      "resolvedUnityY": 0.185904
+    },
+    {
+      "placementStableId": "south-fence-06",
+      "surfaceHeightMeters": 0.506736,
+      "resolvedUnityY": 0.358276
+    },
+    {
+      "placementStableId": "south-fence-07",
+      "surfaceHeightMeters": 0.713394,
+      "resolvedUnityY": 0.564933
+    },
+    {
+      "placementStableId": "south-fence-08",
+      "surfaceHeightMeters": 0.917118,
+      "resolvedUnityY": 0.768658
+    },
+    {
+      "placementStableId": "south-fence-09",
+      "surfaceHeightMeters": 1.084118,
+      "resolvedUnityY": 0.935657
+    },
+    {
+      "placementStableId": "south-fence-10",
+      "surfaceHeightMeters": 1.191996,
+      "resolvedUnityY": 1.043536
+    },
+    {
+      "placementStableId": "forest-buffer-01",
+      "surfaceHeightMeters": 0.671541,
+      "resolvedUnityY": 0.671541
+    },
+    {
+      "placementStableId": "forest-buffer-02",
+      "surfaceHeightMeters": 0.575058,
+      "resolvedUnityY": 0.575058
+    },
+    {
+      "placementStableId": "forest-buffer-03",
+      "surfaceHeightMeters": 0.664586,
+      "resolvedUnityY": 0.664586
+    },
+    {
+      "placementStableId": "forest-buffer-04",
+      "surfaceHeightMeters": 0.964089,
+      "resolvedUnityY": 0.964089
+    },
+    {
+      "placementStableId": "forest-buffer-05",
+      "surfaceHeightMeters": 1.349949,
+      "resolvedUnityY": 1.349949
+    },
+    {
+      "placementStableId": "forest-buffer-06",
+      "surfaceHeightMeters": 1.603994,
+      "resolvedUnityY": 1.603994
+    },
+    {
+      "placementStableId": "forest-buffer-07",
+      "surfaceHeightMeters": 1.599205,
+      "resolvedUnityY": 1.599205
+    },
+    {
+      "placementStableId": "forest-buffer-08",
+      "surfaceHeightMeters": 1.50037,
+      "resolvedUnityY": 1.50037
+    }
+  ],
+  "authorityBoundary": "Editable E4 authoring draft; not Unity Scene, Game View, or E5 evidence."
+}

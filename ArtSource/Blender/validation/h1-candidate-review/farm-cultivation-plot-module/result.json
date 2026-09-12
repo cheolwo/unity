@@ -1,0 +1,20 @@
+{
+  "schemaRevision": "blender-h1-review-variant.r1",
+  "projectId": "farm-cultivation-plot-module",
+  "h1StableId": "h1-stock:farm-production",
+  "status": "BlenderReviewVariant",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Env_Dirt_Rows_01.fbx",
+  "sourceSha256": "95A5DBDB718C842AEFCC511462EED42202F1C019651885B2EB071CD3AEBFAFE5",
+  "operation": "CenterCropWithoutUniformScale",
+  "targetSizeMeters": 2.5,
+  "resultDimensions": [
+    2.5,
+    2.5,
+    0.18834
+  ],
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-cultivation-plot-module\\farm-cultivation-plot-module.blend",
+  "fbxPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-cultivation-plot-module\\farm-cultivation-plot-2_5m.fbx",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-cultivation-plot-module\\farm-cultivation-plot-2_5m.png",
+  "boundary": "Review variant only; not approved asset, Unity import, World placement, or E5 evidence."
+}

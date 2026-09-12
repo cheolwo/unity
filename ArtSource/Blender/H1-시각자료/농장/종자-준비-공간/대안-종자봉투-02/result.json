@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-seed-preparation",
+  "displayName": "종자 준비 공간 대안",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_SeedPacket_02.fbx",
+  "sourceSha256": "863F61487B433EE72684D563739A8DFEFE5B5286BF1170CA47AD19C48C03D544",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\종자-준비-공간\\대안-종자봉투-02\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\종자-준비-공간\\대안-종자봉투-02\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_SeedPacket_02"
+  ],
+  "dimensions": [
+    0.22876,
+    0.06113,
+    0.27591
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

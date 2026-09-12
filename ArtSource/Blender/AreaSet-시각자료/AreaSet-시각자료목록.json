@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "area-set-local-visual-library.v1",
+  "revision": "area-set-local-visual-library.r2",
+  "authorityBoundary": "Local Presentation E4 context review only; not canonical AreaSet, Graph Map, placement map, Unity placement or E5 authority.",
+  "items": [
+    {
+      "reviewStableId": "area-set-review:forest-edge-farm:hans-living-farm.r2",
+      "koreanName": "숲 경계 한스 생활 농장",
+      "focusH1": "h1-node-candidate:farm-loading-point",
+      "referencePlacementProfile": "placement-map-profile:forest-edge-farm:hans-living-farm",
+      "reviewState": "CorrectedContextDraftPendingUserReview",
+      "isolatedH1Image": "../H1-시각자료/농장/농장-상차-지점/빈-상차지점-H1-01/candidate.png",
+      "areaSetOverviewImage": "숲경계-한스-생활농장/r2/숲경계-한스-생활농장-AreaSet-조감도.png",
+      "blend": "숲경계-한스-생활농장/r2/숲경계-한스-생활농장-AreaSet-조감도.blend",
+      "result": "숲경계-한스-생활농장/r2/검증결과.json"
+    }
+  ]
+}

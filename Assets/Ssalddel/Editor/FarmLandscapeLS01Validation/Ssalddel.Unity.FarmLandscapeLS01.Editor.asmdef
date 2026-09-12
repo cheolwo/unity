@@ -1,0 +1,25 @@
+{
+  "name": "Ssalddel.Unity.FarmLandscapeLS01.Editor",
+  "rootNamespace": "Ssalddel.Unity.Editor",
+  "references": [
+    "Ssalddel.CodeMetadata",
+    "Ssalddel.Unity.Runtime",
+    "Ssalddel.Unity.Presentation",
+    "Ssalddel.Unity.Infrastructure",
+    "Ssalddel.Simulation.Contracts",
+    "Ssalddel.Simulation.Domain",
+    "Ssalddel.Simulation.RuntimeCore",
+    "Unity.Newtonsoft.Json"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

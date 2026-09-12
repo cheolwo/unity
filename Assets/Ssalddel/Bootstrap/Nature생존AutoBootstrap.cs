@@ -18,11 +18,19 @@ namespace Ssalddel.Unity.Bootstrap
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetLocalScope()
-            => SimulationWorldLocalRuntimeScope.Reset();
+        {
+            SimulationWorldLocalRuntimeScope.Reset();
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+            => InstallForCurrentScene();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         public static void InstallForCurrentScene()
         {
+            if (SimulationWorldLocalRuntimeScope.RestaurantObserverRequested) return;
             if (SceneManager.GetActiveScene().name != "SimulationWorldShell"
                 || Object.FindFirstObjectByType<Nature생존Controller>(
                     FindObjectsInactive.Include) != null)
@@ -43,10 +51,17 @@ namespace Ssalddel.Unity.Bootstrap
                 FindObjectsInactive.Include);
             var homeAnchor = semanticRoot?.Nodes.FirstOrDefault(value =>
                 value.NodeStableId == "h2-nature-home-core")?.Anchor;
+            var hierarchyEvidence = Object.FindFirstObjectByType<
+                H계층배치증거Root>(FindObjectsInactive.Include);
+            var natureAreaAnchor = hierarchyEvidence?.AreaSetRoots
+                .FirstOrDefault(value => value.AreaRoleCode == "NatureHome")
+                ?.transform;
+            var resolvedNatureAnchor = homeAnchor ?? natureAreaAnchor;
 
-            var root = new GameObject("Nature생존_SoloLocal_r2").transform;
+            var root = new GameObject("Nature생존_SoloLocal_r5").transform;
             root.SetParent(singleView.transform, false);
-            root.position = homeAnchor != null ? homeAnchor.position : player.transform.position;
+            root.position = resolvedNatureAnchor != null
+                ? resolvedNatureAnchor.position : player.transform.position;
             var controller = root.gameObject.AddComponent<Nature생존Controller>();
             var localScope = SimulationWorldLocalRuntimeScope.Install();
             controller.Configure(player, root, root, authorityEngine:
@@ -82,17 +97,18 @@ namespace Ssalddel.Unity.Bootstrap
                 .Where(value => value != null).Concat(new[] { root }).ToArray();
             singleView.SetApprovedEnvironmentRoots(approved);
 
-            if (homeAnchor != null)
+            if (resolvedNatureAnchor != null)
             {
                 var character = player.GetComponent<CharacterController>();
                 if (character != null) character.enabled = false;
-                player.transform.position = homeAnchor.position + homeAnchor.forward * 2.5f
-                    + Vector3.up * .2f;
+                player.transform.position = resolvedNatureAnchor.position
+                    + resolvedNatureAnchor.forward * 2.5f + Vector3.up * .2f;
                 if (character != null) character.enabled = true;
             }
             Debug.Log("NatureSurvivalLocalSimulationRuntimeReady:"
-                + "nature-survival.realtime.r2:network=0");
+                + "nature-survival.realtime.r5:network=0");
         }
+
     }
 
     [DisallowMultipleComponent]
@@ -113,9 +129,11 @@ namespace Ssalddel.Unity.Bootstrap
             battle.WorldLocalBattleRequestFailed += OnBattleRequestFailed;
         }
 
-        private void OnFightRequested(string encounterStableId)
+        private void OnFightRequested(string encounterStableId,
+            long expectedWorldRevision)
         {
-            if (!battle.AuthorityReady || !combat.TryRequestLocalEncounter(encounterStableId))
+            if (!battle.AuthorityReady || !combat.TryRequestLocalEncounter(
+                    encounterStableId, expectedWorldRevision))
                 controller.AllowFightRetry(battle.AuthorityReady
                     ? "전투 시점 전환 대기" : "전투 권위 준비 대기");
         }

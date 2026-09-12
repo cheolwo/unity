@@ -1,0 +1,9 @@
+{
+  "name": "Ssalddel.Unity.VisitorAnimation.EditorTests",
+  "rootNamespace": "Ssalddel.Unity.Editor.VisitorAnimation.Tests",
+  "references": ["Ssalddel.Unity.Presentation", "Ssalddel.Unity.Editor"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

@@ -1,0 +1,21 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-proposal:farm-wastewater-drain-point",
+  "displayName": "B 수변 방류관",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonCity\\Models\\SM_Env_WaterEdge_Pipe_01.fbx",
+  "sourceSha256": "A25B09204FEC69EF6142D4E042E17D5C53500A90201AA44C09551ECBF76A1F96",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\배수-오수처리점\\후보-B-수변방류관\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\배수-오수처리점\\후보-B-수변방류관\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonCity\\Textures\\PolygonCity_01_A.png",
+  "reviewScale": 1.0,
+  "meshObjects": [
+    "SM_Env_WaterEdge_Pipe_01"
+  ],
+  "dimensions": [
+    0.02177,
+    0.00998,
+    0.02177
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

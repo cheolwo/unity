@@ -1,0 +1,61 @@
+{
+  "schemaRevision": "blender-project-owned-variant.r1",
+  "projectId": "replace-with-stable-project-id",
+  "status": "PlanningOnly",
+  "source": {
+    "provider": "Synty",
+    "ownership": "SupplierOriginalReadOnly",
+    "assetPath": "Assets/Synty/<exact-source-file>",
+    "guid": "<unity-meta-guid>",
+    "sha256": "<sha256>",
+    "licenseEvidenceRef": "<purchase-channel-and-applicable-terms-evidence>"
+  },
+  "lineage": {
+    "planningRefs": [
+      "<approved-plan-path-and-revision>"
+    ],
+    "wiIds": [
+      "<existing-wi-id>"
+    ],
+    "hIds": [
+      "<existing-h-id-or-NotApplicable-with-reason>"
+    ],
+    "visualKeys": [
+      "<existing-visual-key>"
+    ]
+  },
+  "intent": {
+    "reuseDecision": "BlenderPlanRequired",
+    "changeBudget": "Subtle",
+    "playerReadableDifference": "<what-the-player-must-notice>",
+    "allowedChanges": [
+      "MeshDamageState"
+    ],
+    "forbiddenChanges": [
+      "SupplierOriginalOverwrite",
+      "ExternalAiUpload",
+      "UnapprovedBulkAutomation"
+    ]
+  },
+  "outputs": {
+    "blendPath": "ArtSource/Blender/source/replace-with-stable-project-id/variant.blend",
+    "exportPath": "ArtSource/Blender/exports/replace-with-stable-project-id/variant.fbx",
+    "validationPath": "ArtSource/Blender/validation/replace-with-stable-project-id/result.json",
+    "unityCandidatePath": "Assets/SsalddelGenerated/ProjectOwnedVariants/replace-with-stable-project-id/variant.fbx"
+  },
+  "executionPolicy": {
+    "mode": "ManualLocalEditOnly",
+    "externalUploadAllowed": false,
+    "supplierOriginalMutationAllowed": false,
+    "autoexecAllowed": false
+  },
+  "acceptance": {
+    "preserveUnitScale": true,
+    "preserveMaterialSlots": true,
+    "preserveRigWhenPresent": true,
+    "requireBlendReopen": true,
+    "requireFbxRoundTrip": true,
+    "requireUnityImportReview": true,
+    "requireGameViewReview": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "status": "BlenderH2CompositionRendered",
+  "mode": "irrigation",
+  "title": "고랑 관수 공간 H2 — 스프링클러 선택 설치 예시",
+  "sourceOwnership": "SupplierOriginalReadOnlyAndProjectOwnedPlotDerivative",
+  "sourcePaths": [
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Bld_WaterTower_01.fbx",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Models\\Props\\SM_Prop_HoseReel_01.fbx",
+    "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\경작구획-2.5x2.5m\\경작구획-H1-2.5x2.5m.fbx",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Sprinkler_01.fbx"
+  ],
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H2-시각자료\\농장\\고랑-관수-공간-스프링클러선택\\H2-연결시안.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H2-시각자료\\농장\\고랑-관수-공간-스프링클러선택\\H2-연결시안.blend",
+  "boundary": "Connected layout proposal only; not canonical placement, Unity Scene, interaction, or E5 evidence."
+}

@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-washing",
+  "displayName": "자연 수로 01",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonNature\\Models\\River_Plane_01.fbx",
+  "sourceSha256": "8B29EF71A32F573894625C52240E264FFB245192BFC9F90047720276D4CD598B",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-자연수로-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-자연수로-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonNature\\Textures\\PolygonNature_01.png",
+  "meshObjects": [
+    "River_Plane_01"
+  ],
+  "dimensions": [
+    5.0,
+    5.0,
+    0.0
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

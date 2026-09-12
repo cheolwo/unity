@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-work-yard",
+  "displayName": "수확·집하 작업마당 - 농산물 판매대 01",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Bld_ProduceStand_01.fbx",
+  "sourceSha256": "E96F2C5C330A0E62667B70658E2199A8C04CD2E943DF1A94E8FE8C57FE353C75",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\주후보-농산물판매대-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\주후보-농산물판매대-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Bld_ProduceStand_01"
+  ],
+  "dimensions": [
+    3.07573,
+    3.0778,
+    3.33369
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

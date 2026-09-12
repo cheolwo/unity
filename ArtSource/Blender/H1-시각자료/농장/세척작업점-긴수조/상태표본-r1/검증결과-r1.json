@@ -1,0 +1,53 @@
+{
+  "candidateRevision": "farm-wash-trough-states.r1",
+  "h1Role": "농산물 세척 작업점",
+  "sourceBlend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\농산물-세척-공간\\후보-세척수조-01\\candidate-review.blend",
+  "sourceBlendSha256": "5E55D18DFDFA24D39C95A2B50D4B14F3AFF8A5D609C29B03ACBFE9A67FAB651F",
+  "states": [
+    {
+      "code": "빈수조",
+      "image": "01-빈수조.png",
+      "blend": "01-빈수조.blend",
+      "imageSha256": "5756DE2D46C7A246B160A84AF6DB24A855E64DB36AAD3147F74FCE2A289407FE",
+      "blendSha256": "E491627EFD8E6804E76793390848E8D6245E5BF0305C2C010F004D0E9943BF93"
+    },
+    {
+      "code": "물채움",
+      "image": "02-물채움.png",
+      "blend": "02-물채움.blend",
+      "imageSha256": "9B588FCF338FC6A1AA4D9C92CF760ED8EEA3B0FBC12A29B004678BA012AE6FB7",
+      "blendSha256": "45E4FBE6227DD7D3D02CE04B40381C048A8D06FAFDCEDFB53B6DCB548DEA70A2"
+    },
+    {
+      "code": "농산물세척중",
+      "image": "03-농산물세척중.png",
+      "blend": "03-농산물세척중.blend",
+      "imageSha256": "FBCAE13F67733CAB4CE442E614CBE94838542110634AB31E737269CD030E8E60",
+      "blendSha256": "3730D9F9867041E113E646625B1D73CA2A2E73379EC36789E981C1F684F8D20D"
+    },
+    {
+      "code": "오염수배출대기",
+      "image": "04-오염수배출대기.png",
+      "blend": "04-오염수배출대기.blend",
+      "imageSha256": "913A28F32DDBB7212F17CE1347C9D2DFA9903FCBD367230B4DA76C73F4C364DC",
+      "blendSha256": "C002CEC407EB05E3CCE8F19C6AD2A32FBC5B04976F647D4DA5883800CB0BD11C"
+    }
+  ],
+  "independentFilesPerState": true,
+  "stateSequence": [
+    "Empty",
+    "CleanWaterReady",
+    "ProduceWashing",
+    "DirtyWaterAwaitingDrain"
+  ],
+  "evidenceBoundary": {
+    "presentation": "E4StateSamples",
+    "canonicalHChanged": false,
+    "unityScene": false,
+    "waterSimulation": false,
+    "drainageSimulation": false,
+    "playMode": false,
+    "gameView": false,
+    "e5": false
+  }
+}

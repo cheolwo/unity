@@ -51,6 +51,7 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     Is.Not.Empty, "공간 효과음을 들을 Player Audio Listener가 필요하다.");
 
                 controller.AcquireAxeForTest();
+                controller.EquipAxeForTest();
                 var acquiredRevision = controller.State.Revision;
                 presenter.RefreshForTest();
                 Assert.That(presenter.CurrentPhaseCode,

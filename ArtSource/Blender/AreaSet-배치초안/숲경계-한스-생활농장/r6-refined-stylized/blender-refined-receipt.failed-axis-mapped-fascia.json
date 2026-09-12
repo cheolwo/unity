@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "revision": "hans-farm-refined-stylized.r1",
+  "sourceBlend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\AreaSet-배치초안\\숲경계-한스-생활농장\\r5-natural-world\\forest-edge-hans-farm-natural-world-r5-r3-final.blend",
+  "sourceBlendSha256": "98A5E09D92B1D09BE0EB50AFA0498AD54DB6FEDF159CAC3905C65E629D391D12",
+  "outputBlend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\AreaSet-배치초안\\숲경계-한스-생활농장\\r6-refined-stylized\\forest-edge-hans-farm-refined-stylized-r6.blend",
+  "outputBlendSha256": "DA6245F841B84CC909CAD3FF02249C5EAC1E51EC4AAB879D8856E76E3FD99170",
+  "overviewSha256": "AADD57BE2E90C58442602878D220934419A7346FC1E8A9755C30A9BB70C882E0",
+  "eyeLevelSha256": "6371541C737504C11AB1EFBBA2E1E36E1C6729053F7BCBA1F3CC5AC5155C89EE",
+  "houseAtlasTexture": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "houseUvLayerCount": 3,
+  "houseVertexColorLayerCount": 0,
+  "fencePostCount": 41,
+  "scaledGrassRoots": [
+    "P074_grass",
+    "P075_grass",
+    "P076_grass",
+    "P077_grass",
+    "P078_grass",
+    "P079_grass",
+    "P080_grass",
+    "P081_grass",
+    "P082_grass"
+  ],
+  "authorityChanged": false,
+  "sourceModified": false,
+  "visualApproval": "Pending"
+}

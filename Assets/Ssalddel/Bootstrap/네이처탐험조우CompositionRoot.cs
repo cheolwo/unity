@@ -16,6 +16,10 @@ namespace Ssalddel.Unity.Bootstrap
     /// </summary>
     [DefaultExecutionOrder(-840)]
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 네이처탐험조우CompositionRoot : MonoBehaviour
     {
         [SerializeField] private UnityClientRuntimeSettings runtimeSettings = null!;
@@ -88,7 +92,7 @@ namespace Ssalddel.Unity.Bootstrap
         private async void Start()
         {
             if (!서버기준사용) return;
-            if (SimulationWorldLocalRuntimeScope.IsInstalled)
+            if (SimulationWorldLocalRuntimeScope.BusinessServerObserverRequested || SimulationWorldLocalRuntimeScope.NeighborhoodLifeRequested || SimulationWorldLocalRuntimeScope.IsInstalled)
             {
                 서버기준사용 = false;
                 Debug.LogWarning(

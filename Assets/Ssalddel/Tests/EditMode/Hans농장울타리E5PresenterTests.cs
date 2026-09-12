@@ -10,6 +10,30 @@ namespace Ssalddel.Unity.Tests.EditMode
     public sealed class Hans농장울타리E5PresenterTests
     {
         [Test]
+        public void 같은상태재조회는_객체를재생성하지않고_입력표식을보존한다()
+        {
+            var root = new GameObject("HansFarmRepeat");
+            try
+            {
+                var presenter = root.AddComponent<Hans농장울타리E5Presenter>();
+                presenter.Configure(root.transform);
+                var state = State(SimulationNatureSurvivalCodes.Damaged,
+                    SimulationNatureSurvivalCodes.Available);
+                presenter.Render(state);
+                var before = presenter.SegmentObjects.ToArray();
+                var axe = presenter.BrokenAxeObject;
+                presenter.Render(state);
+                Assert.That(presenter.SegmentObjects, Is.EqualTo(before));
+                Assert.That(presenter.BrokenAxeObject, Is.SameAs(axe));
+                Assert.That(before.All(value => value.GetComponent<Nature생존상호작용표식>()
+                    .Kind == Nature생존상호작용Kind.HansFarmFence), Is.True);
+                Assert.That(axe!.GetComponent<Nature생존상호작용표식>().Kind,
+                    Is.EqualTo(Nature생존상호작용Kind.HansBrokenAxe));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [Test]
         public void 손상과수리상태는_같은세구간의_최소World표현으로교체된다()
         {
             var root = new GameObject("HansFarmE5Root");
@@ -64,6 +88,42 @@ namespace Ssalddel.Unity.Tests.EditMode
         }
 
         [Test]
+        public void fallback울타리는_권위배치를보존하고_world경계가연속된다()
+        {
+            var root = new GameObject("HansFarmFenceContinuityRoot");
+            try
+            {
+                var presenter = root.AddComponent<Hans농장울타리E5Presenter>();
+                presenter.Configure(root.transform);
+                var state = State(SimulationNatureSurvivalCodes.Damaged,
+                    SimulationNatureSurvivalCodes.Available);
+
+                presenter.Render(state);
+
+                var ordered = presenter.SegmentObjects
+                    .OrderBy(value => value.transform.localPosition.x)
+                    .ToArray();
+                Assert.That(ordered.Select(value => value.transform.localPosition.x),
+                    Is.EqualTo(new[] { -2.4f, 0f, 2.4f }));
+                Assert.That(ordered.Select(value => value.transform.localPosition.z),
+                    Is.All.EqualTo(2.2f));
+                Assert.That(ordered.Select(value =>
+                        Mathf.DeltaAngle(90f, value.transform.localEulerAngles.y)),
+                    Is.EqualTo(new[] { 0f, -8f, 6f }).Within(0.001f));
+
+                var bounds = ordered.Select(WorldBounds).ToArray();
+                Assert.That(bounds[1].min.x - bounds[0].max.x,
+                    Is.LessThanOrEqualTo(0.35f));
+                Assert.That(bounds[2].min.x - bounds[1].max.x,
+                    Is.LessThanOrEqualTo(0.35f));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
         public void 잘못된상태사본은_기존World표현을지우기전에거부된다()
         {
             var root = new GameObject("HansFarmE5InvalidSnapshotRoot");
@@ -101,6 +161,16 @@ namespace Ssalddel.Unity.Tests.EditMode
                 && renderers.All(item => item.enabled
                     && item.bounds.size.sqrMagnitude > 0f)
                 && value.GetComponentsInChildren<Collider>(true).Length > 0;
+        }
+
+        private static Bounds WorldBounds(GameObject value)
+        {
+            var renderers = value.GetComponentsInChildren<Renderer>(true);
+            Assert.That(renderers, Is.Not.Empty);
+            var bounds = renderers[0].bounds;
+            foreach (var renderer in renderers.Skip(1))
+                bounds.Encapsulate(renderer.bounds);
+            return bounds;
         }
 
         private static SimulationNatureSurvivalStateSnapshot State(

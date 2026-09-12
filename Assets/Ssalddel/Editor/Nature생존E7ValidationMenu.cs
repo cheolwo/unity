@@ -21,6 +21,12 @@ namespace Ssalddel.Unity.Editor
         private const string InputBoundaryTestName =
             "Ssalddel.Unity.Tests.EditMode.통합SimulationWorldTests."
             + "일인칭커서는_UI버튼입력으로_다시잠기지않는다";
+        private const string TacticalStabilityTestName =
+            "Ssalddel.Unity.Tests.PlayMode.Nature도끼확보E7PlayModeTests."
+            + "SimulationWorldShell은_실제마우스입력으로_도끼를확보하고_저장복원한다";
+        private const string ShelterStabilityTestName =
+            "Ssalddel.Unity.Tests.PlayMode.Nature생존E7폐루프PlayModeTests."
+            + "SimulationWorldShell은_실제입력으로_Nature생활거점저장복원을완주한다";
         private const string EvidenceDirectory =
             "Assets/Documentation/Changes/2026-08-26-nature-e7-entry";
         private const string EvidencePath =
@@ -48,6 +54,30 @@ namespace Ssalddel.Unity.Editor
             {
                 testMode = TestMode.EditMode,
                 testNames = new[] { InputBoundaryTestName },
+            }));
+        }
+
+        [MenuItem("Ssalddel/검증/NATURE-E8 전술 안정성 Play Mode 1회")]
+        public static void RunTacticalStabilityTest()
+        {
+            var api = ScriptableObject.CreateInstance<TestRunnerApi>();
+            api.RegisterCallbacks(new ResultCallbacks());
+            api.Execute(new ExecutionSettings(new Filter
+            {
+                testMode = TestMode.PlayMode,
+                testNames = new[] { TacticalStabilityTestName },
+            }));
+        }
+
+        [MenuItem("Ssalddel/검증/NATURE-E8 생활거점 안정성 Play Mode 1회")]
+        public static void RunShelterStabilityTest()
+        {
+            var api = ScriptableObject.CreateInstance<TestRunnerApi>();
+            api.RegisterCallbacks(new ResultCallbacks());
+            api.Execute(new ExecutionSettings(new Filter
+            {
+                testMode = TestMode.PlayMode,
+                testNames = new[] { ShelterStabilityTestName },
             }));
         }
 
@@ -202,5 +232,6 @@ namespace Ssalddel.Unity.Editor
                         $"NATURE-E7 실패: {result.FullName}\n{result.Message}");
             }
         }
+
     }
 }

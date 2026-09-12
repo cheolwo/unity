@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "stableId": "h1-node-candidate:farm-fence-defense-chokepoint",
+  "candidateRevision": "r2",
+  "title": "울타리 방어 병목 지점 H1 r2",
+  "sourceBlend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\AreaSet-배치초안\\숲경계-한스-생활농장\\r3\\forest-edge-farm-area-set-draft-r3.blend",
+  "sourceBlendSha256": "20492EB0892B908C9BBCBDCF57ADA64303622EA9144A7D4BB7C4FD6A7E2267CF",
+  "blend": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\울타리-방어-병목지점\\울타리-방어-병목지점-H1-r2.blend",
+  "blendSha256": "26B8F906A2FC5836140398990678D00F00ED9FFCFB33CF0771434C462946DCF6",
+  "cleanImage": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\울타리-방어-병목지점\\울타리-방어-병목지점-H1-r2-clean.png",
+  "cleanImageSha256": "C498E326D4FA4A89E7131E5F273FDBC8425EF0004B86B0A6E2CAC4B7DC8B280B",
+  "overlayImage": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\울타리-방어-병목지점\\울타리-방어-병목지점-H1-r2-overlay.png",
+  "overlayImageSha256": "BCE6CEE50203FD865DF243C5F2D4DEA88B9FD55687ED204A547E8C7D748EF14D",
+  "sourceAssetKeys": [
+    "wood-fence",
+    "wood-gate"
+  ],
+  "sourceAssetState": "SyntySourceUnmodified_DerivedSceneTransformsOnly",
+  "spatialContract": {
+    "pivot": "passage-center-ground",
+    "forward": "+Y_FarmInterior",
+    "enemyApproach": "-Y_Outside",
+    "clearPassageMeters": 4.0,
+    "gateDoorClosedWidthBeforeScaleMeters": 3.3707,
+    "gateDoorClosedWidthAfterScaleMeters": 4.0,
+    "gateDoorOpeningDegrees": 82.0,
+    "leftAndRightFenceShouldersMeters": [
+      2.5,
+      2.5
+    ],
+    "defenderPositionsMeters": {
+      "player": [
+        -1.2,
+        2.0
+      ],
+      "hans": [
+        1.2,
+        2.0
+      ]
+    },
+    "measuredBoundsMeters": [
+      10.9798,
+      4.0734,
+      1.6639
+    ],
+    "placementFootprintMetersRoundedUpTo25cm": [
+      11.0,
+      4.25
+    ]
+  },
+  "visualLegend": {
+    "red": "적 주 접근선",
+    "blue": "플레이어 방어 위치와 내부 복귀선",
+    "green": "한스 방어 위치"
+  },
+  "cleanImageOverlayObjectsRendered": false,
+  "overlayImageOverlayObjectsRendered": true,
+  "reviewStateCode": "VisualCandidatePendingUserApproval",
+  "authorityBoundary": "Integrated H1 plus fence-extension Presentation E4 visual candidate only; not Graph authority, Unity placement, runtime defense, or E5 evidence."
+}

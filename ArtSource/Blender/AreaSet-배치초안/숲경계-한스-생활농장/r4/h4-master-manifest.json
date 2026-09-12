@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "forest-edge-living-farm-defense-h4-blender-authoring.v1",
+  "revision": "r4",
+  "targetH4BlueprintStableId": "h4-blueprint:forest-edge-living-farm-defense-region",
+  "areaSetInstanceStableId": "area-set:review:forest-edge-farm:hans-living-farm.v1",
+  "sourceBlendPath": "C:/Users/user/ssalddel/ArtSource/Blender/AreaSet-배치초안/숲경계-한스-생활농장/r3/forest-edge-farm-area-set-draft-r3.blend",
+  "sourceBlendSha256": "20492EB0892B908C9BBCBDCF57ADA64303622EA9144A7D4BB7C4FD6A7E2267CF",
+  "surfaceSnapshotPath": "C:/Users/user/ssalddel/ArtSource/Blender/AreaSet-배치초안/숲경계-한스-생활농장/r3/surface-snapshot.json",
+  "expectedSourceDraftHashSha256": "3F37C905AB9DB5AF65807D6CEDBD66644D89A15C3B95B2B9C867608BDA8320B4",
+  "placementH3Roles": {
+    "farmhouse-01": "LivingProduction",
+    "work-yard-01": "LivingProduction",
+    "loading-point-01": "LivingProduction",
+    "cultivation-plot-01": "LivingProduction",
+    "cultivation-plot-02": "LivingProduction",
+    "cultivation-plot-03": "LivingProduction",
+    "cultivation-plot-04": "LivingProduction",
+    "cultivation-plot-05": "LivingProduction",
+    "cultivation-plot-06": "LivingProduction",
+    "rural-road-01": "AccessDefense",
+    "rural-road-02": "AccessDefense",
+    "rural-road-03": "AccessDefense",
+    "wood-gate-01": "AccessDefense",
+    "south-fence-01": "AccessDefense",
+    "south-fence-02": "AccessDefense",
+    "south-fence-03": "AccessDefense",
+    "south-fence-04": "AccessDefense",
+    "south-fence-05": "AccessDefense",
+    "south-fence-06": "AccessDefense",
+    "south-fence-07": "AccessDefense",
+    "south-fence-08": "AccessDefense",
+    "south-fence-09": "AccessDefense",
+    "south-fence-10": "AccessDefense",
+    "forest-buffer-01": "AccessDefense",
+    "forest-buffer-02": "AccessDefense",
+    "forest-buffer-03": "AccessDefense",
+    "forest-buffer-04": "AccessDefense",
+    "forest-buffer-05": "AccessDefense",
+    "forest-buffer-06": "AccessDefense",
+    "forest-buffer-07": "AccessDefense",
+    "forest-buffer-08": "AccessDefense"
+  },
+  "contextPlaceholders": [
+    {
+      "stableId": "h1-placeholder:defense-rally-point",
+      "h3RoleCode": "AccessDefense",
+      "position": [8.0, -8.0],
+      "size": [2.0, 2.0, 0.2]
+    },
+    {
+      "stableId": "h1-placeholder:retreat-recovery-point",
+      "h3RoleCode": "DamageRecoveryReturn",
+      "position": [-10.0, 10.0],
+      "size": [2.4, 2.4, 0.2]
+    },
+    {
+      "stableId": "h1-placeholder:damaged-fence-breach",
+      "h3RoleCode": "DamageRecoveryReturn",
+      "position": [-4.5, -16.2],
+      "size": [2.6, 1.2, 1.3]
+    }
+  ],
+  "routes": [
+    {
+      "routeCode": "EnemyPrimaryIngress",
+      "edgeKindCode": "ThreatRoute",
+      "activationConditionCode": "AlwaysAvailableWhenDefenseEncounterActive",
+      "points": [[15.0, -23.0], [15.0, -16.2], [15.0, -8.0], [8.0, -8.0]]
+    },
+    {
+      "routeCode": "EnemyConditionalBreach",
+      "edgeKindCode": "ConditionalThreatRoute",
+      "activationConditionCode": "FenceDamageStateIsBreached",
+      "points": [[-4.5, -23.0], [-4.5, -16.2], [-4.0, -9.0], [2.0, -5.0]]
+    },
+    {
+      "routeCode": "PlayerHansDefenseTraversal",
+      "edgeKindCode": "PlayerCompanionRoute",
+      "activationConditionCode": "DefensePreparationAvailable",
+      "points": [[-16.0, 9.0], [-6.0, 7.0], [2.0, 2.0], [8.0, -8.0]]
+    },
+    {
+      "routeCode": "SupplyRepairHandoff",
+      "edgeKindCode": "SupplyRepairRoute",
+      "activationConditionCode": "RepairOrSupplyWorkSelected",
+      "points": [[1.5, 9.5], [2.0, 2.0], [-1.0, -8.0], [-4.5, -16.2]]
+    },
+    {
+      "routeCode": "RetreatRecoveryReturn",
+      "edgeKindCode": "RecoveryRoute",
+      "activationConditionCode": "RetreatAvailableAndRouteNotBlocked",
+      "points": [[8.0, -8.0], [1.0, -1.0], [-10.0, 10.0], [-16.0, 9.0]]
+    }
+  ],
+  "authorityBoundary": "Presentation E4 authoring manifest only; no canonical Unity placement, runtime route execution, or E5."
+}

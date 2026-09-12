@@ -14,7 +14,7 @@ namespace Ssalddel.Unity.Presentation.World
     /// 이 Component는 Nature생존Engine을 호출하지 않고 상태 변경을 확정하지 않습니다.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class Nature감각표현Presenter : MonoBehaviour
+    public sealed partial class Nature감각표현Presenter : MonoBehaviour
     {
         [SerializeField] private Nature생존Controller controller = null!;
         [SerializeField] private 플레이어경관Controller player = null!;
@@ -59,6 +59,8 @@ namespace Ssalddel.Unity.Presentation.World
         private Quaternion rightUpperArmBase;
         private Quaternion spineBase;
         private Material? fxMaterial;
+        private bool usesAuthoritativeWoodcutting;
+        private bool observedHasAxe;
 
         public bool IsConfigured => controller != null && player != null
                                     && receipt != null && anchors.Length > 0;
@@ -90,6 +92,7 @@ namespace Ssalddel.Unity.Presentation.World
                 throw new InvalidOperationException(
                     "NatureSensoryPresentationConfigurationInvalid");
 
+            InvalidateWoodcuttingObservation();
             controller = natureController;
             player = playerController;
             presentationOnly = true;
@@ -102,6 +105,8 @@ namespace Ssalddel.Unity.Presentation.World
                       ?? gameObject.AddComponent<감각표현검증ReceiptView>();
             receipt.Configure(anchors, OptionalAreaAudioAvailable);
             previousState = controller.State;
+            observedHasAxe = previousState.HasAxe;
+            usesAuthoritativeWoodcutting = !string.IsNullOrWhiteSpace(previousState.PlayerStableId);
             observedRevision = previousState.Revision;
             ApplyFrame(projector.Project(null, previousState), true);
             enabled = true;
@@ -129,13 +134,14 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void Update()
         {
-            if (!CanReadAuthoritySnapshot()) return;
+            if (!CanReadAuthoritySnapshot()) { InvalidateWoodcuttingObservation(); return; }
             RefreshFromAuthoritySnapshot();
         }
 
         private void LateUpdate()
         {
             if (!CanReadAuthoritySnapshot()) return;
+            TickWoodcutting(Time.unscaledDeltaTime);
             TickToolAnimation();
         }
 
@@ -147,12 +153,52 @@ namespace Ssalddel.Unity.Presentation.World
         private void RefreshFromAuthoritySnapshot()
         {
             var current = controller.State;
-            if (previousState != null && current.Revision == observedRevision)
+            var authoritative = !string.IsNullOrWhiteSpace(current.PlayerStableId);
+            if (authoritative && !woodcuttingReconstructionPending
+                && current.SessionStableId == woodcuttingSession && current.PlayerStableId == woodcuttingPlayer
+                && controller.PresentationObservationEpoch < woodcuttingSourceEpoch)
+            {
+                WoodcuttingDiagnostic = "SourceEpochRegressed";
+                woodcuttingTickAllowed = false;
                 return;
-            var frame = projector.Project(previousState, current);
-            ApplyFrame(frame, false);
+            }
+            var baseline = IsSensoryBaseline(previousState, current, woodcuttingReconstructionPending,
+                woodcuttingSourceEpoch, controller.PresentationObservationEpoch);
+            observedHasAxe = current.HasAxe;
+            usesAuthoritativeWoodcutting = authoritative;
+            if (usesAuthoritativeWoodcutting)
+            {
+                if (baseline)
+                {
+                    markers.Clear();
+                    foreach (var marker in controller.GetComponentsInChildren<Nature생존상호작용표식>(true))
+                        markers[marker.StableId] = marker;
+                    RebindWoodcuttingAnchors(current);
+                }
+                if (PrepareWoodcuttingBindings())
+                    RefreshWoodcutting(current, controller.PresentationWorkInputHeld,
+                        player.CurrentMovementIntent == 공용AnimationIntentCodes.Walk
+                        || player.CurrentMovementIntent == 공용AnimationIntentCodes.Run,
+                        controller.PresentationObservationEpoch);
+            }
+            else if (woodcuttingLeaseHeld) InvalidateWoodcuttingObservation();
+            if (!baseline && previousState != null && current.Revision == observedRevision)
+                return;
+            if (!baseline && current.Revision < observedRevision) return;
+            var frame = projector.Project(baseline ? null : previousState, current);
+            ApplyFrame(frame, baseline);
             previousState = current;
             observedRevision = current.Revision;
+        }
+
+        private static bool IsSensoryBaseline(Nature생존State previous, Nature생존State current,
+            bool reconstructionPending, long previousEpoch, long currentEpoch)
+        {
+            bool authoritative = !string.IsNullOrWhiteSpace(current.PlayerStableId);
+            return previous == null || (authoritative && reconstructionPending)
+                || current.SessionStableId != previous.SessionStableId
+                || current.PlayerStableId != previous.PlayerStableId
+                || (authoritative && previousEpoch >= 0 && currentEpoch != previousEpoch);
         }
 
         private void ApplyFrame(Nature감각표현Frame frame, bool baseline)
@@ -167,7 +213,11 @@ namespace Ssalddel.Unity.Presentation.World
             if (harvestWorking && !wasWorking)
                 workAnimationStartedAt = Time.unscaledTime;
 
-            if (!baseline && !string.IsNullOrWhiteSpace(frame.CueStableId)
+            var legacyHarvest = frame.PhaseCode == 감각표현단계Codes.Working
+                || frame.PhaseCode == 감각표현단계Codes.Completed
+                || frame.PhaseCode == 감각표현단계Codes.Cancelled;
+            if (!baseline && !(usesAuthoritativeWoodcutting && legacyHarvest)
+                && !string.IsNullOrWhiteSpace(frame.CueStableId)
                 && playedCueStableIds.Add(frame.CueStableId))
             {
                 if (!string.IsNullOrWhiteSpace(frame.AudioCueCode))
@@ -373,12 +423,37 @@ namespace Ssalddel.Unity.Presentation.World
         private void TickToolAnimation()
         {
             UpdateToolVisibility();
+            if (usesAuthoritativeWoodcutting || woodcuttingLeaseHeld)
+            {
+                // 전신 뼈는 전문 Graph 또는 공용 소유자 하나만 작성한다.
+                if (firstPersonToolRoot != null)
+                {
+                    var toolAngle = 8f;
+                    if (woodcuttingLeaseHeld && woodcuttingAdapter != null)
+                    {
+                        var playback = woodcuttingAdapter.ReadState().Playback;
+                        var time = Mathf.Clamp01(playback.NormalizedTime);
+                        toolAngle = playback.Segment switch
+                        {
+                            NatureWoodcutting.벌목PlaybackSegment.WindUp => Mathf.Lerp(8f, -58f, time),
+                            NatureWoodcutting.벌목PlaybackSegment.AwaitingProgress => -58f,
+                            NatureWoodcutting.벌목PlaybackSegment.Hit => Mathf.Lerp(-58f, 64f, time),
+                            NatureWoodcutting.벌목PlaybackSegment.FollowThrough => Mathf.Lerp(64f, 8f, time),
+                            _ => 8f,
+                        };
+                    }
+                    firstPersonToolRoot.localRotation = Quaternion.Euler(toolAngle, -20f, -35f);
+                }
+                return;
+            }
+            if (woodcuttingCommon != null && woodcuttingCommon.HasExternalPoseOwner) return;
             if (!harvestWorking)
             {
                 if (firstPersonToolRoot != null)
                     firstPersonToolRoot.localRotation =
                         Quaternion.Euler(8f, -20f, -35f);
-                RestoreHumanoidPose();
+                // 평상시 전신 자세는 공용AnimationAdapter가 소유한다.
+                // 여기서 초기 bind pose를 다시 쓰면 절차형 Idle을 T자로 덮는다.
                 return;
             }
 
@@ -401,17 +476,10 @@ namespace Ssalddel.Unity.Presentation.World
                     * Quaternion.Euler(-8f, angle * .08f, 0f);
         }
 
-        private void RestoreHumanoidPose()
-        {
-            if (rightUpperArm != null) rightUpperArm.localRotation = rightUpperArmBase;
-            if (leftUpperArm != null) leftUpperArm.localRotation = leftUpperArmBase;
-            if (spine != null) spine.localRotation = spineBase;
-        }
-
         private void UpdateToolVisibility()
         {
             if (controller == null || !controller.ValidateWiring()) return;
-            var hasAxe = controller.State.HasAxe;
+            var hasAxe = observedHasAxe;
             if (firstPersonToolRoot != null)
                 firstPersonToolRoot.gameObject.SetActive(hasAxe
                     && player.CurrentMode == 플레이어시점Mode.FirstPerson);
@@ -635,12 +703,22 @@ namespace Ssalddel.Unity.Presentation.World
         private void OnDisable()
         {
             harvestWorking = false;
-            RestoreHumanoidPose();
+            InvalidateWoodcuttingObservation();
         }
 
         private void OnDestroy()
         {
-            RestoreHumanoidPose();
+            InvalidateWoodcuttingObservation();
+            // 다른 인스턴스/Graph는 건드리지 않는다. 반환 거부 진단은 유지한다.
+            if (woodcuttingLeaseHeld && woodcuttingCommon != null
+                && (woodcuttingAdapter == null || !woodcuttingAdapter.ReadState().HasOwnership))
+                woodcuttingCommon.RequestExternalPoseRelease(woodcuttingLeaseToken);
+            if (woodcuttingAdapter != null && !woodcuttingAdapter.ReadState().HasOwnership)
+            {
+                woodcuttingAdapter.Dispose();
+                if (UnityEngine.Application.isPlaying) Destroy(woodcuttingAdapter);
+                else DestroyImmediate(woodcuttingAdapter);
+            }
             foreach (var clip in clips.Values)
                 if (clip != null) Destroy(clip);
             if (fxMaterial != null) Destroy(fxMaterial);

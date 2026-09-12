@@ -46,6 +46,9 @@ namespace Ssalddel.Unity.Tests.PlayMode
                     Nature생존Controller>(FindObjectsInactive.Include)!;
                 var player = UnityEngine.Object.FindAnyObjectByType<
                     플레이어경관Controller>(FindObjectsInactive.Include)!;
+                for (var poseFrame = 0; poseFrame < 20; poseFrame++)
+                    yield return null;
+                AssertIdlePoseIsVisible(player);
                 player.EnterExplorationFirstPersonMode();
                 player.TickCameraTransition(player.ViewTransitionDuration);
                 player.enabled = false;
@@ -93,10 +96,27 @@ namespace Ssalddel.Unity.Tests.PlayMode
                 Assert.That(restored.State.SessionStableId, Is.EqualTo(savedSession));
                 Assert.That(restored.State.Revision, Is.EqualTo(savedRevision));
                 Assert.That(restored.State.HasAxe, Is.True);
-                Assert.That(UnityEngine.Object.FindObjectsByType<
+                var restoredAxe = UnityEngine.Object.FindObjectsByType<
                         Nature생존상호작용표식>(FindObjectsInactive.Include)
-                    .Single(value => value.Kind == Nature생존상호작용Kind.Axe)
-                    .gameObject.activeSelf, Is.False);
+                    .Single(value => value.Kind == Nature생존상호작용Kind.Axe);
+                Assert.That(restoredAxe.gameObject.activeSelf, Is.False);
+                var restoredPlayer = UnityEngine.Object.FindAnyObjectByType<
+                    플레이어경관Controller>(FindObjectsInactive.Include)!;
+                var restoredModePresenter = UnityEngine.Object.FindAnyObjectByType<
+                    통합월드ModePresenter>(FindObjectsInactive.Include)!;
+                restoredModePresenter.ShowNatureExploration();
+                Assert.That(restoredModePresenter.CurrentModeCode,
+                    Is.EqualTo(통합월드ModeCodes.NatureExploration));
+                restoredPlayer.TickCameraTransition(
+                    restoredPlayer.ViewTransitionDuration);
+                restoredPlayer.enabled = false;
+                var restoredCollider = restoredAxe.GetComponentInChildren<Collider>(
+                    true);
+                Assert.That(restoredCollider, Is.Not.Null);
+                PointAt(restoredPlayer, restoredAxe, restoredCollider!);
+                for (var captureFrame = 0; captureFrame < 5; captureFrame++)
+                    yield return null;
+                yield return CaptureRestoredGameView();
             }
             finally
             {
@@ -160,6 +180,76 @@ namespace Ssalddel.Unity.Tests.PlayMode
             }
             Assert.That(UnityEngine.Object.FindAnyObjectByType<Nature생존Controller>(
                 FindObjectsInactive.Include), Is.Not.Null);
+        }
+
+        private static IEnumerator CaptureRestoredGameView()
+        {
+            var evidenceDirectory = Path.GetFullPath(Path.Combine(
+                UnityEngine.Application.dataPath, "..", "artifacts", "local",
+                "validation",
+                "nature-tactical-e8"));
+            Directory.CreateDirectory(evidenceDirectory);
+            var evidencePath = Path.Combine(evidenceDirectory,
+                "SimulationWorldShell-nature-tactical-restored-"
+                + DateTime.UtcNow.ToString("yyyyMMdd-HHmmssfff") + ".png");
+            ScreenCapture.CaptureScreenshot(evidencePath, 1);
+
+            var timeout = 10f;
+            while (!File.Exists(evidencePath) && timeout > 0f)
+            {
+                timeout -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            Assert.That(File.Exists(evidencePath), Is.True,
+                "canonical Game View 캡처가 제한 시간 안에 생성되어야 한다.");
+            var receipt = new NatureTacticalE8Receipt
+            {
+                schema = "nature-tactical-e8-playmode-receipt.v1",
+                testFullName = TestContext.CurrentContext.Test.FullName,
+                executedAtUtc = DateTime.UtcNow.ToString("O"),
+                canonicalScene = "SimulationWorldShell",
+                actualInputPassed = true,
+                saveReentryPassed = true,
+                restoredHasAxe = true,
+                gameViewEvidencePath = evidencePath.Replace('\\', '/'),
+            };
+            var receiptPath = Path.Combine(evidenceDirectory,
+                "nature-tactical-e8-playmode-"
+                + DateTime.UtcNow.ToString("yyyyMMdd-HHmmssfff") + ".json");
+            File.WriteAllText(receiptPath, JsonUtility.ToJson(receipt, true),
+                new System.Text.UTF8Encoding(false));
+            TestContext.Progress.WriteLine("GameViewEvidence=" + evidencePath);
+            TestContext.Progress.WriteLine("PlayModeReceipt=" + receiptPath);
+        }
+
+        [Serializable]
+        private sealed class NatureTacticalE8Receipt
+        {
+            public string schema = string.Empty;
+            public string testFullName = string.Empty;
+            public string executedAtUtc = string.Empty;
+            public string canonicalScene = string.Empty;
+            public bool actualInputPassed;
+            public bool saveReentryPassed;
+            public bool restoredHasAxe;
+            public string gameViewEvidencePath = string.Empty;
+        }
+
+        private static void AssertIdlePoseIsVisible(플레이어경관Controller player)
+        {
+            var animator = player.GetComponentsInChildren<Animator>(true)
+                .First(value => value.avatar != null && value.avatar.isHuman);
+            Assert.That(animator.enabled, Is.False,
+                "절차형 대체 자세에서는 Animator가 bind pose를 다시 쓰면 안 된다.");
+            var leftUpperArm = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
+            var rightUpperArm = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
+            var leftHand = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+            var rightHand = animator.GetBoneTransform(HumanBodyBones.RightHand);
+            Assert.That(leftUpperArm.position.y - leftHand.position.y,
+                Is.GreaterThan(.2f), "절차형 Idle 왼팔이 T자 bind pose로 되돌아가면 안 된다.");
+            Assert.That(rightUpperArm.position.y - rightHand.position.y,
+                Is.GreaterThan(.2f), "절차형 Idle 오른팔이 T자 bind pose로 되돌아가면 안 된다.");
         }
 
     }

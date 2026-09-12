@@ -1,0 +1,24 @@
+{
+  "status": "BlenderH1StateFlowRendered",
+  "h1StableId": "h1-stock:farm-work-yard",
+  "flow": [
+    "EmptyOrAvailable",
+    "HandlingOrOccupied",
+    "LoadedStoredOrTransferred",
+    "ClearedOrReturned"
+  ],
+  "handlingReadability": [
+    "OpenBag02",
+    "VisibleGrainMound",
+    "MeasuringScoop"
+  ],
+  "sourcePaths": [
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Bld_ProduceStand_01.fbx",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_GrainBag_01.fbx",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_GrainBag_Open_02.fbx",
+    "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Tool_Rake_01.fbx"
+  ],
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\상태흐름-비교\\작업마당-상태흐름-비교.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확-집하-작업마당\\상태흐름-비교\\작업마당-상태흐름-비교.blend",
+  "boundary": "E4 state-flow review only; labels and geometry are not authority, Unity placement or E5 evidence."
+}

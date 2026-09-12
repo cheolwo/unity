@@ -1,0 +1,9 @@
+{
+  "name": "Ssalddel.Unity.NatureWoodcutting.EditorTests",
+  "rootNamespace": "Ssalddel.Unity.Editor.NatureWoodcuttingValidation.Tests",
+  "references": ["Ssalddel.Unity.Presentation", "Ssalddel.Unity.Editor", "Ssalddel.Unity.Runtime"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

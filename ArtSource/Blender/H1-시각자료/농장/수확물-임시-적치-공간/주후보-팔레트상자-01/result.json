@@ -1,0 +1,20 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-harvest-staging",
+  "displayName": "수확물 임시 적치 공간 주 후보",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_PalletCrate_01.fbx",
+  "sourceSha256": "EF3F115FFC0FEB264090F62C1CD52445C1DD19CED7A6CB8E2B25233A12CA8C7E",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확물-임시-적치-공간\\주후보-팔레트상자-01\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\수확물-임시-적치-공간\\주후보-팔레트상자-01\\candidate-review.blend",
+  "reviewMaterialSource": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Textures\\PolygonFarm_01_A.png",
+  "meshObjects": [
+    "SM_Prop_PalletCrate_01"
+  ],
+  "dimensions": [
+    0.75574,
+    0.45262,
+    0.38513
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

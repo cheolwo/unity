@@ -1,0 +1,72 @@
+{
+  "candidateRevision": "farm-manual-irrigation-connection.r2",
+  "composition": [
+    "h1-proposal:farm-pressurized-water-service-point",
+    "HoseReelAndHandleH1",
+    "HoseH1",
+    "h1-stock:farm-production"
+  ],
+  "states": [
+    {
+      "code": "ValveClosedHoseConnected",
+      "image": "01-밸브닫힘-호스연결.png",
+      "blend": "01-밸브닫힘-호스연결.blend"
+    },
+    {
+      "code": "ValveOpenManualWatering",
+      "image": "02-밸브열림-수동관수.png",
+      "blend": "02-밸브열림-수동관수.blend"
+    }
+  ],
+  "valveOpenVisualRotationDegrees": 45,
+  "waterVisibleOnlyWhenOpen": true,
+  "wetSoilVisibleOnlyWhenOpen": true,
+  "outletCoupling": {
+    "type": "FullWrapSleeveAndReducer",
+    "sleeveOuterRadiusMeters": 0.126,
+    "coveredOutletOuterRadiusMeters": 0.108
+  },
+  "connectionAnchors": [
+    "Anchor_HoseOut",
+    "HoseReelInputCandidate",
+    "ManualNozzle",
+    "CultivationPlotFurrowCenter"
+  ],
+  "sources": [
+    {
+      "path": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\상수도-급수점\\기본형-급수함-r2\\농장-상수도-급수점-H1-r2.fbx",
+      "sha256": "897ABE03A758C41C662F28DA9DA53E01333699FE9AB968923F119830FA612B3E"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Models\\Props\\SM_Prop_HoseReel_01.fbx",
+      "sha256": "C167C4566DA28678B5F69EE90B3E5D359607D5DE37CB9E3AE168EB724B2F213D"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\H1-시각자료\\농장\\경작구획-2.5x2.5m\\경작구획-H1-2.5x2.5m.fbx",
+      "sha256": "5AEC262999F9CE2B1CA6C266E4490BF1FA7030898A11EE15032B7859ADABD265"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Prop_Sprinkler_Hose_01.fbx",
+      "sha256": "485E0B8BBD1ADF6B423D2A79F28F1400F1C4E73C480D7BD90CB0A80FF37F94A2"
+    },
+    {
+      "path": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonTown\\Textures\\Alts\\PolygonTown_01_A.png",
+      "sha256": "141B1AD20BDC9DDA0B187378FB9F55B1C00939358283D47A8E6EDDD0BD07B07C"
+    }
+  ],
+  "files": {
+    "closedImageSha256": "435F2A212F14CDD780F66D10FF67CFDB4D4F3F8F61ACBC6A349C5D2184EBCD5C",
+    "closedBlendSha256": "51B3416C35FB139E96CA02CF256EC561B0395659FBD755D10C74B5D0D3A91503",
+    "openImageSha256": "0DBE5DC6808BEA8294E2EC5378B9496906EEBD5AC4584AC1D56891309EFAD46F",
+    "openBlendSha256": "0FE04B70B371D8DFBCFEEB126305683526F0ECD20F64DB377388E907C2E930B9"
+  },
+  "evidenceBoundary": {
+    "presentation": "E4CompositionCandidate",
+    "unityScene": false,
+    "dynamicHose": false,
+    "waterSimulation": false,
+    "playMode": false,
+    "gameView": false,
+    "e5": false
+  }
+}

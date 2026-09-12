@@ -1,0 +1,19 @@
+{
+  "status": "BlenderReviewRendered",
+  "h1StableId": "h1-stock:farm-production",
+  "displayName": "농업 생산구획",
+  "sourceOwnership": "SupplierOriginalReadOnly",
+  "sourcePath": "C:\\Users\\user\\ssalddel\\Assets\\Synty\\PolygonFarm\\Models\\SM_Env_Dirt_Rows_01.fbx",
+  "sourceSha256": "95A5DBDB718C842AEFCC511462EED42202F1C019651885B2EB071CD3AEBFAFE5",
+  "renderPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-production\\candidate.png",
+  "blendPath": "C:\\Users\\user\\ssalddel\\ArtSource\\Blender\\validation\\h1-candidate-review\\farm-production\\candidate-review.blend",
+  "meshObjects": [
+    "SM_Env_Dirt_Rows_01"
+  ],
+  "dimensions": [
+    4.99055,
+    5.06839,
+    0.19839
+  ],
+  "boundary": "Review image only; not ExactCandidate, Unity placement, or E5 evidence."
+}

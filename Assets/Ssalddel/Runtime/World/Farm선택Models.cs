@@ -79,6 +79,10 @@ namespace Ssalddel.Unity.Runtime.World
             = new 정착지상호작용PreviewData();
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public interface IFarm선택AuthorityClient
     {
         Task<Farm선택ContextData> GetFarmChoiceContextAsync(
@@ -100,6 +104,10 @@ namespace Ssalddel.Unity.Runtime.World
     /// 실제 서버의 Farm 선택 문맥을 사용한다. Unity는 선택 고유 식별자와
     /// 예상 revision만 전달하며 수확량, 비용, 결과를 만들지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class Farm선택Coordinator
     {
         private readonly IFarm선택AuthorityClient farmAuthority;

@@ -17,7 +17,8 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             IReadOnlyList<string> humanoidRigPaths,
             IReadOnlyList<string> importedCharacterClipPaths,
             IReadOnlyList<string> missingControllerPrefabPaths,
-            IReadOnlyDictionary<string, int> particleSystemPrefabCounts)
+            IReadOnlyDictionary<string, int> particleSystemPrefabCounts,
+            IReadOnlyDictionary<string, int> purchasedAnimationClipCounts)
         {
             StandaloneAnimationClipCount = standaloneAnimationClipCount;
             AnimatorControllerCount = animatorControllerCount;
@@ -26,6 +27,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
             ImportedCharacterClipPaths = importedCharacterClipPaths;
             MissingControllerPrefabPaths = missingControllerPrefabPaths;
             ParticleSystemPrefabCounts = particleSystemPrefabCounts;
+            PurchasedAnimationClipCounts = purchasedAnimationClipCounts;
         }
 
         public int StandaloneAnimationClipCount { get; }
@@ -35,6 +37,7 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
         public IReadOnlyList<string> ImportedCharacterClipPaths { get; }
         public IReadOnlyList<string> MissingControllerPrefabPaths { get; }
         public IReadOnlyDictionary<string, int> ParticleSystemPrefabCounts { get; }
+        public IReadOnlyDictionary<string, int> PurchasedAnimationClipCounts { get; }
 
         public void EnsureNoMissingControllerReferences()
         {
@@ -68,6 +71,14 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 ["generic"] = "Assets/Synty/PolygonGeneric/Prefabs/FX",
             };
 
+        private static readonly IReadOnlyDictionary<string, string> PurchasedAnimationRoots =
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["base-locomotion"] = "Assets/Synty/AnimationBaseLocomotion",
+                ["emotes-and-taunts"] = "Assets/Synty/AnimationEmotesAndTaunts",
+                ["sword-combat"] = "Assets/Synty/AnimationSwordCombat",
+            };
+
 
         public static void InspectAndLog()
         {
@@ -82,7 +93,10 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 + $"missingControllers={report.MissingControllerPrefabPaths.Count};"
                 + string.Join(";", report.ParticleSystemPrefabCounts
                     .OrderBy(value => value.Key, StringComparer.Ordinal)
-                    .Select(value => $"fx.{value.Key}={value.Value}")));
+                    .Select(value => $"fx.{value.Key}={value.Value}")) + ";"
+                + string.Join(";", report.PurchasedAnimationClipCounts
+                    .OrderBy(value => value.Key, StringComparer.Ordinal)
+                    .Select(value => $"animation.{value.Key}={value.Value}")));
         }
 
         public static SyntyAnimationSourceInventoryReport Inspect()
@@ -122,6 +136,10 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 value => value.Key,
                 value => CountParticleSystemPrefabs(value.Value),
                 StringComparer.Ordinal);
+            var purchasedAnimationCounts = PurchasedAnimationRoots.ToDictionary(
+                value => value.Key,
+                value => CountImportedAnimationClips(value.Value),
+                StringComparer.Ordinal);
 
             return new SyntyAnimationSourceInventoryReport(
                 standaloneClips,
@@ -130,7 +148,8 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 humanoidRigs,
                 importedCharacterClips,
                 missingControllers,
-                fxCounts);
+                fxCounts,
+                purchasedAnimationCounts);
         }
 
         private static IReadOnlyList<string> FindMissingTownControllerReferences()
@@ -158,5 +177,14 @@ namespace Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor
                 .Select(AssetDatabase.LoadAssetAtPath<GameObject>)
                 .Count(value => value != null
                     && value.GetComponentInChildren<ParticleSystem>(true) != null);
+
+        private static int CountImportedAnimationClips(string root) =>
+            AssetDatabase.FindAssets("t:AnimationClip", new[] { root })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Distinct(StringComparer.Ordinal)
+                .SelectMany(path => AssetDatabase.LoadAllAssetsAtPath(path)
+                    .OfType<AnimationClip>()
+                    .Where(value => !value.name.StartsWith("__preview__", StringComparison.Ordinal)))
+                .Count();
     }
 }
