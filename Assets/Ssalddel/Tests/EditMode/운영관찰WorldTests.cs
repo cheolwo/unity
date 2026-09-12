@@ -89,6 +89,26 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Instructions = instructions
             };
 
+        [Test]
+        public void 재활성화는_Awake없이도_조회연결을다시초기화한다()
+        {
+            var root=new GameObject("reload-test");
+            try
+            {
+                var view=root.AddComponent<운영관찰WorldView>();
+                var controller=root.AddComponent<Ssalddel.Unity.Bootstrap.운영관찰WorldController>();
+                controller.Configure(view);
+                var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+                controller.GetType().GetMethod("OnDisable",flags).Invoke(controller,null);
+                controller.GetType().GetMethod("OnEnable",flags).Invoke(controller,null);
+                var field=controller.GetType().GetField("client",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);
+                Assert.That(field.GetValue(controller),Is.Not.Null);
+                Assert.That(controller.Cursor,Is.Zero);
+                Assert.That(controller.StatusCode,Is.EqualTo("WaitingForConnection"));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
         private static OperationalWorldPlacementInstruction Instruction(string id, long revision)
             => new()
             {

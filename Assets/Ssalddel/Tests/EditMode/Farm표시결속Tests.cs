@@ -68,6 +68,33 @@ namespace Ssalddel.Unity.Tests.EditMode
             finally { if (scene.IsValid()) EditorSceneManager.ClosePreviewScene(scene); }
         }
 
+        [Test] public void 사가정관찰은_기존표시정책에등록하고_다른환경을허용하지않는다()
+        {
+            var root=Child(owner.transform,"OperationalOsWorldRoot");
+            var unrelated=Mesh(town.transform,"UnapprovedRenderer");
+            var view=root.AddComponent<사가정운영디오라마View>();
+            view.Initialize();
+            policy.ApplyView();
+            Assert.That(view.MapStatus,Is.EqualTo("Ready"));
+            Assert.That(root.GetComponentsInChildren<Renderer>(true).Length,Is.EqualTo(5));
+            Assert.That(root.GetComponentsInChildren<Renderer>(true).All(x=>x.enabled),Is.True);
+            Assert.That(unrelated.enabled,Is.False);
+            view.ShowWhole();
+            var size=view.ObservationCamera.orthographicSize;
+            Assert.That(size,Is.GreaterThan(300));
+            view.Show(false);
+            Assert.That(view.ObservationCamera.enabled,Is.False);
+            view.Show(true);
+            Assert.That(view.ObservationCamera.enabled,Is.True);
+            typeof(사가정운영디오라마View).GetMethod("OnDisable",Private).Invoke(view,null);
+            Assert.That(view.ObservationCamera,Is.Null);
+            typeof(사가정운영디오라마View).GetMethod("OnEnable",Private).Invoke(view,null);
+            policy.ApplyView();
+            Assert.That(view.MapStatus,Is.EqualTo("Ready"));
+            Assert.That(root.GetComponentsInChildren<Camera>(true).Length,Is.EqualTo(1));
+            Assert.That(root.GetComponentsInChildren<Renderer>(true).All(x=>x.enabled),Is.True);
+        }
+
         [Test] public void Farm만표시하고_기존Lot전투와바닥은켜지않는다()
         {
             Assert.That(Farm표시범위Lease.TryAcquire(settlement, out lease, out _), Is.True);

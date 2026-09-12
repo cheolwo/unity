@@ -107,6 +107,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void OnGUI()
         {
+            if (Ssalddel.Unity.Presentation.World.사가정운영디오라마View.IsVisible) return;
             확장선택그리기();
             if (SimulationWorldLocalRuntimeScope.NeighborhoodLifeRequested || SimulationWorldLocalRuntimeScope.BusinessServerObserverRequested) return;
             GUILayout.BeginArea(new Rect(12, 12, Mathf.Min(360, Screen.width-24), Mathf.Min(500, Screen.height-24)), GUI.skin.box);

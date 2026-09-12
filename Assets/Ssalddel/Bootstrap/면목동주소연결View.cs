@@ -94,6 +94,7 @@ namespace Ssalddel.Unity.Bootstrap
         private static string Categories(면목동건물Overlay overlay)=>string.Join(" · ",overlay.activityCategories);
         private void OnGUI()
         {
+            if (Ssalddel.Unity.Presentation.World.사가정운영디오라마View.IsVisible) return;
             // 작은 화면에서는 기존 조작 영역을 덮지 않도록 패널을 명시적으로 열게 한다.
             var width=Mathf.Min(390,Screen.width-24);if(width<120)return;
             var button=new Rect(Screen.width-width-12,12,width,36);

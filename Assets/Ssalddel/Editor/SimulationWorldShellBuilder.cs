@@ -2347,7 +2347,8 @@ namespace Ssalddel.Unity.Editor
         {
             var root = shellRoot.Find(OperationalWorldRootName)
                        ?? Child(shellRoot, OperationalWorldRootName);
-            root.localPosition = Vector3.zero;
+            // 다른 독립 영역의 공간과 겹치지 않는 표현 전용 원점. 지역 내부 좌표는 보존한다.
+            root.localPosition = new Vector3(3000, 0, 0);
             root.localRotation = Quaternion.identity;
             root.localScale = Vector3.one;
             var view = root.GetComponent<운영관찰WorldView>()
@@ -2355,6 +2356,9 @@ namespace Ssalddel.Unity.Editor
             var controller = root.GetComponent<운영관찰WorldController>()
                              ?? root.gameObject.AddComponent<운영관찰WorldController>();
             controller.Configure(view);
+            var diorama = root.GetComponent<사가정운영디오라마View>()
+                          ?? root.gameObject.AddComponent<사가정운영디오라마View>();
+            EditorUtility.SetDirty(diorama);
             EditorUtility.SetDirty(view);
             EditorUtility.SetDirty(controller);
         }

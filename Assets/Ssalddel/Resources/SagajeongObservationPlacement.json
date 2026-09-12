@@ -1,0 +1,14 @@
+{
+  "schema": "sagajeong-observation-placement.v1",
+  "mapRevision": "sagajeong-reference.r3",
+  "mapHash": "4B81E60C3C389A69AA765C8CC8D20E4457102C359A5FFBCD7EBDFA880F7E84E3",
+  "coordinateMethod": "WGS84-ECEF-ENU-at-zero-altitude",
+  "places": [
+    { "semanticPlaceStableId": "synthetic-place:food-route-a", "role": "restaurant", "label": "가상 음식점", "x": 572.68, "y": 8, "z": 23.85, "yaw": 0 },
+    { "semanticPlaceStableId": "synthetic-place:food-route-b", "role": "destination", "label": "가상 배송지", "x": 662.81, "y": 8, "z": 103.30, "yaw": 0 },
+    { "semanticPlaceStableId": "synthetic-place:cargo-route-a", "role": "cargo", "label": "화물 완료 표식 A", "x": 413.13, "y": 8, "z": -134.26, "yaw": 35 },
+    { "semanticPlaceStableId": "synthetic-place:cargo-route-b", "role": "cargo", "label": "화물 완료 표식 B", "x": 723.36, "y": 8, "z": -104.00, "yaw": 35 },
+    { "semanticPlaceStableId": "synthetic-place:warehouse-a", "role": "warehouse", "label": "가상 창고", "x": 361.94, "y": 8, "z": 319.89, "yaw": 0 },
+    { "semanticPlaceStableId": "synthetic-place:mart-a", "role": "mart", "label": "가상 마트", "x": 717.81, "y": 60, "z": -291.63, "yaw": 0 }
+  ]
+}

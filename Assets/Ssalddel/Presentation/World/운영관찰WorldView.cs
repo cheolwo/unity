@@ -5,6 +5,7 @@ using Ssalddel.Contracts.Common.Metadata;
 using Ssalddel.Unity.Data.WorldProjection;
 using Ssalddel.WorkflowRules.Contracts;
 using UnityEngine;
+using Ssalddel.Unity.Runtime.World;
 
 namespace Ssalddel.Unity.Presentation.World
 {
@@ -18,6 +19,26 @@ namespace Ssalddel.Unity.Presentation.World
         private readonly Dictionary<string, 운영관찰ObjectView> objects =
             new(StringComparer.Ordinal);
 
+        private Dictionary<string, 운영관찰배치지점> places;
+        public int UnplacedCount { get; private set; }
+        public string PlacementStatus { get; private set; } = "NotLoaded";
+
+        private bool LoadPlaces()
+        {
+            if (places != null) return true;
+            try
+            {
+                var map = Resources.Load<TextAsset>("SagajeongReference");
+                var catalog = Resources.Load<TextAsset>("SagajeongObservationPlacement");
+                if (map == null || catalog == null) throw new ArgumentException();
+                places = 운영관찰지역배치검사.Validate(JsonUtility.FromJson<운영관찰지역배치자료>(catalog.text),
+                    JsonUtility.FromJson<공간참고자료>(map.text), map.bytes);
+                PlacementStatus = "Ready";
+                return true;
+            }
+            catch (ArgumentException) { PlacementStatus = "MapOrPlacementRejected"; return false; }
+        }
+
         public int ObjectCount => objects.Count;
         public IReadOnlyList<운영관찰ObjectView> Objects => objects.Values
             .OrderBy(value => value.ObjectStableId, StringComparer.Ordinal)
@@ -29,6 +50,8 @@ namespace Ssalddel.Unity.Presentation.World
         {
             if (plan == null) throw new ArgumentNullException(nameof(plan));
             if (!plan.Accepted) return;
+            if (!LoadPlaces()) { UnplacedCount = plan.Instructions?.Length ?? 0; Clear(); return; }
+            UnplacedCount = 0;
             RebuildIndex();
             var frozenIds = new HashSet<string>(
                 (applyDiagnostics ?? Array.Empty<OperationalWorldSceneApplyDiagnostic>())
@@ -38,10 +61,14 @@ namespace Ssalddel.Unity.Presentation.World
             var incomingIds = new HashSet<string>(StringComparer.Ordinal);
             foreach (var instruction in plan.Instructions ?? Array.Empty<OperationalWorldPlacementInstruction>())
             {
+                if (instruction == null || string.IsNullOrWhiteSpace(instruction.SemanticPlaceStableId)
+                    || !places.TryGetValue(instruction.SemanticPlaceStableId, out var place))
+                { UnplacedCount++; continue; }
+                if (instruction.ExpiresAtUtc <= DateTime.UtcNow) continue;
                 incomingIds.Add(instruction.ObjectStableId);
                 if (!objects.TryGetValue(instruction.ObjectStableId, out var view))
-                    view = Create(instruction);
-                view.Apply(instruction, frozenIds.Contains(instruction.ObjectStableId));
+                    view = Create(instruction, place);
+                view.Apply(instruction, frozenIds.Contains(instruction.ObjectStableId), place);
             }
 
             foreach (var stale in objects.Keys.Where(id => !incomingIds.Contains(id)).ToArray())
@@ -60,7 +87,16 @@ namespace Ssalddel.Unity.Presentation.World
             objects.Clear();
         }
 
-        private 운영관찰ObjectView Create(OperationalWorldPlacementInstruction instruction)
+        public void Expire(DateTime utcNow)
+        {
+            foreach (var stale in objects.Values.Where(x => x != null && x.ExpiresAtUtc <= utcNow).ToArray())
+            {
+                objects.Remove(stale.ObjectStableId);
+                DestroyObject(stale.gameObject);
+            }
+        }
+
+        private 운영관찰ObjectView Create(OperationalWorldPlacementInstruction instruction, 운영관찰배치지점 place)
         {
             var group = transform.Find(GroupName(instruction.OperatingSystemId));
             if (group == null)
@@ -69,11 +105,23 @@ namespace Ssalddel.Unity.Presentation.World
                 groupObject.transform.SetParent(transform, false);
                 group = groupObject.transform;
             }
-            var primitive = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            var primitive = GameObject.CreatePrimitive(PrimitiveType.Cube);
             primitive.name = "OperationalObject__" + SafeName(instruction.ObjectStableId);
             primitive.transform.SetParent(group, false);
-            primitive.transform.localScale = new Vector3(.8f, .8f, .8f);
+            primitive.layer = 사가정운영디오라마View.ObservationLayer;
+            primitive.transform.localScale = place.role == "cargo" ? new Vector3(14,6,8) : new Vector3(12,8,12);
+            var shader = Resources.Load<Shader>("관찰도형명암") ?? Shader.Find("Universal Render Pipeline/Lit");
+            var material = new Material(shader);
+            primitive.GetComponent<Renderer>().sharedMaterial = material;
             var view = primitive.AddComponent<운영관찰ObjectView>();
+            view.OwnMaterial(material);
+            // 지도 위 역할 표식이며 실제 시설 또는 차량의 현재 위치가 아닙니다.
+            var roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            roof.name = place.role == "cargo" ? "차량 역할 표식" : "시설 역할 표식";
+            roof.layer = primitive.layer; roof.transform.SetParent(primitive.transform,false);
+            roof.transform.localPosition = new Vector3(0,.62f,0);
+            roof.transform.localScale = new Vector3(1.15f,.2f,1.15f);
+            roof.GetComponent<Renderer>().sharedMaterial = material;
             objects.Add(instruction.ObjectStableId, view);
             return view;
         }
@@ -118,6 +166,16 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private long revision;
         [SerializeField] private bool frozen;
 
+        private DateTime expiresAtUtc;
+        private Material ownedMaterial;
+        public DateTime ExpiresAtUtc => expiresAtUtc;
+        public void OwnMaterial(Material material) { ownedMaterial = material; }
+        private void OnDestroy()
+        {
+            if (ownedMaterial == null) return;
+            if (UnityEngine.Application.isPlaying) Destroy(ownedMaterial); else DestroyImmediate(ownedMaterial);
+        }
+
         public string ObjectStableId => objectStableId;
         public string OperatingSystemId => operatingSystemId;
         public string WorkStableId => workStableId;
@@ -129,9 +187,11 @@ namespace Ssalddel.Unity.Presentation.World
         public long Revision => revision;
         public bool Frozen => frozen;
 
-        public void Apply(OperationalWorldPlacementInstruction instruction, bool isFrozen)
+        public void Apply(OperationalWorldPlacementInstruction instruction, bool isFrozen, 운영관찰배치지점 place)
         {
             if (instruction == null) throw new ArgumentNullException(nameof(instruction));
+            if (revision > 0 && instruction.Revision < revision) { frozen = true; ApplyColor(); return; }
+            var keepFrozen = frozen && instruction.Revision <= revision;
             objectStableId = instruction.ObjectStableId;
             operatingSystemId = instruction.OperatingSystemId;
             workStableId = instruction.WorkStableId;
@@ -141,15 +201,15 @@ namespace Ssalddel.Unity.Presentation.World
             sourceKindCode = instruction.SourceKindCode;
             scenarioRunStableId = instruction.ScenarioRunStableId;
             revision = instruction.Revision;
-            frozen = isFrozen;
-            transform.localPosition = Position(instruction.AnchorKey, instruction.ObjectStableId);
+            frozen = isFrozen || keepFrozen;
+            expiresAtUtc = instruction.ExpiresAtUtc;
+            transform.localPosition = new Vector3(place.x,place.y,place.z);
+            transform.localRotation = Quaternion.Euler(0,place.yaw,0);
             ApplyColor();
         }
 
         private void ApplyColor()
         {
-            var renderer = GetComponent<Renderer>();
-            if (renderer == null) return;
             var color = frozen
                 ? new Color(.45f, .45f, .45f)
                 : attentionStateCode == OperationalWorldAttentionStateCodes.Recovered
@@ -162,39 +222,15 @@ namespace Ssalddel.Unity.Presentation.World
                         OperationalWorldOperatingSystemIds.SsalddelMartUrbanLogistics => new Color(.75f, .4f, .9f),
                         _ => Color.white
                     };
-            var properties = new MaterialPropertyBlock();
-            renderer.GetPropertyBlock(properties);
-            properties.SetColor("_BaseColor", color);
-            properties.SetColor("_Color", color);
-            renderer.SetPropertyBlock(properties);
-        }
-
-        private static Vector3 Position(string anchorKey, string stableId)
-        {
-            var center = anchorKey switch
+            foreach (var renderer in GetComponentsInChildren<Renderer>())
             {
-                "world.area.food-delivery" => new Vector3(-12f, 1f, -8f),
-                "world.area.cargo" => new Vector3(12f, 1f, -8f),
-                "world.area.warehouse" => new Vector3(-12f, 1f, 8f),
-                "world.area.mart" => new Vector3(12f, 1f, 8f),
-                _ => Vector3.up
-            };
-            var hash = StableHash(stableId);
-            return center + new Vector3(((hash & 7) - 3) * 1.25f, 0f, (((hash >> 3) & 7) - 3) * 1.25f);
-        }
-
-        private static int StableHash(string value)
-        {
-            unchecked
-            {
-                var hash = 2166136261u;
-                foreach (var character in value ?? string.Empty)
-                {
-                    hash ^= character;
-                    hash *= 16777619u;
-                }
-                return (int)(hash & int.MaxValue);
+                var properties = new MaterialPropertyBlock();
+                renderer.GetPropertyBlock(properties);
+                properties.SetColor("_BaseColor", color);
+                properties.SetColor("_Color", color);
+                renderer.SetPropertyBlock(properties);
             }
         }
+
     }
 }

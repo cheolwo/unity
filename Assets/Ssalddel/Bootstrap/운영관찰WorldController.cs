@@ -44,7 +44,13 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void Awake()
         {
+            InitializeClient();
+        }
+
+        private void InitializeClient()
+        {
             if (worldView == null) worldView = GetComponent<운영관찰WorldView>();
+            if (client != null) return;
             transport = new 운영관찰검증ApiTransport();
             client = new OperationalWorldSceneClient(
                 transport,
@@ -52,17 +58,24 @@ namespace Ssalddel.Unity.Bootstrap
                 new OperationalWorldSceneInterpreter(),
                 OperationalWorldScenePolicy.SchemaVersionV2);
             planner = new OperationalWorldScenePlacementPlanner();
-            lifetime = new CancellationTokenSource();
         }
 
         private void OnEnable()
         {
+            InitializeClient();
+            lifetime?.Dispose();
+            lifetime = new CancellationTokenSource();
+            client?.Clear();
+            cursor = 0;
             nextRefreshAt = Time.unscaledTime;
             statusCode = "WaitingForConnection";
         }
 
         private void Update()
         {
+            GetComponent<사가정운영디오라마View>()?.SetStatus(statusCode);
+            worldView?.Expire(DateTime.UtcNow);
+            client?.Expire(DateTime.UtcNow);
             if (pendingRefresh != null)
             {
                 if (!pendingRefresh.IsCompleted) return;
@@ -106,13 +119,21 @@ namespace Ssalddel.Unity.Bootstrap
             }
             cursor = result.Cursor;
             worldView.Apply(planner.Create(result), result.Diagnostics);
-            statusCode = result.Diagnostics.Length == 0 ? "Success" : "SuccessWithFrozenObjects";
+            statusCode = worldView.UnplacedCount > 0 ? "SuccessWithUnplacedObjects"
+                : result.Diagnostics.Length == 0 ? "Success" : "SuccessWithFrozenObjects";
         }
 
         private void OnDisable()
         {
             lifetime?.Cancel();
+            client?.Clear();
+            worldView?.Clear();
+            cursor = 0;
             pendingRefresh = null;
+            transport?.Dispose();
+            transport = null;
+            client = null;
+            planner = null;
         }
 
         private void OnDestroy()
