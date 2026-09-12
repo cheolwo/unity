@@ -20,6 +20,10 @@ namespace Ssalddel.Unity.Presentation.World
     }
 
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 공간TileStreamingController : MonoBehaviour
     {
         [SerializeField] private Transform target = null!;
@@ -32,6 +36,7 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private int originTileX = 공간TileStreamingCodes.CenterX;
         [SerializeField] private int originTileY = 공간TileStreamingCodes.CenterY;
         [SerializeField] private bool presentationOnly = true;
+        [SerializeField] private bool showTileBoundaries;
         [SerializeField] private 공간문법CompositionCatalog landscapeCompositionCatalog = null!;
         [SerializeField] private 공간문법SyntyBindingCatalog landscapeSyntyBindingCatalog = null!;
 
@@ -633,6 +638,7 @@ namespace Ssalddel.Unity.Presentation.World
                 material = slot.IsActiveWindow ? activeMaterial : preparedMaterial;
             slot.Boundary.sharedMaterial = material;
             slot.Boundary.widthMultiplier = slot.IsActiveWindow ? .11f : .055f;
+            slot.Boundary.enabled = showTileBoundaries;
         }
 
         private void EnsureMaterials()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -69,12 +70,27 @@ namespace Ssalddel.Unity.Presentation.World
         public float ConfiguredZoneDistance => zoneDistance;
         public float ConfiguredObjectDistance => objectDistance;
         public bool PrototypeInputEnabled => enablePrototypeInput;
+        public Camera TargetCamera => targetCamera != null ? targetCamera : GetComponent<Camera>();
         public Vector3 CurrentFocusPosition => initialized && stateMachine != null
             ? new Vector3(
                 stateMachine.State.FocusPoint.X,
                 stateMachine.State.FocusPoint.Y,
                 stateMachine.State.FocusPoint.Z)
             : Vector3.zero;
+
+        public bool TryGetFocusPosition(string anchorId, out Vector3 position)
+        {
+            position = default;
+            if (string.IsNullOrWhiteSpace(anchorId)) return false;
+            var matches = focusBindings?.Where(value => value != null
+                && value.Anchor != null
+                && string.Equals(value.AnchorId, anchorId, StringComparison.Ordinal)).ToArray();
+            if (matches == null || matches.Length != 1) return false;
+            var binding = matches[0];
+            position = binding.Anchor.position;
+            return float.IsFinite(position.x) && float.IsFinite(position.y)
+                && float.IsFinite(position.z);
+        }
 
         private void Awake() => Initialize();
 
@@ -215,6 +231,17 @@ namespace Ssalddel.Unity.Presentation.World
             if (!bindings.TryGetValue(anchorId, out var binding))
                 throw new InvalidOperationException("DioramaCameraFocusUnknown:" + anchorId);
             stateMachine.Focus(ToFocus(binding));
+        }
+
+        public void FocusAt(string anchorId, string levelCode, Vector3 position)
+        {
+            EnsureInitialized();
+            stateMachine.Focus(new DioramaCameraFocus
+            {
+                AnchorId = anchorId,
+                LevelCode = levelCode,
+                Point = new DioramaPoint(position.x, position.y, position.z),
+            });
         }
 
         public void Pan(float worldDeltaX, float worldDeltaZ)

@@ -165,6 +165,10 @@ namespace Ssalddel.Unity.Runtime.World
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public interface I마트피킹포장WorldRepository
     {
         Task<마트피킹포장WorldSnapshot> LoadAsync(
@@ -172,6 +176,10 @@ namespace Ssalddel.Unity.Runtime.World
             CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 마트피킹포장WorldStateStore
     {
         public 마트피킹포장WorldSnapshot Current { get; private set; } = null!;
@@ -217,6 +225,10 @@ namespace Ssalddel.Unity.Runtime.World
     /// 서버 상태 사본을 운영자용 Shelf 표현으로 바꿉니다.
     /// 재고 변경이나 피킹 완료 명령은 만들지 않습니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 운영자재고ShelfProjector
     {
         private static readonly string[] ReadOnlyActions =

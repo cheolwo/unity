@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class DioramaCameraTests
     {
         [Test]
@@ -138,6 +142,37 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Object.DestroyImmediate(cameraObject);
                 Object.DestroyImmediate(worldAnchor);
                 Object.DestroyImmediate(farmAnchor);
+            }
+        }
+
+        [Test]
+        public void CameraRig은_직접AreaSetFocus를_기존Binding추가없이적용한다()
+        {
+            var cameraObject = new GameObject("DioramaTopDownCameraRig");
+            var worldAnchor = new GameObject("WorldFocusAnchor");
+            try
+            {
+                var camera = cameraObject.AddComponent<Camera>();
+                var rig = cameraObject.AddComponent<DioramaTopDownCameraRig>();
+                rig.Configure(camera, new[]
+                {
+                    Binding("camera-focus:world.overview", DioramaCameraFocusLevelCodes.World, worldAnchor.transform),
+                }, "camera-focus:world.overview", false);
+
+                rig.FocusAt(
+                    "camera-focus:areaset:farm",
+                    DioramaCameraFocusLevelCodes.Zone,
+                    new Vector3(14f, 2f, -9f));
+                rig.ApplyNowForTests();
+
+                Assert.That(rig.CurrentFocusAnchorId, Is.EqualTo("camera-focus:areaset:farm"));
+                Assert.That(rig.CurrentFocusPosition, Is.EqualTo(new Vector3(14f, 2f, -9f)));
+                Assert.That(rig.TargetCamera, Is.SameAs(camera));
+            }
+            finally
+            {
+                Object.DestroyImmediate(cameraObject);
+                Object.DestroyImmediate(worldAnchor);
             }
         }
 

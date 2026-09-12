@@ -6,6 +6,10 @@ using UnityEngine.UI;
 namespace Ssalddel.Unity.Presentation.World
 {
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 공간StreamingTreeDiagnosticPresenter : MonoBehaviour
     {
         [SerializeField] private 공간TileStreamingController tileStreaming = null!;
@@ -16,6 +20,7 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private Text toggleText = null!;
         [SerializeField] private bool presentationOnly = true;
         private float nextRefreshTime;
+        private int diagnosticConsumedFrame = -1;
 
         public bool PresentationOnly => presentationOnly;
         public string TreeTextContent => treeText == null ? string.Empty : treeText.text;
@@ -42,7 +47,13 @@ namespace Ssalddel.Unity.Presentation.World
         private void Update()
         {
             var keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.f8Key.wasPressedThisFrame) Toggle();
+            var requested = keyboard != null && 월드진단단축키Policy.ShouldToggleStreaming(
+                keyboard.f8Key.wasPressedThisFrame,
+                keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed,
+                keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed,
+                keyboard.leftAltKey.isPressed || keyboard.rightAltKey.isPressed,
+                keyboard.leftMetaKey.isPressed || keyboard.rightMetaKey.isPressed);
+            if (월드진단단축키Policy.TryConsume(requested, Time.frameCount, ref diagnosticConsumedFrame)) Toggle();
             if (Time.unscaledTime < nextRefreshTime) return;
             nextRefreshTime = Time.unscaledTime + .25f;
             RefreshNow();
@@ -52,12 +63,20 @@ namespace Ssalddel.Unity.Presentation.World
         {
             if (panelRoot == null) return;
             panelRoot.SetActive(!panelRoot.activeSelf);
+            SyncToggleLabel();
+        }
+
+        private void OnEnable() => SyncToggleLabel();
+
+        private void SyncToggleLabel()
+        {
             if (toggleText != null)
-                toggleText.text = panelRoot.activeSelf ? "진단 트리 닫기  F8" : "진단 트리 열기  F8";
+                toggleText.text = IsPanelVisible ? "진단 트리 닫기  Shift+F8" : "진단 트리 열기  Shift+F8";
         }
 
         public void RefreshNow()
         {
+            SyncToggleLabel();
             if (treeText == null || tileStreaming == null || objectStreaming == null) return;
             var builder = new StringBuilder(640);
             builder.AppendLine("사용자 이동·시야 기반 동적 월드");

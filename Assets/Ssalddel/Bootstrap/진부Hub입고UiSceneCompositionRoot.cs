@@ -12,6 +12,10 @@ namespace Ssalddel.Unity.Bootstrap
 {
     [DefaultExecutionOrder(-900)]
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 진부Hub입고UiSceneCompositionRoot : MonoBehaviour
     {
         [SerializeField] private UnityClientRuntimeSettings runtimeSettings = null!;
@@ -53,6 +57,13 @@ namespace Ssalddel.Unity.Bootstrap
 
         public async Task InitializeAsync()
         {
+            // 명시적 로컬 관찰 프로필은 Scene Start 순서와 무관하게 서버 초기화를 건너뛴다.
+            if (SimulationWorldLocalRuntimeScope.BusinessServerObserverRequested || SimulationWorldLocalRuntimeScope.NeighborhoodLifeRequested)
+            {
+                서버기준사용 = false;
+                enabled = false;
+                return;
+            }
             if (shell == null || presenter == null)
                 throw new InvalidOperationException("JinbuInboundUiSceneWiringMissing");
 

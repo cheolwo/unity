@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.Simulation.Contracts;
 
 namespace Ssalddel.Unity.Runtime.World
 {
@@ -42,6 +43,461 @@ namespace Ssalddel.Unity.Runtime.World
         public const int MaximumL3X = 2823;
         public const int MinimumL3Y = 4560;
         public const int MaximumL3Y = 4603;
+    }
+
+    [Serializable]
+    public sealed class 공간동적MapWindowPolicyData
+    {
+        public int DetailRadius = 1;
+        public int ActiveRadius = 2;
+        public int PrefetchRadius = 4;
+
+        public void Validate()
+        {
+            if (DetailRadius < 0
+                || ActiveRadius < DetailRadius
+                || PrefetchRadius < ActiveRadius)
+                throw new InvalidOperationException("DynamicMapWindowPolicyInvalid");
+        }
+
+        public 공간동적MapWindowPolicyData Clone()
+            => new()
+            {
+                DetailRadius = DetailRadius,
+                ActiveRadius = ActiveRadius,
+                PrefetchRadius = PrefetchRadius,
+            };
+    }
+
+    public sealed class 공간동적MapWindowCellData
+    {
+        public int CellX;
+        public int CellY;
+        public string WindowRoleCode = string.Empty;
+        public int Priority;
+    }
+
+    /// <summary>
+    /// L/H 의미 계층이나 셀 식별자 형식을 알지 않고 중심 좌표, 반경과 이동 방향만으로
+    /// 동적 맵 후보 창을 계산한다. 현재 LH의 L3 셀은 이 일반 계산기의 호환 Adapter다.
+    /// </summary>
+    public static class 공간동적MapWindowPlanner
+    {
+        public static 공간동적MapWindowCellData[] Plan(
+            int focusX,
+            int focusY,
+            공간동적MapWindowPolicyData policy,
+            string movementDirectionCode)
+        {
+            if (policy == null)
+                throw new ArgumentNullException(nameof(policy));
+            policy.Validate();
+
+            var movement = DirectionVector(movementDirectionCode);
+            var cells = new List<공간동적MapWindowCellData>();
+            for (var y = focusY - policy.PrefetchRadius;
+                 y <= focusY + policy.PrefetchRadius; y++)
+            for (var x = focusX - policy.PrefetchRadius;
+                 x <= focusX + policy.PrefetchRadius; x++)
+            {
+                var dx = x - focusX;
+                var dy = y - focusY;
+                var distance = Math.Max(Math.Abs(dx), Math.Abs(dy));
+                var role = distance <= policy.DetailRadius
+                    ? 공간LHWorldCodes.Detail
+                    : distance <= policy.ActiveRadius
+                        ? 공간LHWorldCodes.Active
+                        : 공간LHWorldCodes.Prefetch;
+                var directionalBias = dx * movement.X + dy * movement.Y > 0 ? -10 : 0;
+                cells.Add(new 공간동적MapWindowCellData
+                {
+                    CellX = x,
+                    CellY = y,
+                    WindowRoleCode = role,
+                    Priority = distance * 100 + directionalBias + Math.Abs(dx) + Math.Abs(dy),
+                });
+            }
+
+            return cells.OrderBy(value => value.Priority)
+                .ThenBy(value => value.CellY)
+                .ThenBy(value => value.CellX)
+                .ToArray();
+        }
+
+        private static (int X, int Y) DirectionVector(string directionCode)
+            => directionCode switch
+            {
+                "N" => (0, 1), "NE" => (1, 1), "E" => (1, 0), "SE" => (1, -1),
+                "S" => (0, -1), "SW" => (-1, -1), "W" => (-1, 0), "NW" => (-1, 1),
+                _ => (0, 0),
+            };
+    }
+
+    [Serializable]
+    public sealed class 공간동적배치PolicyData
+    {
+        public double 셀크기Meters = 공간LHWorldCodes.L3CellSizeMeters;
+        public double 경계여유Meters = 6d;
+        public double 최소객체간격Meters = 12d;
+        public double 최대표면경사Degrees = 18d;
+        public int 객체당최대시도횟수 = 12;
+
+        public void Validate()
+        {
+            if (!IsFinite(셀크기Meters) || 셀크기Meters <= 0d
+                || !IsFinite(경계여유Meters) || 경계여유Meters < 0d
+                || 경계여유Meters * 2d >= 셀크기Meters
+                || !IsFinite(최소객체간격Meters) || 최소객체간격Meters <= 0d
+                || 경계여유Meters * 2d < 최소객체간격Meters
+                || !IsFinite(최대표면경사Degrees)
+                || 최대표면경사Degrees < 0d || 최대표면경사Degrees > 90d
+                || 객체당최대시도횟수 < 1)
+                throw new InvalidOperationException("DynamicPlacementPolicyInvalid");
+        }
+
+        private static bool IsFinite(double value)
+            => !double.IsNaN(value) && !double.IsInfinity(value);
+    }
+
+    public sealed class 공간동적표면표본Data
+    {
+        public double 표면높이Meters;
+        public double 표면경사Degrees;
+        public bool 배치허용;
+        public string 차단원인Code = string.Empty;
+    }
+
+    public interface I공간동적표면Provider
+    {
+        string SurfaceModeCode { get; }
+        string SurfaceRuleRevision { get; }
+        string SurfaceConfigurationHashSha256 { get; }
+
+        bool TrySample(double worldX, double worldZ, out 공간동적표면표본Data sample);
+    }
+
+    public sealed class 평면공간동적표면Provider : I공간동적표면Provider
+    {
+        private readonly double 표면높이Meters;
+
+        public 평면공간동적표면Provider(double surfaceHeightMeters = 0d)
+        {
+            if (double.IsNaN(surfaceHeightMeters) || double.IsInfinity(surfaceHeightMeters))
+                throw new ArgumentOutOfRangeException(nameof(surfaceHeightMeters));
+            표면높이Meters = surfaceHeightMeters;
+        }
+
+        public string SurfaceModeCode => "Flat";
+        public string SurfaceRuleRevision => "dynamic-surface.flat.r1";
+        public string SurfaceConfigurationHashSha256 => Hash(
+            SurfaceRuleRevision + "|" + 표면높이Meters.ToString("R",
+                CultureInfo.InvariantCulture));
+
+        public bool TrySample(double worldX, double worldZ, out 공간동적표면표본Data sample)
+        {
+            sample = new 공간동적표면표본Data
+            {
+                표면높이Meters = 표면높이Meters,
+                표면경사Degrees = 0d,
+                배치허용 = true,
+            };
+            return true;
+        }
+
+        private static string Hash(string value)
+        {
+            using var sha = SHA256.Create();
+            return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(value)))
+                .Replace("-", string.Empty).ToLowerInvariant();
+        }
+    }
+
+    /// <summary>
+    /// UnityEngine의 Mathf나 현재 셀 원점에 의존하지 않는 결정적 fractal value noise다.
+    /// 월드 좌표를 직접 표본화하므로 인접 셀의 같은 경계 좌표는 같은 높이를 반환한다.
+    /// </summary>
+    public sealed class 결정적ValueNoise공간표면Provider : I공간동적표면Provider
+    {
+        private readonly string seed;
+        private readonly double baseHeightMeters;
+        private readonly double amplitudeMeters;
+        private readonly double wavelengthMeters;
+        private readonly int octaveCount;
+        private readonly double persistence;
+        private readonly double slopeSampleStepMeters;
+
+        public 결정적ValueNoise공간표면Provider(
+            string worldSeed,
+            double baseHeight = 0d,
+            double amplitude = 5d,
+            double wavelength = 96d,
+            int octaves = 3,
+            double octavePersistence = .5d,
+            double slopeSampleStep = 1d)
+        {
+            if (string.IsNullOrWhiteSpace(worldSeed)
+                || !IsFinite(baseHeight) || !IsFinite(amplitude) || amplitude < 0d
+                || !IsFinite(wavelength) || wavelength <= 0d
+                || octaves < 1 || octaves > 8
+                || !IsFinite(octavePersistence) || octavePersistence <= 0d
+                || octavePersistence > 1d
+                || !IsFinite(slopeSampleStep) || slopeSampleStep <= 0d)
+                throw new ArgumentException("DynamicNoiseSurfaceConfigurationInvalid");
+            seed = worldSeed.Trim();
+            baseHeightMeters = baseHeight;
+            amplitudeMeters = amplitude;
+            wavelengthMeters = wavelength;
+            octaveCount = octaves;
+            persistence = octavePersistence;
+            slopeSampleStepMeters = slopeSampleStep;
+        }
+
+        public string SurfaceModeCode => "DeterministicValueNoise";
+        public string SurfaceRuleRevision => "dynamic-surface.value-noise.r1";
+        public string SurfaceConfigurationHashSha256 => Hash(string.Join("|", new[]
+        {
+            SurfaceRuleRevision, seed,
+            baseHeightMeters.ToString("R", CultureInfo.InvariantCulture),
+            amplitudeMeters.ToString("R", CultureInfo.InvariantCulture),
+            wavelengthMeters.ToString("R", CultureInfo.InvariantCulture),
+            octaveCount.ToString(CultureInfo.InvariantCulture),
+            persistence.ToString("R", CultureInfo.InvariantCulture),
+            slopeSampleStepMeters.ToString("R", CultureInfo.InvariantCulture),
+        }));
+
+        public bool TrySample(double worldX, double worldZ,
+            out 공간동적표면표본Data sample)
+        {
+            if (!IsFinite(worldX) || !IsFinite(worldZ))
+            {
+                sample = new 공간동적표면표본Data
+                {
+                    배치허용 = false,
+                    차단원인Code = "GroundSurfaceCoordinateInvalid",
+                };
+                return false;
+            }
+            var height = Height(worldX, worldZ);
+            var dx = (Height(worldX + slopeSampleStepMeters, worldZ)
+                      - Height(worldX - slopeSampleStepMeters, worldZ))
+                     / (2d * slopeSampleStepMeters);
+            var dz = (Height(worldX, worldZ + slopeSampleStepMeters)
+                      - Height(worldX, worldZ - slopeSampleStepMeters))
+                     / (2d * slopeSampleStepMeters);
+            sample = new 공간동적표면표본Data
+            {
+                표면높이Meters = height,
+                표면경사Degrees = Math.Atan(Math.Sqrt(dx * dx + dz * dz))
+                                     * 180d / Math.PI,
+                배치허용 = true,
+            };
+            return true;
+        }
+
+        private double Height(double worldX, double worldZ)
+        {
+            var value = baseHeightMeters;
+            var amplitude = amplitudeMeters;
+            var frequency = 1d / wavelengthMeters;
+            for (var octave = 0; octave < octaveCount; octave++)
+            {
+                value += (ValueNoise(worldX * frequency, worldZ * frequency, octave)
+                          * 2d - 1d) * amplitude;
+                amplitude *= persistence;
+                frequency *= 2d;
+            }
+            return value;
+        }
+
+        private double ValueNoise(double x, double z, int octave)
+        {
+            var x0 = (long)Math.Floor(x);
+            var z0 = (long)Math.Floor(z);
+            var tx = Smooth(x - x0);
+            var tz = Smooth(z - z0);
+            var bottom = Lerp(Lattice(x0, z0, octave),
+                Lattice(x0 + 1, z0, octave), tx);
+            var top = Lerp(Lattice(x0, z0 + 1, octave),
+                Lattice(x0 + 1, z0 + 1, octave), tx);
+            return Lerp(bottom, top, tz);
+        }
+
+        private double Lattice(long x, long z, int octave)
+        {
+            var hash = HashBytes(seed + "|" + octave.ToString(CultureInfo.InvariantCulture)
+                                 + "|" + x.ToString(CultureInfo.InvariantCulture)
+                                 + "|" + z.ToString(CultureInfo.InvariantCulture));
+            var integer = (uint)(hash[0] | hash[1] << 8 | hash[2] << 16
+                                 | hash[3] << 24);
+            return integer / (double)uint.MaxValue;
+        }
+
+        private static double Smooth(double value)
+            => value * value * (3d - 2d * value);
+
+        private static double Lerp(double from, double to, double t)
+            => from + (to - from) * t;
+
+        private static bool IsFinite(double value)
+            => !double.IsNaN(value) && !double.IsInfinity(value);
+
+        private static byte[] HashBytes(string value)
+        {
+            using var sha = SHA256.Create();
+            return sha.ComputeHash(Encoding.UTF8.GetBytes(value));
+        }
+
+        private static string Hash(string value)
+            => BitConverter.ToString(HashBytes(value)).Replace("-", string.Empty)
+                .ToLowerInvariant();
+    }
+
+    public sealed class 공간동적배치점Data
+    {
+        public string 배치StableId = string.Empty;
+        public double LocalXMeters;
+        public double LocalYMeters;
+        public double LocalZMeters;
+        public double RotationDegrees;
+        public double UniformScale = 1d;
+        public double SurfaceSlopeDegrees;
+        public string ValidationCode = string.Empty;
+        public int VariantIndex;
+    }
+
+    public sealed class 공간동적배치PlanData
+    {
+        public int 요청수;
+        public 공간동적배치점Data[] 배치점 = Array.Empty<공간동적배치점Data>();
+        public string[] 거부원인Codes = Array.Empty<string>();
+
+        public bool IsComplete => 배치점.Length == 요청수;
+    }
+
+    /// <summary>
+    /// 셀 키 형식과 H 의미를 알지 않고 월드 seed, 셀 좌표, 표면 표본과 간격 정책만으로
+    /// 동적 배치점을 계산한다. 경계 여유가 최소 간격의 절반 이상이므로 인접 셀이
+    /// 서로 다른 순서로 생성돼도 경계 객체가 겹치지 않는다.
+    /// </summary>
+    public static class 공간동적ObjectPlacementPlanner
+    {
+        public const string RuleRevision = "dynamic-placement.surface-aware.r1";
+
+        public static 공간동적배치PlanData Plan(
+            string worldSeed,
+            int cellX,
+            int cellY,
+            int requestedCount,
+            공간동적배치PolicyData policy,
+            I공간동적표면Provider surfaceProvider,
+            IReadOnlyCollection<공간동적배치점Data>? occupiedPoints = null)
+        {
+            if (string.IsNullOrWhiteSpace(worldSeed))
+                throw new ArgumentException("DynamicPlacementWorldSeedMissing", nameof(worldSeed));
+            if (requestedCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(requestedCount));
+            if (policy == null) throw new ArgumentNullException(nameof(policy));
+            if (surfaceProvider == null) throw new ArgumentNullException(nameof(surfaceProvider));
+            policy.Validate();
+
+            var accepted = new List<공간동적배치점Data>();
+            var occupied = (occupiedPoints ?? Array.Empty<공간동적배치점Data>()).ToArray();
+            var rejectionCodes = new HashSet<string>(StringComparer.Ordinal);
+            var half = policy.셀크기Meters * .5d;
+            var minimum = -half + policy.경계여유Meters;
+            var maximum = half - policy.경계여유Meters;
+            var span = maximum - minimum;
+            var minimumDistanceSquared = policy.최소객체간격Meters
+                                         * policy.최소객체간격Meters;
+
+            for (var index = 0; index < requestedCount; index++)
+            {
+                var placed = false;
+                for (var attempt = 0; attempt < policy.객체당최대시도횟수; attempt++)
+                {
+                    var canonical = string.Join("|", new[]
+                    {
+                        worldSeed.Trim(), RuleRevision,
+                        cellX.ToString(CultureInfo.InvariantCulture),
+                        cellY.ToString(CultureInfo.InvariantCulture),
+                        index.ToString(CultureInfo.InvariantCulture),
+                        attempt.ToString(CultureInfo.InvariantCulture),
+                    });
+                    var bytes = HashBytes(canonical);
+                    var localX = minimum + UInt16(bytes, 0) / 65535d * span;
+                    var localZ = minimum + UInt16(bytes, 2) / 65535d * span;
+                    var worldX = cellX * policy.셀크기Meters + localX;
+                    var worldZ = cellY * policy.셀크기Meters + localZ;
+                    if (!surfaceProvider.TrySample(worldX, worldZ, out var surface)
+                        || surface == null)
+                    {
+                        rejectionCodes.Add("GroundSurfaceMissing");
+                        continue;
+                    }
+                    if (!surface.배치허용)
+                    {
+                        rejectionCodes.Add(string.IsNullOrWhiteSpace(surface.차단원인Code)
+                            ? "SurfacePlacementDenied" : surface.차단원인Code);
+                        continue;
+                    }
+                    if (surface.표면경사Degrees > policy.최대표면경사Degrees)
+                    {
+                        rejectionCodes.Add("SlopeTooSteep");
+                        continue;
+                    }
+                    if (occupied.Concat(accepted).Any(value =>
+                            DistanceSquared(localX, localZ, value.LocalXMeters,
+                                value.LocalZMeters) < minimumDistanceSquared))
+                    {
+                        rejectionCodes.Add("ObjectSpacingTooSmall");
+                        continue;
+                    }
+
+                    accepted.Add(new 공간동적배치점Data
+                    {
+                        배치StableId = "dynamic-object:"
+                            + BitConverter.ToString(bytes).Replace("-", string.Empty)
+                                .ToLowerInvariant().Substring(0, 24),
+                        LocalXMeters = localX,
+                        LocalYMeters = surface.표면높이Meters,
+                        LocalZMeters = localZ,
+                        RotationDegrees = UInt16(bytes, 4) / 65535d * 360d,
+                        UniformScale = .85d + UInt16(bytes, 6) / 65535d * .3d,
+                        SurfaceSlopeDegrees = surface.표면경사Degrees,
+                        ValidationCode = "Passed",
+                        VariantIndex = bytes[8],
+                    });
+                    placed = true;
+                    break;
+                }
+                if (!placed) rejectionCodes.Add("PlacementCandidateExhausted");
+            }
+
+            return new 공간동적배치PlanData
+            {
+                요청수 = requestedCount,
+                배치점 = accepted.OrderBy(value => value.배치StableId,
+                    StringComparer.Ordinal).ToArray(),
+                거부원인Codes = rejectionCodes.OrderBy(value => value,
+                    StringComparer.Ordinal).ToArray(),
+            };
+        }
+
+        private static int UInt16(byte[] bytes, int offset)
+            => bytes[offset] | bytes[offset + 1] << 8;
+
+        private static byte[] HashBytes(string value)
+        {
+            using var sha = SHA256.Create();
+            return sha.ComputeHash(Encoding.UTF8.GetBytes(value));
+        }
+
+        private static double DistanceSquared(double x1, double z1, double x2, double z2)
+        {
+            var dx = x1 - x2;
+            var dz = z1 - z2;
+            return dx * dx + dz * dz;
+        }
     }
 
     [Serializable]
@@ -93,9 +549,10 @@ namespace Ssalddel.Unity.Runtime.World
                 || Levels.Single(value => value.LevelCode == "L2").CellSizeMeters != 500
                 || L3CellSize != 공간LHWorldCodes.L3CellSizeMeters
                 || Levels.Any(value => !IsHLevelCode(value.PrimaryHQueryLevelCode))
-                || DetailRadius != 1 || ActiveRadius != 2 || PrefetchRadius != 4
-                || MaxConcurrentPreparations != 4
-                || Math.Abs(BoundaryPrefetchFraction - .25d) > .000001d
+                || DetailRadius < 0 || ActiveRadius < DetailRadius
+                || PrefetchRadius < ActiveRadius
+                || MaxConcurrentPreparations < 1
+                || BoundaryPrefetchFraction <= 0d || BoundaryPrefetchFraction > .5d
                 || MainThreadAssemblyBudgetMilliseconds <= 0d
                 || CachedCellCapacity < 1 || OriginShiftThresholdWorldUnits < L3CellSize
                 || GenerationLayers == null || GenerationLayers.Length < 6
@@ -317,9 +774,11 @@ namespace Ssalddel.Unity.Runtime.World
         public string ContentSourceCode = 공간LHWorldCodes.ScenarioProcedural;
         public string BasePlanHashSha256 = string.Empty;
         public string PresentationHashSha256 = string.Empty;
+        public 공간LHSurfaceGridData Surface = new();
         public 공간LHHBindingData[] HBindings = Array.Empty<공간LHHBindingData>();
         public 공간LHPlacementData[] Placements = Array.Empty<공간LHPlacementData>();
         public 공간LHConnectorData[] Connectors = Array.Empty<공간LHConnectorData>();
+        public SimulationWorldCellAssemblyResponse WorldAssetAssembly;
         public string[] RequiredCapabilityCodes = Array.Empty<string>();
         public bool PlayerTraversalRequired;
         public bool PresentationOnly;
@@ -332,12 +791,62 @@ namespace Ssalddel.Unity.Runtime.World
                     && ContentSourceCode != 공간LHWorldCodes.AuthoritativeWorld)
                 || BasePlanHashSha256 == null || BasePlanHashSha256.Length != 64
                 || PresentationHashSha256 == null || PresentationHashSha256.Length != 64
-                || HBindings == null || Placements == null || Connectors == null
+                || Surface == null || HBindings == null || Placements == null
+                || Connectors == null
                 || RequiredCapabilityCodes == null || !PresentationOnly)
                 throw new InvalidOperationException("LHWorldCellPlanInvalid:" + CellKey);
+            Surface.Validate();
+            if (WorldAssetAssembly != null
+                && (!WorldAssetAssembly.IsAvailable
+                    || WorldAssetAssembly.CellStableId != CellKey
+                    || WorldAssetAssembly.SourceWorldRevision < 0
+                    || WorldAssetAssembly.SourceLhBasePlanHashSha256 !=
+                    BasePlanHashSha256
+                    || WorldAssetAssembly.AssemblyHashSha256 == null
+                    || WorldAssetAssembly.AssemblyHashSha256.Length != 64))
+                throw new InvalidOperationException(
+                    "LHWorldAssetAssemblyInvalid:" + CellKey);
             foreach (var placement in Placements)
+            {
                 if (placement.OwnerCellKey != CellKey || !placement.PresentationOnly)
                     throw new InvalidOperationException("LHWorldPlacementOwnershipInvalid");
+                if (!string.IsNullOrWhiteSpace(placement.PlacementRuleRevision)
+                    && placement.PlacementValidationCode != "Passed")
+                    throw new InvalidOperationException("LHWorldPlacementValidationInvalid");
+            }
+        }
+    }
+
+    [Serializable]
+    public sealed class 공간LHSurfaceGridData
+    {
+        public string SurfaceModeCode = string.Empty;
+        public string SurfaceRuleRevision = string.Empty;
+        public string SurfaceConfigurationHashSha256 = string.Empty;
+        public string SurfaceGridHashSha256 = string.Empty;
+        public int SampleResolution;
+        public double CellSizeMeters;
+        public double[] HeightMeters = Array.Empty<double>();
+
+        public bool HasGeneratedGrid => SampleResolution >= 2
+                                        && HeightMeters != null
+                                        && HeightMeters.Length
+                                        == SampleResolution * SampleResolution;
+
+        public void Validate()
+        {
+            // 기존 서버 응답은 표면 상태 사본이 없으므로 빈 값은 평면 호환으로 읽는다.
+            if (string.IsNullOrWhiteSpace(SurfaceModeCode)) return;
+            if (string.IsNullOrWhiteSpace(SurfaceRuleRevision)
+                || SurfaceConfigurationHashSha256 == null
+                || SurfaceConfigurationHashSha256.Length != 64
+                || SurfaceGridHashSha256 == null || SurfaceGridHashSha256.Length != 64
+                || SampleResolution < 2 || CellSizeMeters <= 0d
+                || HeightMeters == null
+                || HeightMeters.Length != SampleResolution * SampleResolution
+                || HeightMeters.Any(value => double.IsNaN(value)
+                                             || double.IsInfinity(value)))
+                throw new InvalidOperationException("LHWorldSurfaceGridInvalid");
         }
     }
 
@@ -360,12 +869,17 @@ namespace Ssalddel.Unity.Runtime.World
         public string H1StableId = string.Empty;
         public string EvidenceKindCode = string.Empty;
         public double LocalXMeters;
+        public double LocalYMeters;
         public double LocalZMeters;
         public double RotationDegrees;
         public double UniformScale = 1d;
         public bool FixedAnchor;
         public bool CollisionEligible;
         public bool PresentationOnly;
+        public double SurfaceSlopeDegrees;
+        public string PlacementRuleRevision = string.Empty;
+        public string SurfaceRuleRevision = string.Empty;
+        public string PlacementValidationCode = string.Empty;
     }
 
     [Serializable]
@@ -378,6 +892,10 @@ namespace Ssalddel.Unity.Runtime.World
         public bool Passable;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public interface I공간LHWorldRepository
     {
         string SourceModeCode { get; }
@@ -422,12 +940,6 @@ namespace Ssalddel.Unity.Runtime.World
     /// </summary>
     public class 로컬공간LHWorldEngine : I공간LHWorldRepository
     {
-        private static readonly string[] CompositionKeys =
-        {
-            "farm:감자밭 두렁:A", "farm:감자밭 두렁:B", "farm:혼합 작물밭:A",
-            "nature:초지·야생화:A", "nature:숲 가장자리:A", "nature:침엽수림 군집:A",
-        };
-
         private static readonly string[] SeasonCodes =
         {
             공간LHWorldCodes.Spring, 공간LHWorldCodes.Summer,
@@ -435,6 +947,10 @@ namespace Ssalddel.Unity.Runtime.World
         };
 
         private readonly string worldSeed;
+        private readonly 공간동적MapWindowPolicyData windowPolicy;
+        private readonly I공간동적표면Provider surfaceProvider;
+        private readonly 공간동적배치PolicyData placementPolicy;
+        private readonly I공간실외자산배치PlanProvider exteriorPlacementProvider;
         private int dayNumber;
         private int worldTick;
         private long worldRevision;
@@ -443,11 +959,24 @@ namespace Ssalddel.Unity.Runtime.World
             string localWorldSeed = 공간LHWorldCodes.WorldSeed,
             int localDayNumber = 1,
             int localWorldTick = 0,
-            long localWorldRevision = 0)
+            long localWorldRevision = 0,
+            공간동적MapWindowPolicyData? localWindowPolicy = null,
+            I공간동적표면Provider? localSurfaceProvider = null,
+            공간동적배치PolicyData? localPlacementPolicy = null,
+            I공간실외자산배치PlanProvider? localExteriorPlacementProvider = null)
         {
             if (string.IsNullOrWhiteSpace(localWorldSeed))
                 throw new ArgumentException("LHLocalWorldSeedMissing", nameof(localWorldSeed));
             worldSeed = localWorldSeed.Trim();
+            windowPolicy = (localWindowPolicy ?? new 공간동적MapWindowPolicyData()).Clone();
+            windowPolicy.Validate();
+            surfaceProvider = localSurfaceProvider
+                              ?? new 평면공간동적표면Provider();
+            placementPolicy = localPlacementPolicy ?? new 공간동적배치PolicyData();
+            placementPolicy.Validate();
+            exteriorPlacementProvider = localExteriorPlacementProvider
+                ?? new 결정적공간실외자산배치PlanProvider(
+                    surfaceProvider, placementPolicy);
             SetLocalCalendar(localDayNumber, localWorldTick, localWorldRevision);
         }
 
@@ -478,24 +1007,19 @@ namespace Ssalddel.Unity.Runtime.World
             var profile = Profile();
             var cells = new List<공간LHCellPlanData>();
             var outside = new List<string>();
-            var movement = DirectionVector(request.MovementDirectionCode);
-            for (var y = focusY - profile.PrefetchRadius; y <= focusY + profile.PrefetchRadius; y++)
-            for (var x = focusX - profile.PrefetchRadius; x <= focusX + profile.PrefetchRadius; x++)
+            var window = 공간동적MapWindowPlanner.Plan(
+                focusX, focusY, windowPolicy, request.MovementDirectionCode);
+            foreach (var candidate in window)
             {
+                var x = candidate.CellX;
+                var y = candidate.CellY;
                 var cellKey = 공간LHCellKey.L3(x, y);
                 if (!IsInsideCoverage(x, y))
                 {
                     outside.Add(cellKey);
                     continue;
                 }
-                var dx = x - focusX;
-                var dy = y - focusY;
-                var distance = Math.Max(Math.Abs(dx), Math.Abs(dy));
-                var role = distance <= 1 ? 공간LHWorldCodes.Detail
-                    : distance <= 2 ? 공간LHWorldCodes.Active : 공간LHWorldCodes.Prefetch;
-                var directionalBias = dx * movement.X + dy * movement.Y > 0 ? -10 : 0;
-                cells.Add(Cell(x, y, role,
-                    distance * 100 + directionalBias + Math.Abs(dx) + Math.Abs(dy),
+                cells.Add(Cell(x, y, candidate.WindowRoleCode, candidate.Priority,
                     request.RequiredCapabilityCodes ?? Array.Empty<string>()));
             }
             var response = new 공간LHCellPreviewData
@@ -558,7 +1082,9 @@ namespace Ssalddel.Unity.Runtime.World
                     Level("L0", 8000, "H4"), Level("L1", 2000, "H3"),
                     Level("L2", 500, "H2"), Level("L3", 125, "H1"),
                 },
-                DetailRadius = 1, ActiveRadius = 2, PrefetchRadius = 4,
+                DetailRadius = windowPolicy.DetailRadius,
+                ActiveRadius = windowPolicy.ActiveRadius,
+                PrefetchRadius = windowPolicy.PrefetchRadius,
                 MaxConcurrentPreparations = 4, BoundaryPrefetchFraction = .25d,
                 MainThreadAssemblyBudgetMilliseconds = 2d, CachedCellCapacity = 32,
                 OriginShiftThresholdWorldUnits = 2048,
@@ -573,8 +1099,15 @@ namespace Ssalddel.Unity.Runtime.World
                 },
                 PresentationOnly = true,
             };
-            value.ProfileHashSha256 = Hash("local-profile|" + value.WorldSeed + "|"
-                + value.AreaSetBoundaryHashSha256 + "|" + value.GeneratorVersion);
+            value.ProfileHashSha256 = Hash(string.Join("|", new[]
+            {
+                "local-profile", value.WorldSeed, value.AreaSetBoundaryHashSha256,
+                value.GeneratorVersion,
+                value.DetailRadius.ToString(CultureInfo.InvariantCulture),
+                value.ActiveRadius.ToString(CultureInfo.InvariantCulture),
+                value.PrefetchRadius.ToString(CultureInfo.InvariantCulture),
+                surfaceProvider.SurfaceConfigurationHashSha256,
+            }));
             value.Validate();
             return value;
         }
@@ -584,7 +1117,9 @@ namespace Ssalddel.Unity.Runtime.World
         {
             var cellKey = 공간LHCellKey.L3(x, y);
             var hBindings = HBindings(x, y);
-            var placements = Placements(cellKey, x, y);
+            var surface = Surface(x, y);
+            var placements = exteriorPlacementProvider.Plan(
+                worldSeed, cellKey, x, y);
             var connectors = Connectors(x, y);
             var capabilities = requestedCapabilities.Count > 0
                 ? requestedCapabilities.OrderBy(value => value, StringComparer.Ordinal).ToArray()
@@ -599,6 +1134,7 @@ namespace Ssalddel.Unity.Runtime.World
             var baseHash = Hash(string.Join("|", new[]
             {
                 worldSeed, 공간LHWorldCodes.GeneratorVersion, cellKey,
+                surface.SurfaceGridHashSha256,
                 string.Join(",", hBindings.Select(value =>
                     value.HLevelCode + ":" + value.SpatialStableId + ":" + value.StateCode)),
                 string.Join(",", placements.Select(PlacementCanonical)),
@@ -614,6 +1150,7 @@ namespace Ssalddel.Unity.Runtime.World
                 BasePlanHashSha256 = baseHash,
                 PresentationHashSha256 = Hash(baseHash + "|" + season.SeasonCode + "|"
                     + season.SeasonRuleVersion),
+                Surface = surface,
                 HBindings = hBindings,
                 Placements = placements,
                 Connectors = connectors,
@@ -646,73 +1183,49 @@ namespace Ssalddel.Unity.Runtime.World
             return values.ToArray();
         }
 
-        private 공간LHPlacementData[] Placements(string cellKey, int x, int y)
+        private 공간LHSurfaceGridData Surface(int cellX, int cellY)
         {
-            var values = new List<공간LHPlacementData>();
-            AddFixedAnchor(values, cellKey, x, y, 공간LHWorldCodes.CenterL3X,
-                공간LHWorldCodes.CenterL3Y, "farmhouse", "farm:헛간 작업마당:A",
-                "h1-stock:farm-work-yard", -18d, 12d, 0d);
-            AddFixedAnchor(values, cellKey, x, y, 공간LHWorldCodes.CenterL3X + 1,
-                공간LHWorldCodes.CenterL3Y, "potato-field", "farm:감자밭 두렁:A",
-                "h1-stock:farm-production", 4d, -6d, 0d);
-            AddFixedAnchor(values, cellKey, x, y, 공간LHWorldCodes.CenterL3X,
-                공간LHWorldCodes.CenterL3Y + 1, "work-yard", "farm:농산물 집하·직판장:A",
-                "h1-stock:farm-work-yard", 10d, 8d, 90d);
-            AddFixedAnchor(values, cellKey, x, y, 공간LHWorldCodes.CenterL3X + 1,
-                공간LHWorldCodes.CenterL3Y + 1, "farm-gate", "network:농촌도로 T자:A",
-                "h1-stock:farm-loading-gate", -8d, -10d, 0d);
-
-            var randomBytes = HashBytes(string.Join("|", new[]
+            // 기존 평면 프로필은 별도 높이 배열을 만들지 않아 응답 크기와 조립 방식을 유지한다.
+            if (surfaceProvider.SurfaceModeCode == "Flat")
+                return new 공간LHSurfaceGridData();
+            const int resolution = 17;
+            var heights = new double[resolution * resolution];
+            var half = placementPolicy.셀크기Meters * .5d;
+            var step = placementPolicy.셀크기Meters / (resolution - 1d);
+            for (var z = 0; z < resolution; z++)
+            for (var x = 0; x < resolution; x++)
             {
-                worldSeed, 공간LHWorldCodes.GeneratorVersion, "L3Surface", cellKey,
-            }));
-            var count = 3 + randomBytes[0] % 3;
-            for (var index = 0; index < count; index++)
-            {
-                var offset = 1 + index * 5;
-                var key = CompositionKeys[randomBytes[offset] % CompositionKeys.Length];
-                var identity = Hash(cellKey + "|L3Surface|" + index + "|" + key);
-                values.Add(new 공간LHPlacementData
-                {
-                    GeneratedStableId = "lh-object:" + identity.Substring(0, 24),
-                    OwnerCellKey = cellKey,
-                    LayerCode = "L3Surface",
-                    CompositionKey = key,
-                    H1StableId = key.StartsWith("farm:", StringComparison.Ordinal)
-                        ? "h1-stock:farm-production" : string.Empty,
-                    EvidenceKindCode = "ScenarioProcedural",
-                    LocalXMeters = -50d + randomBytes[offset + 1] / 255d * 100d,
-                    LocalZMeters = -50d + randomBytes[offset + 2] / 255d * 100d,
-                    RotationDegrees = randomBytes[offset + 3] / 255d * 360d,
-                    UniformScale = .85d + randomBytes[offset + 4] / 255d * .3d,
-                    PresentationOnly = true,
-                });
+                var localX = -half + x * step;
+                var localZ = -half + z * step;
+                var worldX = cellX * placementPolicy.셀크기Meters + localX;
+                var worldZ = cellY * placementPolicy.셀크기Meters + localZ;
+                if (!surfaceProvider.TrySample(worldX, worldZ, out var sample)
+                    || sample == null)
+                    throw new InvalidOperationException("LHLocalSurfaceSampleUnavailable");
+                heights[z * resolution + x] = sample.표면높이Meters;
             }
-            return values.OrderBy(value => value.GeneratedStableId, StringComparer.Ordinal).ToArray();
-        }
-
-        private static void AddFixedAnchor(
-            ICollection<공간LHPlacementData> values, string cellKey, int x, int y,
-            int expectedX, int expectedY, string slot, string compositionKey,
-            string h1StableId, double localX, double localZ, double rotation)
-        {
-            if (x != expectedX || y != expectedY) return;
-            var identity = Hash(cellKey + "|H3Intent|" + slot);
-            values.Add(new 공간LHPlacementData
+            var gridHash = Hash(string.Join("|", new[]
             {
-                GeneratedStableId = "lh-anchor:" + identity.Substring(0, 24),
-                OwnerCellKey = cellKey,
-                LayerCode = "H3Intent",
-                CompositionKey = compositionKey,
-                H1StableId = h1StableId,
-                EvidenceKindCode = "ScenarioProcedural",
-                LocalXMeters = localX,
-                LocalZMeters = localZ,
-                RotationDegrees = rotation,
-                UniformScale = 1d,
-                FixedAnchor = true,
-                PresentationOnly = true,
-            });
+                surfaceProvider.SurfaceConfigurationHashSha256,
+                cellX.ToString(CultureInfo.InvariantCulture),
+                cellY.ToString(CultureInfo.InvariantCulture),
+                resolution.ToString(CultureInfo.InvariantCulture),
+                string.Join(",", heights.Select(value =>
+                    value.ToString("R", CultureInfo.InvariantCulture))),
+            }));
+            var value = new 공간LHSurfaceGridData
+            {
+                SurfaceModeCode = surfaceProvider.SurfaceModeCode,
+                SurfaceRuleRevision = surfaceProvider.SurfaceRuleRevision,
+                SurfaceConfigurationHashSha256 =
+                    surfaceProvider.SurfaceConfigurationHashSha256,
+                SurfaceGridHashSha256 = gridHash,
+                SampleResolution = resolution,
+                CellSizeMeters = placementPolicy.셀크기Meters,
+                HeightMeters = heights,
+            };
+            value.Validate();
+            return value;
         }
 
         private static 공간LHConnectorData[] Connectors(int x, int y) => new[]
@@ -795,14 +1308,6 @@ namespace Ssalddel.Unity.Runtime.World
             => x >= 공간LHWorldCodes.MinimumL3X && x <= 공간LHWorldCodes.MaximumL3X
                && y >= 공간LHWorldCodes.MinimumL3Y && y <= 공간LHWorldCodes.MaximumL3Y;
 
-        private static (int X, int Y) DirectionVector(string directionCode)
-            => directionCode switch
-            {
-                "N" => (0, 1), "NE" => (1, 1), "E" => (1, 0), "SE" => (1, -1),
-                "S" => (0, -1), "SW" => (-1, -1), "W" => (-1, 0), "NW" => (-1, 1),
-                _ => (0, 0),
-            };
-
         private static 공간LHHBindingData Binding(
             string level, string stableId, string state, params string[] interactions)
             => new() { HLevelCode = level, SpatialStableId = stableId, StateCode = state,
@@ -813,9 +1318,13 @@ namespace Ssalddel.Unity.Runtime.World
             {
                 value.GeneratedStableId, value.CompositionKey, value.H1StableId,
                 value.LocalXMeters.ToString("R", CultureInfo.InvariantCulture),
+                value.LocalYMeters.ToString("R", CultureInfo.InvariantCulture),
                 value.LocalZMeters.ToString("R", CultureInfo.InvariantCulture),
                 value.RotationDegrees.ToString("R", CultureInfo.InvariantCulture),
                 value.UniformScale.ToString("R", CultureInfo.InvariantCulture),
+                value.SurfaceSlopeDegrees.ToString("R", CultureInfo.InvariantCulture),
+                value.PlacementRuleRevision, value.SurfaceRuleRevision,
+                value.PlacementValidationCode,
                 value.FixedAnchor.ToString(),
             });
 
@@ -836,6 +1345,10 @@ namespace Ssalddel.Unity.Runtime.World
     }
 
     /// <summary>기존 시험 코드 호환용 이름이다. 새 씬 구성에는 로컬공간LHWorldEngine을 사용한다.</summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 대관령Farm공간LHWorldFixtureRepository : 로컬공간LHWorldEngine
     {
         public 대관령Farm공간LHWorldFixtureRepository(int fixtureDayNumber = 1)

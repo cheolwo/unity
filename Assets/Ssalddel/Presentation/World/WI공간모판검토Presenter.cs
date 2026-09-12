@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ssalddel.Simulation.Contracts;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 실제 H2~H4 공간 조립이나 E5 증거, 업무 상태를 생성하거나 변경하지 않는다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class WI공간모판검토Presenter : MonoBehaviour
     {
         public const string OverviewAnchorId = "wi-seedbed-overview";
@@ -316,7 +321,9 @@ namespace Ssalddel.Unity.Presentation.World
                 $"{value.CapacityCode} {value.Quantity}{value.UnitCode}"));
             var connectors = selectedSeedbed.ConnectorStubs
                 .Where(value => value.InternalSpaceCode == selectedSpace.SpaceCode)
-                .Select(value => $"{value.FlowDirectionCode} {value.StubCode} → {value.AdjacentWorldInteractionId}")
+                .Select(value => $"{value.FlowDirectionCode} {value.StubCode} → "
+                    + Simulation세계상호작용이름Catalog
+                        .한국어표시명(value.AdjacentWorldInteractionId))
                 .ToArray();
             var connectorText = connectors.Length == 0 ? "외부 연결구 없음" : string.Join(" / ", connectors);
             var fit = BuildFitStatus(selectedSeedbed, selectedCandidate);
@@ -329,7 +336,10 @@ namespace Ssalddel.Unity.Presentation.World
                 + $"업무 용량 {capacities}\n"
                 + $"후보 {selectedCandidate.CompositionKey}\n"
                 + $"형태 {selectedCandidate.TopologyCode} · 원형 크기 {FormatSize(selectedCandidate.NativeFootprintMeters)} · {fit}";
-            lineageText.text = $"포함 WI: {string.Join(" → ", selectedSeedbed.IncludedWiIds)}\n{connectorText}";
+            lineageText.text = "포함 세계 행동: "
+                + string.Join(" → ", selectedSeedbed.IncludedWiIds.Select(
+                    Simulation세계상호작용이름Catalog.한국어표시명))
+                + $"\n{connectorText}";
             boundaryText.text = $"허용 크기 최소 {FormatSize(selectedSeedbed.MinimumSizeMeters)} · 선호 "
                 + $"{FormatSize(selectedSeedbed.PreferredSizeMeters)} · 최대 {FormatSize(selectedSeedbed.MaximumSizeMeters)}\n"
                 + "H1 연결구 미리보기 · 실제 H2 Block / 도로 / 좌표 / 운영 상태가 아닙니다.";

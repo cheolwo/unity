@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "simulation-world-interaction-spatial-seedbed.v1",
+  "stableId": "wi-spatial-seedbed:hub-outbound-staging.v1",
+  "revision": 1,
+  "title": "Hub 피킹·출고 준비 공간 모판",
+  "summary": "보관 재고를 피킹하고 차량 상차 전 출고 대기 상태로 돌려놓는 Hub 내부 공간 모판이다.",
+  "authoredDocument": "authored/hub-outbound-staging.v1.md",
+  "includedWiIds": ["WI-HUB-03", "WI-HUB-04", "WI-HUB-05"],
+  "internalSpaces": [
+    {
+      "spaceCode": "picking-area",
+      "spatialRoleCode": "HubPickingArea",
+      "capabilityCodes": ["Spatial.Storage", "Spatial.PickingWorkArea", "Spatial.CargoAccessible", "Spatial.WorkerAccessible"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "city:화물 대기 야드:A", "city:화물 대기 야드:B", "city:화물 대기 야드:C"
+      ]
+    },
+    {
+      "spaceCode": "outbound-staging-area",
+      "spatialRoleCode": "HubOutboundStagingArea",
+      "capabilityCodes": ["Spatial.OutboundStagingArea", "Spatial.PackingWorkArea", "Spatial.LoadingWorkArea", "Spatial.CargoAccessible", "Spatial.WorkerAccessible"],
+      "baseCapacities": [
+        { "capacityCode": "WorkArea", "quantity": 1, "unitCode": "slot" }
+      ],
+      "allowedLandscapeCompositionKeys": [
+        "city:화물 대기 야드:A", "city:상하차 Dock:A"
+      ]
+    }
+  ],
+  "wiBindings": [
+    { "worldInteractionId": "WI-HUB-03", "internalSpaceCode": "picking-area" },
+    { "worldInteractionId": "WI-HUB-04", "internalSpaceCode": "picking-area" },
+    { "worldInteractionId": "WI-HUB-05", "internalSpaceCode": "outbound-staging-area" }
+  ],
+  "internalRelations": [
+    { "relationCode": "PickingToOutboundStaging", "fromSpaceCode": "picking-area", "toSpaceCode": "outbound-staging-area", "connectorTypeCode": "cargo-handoff" }
+  ],
+  "externalConnectorStubs": [
+    { "stubCode": "storage-to-picking-input", "internalSpaceCode": "picking-area", "connectorTypeCode": "cargo-handoff", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-002" },
+    { "stubCode": "hub-outbound-loading", "internalSpaceCode": "outbound-staging-area", "connectorTypeCode": "vehicle", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-HUB-06" }
+  ],
+  "transformConstraint": {
+    "allowedRotationCodes": ["0", "90", "180", "270"],
+    "scaleModeCode": "Uniform",
+    "minimumWidthMeters": 24,
+    "minimumDepthMeters": 18,
+    "preferredWidthMeters": 25,
+    "preferredDepthMeters": 20,
+    "maximumWidthMeters": 96,
+    "maximumDepthMeters": 72
+  },
+  "reviewStatusCode": "ApprovedForSimulation",
+  "evidenceRefs": ["decision:D-217", "decision:D-241", "placement-control-hierarchy.v2"],
+  "presentationOnly": true,
+  "isOperationalState": false
+}

@@ -54,7 +54,8 @@
     { "relationCode": "WarehouseHandoff", "fromSpaceCode": "inspection-area", "toSpaceCode": "storage-area", "connectorTypeCode": "cargo-handoff" }
   ],
   "externalConnectorStubs": [
-    { "stubCode": "farm-hub-input", "internalSpaceCode": "unloading-area", "connectorTypeCode": "vehicle", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-LOG-03" }
+    { "stubCode": "farm-hub-input", "internalSpaceCode": "unloading-area", "connectorTypeCode": "vehicle", "flowDirectionCode": "Input", "adjacentWorldInteractionId": "WI-LOG-03" },
+    { "stubCode": "storage-to-picking-output", "internalSpaceCode": "storage-area", "connectorTypeCode": "cargo-handoff", "flowDirectionCode": "Output", "adjacentWorldInteractionId": "WI-HUB-03" }
   ],
   "transformConstraint": {
     "allowedRotationCodes": ["0", "90", "180", "270"],

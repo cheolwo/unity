@@ -6,6 +6,10 @@ using UnityEngine;
 namespace Ssalddel.Unity.Presentation.World
 {
     [Serializable]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class WI공간모판CapacityView
     {
         [SerializeField] private string capacityCode = string.Empty;
@@ -28,6 +32,10 @@ namespace Ssalddel.Unity.Presentation.World
     }
 
     [Serializable]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class WI공간모판CandidateView
     {
         [SerializeField] private string compositionKey = string.Empty;
@@ -64,6 +72,10 @@ namespace Ssalddel.Unity.Presentation.World
     }
 
     [Serializable]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class WI공간모판SpaceView
     {
         [SerializeField] private string spaceCode = string.Empty;
@@ -105,6 +117,10 @@ namespace Ssalddel.Unity.Presentation.World
     }
 
     [Serializable]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class WI공간모판RelationView
     {
         [SerializeField] private string relationCode = string.Empty;
@@ -132,6 +148,10 @@ namespace Ssalddel.Unity.Presentation.World
     }
 
     [Serializable]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class WI공간모판ConnectorView
     {
         [SerializeField] private string stubCode = string.Empty;

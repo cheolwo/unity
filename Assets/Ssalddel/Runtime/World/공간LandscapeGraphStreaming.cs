@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Ssalddel.Unity.Runtime.World
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public interface I공간AreaSetLandscapeGraphRepository
     {
         Task<공간AreaSetDefinitionData> LoadAreaSetAsync(
@@ -37,6 +41,10 @@ namespace Ssalddel.Unity.Runtime.World
         public string[] ReleasedGraphStableIds = Array.Empty<string>();
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 공간LandscapeGraphStreamingPlanner
     {
         private readonly Dictionary<string, 공간LandscapeGraphStreamingState> states =

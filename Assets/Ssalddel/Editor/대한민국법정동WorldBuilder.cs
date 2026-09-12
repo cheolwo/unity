@@ -14,6 +14,10 @@ using UnityEngine.Rendering.Universal;
 
 namespace Ssalddel.Unity.Editor
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class 대한민국법정동WorldBuilder
     {
         public const string ScenePath = "Assets/Ssalddel/Scenes/SimulationWorldShell.unity";
@@ -265,7 +269,7 @@ namespace Ssalddel.Unity.Editor
             Debug.Log("WORLD-COMPLETION-AREA-1: 실제 Play Mode Game View에서 대관령 Farm 1km 화면 저장을 요청했습니다.");
         }
 
-        [MenuItem("Ssalddel/검증/화면 증거/대관령 Farm 1인칭 _F8")]
+        [MenuItem("Ssalddel/검증/화면 증거/대관령 Farm 1인칭")]
         public static void CaptureFarmFirstPersonPlayGameView()
         {
             if (!UnityEngine.Application.isPlaying)

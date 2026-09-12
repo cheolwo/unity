@@ -65,6 +65,10 @@ namespace Ssalddel.Unity.Runtime.World
         public string PreviewHashSha256 = string.Empty;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public interface IAreaSet접근AuthorityClient
     {
         Task<AreaSet접근Data> RefreshAsync(string sessionStableId,
@@ -80,6 +84,10 @@ namespace Ssalddel.Unity.Runtime.World
             CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class AreaSet접근Coordinator
     {
         private readonly IAreaSet접근AuthorityClient authority;

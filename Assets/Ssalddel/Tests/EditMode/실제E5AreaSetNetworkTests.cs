@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -10,9 +11,14 @@ using Ssalddel.Unity.Presentation.World;
 using Ssalddel.Unity.Runtime.World;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
+using UnityEngine;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 실제E5AreaSetNetworkTests
     {
         [Test]
@@ -60,6 +66,56 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(fixture.GraphLoads.Count(value =>
                     value == 실제E5NetworkFixtureRepository.NatureFarmRoute),
                 Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task 운영지도는_실제Network구성원과_RuntimeRoot위치만_반환한다()
+        {
+            var fixture = new 실제E5NetworkFixtureRepository();
+            var session = new 실제E5AreaSetNetworkStreamingSession(fixture, fixture);
+            await session.InitializeAsync(CancellationToken.None);
+            var host = new GameObject("ActualE5ObservationHost");
+            try
+            {
+                var controller = host.AddComponent<실제E5AreaSetNetworkController>();
+                typeof(실제E5AreaSetNetworkController)
+                    .GetField("session", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .SetValue(controller, session);
+                var roots = (Dictionary<string, Transform>)typeof(실제E5AreaSetNetworkController)
+                    .GetField("areaRoots", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .GetValue(controller)!;
+                foreach (var area in session.Network.AreaSets)
+                {
+                    var root = new GameObject("Root_" + area.AreaSetStableId).transform;
+                    root.SetParent(host.transform, false);
+                    root.position = area.AreaSetStableId == 실제E5AreaSetNetworkCodes.NatureAreaSet
+                        ? new Vector3(-45f, 3f, 7f) : Vector3.zero;
+                    roots.Add(area.AreaSetStableId, root);
+                }
+
+                var areas = controller.GetObservationAreas();
+                var focus = await controller.ObserveAreaAsync(
+                    실제E5AreaSetNetworkCodes.NatureAreaSet, CancellationToken.None);
+
+                Assert.That(areas.Select(value => value.StableId), Is.EqualTo(new[]
+                {
+                    실제E5AreaSetNetworkCodes.NatureAreaSet,
+                    실제E5AreaSetNetworkCodes.FarmAreaSet,
+                    실제E5AreaSetNetworkCodes.HubAreaSet,
+                    실제E5AreaSetNetworkCodes.TownAreaSet,
+                }));
+                Assert.That(areas.Single(value => value.StableId == 실제E5AreaSetNetworkCodes.NatureAreaSet).Selected, Is.True);
+                Assert.That(areas.All(value => value.Selectable), Is.True);
+                Assert.That(focus.AnchorId, Is.EqualTo("camera-focus:areaset:" + 실제E5AreaSetNetworkCodes.NatureAreaSet));
+                Assert.That(focus.LevelCode, Is.EqualTo(DioramaCameraFocusLevelCodes.Zone));
+                Assert.That(focus.Point.X, Is.EqualTo(-45f));
+                Assert.That(focus.Point.Y, Is.EqualTo(3f));
+                Assert.That(focus.Point.Z, Is.EqualTo(7f));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(host);
+            }
         }
 
         [Test]

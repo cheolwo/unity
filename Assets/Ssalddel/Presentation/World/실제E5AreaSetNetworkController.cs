@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.Unity.Observation;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,6 +15,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 키 입력은 표현 지역만 전환하며 서버 업무 확정이나 WorldTick을 변경하지 않는다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 실제E5AreaSetNetworkController : MonoBehaviour
     {
         [SerializeField] private Transform areaSetRoot = null!;
@@ -100,6 +105,75 @@ namespace Ssalddel.Unity.Presentation.World
             finally
             {
                 switching = false;
+            }
+        }
+
+        public IReadOnlyList<운영지도AreaViewModel> GetObservationAreas()
+        {
+            if (!Initialized) return Array.Empty<운영지도AreaViewModel>();
+            return session.Network.AreaSets
+                .OrderBy(value => ObservationOrder(value.AreaSetStableId))
+                .ThenBy(value => value.AreaSetStableId, StringComparer.Ordinal)
+                .Select(value =>
+                {
+                    var available = areaRoots.TryGetValue(value.AreaSetStableId, out var root)
+                                    && root != null;
+                    return new 운영지도AreaViewModel
+                    {
+                        StableId = value.AreaSetStableId,
+                        DisplayName = ObservationName(value.AreaSetStableId),
+                        Selectable = available,
+                        Selected = string.Equals(value.AreaSetStableId,
+                            ActiveAreaSetStableId, StringComparison.Ordinal),
+                        Reason = available ? "실제 E5 AreaSet 관찰 가능" : "표현 Root 미확보",
+                    };
+                })
+                .ToArray();
+        }
+
+        public async Task<DioramaCameraFocus> ObserveAreaAsync(
+            string areaSetStableId,
+            CancellationToken cancellationToken = default)
+        {
+            if (switching)
+                throw new InvalidOperationException("ActualE5AreaSetNetworkSwitchInProgress");
+            var area = GetObservationAreas().SingleOrDefault(value =>
+                string.Equals(value.StableId, areaSetStableId, StringComparison.Ordinal));
+            if (area == null)
+                throw new InvalidOperationException("ActualE5ObservationAreaUnknown:" + areaSetStableId);
+            if (!area.Selectable || !areaRoots.TryGetValue(areaSetStableId, out var root)
+                                 || root == null)
+                throw new InvalidOperationException("ActualE5ObservationAreaUnavailable:" + areaSetStableId);
+
+            var previous = ActiveAreaSetStableId;
+            try
+            {
+                if (!string.Equals(previous, areaSetStableId, StringComparison.Ordinal))
+                    await SwitchAreaAsync(areaSetStableId, cancellationToken);
+                var position = root.position;
+                return new DioramaCameraFocus
+                {
+                    AnchorId = "camera-focus:areaset:" + areaSetStableId,
+                    LevelCode = DioramaCameraFocusLevelCodes.Zone,
+                    Point = new DioramaPoint(position.x, position.y, position.z),
+                };
+            }
+            catch (Exception observationError)
+            {
+                if (!string.IsNullOrWhiteSpace(previous)
+                    && !string.Equals(previous, ActiveAreaSetStableId, StringComparison.Ordinal))
+                {
+                    try
+                    {
+                        await SwitchAreaAsync(previous, CancellationToken.None);
+                    }
+                    catch (Exception restoreError)
+                    {
+                        throw new AggregateException(
+                            "ActualE5ObservationAreaRestoreFailed", observationError, restoreError);
+                    }
+                }
+                throw;
             }
         }
 
@@ -211,6 +285,24 @@ namespace Ssalddel.Unity.Presentation.World
             if (stableId == 실제E5AreaSetNetworkCodes.HubAreaSet)
                 return new Vector3(45f, 0f, 0f);
             return new Vector3(90f, 0f, 0f);
+        }
+
+        private static int ObservationOrder(string stableId)
+        {
+            if (stableId == 실제E5AreaSetNetworkCodes.NatureAreaSet) return 0;
+            if (stableId == 실제E5AreaSetNetworkCodes.FarmAreaSet) return 1;
+            if (stableId == 실제E5AreaSetNetworkCodes.HubAreaSet) return 2;
+            if (stableId == 실제E5AreaSetNetworkCodes.TownAreaSet) return 3;
+            return int.MaxValue;
+        }
+
+        private static string ObservationName(string stableId)
+        {
+            if (stableId == 실제E5AreaSetNetworkCodes.NatureAreaSet) return "Nature 생활 거점";
+            if (stableId == 실제E5AreaSetNetworkCodes.FarmAreaSet) return "Farm 생산";
+            if (stableId == 실제E5AreaSetNetworkCodes.HubAreaSet) return "Hub 물류";
+            if (stableId == 실제E5AreaSetNetworkCodes.TownAreaSet) return "Town 시장";
+            return stableId;
         }
 
         private static string SafeName(string value) =>

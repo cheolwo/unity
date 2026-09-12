@@ -14,6 +14,10 @@ using UnityEngine.UI;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 공간TileStreamingTests
     {
         [Test]
@@ -70,6 +74,7 @@ namespace Ssalddel.Unity.Tests.EditMode
         [Test]
         public async Task ServerRepository는_읽기경로만사용하고_응답계약을검증한다()
         {
+            공간TileStreamRemoteRequestDiagnostics.ResetForTests();
             var client = new CapturingApiClient();
             var repository = new 공간TileStreamServerRepository(client);
 
@@ -90,6 +95,8 @@ namespace Ssalddel.Unity.Tests.EditMode
                 "kr5186:l2:700:1145", CancellationToken.None);
             Assert.That(objects.Objects, Has.Length.EqualTo(1));
             Assert.That(client.LastRequest.RelativePath, Does.EndWith("/objects"));
+            Assert.That(공간TileStreamRemoteRequestDiagnostics.RequestCount,
+                Is.EqualTo(2));
         }
 
         [Test]

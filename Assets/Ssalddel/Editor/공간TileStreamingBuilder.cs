@@ -10,6 +10,10 @@ using UnityEngine.UI;
 
 namespace Ssalddel.Unity.Editor
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class 공간TileStreamingBuilder
     {
         public const string RootName = "L11_동적공간TileStreaming_PresentationOnly";
@@ -244,7 +248,7 @@ namespace Ssalddel.Unity.Editor
             buttonText.rectTransform.offsetMin = Vector2.zero;
             buttonText.rectTransform.offsetMax = Vector2.zero;
             buttonText.alignment = TextAnchor.MiddleCenter;
-            buttonText.text = "진단 트리 닫기  F8";
+            buttonText.text = "진단 트리 닫기  Shift+F8";
             return root.GetComponent<Button>();
         }
 

@@ -2,11 +2,11 @@
   "schemaVersion": "wi-spatial-seedbed-unity-source-receipt.v1",
   "sourceProject": "Hongdal",
   "sourceRelativeRoot": "eng/world-seedbeds/wi-spatial-seedbeds",
-  "catalogRevision": "simulation-world-interaction-spatial-seedbeds.r1",
+  "catalogRevision": "simulation-world-interaction-spatial-seedbeds.r15",
   "files": [
     {
       "relativePath": "catalog.json",
-      "sha256": "f8c08f006232f4728a145f32be42895ed4b1378375ee64cdd0e9cef0a03a4f9e"
+      "sha256": "04b1010870864494eda872a06f9fab0145e9f69dec18ad92ef484ec30cfde9ae"
     },
     {
       "relativePath": "definitions/farm-production.v1.json",
@@ -26,7 +26,19 @@
     },
     {
       "relativePath": "definitions/hub-receiving-storage.v1.json",
-      "sha256": "50a94f49af796ccf082c6e00b778e01815e04efab39f79bf1d29fdc8fc6a67cb"
+      "sha256": "c411d90c441d8792418c37a2a31757b73c21a0c39ea7e6335922a31070ea2ece"
+    },
+    {
+      "relativePath": "definitions/hub-outbound-staging.v1.json",
+      "sha256": "18851bcfb0305915af3121ce2327acb8c1a945555f43df5a6ba3d7c16e605cd5"
+    },
+    {
+      "relativePath": "definitions/nature-survival-home.v1.json",
+      "sha256": "a46001236fa509301e45539752eb10aacdb6495684aacca4db3119715ea6731f"
+    },
+    {
+      "relativePath": "definitions/nature-survival-encounter.v1.json",
+      "sha256": "972ee28c5ae8a6fb976fad27b296b779b8d96469a75048d6e1b4e71e31297aaf"
     }
   ],
   "presentationOnly": true

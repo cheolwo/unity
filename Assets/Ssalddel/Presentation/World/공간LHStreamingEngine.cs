@@ -35,6 +35,8 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private Transform floatingOriginRoot = null!;
         [SerializeField] private Text statusLabel = null!;
         [SerializeField] private 공간문법CompositionCatalog compositionCatalog = null!;
+        [SerializeField] private World공간표현조립Coordinator
+            worldPresentationCoordinator = null!;
         [SerializeField] private SimulationWorldShellPresenter authorityShell = null!;
         [SerializeField] private Vector3 originWorldPosition;
         [SerializeField] private float l3CellWorldSize = 공간LHWorldCodes.L3CellSizeMeters;
@@ -91,6 +93,27 @@ namespace Ssalddel.Unity.Presentation.World
         {
             get { lock (assemblyLock) return mainThreadAssembly.Count; }
         }
+        public World공간표현조립Coordinator WorldPresentationCoordinator
+            => worldPresentationCoordinator;
+
+        public string WorldAssetAssemblyStatus(string cellKey)
+        {
+            if (!cells.TryGetValue(cellKey ?? string.Empty, out var cell)
+                || cell.Plan == null) return "CellMissing";
+            var assembly = cell.Plan.WorldAssetAssembly;
+            if (assembly == null) return "AssemblyMissing:" +
+                                         cell.Plan.WindowRoleCode;
+            return string.Join(":", new[]
+            {
+                assembly.IsAvailable ? "Available" : "Unavailable",
+                cell.Plan.WindowRoleCode,
+                (assembly.ExteriorPlacement?.Placements?.Length ?? 0)
+                    .ToString(),
+                (assembly.InteriorPlacement?.InteriorPlanBodies?.Length ?? 0)
+                    .ToString(),
+                assembly.SourceWorldRevision.ToString(),
+            });
+        }
 
         public void Configure(
             Transform player,
@@ -107,6 +130,7 @@ namespace Ssalddel.Unity.Presentation.World
             statusLabel = stateLabel;
             compositionCatalog = catalog;
             originWorldPosition = worldOrigin;
+            NormalizeOriginSurfaceHeight();
             l3CellWorldSize = Mathf.Max(1f, cellWorldSize);
             sessionStableId = sessionId ?? string.Empty;
             expectedWorldRevision = worldRevision;
@@ -137,10 +161,18 @@ namespace Ssalddel.Unity.Presentation.World
             repository = worldRepository ?? throw new ArgumentNullException(nameof(worldRepository));
             if (focusTarget == null || generatedCellRoot == null)
                 throw new InvalidOperationException("LHWorldStreamingWiringMissing");
+            EnsureWorldPresentationCoordinator();
+            NormalizeOriginSurfaceHeight();
             lifetime?.Cancel();
             lifetime?.Dispose();
             lifetime = new CancellationTokenSource();
             await RequestWindowAsync(true, lifetime.Token);
+        }
+
+        private void NormalizeOriginSurfaceHeight()
+        {
+            if (generatedCellRoot == null) return;
+            originWorldPosition.y = generatedCellRoot.position.y;
         }
 
         private void Update()
@@ -165,6 +197,22 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void DrainAssemblyForTests() => DrainAssemblyBudget(double.MaxValue);
 
+        /// <summary>
+        /// 같은 Session의 WI가 권위 개정 번호를 바꿨을 때 이동을 기다리지 않고
+        /// 현재 창의 파생 배치 계획을 다시 요청한다.
+        /// </summary>
+        public void NotifyAuthorityRevision(long worldRevision)
+        {
+            if (worldRevision < 0 || worldRevision == expectedWorldRevision)
+                return;
+            expectedWorldRevision = worldRevision;
+            requestedFocusCellKey = string.Empty;
+            if (repository != null && lifetime != null
+                && Volatile.Read(ref requestsInFlight) <
+                (profile?.MaxConcurrentPreparations ?? 4))
+                _ = RequestWindowAsync(false, lifetime.Token);
+        }
+
         public bool IsCapabilityReady(string cellKey, string capabilityCode)
             => cells.TryGetValue(cellKey, out var cell)
                && cell.ReadyCapabilities.Contains(capabilityCode);
@@ -179,6 +227,18 @@ namespace Ssalddel.Unity.Presentation.World
             => 공간LHCellKey.FromWorldPosition(
                 worldPosition.x, worldPosition.z,
                 originWorldPosition.x, originWorldPosition.z);
+
+        public Vector3 CellOriginWorldPosition(string cellKey)
+        {
+            if (!공간LHCellKey.TryParseL3(cellKey, out var cellX,
+                    out var cellY))
+                throw new ArgumentException("LHWorldCellKeyInvalid",
+                    nameof(cellKey));
+            return originWorldPosition + new Vector3(
+                (cellX - 공간LHWorldCodes.CenterL3X) * l3CellWorldSize,
+                0f,
+                (cellY - 공간LHWorldCodes.CenterL3Y) * l3CellWorldSize);
+        }
 
         public void RegisterNpcRouteInterest(string npcStableId, Vector3 worldPosition)
         {
@@ -505,7 +565,12 @@ namespace Ssalddel.Unity.Presentation.World
                 cell.ReadyCapabilities.Add(공간LHWorldCodes.Collision);
                 cell.ReadyCapabilities.Add(공간LHWorldCodes.Connector);
             }
-            EnsurePlacements(cell, plan.WindowRoleCode == 공간LHWorldCodes.Detail);
+            if (!worldPresentationCoordinator.ApplyPreparedCell(
+                    plan, cell.Root.transform, cell.Floor))
+            {
+                cell.Root.SetActive(false);
+                return;
+            }
             cell.State = 공간LHCellPreparationState.VisualPrepared;
 
             if (plan.HBindings.Any(value => value.HLevelCode == "H1"))
@@ -523,6 +588,18 @@ namespace Ssalddel.Unity.Presentation.World
                 cell.State = 공간LHCellPreparationState.PlayerTraversalReady;
             cell.State = 공간LHCellPreparationState.Active;
             cell.Root.SetActive(plan.WindowRoleCode != 공간LHWorldCodes.Prefetch);
+            worldPresentationCoordinator.ActivateCell(plan.CellKey);
+        }
+
+        private void EnsureWorldPresentationCoordinator()
+        {
+            if (worldPresentationCoordinator == null)
+                worldPresentationCoordinator =
+                    GetComponent<World공간표현조립Coordinator>();
+            if (worldPresentationCoordinator == null)
+                worldPresentationCoordinator =
+                    gameObject.AddComponent<World공간표현조립Coordinator>();
+            worldPresentationCoordinator.Configure(compositionCatalog);
         }
 
         private CellRuntime AcquireCell(string cellKey)
@@ -559,45 +636,85 @@ namespace Ssalddel.Unity.Presentation.World
                 if (cell.Floor != null) cell.Floor.SetActive(false);
                 return;
             }
+            var surface = cell.Plan.Surface;
+            var useGeneratedMesh = surface != null && surface.HasGeneratedGrid
+                                   && surface.SurfaceModeCode != "Flat";
+            var requiredMode = useGeneratedMesh ? surface.SurfaceModeCode : "Flat";
+            if (cell.Floor != null && cell.FloorSurfaceModeCode != requiredMode)
+            {
+                Destroy(cell.Floor);
+                cell.Floor = null;
+            }
             if (cell.Floor == null)
             {
+                if (useGeneratedMesh)
+                {
+                    cell.Floor = new GameObject("PlayerTraversalFloor");
+                    cell.Floor.transform.SetParent(cell.Root.transform, false);
+                    var mesh = BuildSurfaceMesh(surface);
+                    cell.Floor.AddComponent<MeshFilter>().sharedMesh = mesh;
+                    cell.Floor.AddComponent<MeshRenderer>().sharedMaterial =
+                        SharedSeasonMaterial();
+                    cell.Floor.AddComponent<MeshCollider>().sharedMesh = mesh;
+                }
+                else
+                {
                 cell.Floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cell.Floor.name = "PlayerTraversalFloor";
                 cell.Floor.transform.SetParent(cell.Root.transform, false);
                 var renderer = cell.Floor.GetComponent<Renderer>();
                 renderer.sharedMaterial = SharedSeasonMaterial();
+                }
+                cell.FloorSurfaceModeCode = requiredMode;
             }
             cell.Floor.SetActive(true);
-            cell.Floor.transform.localPosition = new Vector3(0f, -.15f, 0f);
-            cell.Floor.transform.localScale = new Vector3(l3CellWorldSize, .2f, l3CellWorldSize);
+            if (useGeneratedMesh)
+            {
+                cell.Floor.transform.localPosition = Vector3.zero;
+                cell.Floor.transform.localScale = Vector3.one;
+            }
+            else
+            {
+                cell.Floor.transform.localPosition = new Vector3(0f, -.15f, 0f);
+                cell.Floor.transform.localScale = new Vector3(
+                    l3CellWorldSize, .2f, l3CellWorldSize);
+            }
         }
 
-        private void EnsurePlacements(CellRuntime cell, bool shouldExist)
+        private static Mesh BuildSurfaceMesh(공간LHSurfaceGridData surface)
         {
-            foreach (var placement in cell.PlacementObjects)
-                if (placement != null) Destroy(placement);
-            cell.PlacementObjects.Clear();
-            if (!shouldExist || compositionCatalog == null) return;
-            foreach (var placement in cell.Plan.Placements)
+            surface.Validate();
+            var resolution = surface.SampleResolution;
+            var vertices = new Vector3[resolution * resolution];
+            var triangles = new int[(resolution - 1) * (resolution - 1) * 6];
+            var half = (float)(surface.CellSizeMeters * .5d);
+            var step = (float)(surface.CellSizeMeters / (resolution - 1d));
+            for (var z = 0; z < resolution; z++)
+            for (var x = 0; x < resolution; x++)
             {
-                try
-                {
-                    var entry = compositionCatalog.Resolve(placement.CompositionKey);
-                    if (entry.Prefab == null) continue;
-                    var instance = Instantiate(entry.Prefab, cell.Root.transform);
-                    instance.name = "LHPlacement_" + placement.GeneratedStableId;
-                    instance.transform.localPosition = new Vector3(
-                        (float)placement.LocalXMeters, 0f, (float)placement.LocalZMeters);
-                    instance.transform.localRotation = Quaternion.Euler(
-                        0f, (float)placement.RotationDegrees, 0f);
-                    instance.transform.localScale = Vector3.one * (float)placement.UniformScale;
-                    cell.PlacementObjects.Add(instance);
-                }
-                catch (InvalidOperationException)
-                {
-                    // 누락된 로컬 시각 에셋은 권위 데이터와 충돌 준비를 막지 않는다.
-                }
+                var index = z * resolution + x;
+                vertices[index] = new Vector3(-half + x * step,
+                    (float)surface.HeightMeters[index], -half + z * step);
             }
+            var triangleIndex = 0;
+            for (var z = 0; z < resolution - 1; z++)
+            for (var x = 0; x < resolution - 1; x++)
+            {
+                var lowerLeft = z * resolution + x;
+                var upperLeft = (z + 1) * resolution + x;
+                triangles[triangleIndex++] = lowerLeft;
+                triangles[triangleIndex++] = upperLeft;
+                triangles[triangleIndex++] = lowerLeft + 1;
+                triangles[triangleIndex++] = lowerLeft + 1;
+                triangles[triangleIndex++] = upperLeft;
+                triangles[triangleIndex++] = upperLeft + 1;
+            }
+            var mesh = new Mesh { name = "LH_DynamicSurface_" + surface.SurfaceModeCode };
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
         }
 
         private void CacheOutsideWindow(HashSet<string> activeKeys, string epoch)
@@ -606,6 +723,7 @@ namespace Ssalddel.Unity.Presentation.World
             foreach (var pair in cells.Where(value => !activeKeys.Contains(value.Key)).ToArray())
             {
                 pair.Value.State = 공간LHCellPreparationState.Cached;
+                worldPresentationCoordinator.CacheCell(pair.Key);
                 pair.Value.Root.SetActive(false);
             }
             var capacity = profile?.CachedCellCapacity ?? 32;
@@ -618,9 +736,7 @@ namespace Ssalddel.Unity.Presentation.World
         private void ReleaseCell(CellRuntime cell)
         {
             cells.Remove(cell.CellKey);
-            foreach (var placement in cell.PlacementObjects)
-                if (placement != null) Destroy(placement);
-            cell.PlacementObjects.Clear();
+            worldPresentationCoordinator.ReleaseCell(cell.CellKey);
             cell.Plan = null!;
             cell.ReadyCapabilities.Clear();
             cell.State = 공간LHCellPreparationState.Released;
@@ -702,10 +818,10 @@ namespace Ssalddel.Unity.Presentation.World
             public string CellKey;
             public readonly GameObject Root;
             public GameObject Floor;
+            public string FloorSurfaceModeCode = string.Empty;
             public 공간LHCellPlanData Plan = null!;
             public 공간LHCellPreparationState State;
             public readonly HashSet<string> ReadyCapabilities = new(StringComparer.Ordinal);
-            public readonly List<GameObject> PlacementObjects = new();
             public long LastTouchedSequence;
 
             public CellRuntime(string key, GameObject root)

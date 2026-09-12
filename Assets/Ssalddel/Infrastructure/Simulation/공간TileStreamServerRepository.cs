@@ -7,6 +7,27 @@ using Ssalddel.Unity.Runtime.World;
 
 namespace Ssalddel.Unity.Infrastructure.Simulation
 {
+    /// <summary>
+    /// 실제 HTTP 공간 요청이 발생했는지 런타임·시험 증거에서 판독하기 위한
+    /// 과정 진단 계기입니다. Simulation 상태나 WorldRevision은 변경하지 않습니다.
+    /// </summary>
+    public static class 공간TileStreamRemoteRequestDiagnostics
+    {
+        private static int requestCount;
+
+        public static int RequestCount => Volatile.Read(ref requestCount);
+
+        public static void ResetForTests()
+            => Interlocked.Exchange(ref requestCount, 0);
+
+        internal static void RecordRequest()
+            => Interlocked.Increment(ref requestCount);
+    }
+
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 공간TileStreamServerRepository : I공간TileStreamRepository,
         I공간TileLandscapeCompositionRepository,
         I공간AreaSetLandscapeGraphRepository,
@@ -157,6 +178,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             descriptor.Validate();
             if (descriptor.StatusCode != 공간TileStreamingCodes.Available)
                 throw new InvalidOperationException("WorldTileStreamArtifactNotFound");
+            공간TileStreamRemoteRequestDiagnostics.RecordRequest();
             var response = await apiClient.SendAsync(new UnityApiRequest
             {
                 Method = "GET",
@@ -187,6 +209,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             CancellationToken cancellationToken)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
+            공간TileStreamRemoteRequestDiagnostics.RecordRequest();
             var response = await apiClient.SendAsync(new UnityApiRequest
             {
                 Method = "POST",
@@ -206,6 +229,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
 
         private async Task<T> GetAsync<T>(string suffix, CancellationToken cancellationToken)
         {
+            공간TileStreamRemoteRequestDiagnostics.RecordRequest();
             var response = await apiClient.SendAsync(new UnityApiRequest
             {
                 Method = "GET",

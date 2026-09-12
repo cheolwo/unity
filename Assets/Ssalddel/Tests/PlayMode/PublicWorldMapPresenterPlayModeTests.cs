@@ -23,6 +23,10 @@ using UnityEngine.InputSystem.LowLevel;
 
 namespace Ssalddel.Unity.Tests.PlayMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class PublicWorldMapPresenterPlayModeTests
     {
         [UnityTest]
@@ -155,6 +159,10 @@ namespace Ssalddel.Unity.Tests.PlayMode
         };
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class 전략카메라PlayModeTests
     {
         [UnityTest]
@@ -238,6 +246,10 @@ namespace Ssalddel.Unity.Tests.PlayMode
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 플레이어경관PlayModeTests
     {
         [UnityTest]
