@@ -27,6 +27,7 @@ namespace Ssalddel.Unity.Editor
     {
         public const string ScenePath = 통합WorldScenePolicy.CanonicalScenePath;
         public const string RootName = "SimulationWorldShell";
+        public const string OperationalWorldRootName = "OperationalOsWorldRoot";
         public const string EnvironmentCatalogPath =
             "Assets/Ssalddel/Experiments - 연구/CityFarmWorld/Catalogs/FarmCityEnvironmentCatalog.asset";
         public const string ExhibitionObjectCatalogPath =
@@ -81,6 +82,7 @@ namespace Ssalddel.Unity.Editor
             root.AddComponent<월드시간대Presenter>()
                 .Configure(light, rig.GetComponent<Camera>(), root.transform, 15f / 24f, false, 180f);
             BuildSkyEngineVisualRoot(root.transform);
+            BuildOperationalWorldObservationRoot(root.transform);
             var ui = BuildHud(persistentUi, rig.GetComponent<Camera>());
 
             var presenter = shellRuntimeRoot.AddComponent<SimulationWorldShellPresenter>();
@@ -806,6 +808,10 @@ namespace Ssalddel.Unity.Editor
             Required(root.transform, "CameraSystem");
             Required(root.transform, "Lighting");
             Required(root.transform, "PersistentUI");
+            var operationalRoot = Required(root.transform, OperationalWorldRootName);
+            if (operationalRoot.GetComponent<운영관찰WorldView>() == null
+                || operationalRoot.GetComponent<운영관찰WorldController>() == null)
+                throw new InvalidOperationException("OperationalWorldObservationWiringMissing");
 
             foreach (var child in new[]
                      {
@@ -834,6 +840,33 @@ namespace Ssalddel.Unity.Editor
                     component.GetType().Name.Contains("Command", StringComparison.Ordinal)
                     || component.GetType().Name.Contains("Operational", StringComparison.Ordinal)))
                 throw new InvalidOperationException("SimulationWorldShellAuthorityLeak");
+        }
+
+        [MenuItem("Ssalddel/통합 월드/운영 관찰/Build Read Only Root")]
+        public static void BuildOperationalWorldObservation()
+        {
+            OpenShellIfRequired();
+            var shellRoot = Required(RootName).transform;
+            BuildOperationalWorldObservationRoot(shellRoot);
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException("OperationalWorldObservationSceneSaveFailed");
+            ValidateOperationalWorldObservationOpenScene();
+            Selection.activeGameObject = Required(shellRoot, OperationalWorldRootName).gameObject;
+            Debug.Log("OPERATIONAL-WORLD-OBSERVATION: 읽기 전용 관찰 루트를 공식 Scene에 연결했습니다.");
+        }
+
+        [MenuItem("Ssalddel/통합 월드/운영 관찰/Validate Open Scene")]
+        public static void ValidateOperationalWorldObservationOpenScene()
+        {
+            OpenShellIfRequired();
+            var shellRoot = Required(RootName).transform;
+            var operationalRoot = Required(shellRoot, OperationalWorldRootName);
+            var view = operationalRoot.GetComponent<운영관찰WorldView>();
+            var controller = operationalRoot.GetComponent<운영관찰WorldController>();
+            if (view == null || controller == null || controller.ObjectCount != view.ObjectCount)
+                throw new InvalidOperationException("OperationalWorldObservationWiringMissing");
         }
 
         [MenuItem("Ssalddel/통합 월드/정착지/기본/Validate Open Scene")]
@@ -2308,6 +2341,22 @@ namespace Ssalddel.Unity.Editor
                 .AddComponent<AudioSource>();
             thunderAudio.playOnAwake = false;
             thunderAudio.spatialBlend = 0f;
+        }
+
+        private static void BuildOperationalWorldObservationRoot(Transform shellRoot)
+        {
+            var root = shellRoot.Find(OperationalWorldRootName)
+                       ?? Child(shellRoot, OperationalWorldRootName);
+            root.localPosition = Vector3.zero;
+            root.localRotation = Quaternion.identity;
+            root.localScale = Vector3.one;
+            var view = root.GetComponent<운영관찰WorldView>()
+                       ?? root.gameObject.AddComponent<운영관찰WorldView>();
+            var controller = root.GetComponent<운영관찰WorldController>()
+                             ?? root.gameObject.AddComponent<운영관찰WorldController>();
+            controller.Configure(view);
+            EditorUtility.SetDirty(view);
+            EditorUtility.SetDirty(controller);
         }
 
         private static GameObject SeedbedObjectPlacement(
