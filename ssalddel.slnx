@@ -28,12 +28,14 @@
   <Project Path="Ssalddel.WorkflowRules.Contracts.csproj" />
   <Project Path="Ssalddel.Unity.UrbanLogisticsCenter.Sample.EditorTests.csproj" />
   <Project Path="Ssalddel.Unity.NpcMovement.Sample.csproj" />
+  <Project Path="Ssalddel.Unity.OperationalTransport.csproj" />
   <Project Path="Ssalddel.Unity.UrbanMarket.Sample.Editor.csproj" />
   <Project Path="Ssalddel.Unity.Farm.Sample.EditorTests.csproj" />
   <Project Path="Ssalddel.Unity.VisitorAnimation.EditorTests.csproj" />
   <Project Path="Ssalddel.Unity.SyntyCityPackIntegration.Editor.csproj" />
   <Project Path="Ssalddel.Unity.UrbanLogisticsCenter.Sample.Editor.csproj" />
   <Project Path="Ssalddel.Unity.UrbanMarket.Sample.EditorTests.csproj" />
+  <Project Path="Ssalddel.Simulation.BusinessWorkflow.csproj" />
   <Project Path="Ssalddel.BusinessWorkflow.csproj" />
   <Project Path="Ssalddel.LocalNpcDialogue.Tests.csproj" />
   <Project Path="Ssalddel.LocalNpcDialogue.Core.csproj" />

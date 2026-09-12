@@ -66,7 +66,8 @@
       "dependencies": {
         "com.ssalddel.code-metadata": "0.1.0",
         "com.ssalddel.interior.contracts": "0.1.0",
-        "com.ssalddel.simulation.contracts": "0.1.0"
+        "com.ssalddel.simulation.contracts": "0.1.0",
+        "com.ssalddel.workflow-rules.contracts": "0.1.0"
       }
     },
     "com.ssalddel.simulation.domain": {
@@ -85,7 +86,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.ssalddel.business-workflow": "0.1.0",
+        "com.ssalddel.simulation.business-workflow": "0.1.0",
         "com.ssalddel.code-metadata": "0.1.0",
         "com.ssalddel.simulation.contracts": "0.1.0",
         "com.ssalddel.simulation.domain": "0.1.0"

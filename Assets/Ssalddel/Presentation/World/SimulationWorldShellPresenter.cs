@@ -10,6 +10,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// Read-only shell for switching observation scale over one Simulation snapshot.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class SimulationWorldShellPresenter : MonoBehaviour
     {
         public const string WorldMapFocusAnchorId = "camera-focus:simulation-world-map";
@@ -32,6 +36,10 @@ namespace Ssalddel.Unity.Presentation.World
 
         private SimulationWorldShellStateMachine stateMachine = null!;
         private bool listenersBound;
+        private Farm표시범위Lease farmViewLease;
+        private 단일PlayerViewController farmViewPolicy;
+        private Transform[] farmAllowedRoots = Array.Empty<Transform>();
+        public bool HasFarmPresentation => farmViewLease?.IsAcquired == true;
 
         public event Action? PresentationChanged;
         public event Action<SimulationWorldShellSnapshot>? AuthoritativeSnapshotApplied;
@@ -50,7 +58,8 @@ namespace Ssalddel.Unity.Presentation.World
             ?? string.Empty;
         public string SelectedObjectStableId => stateMachine?.State.SelectedObjectStableId
             ?? string.Empty;
-        public string CurrentFocusAnchorId => cameraRig != null
+        public string CurrentFocusAnchorId => HasFarmPresentation
+            ? DistrictFocusAnchorPrefix + "district:farm" : cameraRig != null
             ? cameraRig.CurrentFocusAnchorId : string.Empty;
         public string SelectionSummary => selectionText != null ? selectionText.text : string.Empty;
 
@@ -58,6 +67,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnDestroy()
         {
+            ReleaseFarmPresentation();
             if (!listenersBound) return;
             worldMapButton.onClick.RemoveListener(ShowWorldMap);
             settlementButton.onClick.RemoveListener(ShowSettlement);
@@ -104,12 +114,14 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void ShowWorldMap()
         {
+            ReleaseFarmPresentation();
             stateMachine.ShowWorldMap();
             ApplyPresentation(WorldMapFocusAnchorId);
         }
 
         public void ShowSettlement()
         {
+            ReleaseFarmPresentation();
             stateMachine.ShowSettlement(SimulationWorldShellFixture.SettlementStableId);
             ApplyPresentation(SettlementFocusAnchorId);
         }
@@ -123,12 +135,62 @@ namespace Ssalddel.Unity.Presentation.World
             if (string.IsNullOrWhiteSpace(focusAnchorId))
                 throw new ArgumentException("SimulationWorldPresentationFocusMissing",
                     nameof(focusAnchorId));
+            ReleaseFarmPresentation();
             worldMapRoot.SetActive(true);
             settlementInteriorRoot.SetActive(false);
             cameraRig.Focus(focusAnchorId);
             cameraRig.ApplyNowForTests();
             PresentationChanged?.Invoke();
         }
+
+        public bool TryGetFarmPresentationFocus(out Vector3 focus)
+        {
+            focus = default;
+            return cameraRig != null && cameraRig.TryGetFocusPosition(
+                DistrictFocusAnchorPrefix + "district:farm", out focus);
+        }
+
+        public bool TryShowFarmPresentation(out string diagnostic)
+        {
+            diagnostic = "FarmViewTopologyChanged";
+            if (HasFarmPresentation)
+            {
+                if (!farmViewLease.ValidateTopology()) return false;
+                diagnostic = "FarmViewStaticPresentationAlreadyVisible";
+                return true;
+            }
+            farmViewPolicy = GetComponentInParent<단일PlayerViewController>(true);
+            if (farmViewPolicy == null || worldMapRoot == null || !worldMapRoot.activeSelf)
+            {
+                diagnostic = "FarmViewWorldOrPolicyUnavailable";
+                return false;
+            }
+            if (!Farm표시범위Lease.TryAcquire(settlementInteriorRoot?.transform,
+                    out farmViewLease, out diagnostic)) return false;
+            farmAllowedRoots = farmViewLease.AllowedRoots;
+            foreach (var root in farmAllowedRoots)
+            {
+                if (farmViewPolicy.TryRegisterRuntimeEnvironment(root, this, out diagnostic)) continue;
+                ReleaseFarmPresentation();
+                return false;
+            }
+            diagnostic = "FarmViewStaticPresentationVisible";
+            return true;
+        }
+
+        public void ReleaseFarmPresentation()
+        {
+            // 먼저 하위를 비활성 상위 아래로 돌린 뒤 자기 Renderer 허용만 반납한다.
+            farmViewLease?.Dispose();
+            farmViewLease = null;
+            foreach (var root in farmAllowedRoots)
+                if (farmViewPolicy != null)
+                    farmViewPolicy.UnregisterRuntimeEnvironment(root, this);
+            farmAllowedRoots = Array.Empty<Transform>();
+            farmViewPolicy = null;
+        }
+
+        private void OnDisable() => ReleaseFarmPresentation();
 
         public void NavigateTo(SimulationWorldNavigationTargetView target)
         {
@@ -229,8 +291,17 @@ namespace Ssalddel.Unity.Presentation.World
         {
             var worldMapVisible = stateMachine.State.ObservationScaleCode
                 == SimulationObservationScaleCodes.WorldMap;
-            worldMapRoot.SetActive(worldMapVisible);
-            settlementInteriorRoot.SetActive(!worldMapVisible);
+            if (HasFarmPresentation)
+            {
+                if (!farmViewLease.ValidateTopology())
+                    throw new InvalidOperationException("FarmViewTopologyChanged");
+                // 권위 조회의 관찰 단계와 Farm의 표시 임대는 서로 다른 상태다.
+            }
+            else
+            {
+                worldMapRoot.SetActive(worldMapVisible);
+                settlementInteriorRoot.SetActive(!worldMapVisible);
+            }
             cameraRig.Focus(focusAnchorId);
             cameraRig.ApplyNowForTests();
             ApplyTargetSelection();

@@ -51,6 +51,10 @@ namespace Ssalddel.Unity.Editor
             "scene-placement:simulation-world-shell.market.urban-market-shop.a";
         public const string GroupingCartTablePlacementStableId =
             "scene-placement:simulation-world-shell.town.grouping-cart-table.a";
+        public const string SkyEngineCloudPrefabPrefix =
+            "Assets/Synty/PolygonFarm/Prefabs/Generic/SM_Generic_Cloud_0";
+        public const string SkyEngineRainPrefabPath =
+            "Assets/Synty/PolygonFarm/Prefabs/FX/FX_Rain.prefab";
 
         private const float TacticalNavigationFloorThickness = .12f;
 
@@ -76,6 +80,7 @@ namespace Ssalddel.Unity.Editor
             var light = BuildLighting(lightingRoot);
             root.AddComponent<월드시간대Presenter>()
                 .Configure(light, rig.GetComponent<Camera>(), root.transform, 15f / 24f, false, 180f);
+            BuildSkyEngineVisualRoot(root.transform);
             var ui = BuildHud(persistentUi, rig.GetComponent<Camera>());
 
             var presenter = shellRuntimeRoot.AddComponent<SimulationWorldShellPresenter>();
@@ -113,6 +118,44 @@ namespace Ssalddel.Unity.Editor
             Selection.activeGameObject = root;
             SceneView.RepaintAll();
             Debug.Log("WORLD-SHELL-0 built: " + ScenePath);
+        }
+
+        [MenuItem("Ssalddel/통합 월드/Sky Engine/Build Synty Visuals")]
+        public static void BuildSkyEngineVisuals()
+        {
+            OpenShellIfRequired();
+            var shellRoot = Required(RootName).transform;
+            BuildSkyEngineVisualRoot(shellRoot);
+            ConfigureTimeOfDay(shellRoot);
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+                throw new InvalidOperationException("SkyEngineSceneSaveFailed");
+            AssetDatabase.SaveAssets();
+            ValidateSkyEngineOpenScene();
+            Selection.activeGameObject = Required(shellRoot, "SkyEngineVisualRoot")
+                .gameObject;
+            SceneView.RepaintAll();
+            Debug.Log("SKY-ENGINE-0 built: " + ScenePath);
+        }
+
+        [MenuItem("Ssalddel/통합 월드/Sky Engine/Validate Open Scene")]
+        public static void ValidateSkyEngineOpenScene()
+        {
+            var shellRoot = Required(RootName).transform;
+            var visualRoot = Required(shellRoot, "SkyEngineVisualRoot");
+            var clouds = Required(visualRoot, "Clouds");
+            var rain = Required(visualRoot, "Rain");
+            if (clouds.childCount != 5)
+                throw new InvalidOperationException("SkyEngineCloudCountInvalid");
+            if (rain.GetComponentsInChildren<ParticleSystem>(true).Length == 0)
+                throw new InvalidOperationException("SkyEngineRainParticleMissing");
+            if (Required(visualRoot, "LightningFlash").GetComponent<Light>() == null)
+                throw new InvalidOperationException("SkyEngineLightningMissing");
+            if (Required(visualRoot, "RainAudio").GetComponent<AudioSource>() == null
+                || Required(visualRoot, "ThunderAudio").GetComponent<AudioSource>()
+                    == null)
+                throw new InvalidOperationException("SkyEngineAudioMissing");
         }
 
         [MenuItem("Ssalddel/통합 월드/정착지/기본/Build First Settlement")]
@@ -2197,6 +2240,74 @@ namespace Ssalddel.Unity.Editor
                 ?? shellRoot.gameObject.AddComponent<월드시간대Presenter>();
             presenter.Configure(light, camera, shellRoot, 15f / 24f, false, 180f);
             EditorUtility.SetDirty(presenter);
+        }
+
+        private static void BuildSkyEngineVisualRoot(Transform shellRoot)
+        {
+            var previous = shellRoot.Find("SkyEngineVisualRoot");
+            if (previous != null)
+                UnityEngine.Object.DestroyImmediate(previous.gameObject);
+
+            var visualRoot = Child(shellRoot, "SkyEngineVisualRoot");
+            var clouds = Child(visualRoot, "Clouds");
+            clouds.localPosition = new Vector3(0f, 38f, 0f);
+            var positions = new[]
+            {
+                new Vector3(-28f, 0f, -12f),
+                new Vector3(-12f, 2f, 17f),
+                new Vector3(6f, -1f, -20f),
+                new Vector3(22f, 3f, 9f),
+                new Vector3(34f, 0f, -5f),
+            };
+            for (var index = 1; index <= 5; index++)
+            {
+                var path = SkyEngineCloudPrefabPrefix + index + ".prefab";
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path)
+                    ?? throw new InvalidOperationException(
+                        "SkyEngineCloudPrefabMissing:" + path);
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(
+                    prefab, clouds);
+                instance.name = "SyntyCloud_" + index.ToString("00");
+                instance.transform.localPosition = positions[index - 1];
+                instance.transform.localRotation = Quaternion.Euler(
+                    0f, index * 37f, 0f);
+                instance.transform.localScale = Vector3.one * (7f + index * .7f);
+                // 권위 기상 사본이 준비되기 전 정지 화면을 가리지 않는다. Play의 ApplyClouds가 활성 여부를 정한다.
+                instance.SetActive(false);
+            }
+
+            var rain = Child(visualRoot, "Rain");
+            rain.localPosition = Vector3.up * 8f;
+            var rainPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                    SkyEngineRainPrefabPath)
+                ?? throw new InvalidOperationException(
+                    "SkyEngineRainPrefabMissing:" + SkyEngineRainPrefabPath);
+            var rainInstance = (GameObject)PrefabUtility.InstantiatePrefab(
+                rainPrefab, rain);
+            rainInstance.name = "SyntyRain";
+            rainInstance.transform.localPosition = Vector3.zero;
+            rainInstance.transform.localRotation = Quaternion.identity;
+            rainInstance.transform.localScale = Vector3.one;
+            rain.gameObject.SetActive(false);
+
+            var lightning = Child(visualRoot, "LightningFlash");
+            var light = lightning.gameObject.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = new Color(.72f, .82f, 1f);
+            light.intensity = 7f;
+            light.range = 120f;
+            light.shadows = LightShadows.None;
+            light.enabled = false;
+
+            var rainAudio = Child(visualRoot, "RainAudio").gameObject
+                .AddComponent<AudioSource>();
+            rainAudio.playOnAwake = false;
+            rainAudio.loop = true;
+            rainAudio.spatialBlend = 0f;
+            var thunderAudio = Child(visualRoot, "ThunderAudio").gameObject
+                .AddComponent<AudioSource>();
+            thunderAudio.playOnAwake = false;
+            thunderAudio.spatialBlend = 0f;
         }
 
         private static GameObject SeedbedObjectPlacement(
