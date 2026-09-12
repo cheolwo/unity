@@ -18,6 +18,10 @@ namespace Ssalddel.Unity.Bootstrap
     /// </summary>
     [DefaultExecutionOrder(-845)]
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 현장전투CompositionRoot : MonoBehaviour
     {
         [SerializeField] private UnityClientRuntimeSettings runtimeSettings = null!;
@@ -40,6 +44,8 @@ namespace Ssalddel.Unity.Bootstrap
         private string lastResolvedBattleStableId = string.Empty;
 
         public event Action<string> WorldLocalBattleResolved = delegate { };
+        public event Action<string, string> WorldLocalBattleResultResolved
+            = delegate { };
         public event Action<string, string> WorldLocalBattleRequestFailed
             = delegate { };
 
@@ -91,18 +97,24 @@ namespace Ssalddel.Unity.Bootstrap
             if (combat == null) return;
             combat.CombatEntryRequested -= OnCombatEntryRequested;
             combat.LocalActionCommandPrepared -= OnLocalActionPrepared;
+            combat.ObserverInterventionCommandPrepared -=
+                OnObserverInterventionPrepared;
             combat.CombatEntryRequested += OnCombatEntryRequested;
             combat.LocalActionCommandPrepared += OnLocalActionPrepared;
+            combat.ObserverInterventionCommandPrepared +=
+                OnObserverInterventionPrepared;
         }
 
         private async void Start()
         {
+            if (SimulationWorldLocalRuntimeScope.RestaurantObserverRequested) return;
             if (!서버기준사용) return;
-            if (SimulationWorldLocalRuntimeScope.IsInstalled)
+            if (SimulationWorldLocalRuntimeScope.TryGet(out var localScope))
             {
-                서버기준사용 = false;
-                Debug.LogWarning(
-                    "LocalCombatSimulationCapabilityWaiting:network=0", this);
+                lifetime = new CancellationTokenSource();
+                sessionStableId = localScope.SessionStableId;
+                authority = new LocalSimulationUnifiedBattleAuthorityClient(
+                    localScope.Runtime);
                 return;
             }
             try
@@ -129,7 +141,7 @@ namespace Ssalddel.Unity.Bootstrap
                 || authority == null || commandInFlight)
                 return;
             var desiredControlMode = combat.DesiredLocalControlModeCode;
-            if (current.LocalCombat.ControlModeCode != desiredControlMode)
+            if (!current.LocalCombat.ParticipationModeLocked)
             {
                 commandInFlight = true;
                 try
@@ -141,12 +153,15 @@ namespace Ssalddel.Unity.Bootstrap
                             ExpectedBattleRevision = current.BattleRevision,
                             RequestingActorStableId = actorStableId,
                             ControlModeCode = desiredControlMode,
+                            ExpectedCardLoadoutHashSha256 = current.LocalCombat
+                                .FrozenCardLoadoutHashSha256,
                         }, lifetime?.Token ?? CancellationToken.None));
                 }
                 catch (Exception error) { combat.SetAuthorityFailure(error.Message); }
                 finally { commandInFlight = false; }
                 return;
             }
+            if (current.LocalCombat.ObserverOperation.TacticalPauseActive) return;
             tickAccumulator += Time.unscaledDeltaTime;
             // 서버 전투 틱은 100ms다. 한 번에 5틱을 넘기면 첫 틱의 공격 예고가
             // 같은 응답 안에서 해소되어 플레이어가 방어·회피할 기회를 잃는다.
@@ -173,7 +188,9 @@ namespace Ssalddel.Unity.Bootstrap
                 var preview = await authority.PreviewAsync(sessionStableId,
                     new BattleCreatePreviewCommandDraft
                     {
-                        ExpectedWorldRevision = shell.WorldRevision,
+                        ExpectedWorldRevision = combat.RequestedEncounterWorldRevision >= 0
+                            ? combat.RequestedEncounterWorldRevision
+                            : shell.WorldRevision,
                         EncounterStableId = encounterStableId,
                         RequestingActorStableId = actorStableId,
                     }, lifetime?.Token ?? CancellationToken.None);
@@ -219,6 +236,21 @@ namespace Ssalddel.Unity.Bootstrap
             finally { commandInFlight = false; }
         }
 
+        private async void OnObserverInterventionPrepared(
+            LocalCombatObserverInterventionCommandDraft request)
+        {
+            if (authority == null || current == null || commandInFlight) return;
+            commandInFlight = true;
+            try
+            {
+                Apply(await authority.ConfirmObserverInterventionAsync(sessionStableId,
+                    current.BattleStableId, request,
+                    lifetime?.Token ?? CancellationToken.None));
+            }
+            catch (Exception error) { combat.SetAuthorityFailure(error.Message); }
+            finally { commandInFlight = false; }
+        }
+
         private void Apply(BattleInstanceApiModel value)
         {
             current = value ?? throw new InvalidOperationException("BattleStateMissing");
@@ -233,6 +265,8 @@ namespace Ssalddel.Unity.Bootstrap
                     {
                         lastResolvedBattleStableId = current.BattleStableId;
                         WorldLocalBattleResolved(current.EncounterStableId);
+                        WorldLocalBattleResultResolved(current.EncounterStableId,
+                            current.Outcome?.ResultCode ?? string.Empty);
                     }
                     return;
                 }
@@ -278,6 +312,8 @@ namespace Ssalddel.Unity.Bootstrap
             {
                 combat.CombatEntryRequested -= OnCombatEntryRequested;
                 combat.LocalActionCommandPrepared -= OnLocalActionPrepared;
+                combat.ObserverInterventionCommandPrepared -=
+                    OnObserverInterventionPrepared;
             }
             lifetime?.Cancel();
             lifetime?.Dispose();

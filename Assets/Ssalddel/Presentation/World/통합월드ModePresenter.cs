@@ -35,6 +35,8 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private bool startInTacticalMode;
 
         private bool listenersBound;
+        private bool 업무서버관찰잠금;
+        public string FarmViewDiagnostic { get; private set; } = string.Empty;
 
         public string CurrentModeCode { get; private set; } = 통합월드ModeCodes.WorldOverview;
         public bool StartsInTacticalMode => startInTacticalMode;
@@ -76,8 +78,18 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void SetStartInTacticalMode(bool enabled) => startInTacticalMode = enabled;
 
+        /// <summary>업무 서버 관찰에서는 다른 플레이 화면·입력으로 전환하지 않는다. Scene 저장에는 적용하지 않는다.</summary>
+        public void 업무서버관찰전용으로잠금()
+        {
+            업무서버관찰잠금 = true;
+            foreach (var button in new[] { worldButton, natureButton, firstPersonButton, tacticalButton, inboundButton })
+                if (button != null) button.interactable = false;
+            if (worldButton != null) worldButton.transform.parent.gameObject.SetActive(false);
+        }
+
         private void OnDestroy()
         {
+            shell?.ReleaseFarmPresentation();
             if (!listenersBound) return;
             worldButton.onClick.RemoveListener(ShowWorldOverview);
             natureButton.onClick.RemoveListener(ShowNatureExploration);
@@ -88,6 +100,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void ShowWorldOverview()
         {
+            if (업무서버관찰잠금) return;
             player.ExitPlayerMode();
             inboundUi.SetContextVisible(false);
             shell.ShowWorldMap();
@@ -96,6 +109,9 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void ShowFarmFirstPerson()
         {
+            if (업무서버관찰잠금) return;
+            shell.ReleaseFarmPresentation();
+            player.FarmManagement?.SetGuidanceVisible(false);
             inboundUi.SetContextVisible(false);
             shell.FocusWorldPresentation(
                 SimulationWorldShellPresenter.DistrictFocusAnchorPrefix + "district:farm");
@@ -105,6 +121,9 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void ShowNatureExploration()
         {
+            if (업무서버관찰잠금) return;
+            shell.ReleaseFarmPresentation();
+            player.FarmManagement?.SetGuidanceVisible(false);
             inboundUi.SetContextVisible(false);
             player.EnterExplorationFirstPersonMode();
             var nature = FindFirstObjectByType<Nature생존Controller>(
@@ -115,17 +134,50 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void ShowFarmTactical()
         {
-            inboundUi.SetContextVisible(false);
-            shell.FocusWorldPresentation(
-                SimulationWorldShellPresenter.DistrictFocusAnchorPrefix + "district:farm");
-            player.EnterFarmManagementMode();
-            SetMode(통합월드ModeCodes.FarmTactical);
+            if (업무서버관찰잠금) return;
+            if (!shell.TryGetFarmPresentationFocus(out var focus))
+            {
+                FarmViewDiagnostic = "FarmFocusAnchorMissing";
+                return;
+            }
+            if (!player.CanFocusTacticalCameraAt(focus, out var diagnostic))
+            {
+                FarmViewDiagnostic = diagnostic;
+                return;
+            }
+            if (!shell.TryShowFarmPresentation(out diagnostic))
+            {
+                FarmViewDiagnostic = diagnostic;
+                return;
+            }
+            try
+            {
+                if (!player.TryEnterFarmManagementModeAt(focus, out diagnostic))
+                {
+                    shell.ReleaseFarmPresentation();
+                    FarmViewDiagnostic = diagnostic;
+                    return;
+                }
+                inboundUi.SetContextVisible(false);
+                player.FarmManagement?.SetGuidanceVisible(true);
+                FarmViewDiagnostic = "FarmStaticReview_ExecutionNotConnected";
+                SetMode(통합월드ModeCodes.FarmTactical);
+            }
+            catch (Exception error)
+            {
+                shell.ReleaseFarmPresentation();
+                FarmViewDiagnostic = "FarmViewEntryFailed:" + error.GetType().Name;
+                Debug.LogException(error);
+            }
         }
+
+        private void OnDisable() => shell?.ReleaseFarmPresentation();
 
         public void ShowFarmDefault() => ShowFarmTactical();
 
         public void ShowJinbuInbound()
         {
+            if (업무서버관찰잠금) return;
             player.ExitPlayerMode();
             shell.FocusWorldPresentation(
                 SimulationWorldShellPresenter.DistrictFocusAnchorPrefix + "district:logistics");

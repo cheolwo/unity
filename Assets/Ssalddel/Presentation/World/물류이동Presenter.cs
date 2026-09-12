@@ -10,8 +10,13 @@ using UnityEngine.UI;
 namespace Ssalddel.Unity.Presentation.World
 {
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 물류이동Presenter : MonoBehaviour
     {
+        public const string FreightObservationBoundaryLabel = "가상 화물 NPC 관찰 · 실제 화물 운송 없음";
         [SerializeField] private SimulationWorldShellPresenter shellPresenter = null!;
         [SerializeField] private GameObject cardRoot = null!;
         [SerializeField] private Text cargoText = null!;
@@ -208,7 +213,7 @@ namespace Ssalddel.Unity.Presentation.World
             if (coordinator.PhaseCode == 물류이동PhaseCodes.Failed)
                 return "차단: " + coordinator.ErrorCode;
             if (coordinator.CurrentPreview == null)
-                return "농장 포장장 → 지역 물류 거점\n"
+                return FreightObservationBoundaryLabel + "\n농장 포장장 → 지역 물류 거점\n"
                     + Number(snapshot.Quantity) + UnitLabel(snapshot.UnitCode)
                     + " 감자를 실을 가상 기사를 비교합니다.\n"
                     + "미리보기는 재고·배차·차량을 변경하지 않습니다.";
@@ -217,7 +222,7 @@ namespace Ssalddel.Unity.Presentation.World
             if (coordinator.PhaseCode == 물류이동PhaseCodes.PreviewReady)
             {
                 var builder = new StringBuilder();
-                builder.Append("배차 후보 ").Append(preview.CandidateEvaluations.Length)
+                builder.Append(FreightObservationBoundaryLabel).Append("\n배차 후보 ").Append(preview.CandidateEvaluations.Length)
                     .Append("명 · 규칙 ").Append(preview.DispatchRuleRevision);
                 foreach (var candidate in preview.CandidateEvaluations)
                 {
@@ -234,7 +239,8 @@ namespace Ssalddel.Unity.Presentation.World
                 return builder.ToString();
             }
 
-            return "배차  " + CandidateLabel(snapshot.CarrierCandidateStableId)
+            return FreightObservationBoundaryLabel
+                + "\n배차  " + CandidateLabel(snapshot.CarrierCandidateStableId)
                 + " · " + snapshot.VehicleStableId
                 + "\n상태  " + snapshot.DispatchStateCode
                 + "\n운송  " + snapshot.CompletedRouteTicks + " / " + snapshot.RequiredRouteTicks

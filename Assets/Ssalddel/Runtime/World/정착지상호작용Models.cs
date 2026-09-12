@@ -237,6 +237,10 @@ namespace Ssalddel.Unity.Runtime.World
             = Array.Empty<수확판로선택지PresentationModel>();
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 수확판로결과Projector
     {
         public 수확판로결과PresentationModel Project(수확판로결과Data source)
@@ -362,6 +366,10 @@ namespace Ssalddel.Unity.Runtime.World
             => value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public interface I정착지상호작용AuthorityClient
     {
         Task<정착지상호작용AuthoritySnapshot> RefreshAsync(
@@ -430,6 +438,10 @@ namespace Ssalddel.Unity.Runtime.World
         }
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 정착지상호작용Coordinator
     {
         private readonly I정착지상호작용AuthorityClient authority;
@@ -696,6 +708,10 @@ namespace Ssalddel.Unity.Runtime.World
     /// Visual proof test double. Production flow uses the HTTP authority client.
     /// It never represents operational sales, shipping or settlement.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 정착지상호작용FixtureAuthorityClient
         : I정착지상호작용AuthorityClient
     {

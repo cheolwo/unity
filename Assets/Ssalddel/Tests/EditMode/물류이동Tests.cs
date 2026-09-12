@@ -15,6 +15,10 @@ using UnityEngine.SceneManagement;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class 물류이동Tests
     {
         private const string ScenePath = "Assets/Ssalddel/Scenes/SimulationWorldShell.unity";
@@ -162,6 +166,14 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Does.Contain("\"SelectedCarrierCandidateStableId\":\"carrier-candidate:sim.waiting-truck\""));
             Assert.That(api.Requests[3].RelativePath, Does.EndWith("/ticks"));
             Assert.That(api.Requests[3].JsonBody, Does.Contain("\"TickCount\":1"));
+        }
+
+        [Test]
+        public void 화물표현은_가상Npc관찰이며_실제운송이아님을_명시한다()
+        {
+            Assert.That(
+                물류이동Presenter.FreightObservationBoundaryLabel,
+                Is.EqualTo("가상 화물 NPC 관찰 · 실제 화물 운송 없음"));
         }
 
         [Test]

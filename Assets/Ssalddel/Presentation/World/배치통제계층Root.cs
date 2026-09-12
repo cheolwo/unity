@@ -49,8 +49,8 @@ namespace Ssalddel.Unity.Presentation.World
     }
 
     /// <summary>
-    /// H1~H5의 의미 계층과 별개로, Player 실측 크기에서 시작해 H1 발자국이
-    /// H2 블록·H3 경관·AreaSet 외곽 안에 놓였는지를 통제하는 표현 전용 기록입니다.
+    /// H1~H5의 의미 계층과 별개로, 배치 구조·제약의 참조와 Player 기준 비율을
+    /// 선언하는 표현 전용 기록입니다. 실제 외곽 포함·지지·통행은 별도 검사입니다.
     /// 원본 Synty Transform의 부모를 바꾸지 않고 결정된 소속과 비율만 보존합니다.
     /// </summary>
     [DisallowMultipleComponent]
@@ -167,7 +167,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         /// <summary>
         /// v3의 상향식 성립과 하향식 제약을 보존한 채, 배치가 플레이어에게
-        /// 보이고 들리며 조작 가능한지를 검사하는 감각 표현축을 교차 결속합니다.
+        /// 보이고 들리며 조작 가능한지를 검증할 감각 표현 책임 선언을 결속합니다.
         /// 표현축은 H 단계가 아니고 Simulation 상태를 만들거나 완료하지 않습니다.
         /// </summary>
         public void ConfigureSensoryPresentationV4(Transform world,
@@ -193,6 +193,10 @@ namespace Ssalddel.Unity.Presentation.World
         public Player상대ScaleBandRecord FindBand(string code) =>
             scaleBands.Single(value => value.ScaleBandCode == code);
 
+        /// <summary>
+        /// 선언의 판본·참조·구성만 검사합니다. 계획 계산이나 실제 Renderer,
+        /// Collider, 지지면·통행 검증 및 Simulation의 H 성립 판정은 하지 않습니다.
+        /// </summary>
         public void Validate()
         {
             var levelCodes = levels.Select(value => value.LevelCode)
@@ -244,37 +248,9 @@ namespace Ssalddel.Unity.Presentation.World
                     || !levelCodes.Contains("SourcePrefab")
                     || !levelCodes.Contains("PlacementReceipt"))
                 || isComposition
-                && (primaryCompositionDirectionCode
-                        != BottomUpCompositionDirection
-                    || constraintEvaluationDirectionCode
-                        != TopDownConstraintDirection
-                    || compositionSteps.Length != 3
-                    || compositionSteps[0].SourceLevelCode != "H1"
-                    || compositionSteps[0].TargetLevelCode != "H2"
-                    || !compositionSteps[0].CreatesSpatialInstance
-                    || compositionSteps[1].SourceLevelCode != "H2"
-                    || compositionSteps[1].TargetLevelCode != "H3"
-                    || !compositionSteps[1].CreatesSpatialInstance
-                    || compositionSteps[2].SourceLevelCode != "H3"
-                    || compositionSteps[2].TargetLevelCode != "H4"
-                    || compositionSteps[2].CreatesSpatialInstance)
+                && 공간성립선언이잘못되었는가()
                 || isSensoryPresentationV4
-                && (presentationEvaluationDirectionCode
-                        != SensoryPresentationDirection
-                    || presentationBindingSchemaCode
-                        != SensoryPresentationBindingSchema
-                    || presentationChannels.Length
-                        != 표현규칙영역Codes.All.Length
-                    || presentationChannels.Select(value => value.DomainCode)
-                        .Distinct(StringComparer.Ordinal).Count()
-                        != 표현규칙영역Codes.All.Length
-                    || 표현규칙영역Codes.All.Any(domain =>
-                        !presentationChannels.Any(value =>
-                            value.DomainCode == domain))
-                    || presentationChannels.Any(value =>
-                        string.IsNullOrWhiteSpace(value.ResponsibilityCode)
-                        || value.MutatesCanonicalState
-                        || value.ConfirmsBusinessCompletion))
+                && 감각표현선언이잘못되었는가()
                 || !isSensoryPresentationV4
                 && (!string.IsNullOrEmpty(presentationEvaluationDirectionCode)
                     || !string.IsNullOrEmpty(presentationBindingSchemaCode)
@@ -357,6 +333,35 @@ namespace Ssalddel.Unity.Presentation.World
             presentationOnly = true;
             Validate();
         }
+
+        // 호출 위치와 단락 평가 순서를 유지한다. 새 H 성립/표현 실행 검사가 아니다.
+        private bool 공간성립선언이잘못되었는가() =>
+            primaryCompositionDirectionCode != BottomUpCompositionDirection
+            || constraintEvaluationDirectionCode != TopDownConstraintDirection
+            || compositionSteps.Length != 3
+            || compositionSteps[0].SourceLevelCode != "H1"
+            || compositionSteps[0].TargetLevelCode != "H2"
+            || !compositionSteps[0].CreatesSpatialInstance
+            || compositionSteps[1].SourceLevelCode != "H2"
+            || compositionSteps[1].TargetLevelCode != "H3"
+            || !compositionSteps[1].CreatesSpatialInstance
+            || compositionSteps[2].SourceLevelCode != "H3"
+            || compositionSteps[2].TargetLevelCode != "H4"
+            || compositionSteps[2].CreatesSpatialInstance;
+
+        private bool 감각표현선언이잘못되었는가() =>
+            presentationEvaluationDirectionCode != SensoryPresentationDirection
+            || presentationBindingSchemaCode != SensoryPresentationBindingSchema
+            || presentationChannels.Length != 표현규칙영역Codes.All.Length
+            || presentationChannels.Select(value => value.DomainCode)
+                .Distinct(StringComparer.Ordinal).Count()
+                != 표현규칙영역Codes.All.Length
+            || 표현규칙영역Codes.All.Any(domain =>
+                !presentationChannels.Any(value => value.DomainCode == domain))
+            || presentationChannels.Any(value =>
+                string.IsNullOrWhiteSpace(value.ResponsibilityCode)
+                || value.MutatesCanonicalState
+                || value.ConfirmsBusinessCompletion);
 
         private static 배치통제계층LevelRecord[] ExteriorLevels() => new[]
         {

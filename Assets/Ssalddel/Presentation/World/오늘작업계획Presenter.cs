@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ssalddel.Simulation.Contracts;
 using Ssalddel.Unity.Farm;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
@@ -18,6 +19,10 @@ namespace Ssalddel.Unity.Presentation.World
     }
 
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 오늘작업계획Presenter : MonoBehaviour
     {
         [SerializeField] private 농장경영시점Controller management = null!;
@@ -1013,7 +1018,7 @@ namespace Ssalddel.Unity.Presentation.World
                 : hub.AccessStateCode == AreaSet접근Codes.Granted
                     ? new Color(.1f, .1f, .035f, .95f)
                     : new Color(.075f, .065f, .065f, .95f);
-            GUI.DrawTexture(new Rect(x, y, 360f, 166f), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(x, y, 360f, 232f), Texture2D.whiteTexture);
             GUI.color = Color.white;
             GUI.Label(new Rect(x + 14f, y + 10f, 330f, 22f),
                 "세계 확장 · Farm → Hub");
@@ -1038,10 +1043,50 @@ namespace Ssalddel.Unity.Presentation.World
             if (GUI.Button(new Rect(x + 242f, y + 80f, 104f, 30f), "이동 Tick"))
                 Run(AdvanceHubAccessAsync);
             GUI.enabled = true;
-            GUI.Label(new Rect(x + 14f, y + 118f, 330f, 38f),
+            GUI.Label(new Rect(x + 14f, y + 118f, 330f, 102f),
                 hub.AccessStateCode == AreaSet접근Codes.Entered
-                    ? "신규 WI · " + string.Join(", ", hub.AvailableWorldInteractionIds)
+                    ? "새로 열린 세계 행동\n"
+                      + 한국어세계상호작용목록(hub.AvailableWorldInteractionIds)
                     : "H 정적 정의 불변 · 서버 Connector 통과 검증");
+        }
+
+        public static string 한국어세계상호작용목록(
+            IEnumerable<string> worldInteractionIds)
+        {
+            var 한국어표시명들 = (worldInteractionIds ?? Array.Empty<string>())
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(Simulation세계상호작용이름Catalog.한국어표시명)
+                .ToArray();
+            return 한국어표시명들.Length == 0
+                ? "열린 세계 행동 없음"
+                : string.Join("\n", 한국어표시명들);
+        }
+
+        public static string 한국어음양수행주체분류(
+            SimulationWI음양주체분류Snapshot? 상태사본)
+        {
+            if (상태사본 == null
+                || string.IsNullOrWhiteSpace(상태사본.사분면Code))
+                return "음양·수행주체 미분류";
+            if (상태사본.사분면Code ==
+                SimulationWI사분면Codes.NotApplicable)
+                return "사분면 적용 제외";
+            if (상태사본.사분면Code ==
+                SimulationWI사분면Codes.Unclassified)
+                return "음양·수행주체 판정 대기";
+
+            var 이름 = 상태사본.사분면Code ==
+                SimulationWI사분면Codes.YangPlayer ? "양·플레이어"
+                : 상태사본.사분면Code ==
+                    SimulationWI사분면Codes.YangNpc ? "양·NPC"
+                : 상태사본.사분면Code ==
+                    SimulationWI사분면Codes.YinPlayer ? "음·플레이어"
+                : 상태사본.사분면Code ==
+                    SimulationWI사분면Codes.YinNpc ? "음·NPC"
+                : "음양·수행주체 미분류";
+            return string.IsNullOrWhiteSpace(상태사본.사분면기호)
+                ? 이름
+                : 상태사본.사분면기호 + " · " + 이름;
         }
 
         private void DrawHostedBeaconPanel()

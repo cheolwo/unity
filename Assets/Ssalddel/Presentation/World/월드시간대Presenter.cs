@@ -210,7 +210,16 @@ namespace Ssalddel.Unity.Presentation.World
         }
     }
 
+    public interface I월드시간대PresentationOutput
+    {
+        void ApplyTimeOfDay(월드시간대PresentationModel model);
+    }
+
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 월드시간대Presenter : MonoBehaviour
     {
         private sealed class SurfaceBinding
@@ -232,19 +241,26 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private Light directionalLight = null!;
         [SerializeField] private Camera targetCamera = null!;
         [SerializeField] private Transform surfaceRoot = null!;
+        [SerializeField] private string lightingProfileKey =
+            World방향광표현Catalog.DefaultProfileStableId;
 
         private readonly List<SurfaceBinding> surfaceBindings = new();
-        private MaterialPropertyBlock propertyBlock = null!;
+        private I월드시간대PresentationOutput? externalOutput;
 
         public 월드시간대SourceMode SourceMode => sourceMode;
         public float NormalizedTime => normalizedTime;
         public bool AutoCycleInPlayMode => autoCycleInPlayMode;
         public int SurfaceBindingCount => surfaceBindings.Count;
+        public string LightingProfileKey => lightingProfileKey;
         public 월드시간대PresentationModel CurrentModel { get; private set; }
+        public 방향광표현Model CurrentDirectionalLightingModel
+        {
+            get;
+            private set;
+        }
 
         private void OnEnable()
         {
-            propertyBlock ??= new MaterialPropertyBlock();
             RebuildSurfaceBindings();
             if (directionalLight != null && targetCamera != null && surfaceRoot != null)
                 ApplyNowForTests(normalizedTime);
@@ -256,7 +272,8 @@ namespace Ssalddel.Unity.Presentation.World
             Transform worldSurfaceRoot,
             float initialNormalizedTime,
             bool playAutomatically,
-            float dayDurationSeconds = 180f)
+            float dayDurationSeconds = 180f,
+            string? profileStableId = null)
         {
             directionalLight = worldDirectionalLight;
             targetCamera = worldCamera;
@@ -267,7 +284,9 @@ namespace Ssalddel.Unity.Presentation.World
             sourceMode = playAutomatically
                 ? 월드시간대SourceMode.PreviewScrub
                 : 월드시간대SourceMode.FixedReference;
-            propertyBlock ??= new MaterialPropertyBlock();
+            lightingProfileKey = string.IsNullOrWhiteSpace(profileStableId)
+                ? World방향광표현Catalog.DefaultProfileStableId
+                : profileStableId;
             RebuildSurfaceBindings();
             ApplyNowForTests(normalizedTime);
         }
@@ -282,6 +301,7 @@ namespace Ssalddel.Unity.Presentation.World
                 && surfaceRoot != null
                 && (surfaceRoot == transform || surfaceRoot.IsChildOf(transform))
                 && cycleDurationSeconds >= 10f
+                && !string.IsNullOrWhiteSpace(lightingProfileKey)
                 && surfaceBindings.Count > 0;
         }
 
@@ -289,8 +309,24 @@ namespace Ssalddel.Unity.Presentation.World
         {
             normalizedTime = Mathf.Repeat(value, 1f);
             CurrentModel = 월드시간대Interpreter.Evaluate(normalizedTime);
-            Apply(CurrentModel);
+            if (externalOutput == null) Apply(CurrentModel);
+            else externalOutput.ApplyTimeOfDay(CurrentModel);
         }
+
+        public void SetExternalOutput(I월드시간대PresentationOutput output)
+        {
+            externalOutput = output ?? throw new ArgumentNullException(
+                nameof(output));
+            externalOutput.ApplyTimeOfDay(CurrentModel);
+        }
+
+        public void ClearExternalOutput(I월드시간대PresentationOutput output)
+        {
+            if (ReferenceEquals(externalOutput, output)) externalOutput = null;
+        }
+
+        public void ApplyComposedModel(월드시간대PresentationModel model)
+            => Apply(model);
 
         public void RebuildSurfaceBindings()
         {
@@ -328,38 +364,37 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void Apply(월드시간대PresentationModel model)
         {
+            CurrentDirectionalLightingModel =
+                방향광표현Projector.Project(model, lightingProfileKey);
             if (directionalLight != null)
             {
                 directionalLight.transform.rotation = Quaternion.Euler(
                     model.SunPitch, model.SunYaw, 0f);
                 directionalLight.color = model.SunColor;
-                directionalLight.intensity = model.SunIntensity;
+                directionalLight.intensity = model.SunIntensity
+                                             * CurrentDirectionalLightingModel
+                                                 .DirectLightMultiplier;
                 directionalLight.shadows = LightShadows.Soft;
-                directionalLight.shadowStrength = model.ShadowStrength;
+                directionalLight.shadowStrength = Mathf.Clamp01(
+                    model.ShadowStrength * CurrentDirectionalLightingModel
+                        .ShadowStrengthMultiplier);
             }
 
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = model.AmbientSky;
-            RenderSettings.ambientEquatorColor = model.AmbientEquator;
-            RenderSettings.ambientGroundColor = model.AmbientGround;
+            var ambientLift = CurrentDirectionalLightingModel.AmbientLift;
+            RenderSettings.ambientSkyColor = model.AmbientSky * ambientLift;
+            RenderSettings.ambientEquatorColor = model.AmbientEquator
+                                                  * ambientLift;
+            RenderSettings.ambientGroundColor = model.AmbientGround
+                                                 * ambientLift;
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.ExponentialSquared;
             RenderSettings.fogColor = model.FogColor;
             RenderSettings.fogDensity = model.FogDensity;
             if (targetCamera != null) targetCamera.backgroundColor = model.CameraBackground;
-
-            var tint = model.SurfaceTint * model.SurfaceBrightness;
-            propertyBlock ??= new MaterialPropertyBlock();
-            foreach (var binding in surfaceBindings)
-            {
-                if (binding.Renderer == null) continue;
-                binding.Renderer.GetPropertyBlock(propertyBlock, binding.MaterialIndex);
-                var color = binding.OriginalColor * tint;
-                color.a = binding.OriginalColor.a;
-                propertyBlock.SetColor(binding.ColorPropertyId, color);
-                binding.Renderer.SetPropertyBlock(propertyBlock, binding.MaterialIndex);
-                propertyBlock.Clear();
-            }
+            // Synty Universal Lit가 표면 법선과 주광원 방향의 내적을 계산한다.
+            // 모든 Renderer의 BaseColor를 MPB로 다시 덮지 않아 동적 LH 셀도
+            // 같은 자연광을 받고 SRP Batcher 호환 경로를 유지할 수 있게 한다.
         }
     }
 }

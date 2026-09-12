@@ -12,12 +12,19 @@ using UnityEngine;
 
 namespace Ssalddel.Unity.Infrastructure.Simulation
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public static class LocalSimulationUnityRuntime
     {
         public static LocalSimulationRuntime Create()
         {
-            var savesRoot = Path.Combine(UnityEngine.Application.persistentDataPath,
-                "Saves");
+            var overrideRoot = Environment.GetEnvironmentVariable(
+                "SSALDDEL_LOCAL_SAVE_ROOT");
+            var savesRoot = string.IsNullOrWhiteSpace(overrideRoot)
+                ? Path.Combine(UnityEngine.Application.persistentDataPath, "Saves")
+                : Path.GetFullPath(overrideRoot!);
             return Create(savesRoot);
         }
 
@@ -60,6 +67,21 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             if (!sessions.TryAdd(session.SessionStableId, session))
                 throw new SimulationConflictException("SimulationSessionAlreadyActive");
             return session;
+        }
+
+        public 경영SimulationSessionAggregate ReplaceForCampaignRetry(
+            경영SimulationSessionAggregate session, long expectedCurrentRevision)
+        {
+            if (session == null) throw new ArgumentNullException(nameof(session));
+            while (true)
+            {
+                if (!sessions.TryGetValue(session.SessionStableId, out var current))
+                    throw new SimulationNotFoundException("SimulationSessionNotFound");
+                if (current.Revision != expectedCurrentRevision)
+                    throw new SimulationConflictException("SimulationExpectedRevisionMismatch");
+                if (sessions.TryUpdate(session.SessionStableId, session, current))
+                    return session;
+            }
         }
     }
 
@@ -160,13 +182,17 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
 
         private Envelope ReadEnvelope(string path, string slot)
         {
+            var storedJson = File.ReadAllText(path, Encoding.UTF8);
+            using var document = JsonDocument.Parse(storedJson);
             var envelope = JsonSerializer.Deserialize<Envelope>(
-                File.ReadAllText(path, Encoding.UTF8), jsonOptions)
+                storedJson, jsonOptions)
                 ?? throw new SimulationContractException("SimulationLocalSaveCorrupted");
             if (envelope.FileFormatVersion != Format || envelope.SlotStableId != slot
-                || envelope.Package == null)
+                || envelope.Package == null || !document.RootElement.TryGetProperty("Package", out var storedPackage))
                 throw new SimulationContractException("SimulationLocalSaveCorrupted");
-            var json = JsonSerializer.Serialize(envelope.Package, jsonOptions);
+            // 추가된 선택 필드의 기본값으로 과거 파일을 다시 직렬화하지 않는다.
+            // 저장 당시 원문을 검증한 뒤 기존 Replay 검증을 그대로 수행한다.
+            var json = storedPackage.GetRawText();
             if (envelope.PackageSha256 != Hash(json))
                 throw new SimulationContractException(
                     "SimulationLocalSaveChecksumMismatch");

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -22,6 +23,10 @@ namespace Ssalddel.Unity.Presentation.World
         [SerializeField] private bool applyOnPlay = true;
 
         private int nextRefreshFrame;
+        private readonly Dictionary<Renderer, bool> suppressedRenderers = new();
+        private readonly Dictionary<Transform, object> runtimeEnvironmentOwners = new();
+        private readonly Dictionary<Transform, Dictionary<Renderer, Transform[]>> runtimeRendererPaths = new();
+        private readonly Dictionary<Transform, Transform[]> runtimeRootPaths = new();
 
         public 플레이어경관Controller Player => player;
         public Canvas ModeCanvas => modeCanvas;
@@ -81,6 +86,14 @@ namespace Ssalddel.Unity.Presentation.World
         public void ApplyView()
         {
             ValidateWiring();
+            foreach (var destroyed in suppressedRenderers.Keys.Where(value => value == null).ToArray())
+                suppressedRenderers.Remove(destroyed);
+            foreach (var destroyed in runtimeEnvironmentOwners.Keys.Where(value => value == null).ToArray())
+            {
+                runtimeEnvironmentOwners.Remove(destroyed);
+                runtimeRendererPaths.Remove(destroyed);
+                runtimeRootPaths.Remove(destroyed);
+            }
             var visualRoot = player.VisualRoot;
             foreach (var renderer in GetComponentsInChildren<Renderer>(true))
             {
@@ -90,7 +103,11 @@ namespace Ssalddel.Unity.Presentation.World
                 // 소켓처럼 의도적으로 끈 Renderer까지 다시 켜라는 뜻은 아니다.
                 // 따라서 승인 밖의 표현만 끄고 승인 안의 기존 활성 상태는 보존한다.
                 if (!isPlayerVisual && !IsApprovedEnvironment(renderer.transform))
+                {
+                    if (renderer.enabled && !suppressedRenderers.ContainsKey(renderer))
+                        suppressedRenderers.Add(renderer, true);
                     renderer.enabled = false;
+                }
             }
 
             foreach (var terrain in GetComponentsInChildren<Terrain>(true))
@@ -102,6 +119,10 @@ namespace Ssalddel.Unity.Presentation.World
 
         private bool IsApprovedEnvironment(Transform candidate)
         {
+            if (runtimeEnvironmentOwners.Keys.Any(root => root != null
+                    && MatchesOwnedPath(root, runtimeRootPaths[root])
+                    && (candidate == root || candidate.IsChildOf(root))))
+                return true;
             if (approvedEnvironmentRoots.Any(root =>
                     candidate == root || candidate.IsChildOf(root)))
                 return true;
@@ -111,6 +132,86 @@ namespace Ssalddel.Unity.Presentation.World
             // 판정하면 다음 저빈도 ApplyView에서 Renderer가 다시 꺼진다.
             return candidate.GetComponentInParent<공간LHStreamingEngine>(true)
                    != null;
+        }
+
+        public bool TryRegisterRuntimeEnvironment(
+            Transform root, object owner, out string diagnostic)
+        {
+            diagnostic = "SinglePlayerRuntimeEnvironmentInvalid";
+            if (root == null || root == transform || owner == null || !root.IsChildOf(transform))
+                return false;
+            if (runtimeEnvironmentOwners.TryGetValue(root, out var currentOwner))
+            {
+                if (!ReferenceEquals(currentOwner, owner))
+                {
+                    diagnostic = "SinglePlayerRuntimeEnvironmentOwnedByOther";
+                    return false;
+                }
+                diagnostic = "SinglePlayerRuntimeEnvironmentAlreadyOwned";
+                return true;
+            }
+
+            runtimeEnvironmentOwners.Add(root, owner);
+            runtimeRootPaths.Add(root, CaptureOwnedPath(root));
+            var rendererPaths = root.GetComponentsInChildren<Renderer>(true)
+                .ToDictionary(value => value, value => CaptureOwnedPath(value.transform));
+            runtimeRendererPaths.Add(root, rendererPaths);
+            foreach (var renderer in rendererPaths.Keys)
+            {
+                // 이 정책이 실제 true→false로 바꾼 항목만 복원한다.
+                if (!suppressedRenderers.Remove(renderer)) continue;
+                renderer.enabled = true;
+            }
+            diagnostic = "SinglePlayerRuntimeEnvironmentRegistered";
+            return true;
+        }
+
+        public bool UnregisterRuntimeEnvironment(Transform root, object owner)
+        {
+            if (root == null || owner == null
+                || !runtimeEnvironmentOwners.TryGetValue(root, out var currentOwner)
+                || !ReferenceEquals(currentOwner, owner)) return false;
+            runtimeEnvironmentOwners.Remove(root);
+            var rootStillOwned = MatchesOwnedPath(root, runtimeRootPaths[root]);
+            var rendererPaths = runtimeRendererPaths[root];
+            runtimeRootPaths.Remove(root);
+            runtimeRendererPaths.Remove(root);
+            // 등록 당시 객체만 반환한다. 재부모화·새 외부 자식은 해제 쓰기 대상이 아니다.
+            foreach (var entry in rendererPaths)
+            {
+                var renderer = entry.Key;
+                if (!rootStillOwned || renderer == null
+                    || !MatchesOwnedPath(renderer.transform, entry.Value)) continue;
+                if (IsApprovedEnvironment(renderer.transform)) continue;
+                if (renderer.enabled && !suppressedRenderers.ContainsKey(renderer))
+                    suppressedRenderers.Add(renderer, true);
+                renderer.enabled = false;
+            }
+            return true;
+        }
+
+        private Transform[] CaptureOwnedPath(Transform value)
+        {
+            var path = new List<Transform>();
+            for (var current = value; current != null; current = current.parent)
+            {
+                path.Add(current);
+                if (current == transform) return path.ToArray();
+            }
+            return Array.Empty<Transform>();
+        }
+
+        private bool MatchesOwnedPath(Transform value, Transform[] path)
+        {
+            if (value == null || path.Length == 0) return false;
+            var current = value;
+            foreach (var expected in path)
+            {
+                if (current == null || current != expected) return false;
+                if (current == transform) return expected == path[path.Length - 1];
+                current = current.parent;
+            }
+            return false;
         }
     }
 }

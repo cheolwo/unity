@@ -125,6 +125,10 @@ namespace Ssalddel.Unity.Runtime.World
         public SimulationWorldShellSnapshot WorldSnapshot { get; set; } = null!;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public interface I턴마감AuthorityClient
     {
         Task<턴마감ContextData> GetContextAsync(string sessionStableId, CancellationToken cancellationToken);
@@ -136,6 +140,10 @@ namespace Ssalddel.Unity.Runtime.World
             string selectedCardStableId, CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public interface I타로턴마감AuthorityClient : I턴마감AuthorityClient
     {
         Task<타로객체반응PreviewData> Preview타로객체반응Async(
@@ -149,6 +157,10 @@ namespace Ssalddel.Unity.Runtime.World
             턴마감타로SelectionData selection, CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 턴마감FixtureAuthorityClient : I타로턴마감AuthorityClient
     {
         private static readonly 턴마감CardData[] Cards =

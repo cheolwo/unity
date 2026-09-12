@@ -93,6 +93,7 @@ namespace Ssalddel.Unity.Presentation.World
             PlayerActivityViewPolicyCatalog.CreateDefault();
         private PlayerActivityViewDecision _currentViewDecision = null!;
         private string _currentActivityCode = PlayerActivityCodes.WorldOverview;
+        private Nature생존Controller? _natureHud;
         private Camera? _viewTransitionCamera;
         private Camera? _viewTransitionTarget;
         private Vector3 _viewTransitionStartPosition;
@@ -107,6 +108,8 @@ namespace Ssalddel.Unity.Presentation.World
         private bool _viewTransitionTargetEnablesFarmManagement;
         private bool _viewTransitionVisualSwitched;
         private bool _placementInputBlocked;
+        private bool _modalInputBlocked;
+        private 플레이어전술조작Controller _tacticalControls = null!;
 
         public 플레이어경관Profile Profile => profile;
         public Camera PlayerCamera => thirdPersonCamera;
@@ -121,7 +124,21 @@ namespace Ssalddel.Unity.Presentation.World
         public void SetPlacementInputBlocked(bool blocked)
         {
             _placementInputBlocked = blocked;
-            if (blocked) ApplySelectionState(false);
+            if (blocked)
+            {
+                ApplySelectionState(false);
+                _tacticalControls?.CancelSelectionGesture();
+            }
+        }
+        public void SetModalInputBlocked(bool blocked)
+        {
+            _modalInputBlocked = blocked;
+            if (blocked)
+            {
+                ApplySelectionState(false);
+                _tacticalControls?.CancelSelectionGesture();
+                ReleaseCursor();
+            }
         }
         public bool IsSelected => _isSelected;
         public bool HasDestination => _hasDestination;
@@ -142,6 +159,9 @@ namespace Ssalddel.Unity.Presentation.World
         public 전투시점Controller Combat => combat;
         public bool IsCameraTransitioning { get; private set; }
         public bool PlacementInputBlocked => _placementInputBlocked;
+        public bool ModalInputBlocked => _modalInputBlocked;
+        public 플레이어전술조작Controller TacticalControls
+            => EnsureTacticalControls();
         public float CameraTransitionProgress => !IsCameraTransitioning
             ? 1f
             : Mathf.Clamp01(_viewTransitionElapsed / Mathf.Max(.1f, viewTransitionDuration));
@@ -182,8 +202,13 @@ namespace Ssalddel.Unity.Presentation.World
             _tacticalFocus = transform.position;
             _tacticalDistance = profile.CameraDistance;
             ApplyLookRotation();
+            PrepareTacticalIndicator(selectionHighlight,
+                new Color(1f, .76f, .16f, 1f), .11f);
+            PrepareTacticalIndicator(destinationMarker,
+                new Color(.18f, .92f, .95f, 1f), .09f);
             ApplySelectionState(false);
             destinationMarker.SetActive(false);
+            EnsureTacticalControls();
         }
 
         public bool ValidateWiring()
@@ -285,6 +310,11 @@ namespace Ssalddel.Unity.Presentation.World
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
+            EnsureTacticalControls();
+            PrepareTacticalIndicator(selectionHighlight,
+                new Color(1f, .76f, .16f, 1f), .11f);
+            PrepareTacticalIndicator(destinationMarker,
+                new Color(.18f, .92f, .95f, 1f), .09f);
             farmManagement ??= FindFirstObjectByType<농장경영시점Controller>(
                 FindObjectsInactive.Include);
             combat ??= FindFirstObjectByType<전투시점Controller>(
@@ -304,6 +334,9 @@ namespace Ssalddel.Unity.Presentation.World
         private void Update()
         {
             if (!presentationOnly) return;
+            if (_modalInputBlocked) return;
+            if (_natureHud != null && _natureHud.BlocksWorldPointerForEquipment)
+                ReleaseCursor();
             if (IsCameraTransitioning) TickCameraTransition(Time.unscaledDeltaTime);
             if (Keyboard.current == null) return;
             if (combat != null)
@@ -331,16 +364,7 @@ namespace Ssalddel.Unity.Presentation.World
         {
             var primaryPressed = Mouse.current?.leftButton.wasPressedThisFrame == true;
             var mousePosition = Mouse.current?.position.ReadValue() ?? Vector2.zero;
-            var pointerOverUi = IsPointerOverUnityUi()
-                                || IsPointerInPersistentModeBand(
-                                    mousePosition, Screen.height)
-                                || IsPointerInPersistentHudControls(
-                                    mousePosition, Screen.width, Screen.height);
-            if (ShouldCaptureFirstPersonCursor(primaryPressed, pointerOverUi))
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-            }
+            UpdateFirstPersonCursor(primaryPressed, mousePosition);
 
             var movement = Vector2.zero;
             if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) movement.y += 1f;
@@ -363,28 +387,34 @@ namespace Ssalddel.Unity.Presentation.World
         {
             var mouse = Mouse.current;
             if (mouse == null) return;
-            var farmInputHandled = !_placementInputBlocked && farmManagement != null
-                && farmManagement.TryHandlePointerInput(mouse, keyboard);
-            if (!_placementInputBlocked && !farmInputHandled)
-            {
-                if (mouse.leftButton.wasPressedThisFrame)
-                    TrySelectPlayer(mouse.position.ReadValue());
-                if (mouse.rightButton.wasPressedThisFrame && _isSelected)
-                    TrySetDestination(mouse.position.ReadValue());
-            }
-            if (mouse.middleButton.isPressed)
+            var controls = EnsureTacticalControls();
+            var naturePointerBlocked = ProtectNatureTacticalPointer(mouse.position.ReadValue(), controls);
+            if (!naturePointerBlocked) controls.TickPointer(mouse, keyboard);
+            if (!naturePointerBlocked && mouse.middleButton.isPressed)
                 TickLook(mouse.delta.ReadValue());
             var panInput = Vector2.zero;
-            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) panInput.y += 1f;
-            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) panInput.y -= 1f;
-            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) panInput.x += 1f;
-            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) panInput.x -= 1f;
+            if (keyboard.wKey.isPressed) panInput.y += 1f;
+            if (keyboard.sKey.isPressed) panInput.y -= 1f;
+            if (keyboard.dKey.isPressed) panInput.x += 1f;
+            if (keyboard.aKey.isPressed) panInput.x -= 1f;
             if (panInput.sqrMagnitude > 1f) panInput.Normalize();
             if (keyboard.fKey.wasPressedThisFrame && _isSelected)
                 FocusTacticalCameraOnPlayer();
+            if (controls.TryConsumeRecenterInput(keyboard, Time.unscaledTime))
+                FocusTacticalCameraOnPlayer();
             TickTacticalCamera(
-                panInput, mouse.scroll.ReadValue().y, Time.deltaTime);
-            TickThirdPersonMovement(Time.deltaTime);
+                panInput, naturePointerBlocked ? 0f : mouse.scroll.ReadValue().y, Time.deltaTime);
+
+            var directMovementInput = Vector2.zero;
+            if (keyboard.upArrowKey.isPressed) directMovementInput.y += 1f;
+            if (keyboard.downArrowKey.isPressed) directMovementInput.y -= 1f;
+            if (keyboard.rightArrowKey.isPressed) directMovementInput.x += 1f;
+            if (keyboard.leftArrowKey.isPressed) directMovementInput.x -= 1f;
+            if (_isSelected && directMovementInput.sqrMagnitude > 0f)
+                TickThirdPersonDirectMovement(directMovementInput,
+                    Time.deltaTime);
+            else
+                TickThirdPersonMovement(Time.deltaTime);
         }
 
         public void TickTacticalCamera(
@@ -606,6 +636,74 @@ namespace Ssalddel.Unity.Presentation.World
             }
         }
 
+        public bool CanFocusTacticalCameraAt(Vector3 worldPoint, out string diagnostic)
+        {
+            if (!ValidateWiring())
+            {
+                diagnostic = "FarmFocusPlayerWiringInvalid";
+                return false;
+            }
+            diagnostic = "FarmFocusTrackedBoundsUnavailable";
+            if (!float.IsFinite(worldPoint.x) || !float.IsFinite(worldPoint.y)
+                || !float.IsFinite(worldPoint.z) || movementGate == null
+                || !movementGate.TryGetTrackedWorldBounds(out var bounds)) return false;
+            if (!IsTacticalFocusInsideBounds(worldPoint, bounds))
+            {
+                diagnostic = "FarmFocusOutsideTrackedBounds";
+                return false;
+            }
+            diagnostic = "FarmFocusInsideTrackedBounds";
+            return true;
+        }
+
+        public static bool IsTacticalFocusInsideBounds(Vector3 worldPoint, Bounds bounds)
+            => float.IsFinite(worldPoint.x) && float.IsFinite(worldPoint.y)
+                && float.IsFinite(worldPoint.z) && float.IsFinite(bounds.min.x)
+                && float.IsFinite(bounds.max.x) && float.IsFinite(bounds.min.z)
+                && float.IsFinite(bounds.max.z) && bounds.size.x > 0f && bounds.size.z > 0f
+                && worldPoint.x >= bounds.min.x && worldPoint.x <= bounds.max.x
+                && worldPoint.z >= bounds.min.z && worldPoint.z <= bounds.max.z;
+
+        public bool TryEnterFarmManagementModeAt(
+            Vector3 worldFocus, out string diagnostic)
+        {
+            if (!CanFocusTacticalCameraAt(worldFocus, out diagnostic)) return false;
+            var decision = _activityViewPolicies.Resolve(
+                PlayerActivityCodes.FarmManagement,
+                PlayerActivityViewModeCodes.TacticalThirdPerson);
+            if (decision == null || !decision.PresentationOnly || decision.ChangesWorldState)
+            {
+                diagnostic = "FarmFocusViewDecisionInvalid";
+                return false;
+            }
+            _currentActivityCode = decision.ActivityCode;
+            _currentViewDecision = decision;
+            EnterThirdPersonModeCore(worldFocus);
+            diagnostic = "FarmFocusApplied";
+            return true;
+        }
+
+        public void TickThirdPersonDirectMovement(Vector2 movementInput,
+            float deltaTime)
+        {
+            if (!ValidateWiring() || !_isSelected || deltaTime <= 0f) return;
+            if (movementInput.sqrMagnitude > 1f) movementInput.Normalize();
+            if (movementInput.sqrMagnitude <= 0f)
+            {
+                MoveCharacter(Vector3.zero, false, deltaTime);
+                return;
+            }
+
+            ClearDestination();
+            var forward = Vector3.ProjectOnPlane(
+                thirdPersonCamera.transform.forward, Vector3.up).normalized;
+            var right = Vector3.ProjectOnPlane(
+                thirdPersonCamera.transform.right, Vector3.up).normalized;
+            var direction = forward * movementInput.y + right * movementInput.x;
+            if (direction.sqrMagnitude > 1f) direction.Normalize();
+            MoveCharacter(direction, false, deltaTime);
+        }
+
         /// <summary>
         /// 플레이어가 화면에서 요청한 다음 목표 접근을 표현 계층에서만 진행한다.
         /// Simulation 상태와 WorldTick은 변경하지 않으며 기존 CharacterController와
@@ -647,6 +745,54 @@ namespace Ssalddel.Unity.Presentation.World
             var remaining = worldTarget - transform.position;
             remaining.y = 0f;
             return remaining.magnitude <= stopDistance + completionTolerance;
+        }
+
+        public bool TryBindNatureHud(Nature생존Controller owner)
+        {
+            if (owner == null || (_natureHud != null && _natureHud != owner)) return false;
+            _natureHud = owner;
+            return true;
+        }
+
+        public bool OwnsNatureHud(Nature생존Controller owner)
+            => owner != null && _natureHud == owner;
+
+        public bool ReleaseNatureHud(Nature생존Controller owner)
+        {
+            if (owner == null || _natureHud != owner) return false;
+            _natureHud = null;
+            ReleaseCursor();
+            return true;
+        }
+
+        public void NotifyNatureHudTransition(Nature생존Controller owner)
+        {
+            if (_natureHud == owner && owner != null) ReleaseCursor();
+        }
+
+        public bool IsNaturePresentationPointerBlocked(Vector2 screenPoint)
+            => _natureHud != null && _natureHud.IsPresentationPointerBlocked(screenPoint);
+
+        private void UpdateFirstPersonCursor(bool primaryPressed, Vector2 mousePosition)
+        {
+            if (_natureHud != null && _natureHud.BlocksWorldPointerForEquipment)
+                ReleaseCursor();
+            var pointerOverUi = IsNaturePresentationPointerBlocked(mousePosition)
+                || IsPointerOverUnityUi()
+                || IsPointerInPersistentModeBand(mousePosition, Screen.height)
+                || IsPointerInPersistentHudControls(mousePosition, Screen.width, Screen.height);
+            if (ShouldCaptureFirstPersonCursor(primaryPressed, pointerOverUi))
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+
+        private bool ProtectNatureTacticalPointer(Vector2 screenPoint, 플레이어전술조작Controller controls)
+        {
+            if (!IsNaturePresentationPointerBlocked(screenPoint)) return false;
+            controls.CancelSelectionGesture();
+            return true;
         }
 
         public static bool ShouldCaptureFirstPersonCursor(
@@ -747,6 +893,9 @@ namespace Ssalddel.Unity.Presentation.World
         }
 
         private void EnterThirdPersonModeCore()
+            => EnterThirdPersonModeCore(null);
+
+        private void EnterThirdPersonModeCore(Vector3? requestedFocus)
         {
             if (!ValidateWiring()) return;
             var sourcePose = CaptureActiveCameraPose();
@@ -754,7 +903,10 @@ namespace Ssalddel.Unity.Presentation.World
             _yaw = profile.TacticalYaw;
             _pitch = profile.TacticalPitch;
             _tacticalDistance = profile.CameraDistance;
-            FocusTacticalCameraOnPlayer();
+            if (requestedFocus.HasValue)
+                _tacticalFocus = requestedFocus.Value;
+            else
+                FocusTacticalCameraOnPlayer();
             ApplyLookRotation();
             ApplyThirdPersonCameraPose();
             ReleaseCursor();
@@ -985,37 +1137,107 @@ namespace Ssalddel.Unity.Presentation.World
                 camera.enabled = camera == exception;
         }
 
-        private void TrySelectPlayer(Vector2 screenPosition)
+        public bool IsScreenPointOverPlayer(Vector2 screenPosition)
         {
             var ray = thirdPersonCamera.ScreenPointToRay(screenPosition);
             if (!Physics.Raycast(ray, out var hit, 500f, ~0, QueryTriggerInteraction.Ignore))
-            {
-                ApplySelectionState(false);
-                return;
-            }
-            ApplySelectionState(hit.transform == transform || hit.transform.IsChildOf(transform));
+                return false;
+            return hit.transform == transform || hit.transform.IsChildOf(transform);
         }
 
-        private void TrySetDestination(Vector2 screenPosition)
+        public bool DoesScreenRectIntersectPlayer(Rect screenRect)
+        {
+            if (thirdPersonCamera == null || _characterController == null) return false;
+            var bounds = _characterController.bounds;
+            var minimum = bounds.min;
+            var maximum = bounds.max;
+            var hasVisiblePoint = false;
+            var projectedMinimum = new Vector2(float.PositiveInfinity,
+                float.PositiveInfinity);
+            var projectedMaximum = new Vector2(float.NegativeInfinity,
+                float.NegativeInfinity);
+            for (var x = 0; x < 2; x++)
+            for (var y = 0; y < 2; y++)
+            for (var z = 0; z < 2; z++)
+            {
+                var point = new Vector3(x == 0 ? minimum.x : maximum.x,
+                    y == 0 ? minimum.y : maximum.y,
+                    z == 0 ? minimum.z : maximum.z);
+                var screenPoint = thirdPersonCamera.WorldToScreenPoint(point);
+                if (screenPoint.z <= 0f) continue;
+                hasVisiblePoint = true;
+                projectedMinimum = Vector2.Min(projectedMinimum, screenPoint);
+                projectedMaximum = Vector2.Max(projectedMaximum, screenPoint);
+            }
+
+            return hasVisiblePoint && screenRect.Overlaps(Rect.MinMaxRect(
+                projectedMinimum.x, projectedMinimum.y,
+                projectedMaximum.x, projectedMaximum.y), true);
+        }
+
+        public bool TrySetThirdPersonDestinationAtScreenPoint(
+            Vector2 screenPosition)
         {
             var ray = thirdPersonCamera.ScreenPointToRay(screenPosition);
             if (Physics.Raycast(
                     ray, out var hit, 500f,
                     Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
                 SetThirdPersonDestination(hit.point);
+                return true;
+            }
+            return false;
         }
 
         private void ApplySelectionState(bool selected)
         {
             _isSelected = selected;
+            if (selected)
+                PrepareTacticalIndicator(selectionHighlight,
+                    new Color(1f, .76f, .16f, 1f), .11f);
             if (selectionHighlight != null) selectionHighlight.SetActive(selected);
             if (!selected) ClearDestination();
+        }
+
+        private static void PrepareTacticalIndicator(
+            GameObject indicator,
+            Color color,
+            float minimumWidth)
+        {
+            if (indicator == null
+                || !indicator.TryGetComponent<LineRenderer>(out var line))
+                return;
+
+            line.widthMultiplier = Mathf.Max(line.widthMultiplier, minimumWidth);
+            line.startColor = color;
+            line.endColor = color;
+            var material = line.material;
+            if (material.HasProperty("_BaseColor"))
+                material.SetColor("_BaseColor", color);
+            if (material.HasProperty("_Color"))
+                material.SetColor("_Color", color);
+            if (material.HasProperty("_EmissionColor"))
+            {
+                material.EnableKeyword("_EMISSION");
+                material.SetColor("_EmissionColor", color * 2.5f);
+            }
         }
 
         private void ClearDestination()
         {
             _hasDestination = false;
             if (destinationMarker != null) destinationMarker.SetActive(false);
+        }
+
+        private 플레이어전술조작Controller EnsureTacticalControls()
+        {
+            _tacticalControls ??= GetComponent<플레이어전술조작Controller>();
+            if (_tacticalControls == null)
+                _tacticalControls = gameObject.AddComponent<
+                    플레이어전술조작Controller>();
+            if (_tacticalControls.enabled)
+                _tacticalControls.Configure(this);
+            return _tacticalControls;
         }
 
         private void TickLook(Vector2 lookDelta)
@@ -1076,7 +1298,7 @@ namespace Ssalddel.Unity.Presentation.World
                 ? $"시점 전환 중 · 곡선 이동 {CameraTransitionProgress:P0} · 입력은 전환 완료 후 활성화"
                 : _currentMode == 플레이어시점Mode.FirstPerson
                 ? "1인칭 · WASD/방향키 이동 · Shift 달리기 · 클릭 후 마우스 시선 · F3 농장 경영 · F1 전략 화면"
-                : "전술 3인칭 · 농지 다중 선택/작업 초안 · 좌클릭 유닛 선택 · 우클릭 이동 · WASD 화면 이동 · 휠 확대/축소 · F2 1인칭 · F1 전략"
+                : "전술 3인칭 · 클릭/박스 드래그 자기 캐릭터 선택 · 우클릭/방향키 이동 · WASD 화면 이동 · Backspace×2 재집중 · F2 1인칭 · F1 전략"
                     + (_isSelected ? " · 선택됨" : " · 캐릭터를 먼저 선택하세요");
             GUI.Label(new Rect(24f, Screen.height - 54f, 920f, 28f), message);
         }

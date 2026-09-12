@@ -7,6 +7,10 @@ using Ssalddel.Unity.Runtime.Transport;
 
 namespace Ssalddel.Unity.Infrastructure.Simulation
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public interface ISimulationUnifiedBattleAuthorityClient
     {
         Task<BattleCreatePreviewApiModel> PreviewAsync(string sessionStableId,
@@ -19,11 +23,19 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         Task<BattleInstanceApiModel> ConfirmLocalControlModeAsync(string sessionStableId,
             string battleStableId, LocalCombatControlModeCommandDraft request,
             CancellationToken cancellationToken);
+        Task<BattleInstanceApiModel> ConfirmObserverInterventionAsync(
+            string sessionStableId, string battleStableId,
+            LocalCombatObserverInterventionCommandDraft request,
+            CancellationToken cancellationToken);
         Task<BattleInstanceApiModel> AdvanceAsync(string sessionStableId,
             string battleStableId, string commandId, long expectedRevision,
             int combatTickCount, CancellationToken cancellationToken);
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class SimulationUnifiedBattleServerRepository
         : ISimulationUnifiedBattleAuthorityClient
     {
@@ -56,6 +68,14 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             CancellationToken cancellationToken)
             => SendAsync<BattleInstanceApiModel>("POST", Base(sessionStableId) + "/"
                 + Required(battleStableId) + "/local-control-mode/confirm", request,
+                cancellationToken);
+
+        public Task<BattleInstanceApiModel> ConfirmObserverInterventionAsync(
+            string sessionStableId, string battleStableId,
+            LocalCombatObserverInterventionCommandDraft request,
+            CancellationToken cancellationToken)
+            => SendAsync<BattleInstanceApiModel>("POST", Base(sessionStableId) + "/"
+                + Required(battleStableId) + "/observer-interventions/confirm", request,
                 cancellationToken);
 
         public Task<BattleInstanceApiModel> AdvanceAsync(string sessionStableId,

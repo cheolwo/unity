@@ -4,6 +4,10 @@ using UnityEngine;
 namespace Ssalddel.Unity.Presentation.World
 {
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 공용AnimationAdapter : MonoBehaviour
     {
         [SerializeField] private string packCode = string.Empty;
@@ -38,6 +42,10 @@ namespace Ssalddel.Unity.Presentation.World
         private float _actionPoseWeight;
         private string _blendedActionIntentCode = 공용AnimationIntentCodes.Idle;
         private bool _bonesCached;
+        private string? _externalPoseToken;
+        private string? _pendingExternalPoseReleaseToken;
+        private bool _animatorEnabledBeforeLease;
+        private Avatar? _leasedAvatar;
 
         public string PackCode => packCode;
         public string ActorRoleCode => actorRoleCode;
@@ -51,6 +59,54 @@ namespace Ssalddel.Unity.Presentation.World
         public float PlaybackScale => playbackScale;
         public float PresentationPhase => _phase;
         public float ActionPoseWeight => _actionPoseWeight;
+        public bool HasExternalPoseOwner => _externalPoseToken != null;
+        public bool IsExternalPoseOwnedBy(string token)
+            => !string.IsNullOrWhiteSpace(token) && _externalPoseToken == token;
+
+        // 호출자는 자신의 Graph를 해제한 뒤 같은 토큰으로 반환한다.
+        // OnEnable 왕복 없이 기준 뼈 자세와 마지막 이동 의도를 그대로 보존한다.
+        public bool TryAcquireExternalPose(string token, Animator expectedAnimator)
+        {
+            if (string.IsNullOrWhiteSpace(token) || animator == null || expectedAnimator != animator)
+                return false;
+            if (HasExternalPoseOwner)
+                return _pendingExternalPoseReleaseToken == null && _externalPoseToken == token && animator.avatar == _leasedAvatar
+                    && animator.isActiveAndEnabled && !animator.applyRootMotion
+                    && animator.runtimeAnimatorController == null;
+            if (!isActiveAndEnabled || !animator.gameObject.activeInHierarchy
+                || sourceKindCode != 공용AnimationSourceKindCodes.ProceduralFallback
+                || !ValidateWiring() || !UsesFullBodyProceduralPose || !_bonesCached
+                || !animator.avatar.isValid || animator.runtimeAnimatorController != null
+                || animator.hasBoundPlayables)
+                return false;
+            _animatorEnabledBeforeLease = animator.enabled;
+            _leasedAvatar = animator.avatar;
+            _externalPoseToken = token;
+            animator.enabled = true;
+            return true;
+        }
+
+        public bool ReleaseExternalPose(string token)
+        {
+            if (!HasExternalPoseOwner || _externalPoseToken != token) return false;
+            // 다른 평가기가 남아 있으면 절차형 쓰기를 재개하지 않는다.
+            if (animator != null && (animator.hasBoundPlayables
+                || animator.runtimeAnimatorController != null || animator.avatar != _leasedAvatar))
+                return false;
+            if (animator != null) animator.enabled = _animatorEnabledBeforeLease;
+            _externalPoseToken = null;
+            _pendingExternalPoseReleaseToken = null;
+            _leasedAvatar = null;
+            return true;
+        }
+
+        // 종료된 소유자의 반환 요청만 보관한다. 외부 출력/Controller/Avatar 보호조건은 유지한다.
+        public bool RequestExternalPoseRelease(string token)
+        {
+            if (!IsExternalPoseOwnedBy(token)) return false;
+            _pendingExternalPoseReleaseToken = token;
+            return ReleaseExternalPose(token);
+        }
         public bool UsesFullBodyProceduralPose
             => sourceKindCode == 공용AnimationSourceKindCodes.ProceduralFallback
                && _leftUpperArm != null && _rightUpperArm != null
@@ -60,6 +116,8 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void Configure(공용AnimationCatalogEntry entry, Animator targetAnimator)
         {
+            if (HasExternalPoseOwner)
+                throw new InvalidOperationException("CommonAnimationPoseLeaseMustBeReleased");
             if (entry == null || !entry.Validate() || targetAnimator == null)
                 throw new ArgumentException("CommonAnimationAdapterConfigurationInvalid");
             packCode = entry.PackCode;
@@ -67,8 +125,6 @@ namespace Ssalddel.Unity.Presentation.World
             sourceKindCode = entry.SourceKindCode;
             animator = targetAnimator;
             _bonesCached = false;
-            animator.applyRootMotion = false;
-            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             if (entry.UsesFallback)
             {
                 animator.runtimeAnimatorController = null;
@@ -78,9 +134,17 @@ namespace Ssalddel.Unity.Presentation.World
             {
                 diagnosticCode = string.Empty;
             }
-            rootMotionDisabled = !animator.applyRootMotion;
-            CacheBones();
+            PrepareAnimatorOwnership();
             ApplyIntent(공용AnimationIntentCodes.Idle);
+        }
+
+        private void OnEnable()
+        {
+            // 저장 Scene의 기존 Adapter는 런타임 Configure를 다시 거치지 않는다.
+            // Scene 재진입과 동적 역할 교체가 같은 뼈 작성 규칙을 사용하게 한다.
+            if (animator == null || HasExternalPoseOwner) return;
+            _bonesCached = false;
+            PrepareAnimatorOwnership();
         }
 
         public void ConfigureDeterministicPhase(string actorStableId)
@@ -129,6 +193,9 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void TickPresentation(float deltaTime)
         {
+            if (_pendingExternalPoseReleaseToken != null)
+                ReleaseExternalPose(_pendingExternalPoseReleaseToken);
+            if (HasExternalPoseOwner) return;
             if (!ValidateWiring() || deltaTime < 0f)
                 return;
             if (!UsesFullBodyProceduralPose)
@@ -149,7 +216,24 @@ namespace Ssalddel.Unity.Presentation.World
             ApplyProceduralPose(deltaTime);
         }
 
-        private void Update() => TickPresentation(Time.deltaTime);
+        // Animator 평가는 Update 이후에 Humanoid 뼈를 다시 기록할 수 있다.
+        // 절차형 대체 자세는 마지막 표현 단계에서 적용해야 Game View에 남는다.
+        private void LateUpdate() => TickPresentation(Time.deltaTime);
+
+        private void PrepareAnimatorOwnership()
+        {
+            animator.enabled = true;
+            animator.applyRootMotion = false;
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            rootMotionDisabled = !animator.applyRootMotion;
+            CacheBones();
+            // Controller가 없는 Humanoid Animator는 매 프레임 bind pose를 다시
+            // 기록할 수 있다. 절차형 대체 자세가 뼈의 유일한 작성자이므로,
+            // 뼈를 확보한 뒤 Animator 평가를 끈다.
+            if (sourceKindCode == 공용AnimationSourceKindCodes.ProceduralFallback
+                && UsesFullBodyProceduralPose)
+                animator.enabled = false;
+        }
 
         private void CacheBones()
         {

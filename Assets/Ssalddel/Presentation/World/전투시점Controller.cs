@@ -12,6 +12,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// Unity는 판정 등급·피해·점수를 만들지 않고 행동과 반응 시각만 전송 대상으로 만듭니다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 전투시점Controller : MonoBehaviour
     {
         [SerializeField] private 플레이어경관Controller player = null!;
@@ -33,12 +37,15 @@ namespace Ssalddel.Unity.Presentation.World
         private int _commandSequence;
         private bool _reactionSubmitted;
         private BattleInstanceApiModel? _localBattle;
+        private long _requestedEncounterWorldRevision = -1;
 
         public event Action<FarmCombatReactionCommandDraft> ReactionCommandPrepared
             = delegate { };
         public event Action<string> CombatEntryRequested = delegate { };
         public event Action<LocalCombatActionCommandDraft> LocalActionCommandPrepared
             = delegate { };
+        public event Action<LocalCombatObserverInterventionCommandDraft>
+            ObserverInterventionCommandPrepared = delegate { };
         public event Action<FarmTacticalOrderPresentationFrame>
             TacticalViewTransitionSuggested = delegate { };
         public event Action<FarmTacticalOrderPreviewDraft>
@@ -63,9 +70,11 @@ namespace Ssalddel.Unity.Presentation.World
         public string DesiredLocalControlModeCode
             => player != null && player.CurrentMode == 플레이어시점Mode.FirstPerson
                 ? LocalCombatPresentationCodes.DirectAction
-                : LocalCombatPresentationCodes.TacticalCommand;
+                : LocalCombatPresentationCodes.ObserverOperation;
         public bool HasActiveUnifiedBattle => _localBattle != null
             && _localBattle.PhaseCode == BattlePresentationCodes.Active;
+        public long RequestedEncounterWorldRevision
+            => _requestedEncounterWorldRevision;
         public bool LocksPlayerMovement
             => _localBattle == null && (_activeFrame != null
                 || _inputPhaseCode == FarmCombatPresentationCodes.Entering
@@ -84,9 +93,25 @@ namespace Ssalddel.Unity.Presentation.World
             _inputPhaseCode = state.PhaseCode == BattlePresentationCodes.Active
                 ? FarmCombatPresentationCodes.Telegraph
                 : FarmCombatPresentationCodes.Resolved;
+            if (state.PhaseCode == BattlePresentationCodes.Active
+                && state.LocalCombat.ParticipationModeLocked)
+            {
+                var direct = state.LocalCombat.ControlModeCode ==
+                    LocalCombatPresentationCodes.DirectAction;
+                if (direct && player.CurrentMode != 플레이어시점Mode.FirstPerson)
+                    player.EnterCombatMode(
+                        FarmCombatPresentationCodes.FirstPersonPrecision);
+                else if (!direct && player.CurrentMode == 플레이어시점Mode.FirstPerson)
+                    player.EnterCombatMode(
+                        FarmCombatPresentationCodes.ThirdPersonAwareness);
+            }
         }
 
         public bool TryRequestLocalEncounter(string encounterStableId)
+            => TryRequestLocalEncounter(encounterStableId, -1);
+
+        public bool TryRequestLocalEncounter(string encounterStableId,
+            long expectedWorldRevision)
         {
             if (string.IsNullOrWhiteSpace(encounterStableId)
                 || HasActiveUnifiedBattle || player == null
@@ -94,6 +119,7 @@ namespace Ssalddel.Unity.Presentation.World
                 return false;
             if (player.CurrentMode == 플레이어시점Mode.Strategy)
                 player.EnterExplorationMode();
+            _requestedEncounterWorldRevision = expectedWorldRevision;
             _inputPhaseCode = FarmCombatPresentationCodes.Entering;
             _lastAuthorityErrorCode = string.Empty;
             CombatEntryRequested(encounterStableId.Trim());
@@ -254,6 +280,9 @@ namespace Ssalddel.Unity.Presentation.World
         {
             if (_localBattle == null || string.IsNullOrWhiteSpace(_actorStableId))
                 return false;
+            if (_localBattle.LocalCombat.ControlModeCode ==
+                LocalCombatPresentationCodes.ObserverOperation)
+                return TryHandleObserverOperationInput(keyboard);
             if (_localBattle.LocalCombat.ControlModeCode !=
                     DesiredLocalControlModeCode)
                 return true;
@@ -296,6 +325,47 @@ namespace Ssalddel.Unity.Presentation.World
                     ? 공용AnimationIntentCodes.Guard
                     : 공용AnimationIntentCodes.Attack);
             LocalActionCommandPrepared(command);
+            return true;
+        }
+
+        private bool TryHandleObserverOperationInput(Keyboard? keyboard)
+        {
+            if (_localBattle == null || keyboard == null) return true;
+            var observer = _localBattle.LocalCombat.ObserverOperation;
+            string? actionCode = null;
+            var cardCopyStableId = string.Empty;
+            if (!observer.InterventionOpportunityConsumed
+                && !observer.TacticalPauseActive
+                && keyboard.spaceKey.wasPressedThisFrame)
+            {
+                actionCode = LocalCombatPresentationCodes.PauseObserverIntervention;
+            }
+            else if (observer.TacticalPauseActive
+                && (keyboard.digit3Key.wasPressedThisFrame
+                    || keyboard.numpad3Key.wasPressedThisFrame))
+            {
+                actionCode = LocalCombatPresentationCodes.ActivateObserverCard;
+                cardCopyStableId = (observer.AvailableEmergencyCardCopyStableIds
+                    ?? Array.Empty<string>()).FirstOrDefault() ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(cardCopyStableId)) return true;
+            }
+            else if (observer.TacticalPauseActive
+                && (keyboard.digit4Key.wasPressedThisFrame
+                    || keyboard.numpad4Key.wasPressedThisFrame
+                    || keyboard.escapeKey.wasPressedThisFrame))
+            {
+                actionCode = LocalCombatPresentationCodes.SkipObserverIntervention;
+            }
+            if (actionCode == null) return true;
+            ObserverInterventionCommandPrepared(
+                new LocalCombatObserverInterventionCommandDraft
+                {
+                    CommandId = NextLocalCommandId(),
+                    ExpectedBattleRevision = _localBattle.BattleRevision,
+                    RequestingActorStableId = _actorStableId,
+                    ActionCode = actionCode,
+                    CardCopyStableId = cardCopyStableId,
+                });
             return true;
         }
 
