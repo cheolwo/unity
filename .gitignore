@@ -104,6 +104,11 @@ crashlytics-build.properties
 InitTestScene*.unity*
 /test-results.xml
 
+# LLMUnity extracts platform binaries here during local package setup.
+/Assets/StreamingAssets/LlamaLib-v*/
+/Assets/StreamingAssets/LlamaLib-v*.meta
+/Assets/StreamingAssets.meta
+
 # Addressables default ignores, before user customizations
 /ServerData
 /[Aa]ssets/StreamingAssets/aa*
