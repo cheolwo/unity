@@ -81,6 +81,27 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(OperationalWorldScenePolicy.RefreshAfterSeconds, Is.EqualTo(30));
         }
 
+        [Test]
+        public void 게임모드중에도_운영사본은갱신하고_표시만숨긴다()
+        {
+            var root=new GameObject("operation-layer-test");
+            try
+            {
+                var view=root.AddComponent<운영관찰WorldView>();
+                view.Apply(Plan(Instruction("object:a",1)),Array.Empty<OperationalWorldSceneApplyDiagnostic>());
+                var original=view.Objects.Single();
+                view.SetPresentationVisible(false);
+                view.Apply(Plan(Instruction("object:a",2),Instruction("object:b",1)),Array.Empty<OperationalWorldSceneApplyDiagnostic>());
+                Assert.That(view.ObjectCount,Is.EqualTo(2));
+                Assert.That(view.Objects.Single(x=>x.ObjectStableId=="object:a"),Is.SameAs(original));
+                Assert.That(original.Revision,Is.EqualTo(2));
+                Assert.That(view.Objects.All(x=>!x.gameObject.activeSelf),Is.True);
+                view.SetPresentationVisible(true);
+                Assert.That(view.Objects.All(x=>x.gameObject.activeSelf),Is.True);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
         private static OperationalWorldPlacementPlan Plan(
             params OperationalWorldPlacementInstruction[] instructions)
             => new()

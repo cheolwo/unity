@@ -1,0 +1,28 @@
+{
+  "schema": "sagajeong-building-height-overlay.v1",
+  "revision": "sagajeong-building-height-presentation.r1",
+  "mapRevision": "sagajeong-reference.r3",
+  "mapHash": "4B81E60C3C389A69AA765C8CC8D20E4457102C359A5FFBCD7EBDFA880F7E84E3",
+  "sourceUrl": "https://www.data.go.kr/data/15134735/openapi.do",
+  "presentationOnly": true,
+  "buildings": [
+    {
+      "id": "osm:way:1240882409",
+      "street": "동일로96길",
+      "houseNumber": "51",
+      "heightMeters": 8.3,
+      "sourceHash": "20338ee94f000be8e4abb862bb5670f60e6b1864d9e040dc4be0ef9edf0de80d",
+      "recordCreationDate": "20220813",
+      "matchingStatus": "RoadAndParcelAgreeCandidate"
+    },
+    {
+      "id": "osm:way:1240882396",
+      "street": "동일로92길",
+      "houseNumber": "57",
+      "heightMeters": 19.1,
+      "sourceHash": "bc7f227994ea1383cae5b63da4e8b8c69a171405a36227c5e6b037f662638bc8",
+      "recordCreationDate": "20220813",
+      "matchingStatus": "RoadAndParcelAgreeCandidate"
+    }
+  ]
+}

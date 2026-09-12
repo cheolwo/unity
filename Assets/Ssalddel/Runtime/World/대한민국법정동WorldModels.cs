@@ -88,6 +88,10 @@ namespace Ssalddel.Unity.Runtime.World
         public const string DistantMountain = "legal.terrain.mountain.distant";
         public const string RiverSurface = "legal.water.river.surface";
         public const string WindLeavesFx = "legal.environment.fx.wind-leaves";
+        public const string CityApartment = "legal.city.building.apartment";
+        public const string CityShop = "legal.city.building.shop";
+        public const string CityOffice = "legal.city.building.office";
+        public const string CityCivic = "legal.city.building.civic";
 
         public static readonly string[] All =
         {
@@ -97,6 +101,7 @@ namespace Ssalddel.Unity.Runtime.World
             Greenhouse, ConiferTree, Reeds, SmallRocks,
             BroadleafTree, MixedTreePatch, Understory, ForestEdge,
             RockWall, DistantMountain, RiverSurface, WindLeavesFx,
+            CityApartment, CityShop, CityOffice, CityCivic,
         };
     }
 

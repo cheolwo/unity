@@ -20,6 +20,12 @@ namespace Ssalddel.Unity.Presentation.World
             new(StringComparer.Ordinal);
 
         private Dictionary<string, 운영관찰배치지점> places;
+        private bool presentationVisible = true;
+        public void SetPresentationVisible(bool value)
+        {
+            presentationVisible = value;
+            foreach (var item in objects.Values) if (item != null) item.gameObject.SetActive(value);
+        }
         public int UnplacedCount { get; private set; }
         public string PlacementStatus { get; private set; } = "NotLoaded";
 
@@ -123,6 +129,7 @@ namespace Ssalddel.Unity.Presentation.World
             roof.transform.localScale = new Vector3(1.15f,.2f,1.15f);
             roof.GetComponent<Renderer>().sharedMaterial = material;
             objects.Add(instruction.ObjectStableId, view);
+            primitive.SetActive(presentationVisible);
             return view;
         }
 

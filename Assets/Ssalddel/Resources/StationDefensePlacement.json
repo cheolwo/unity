@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "station-defense-placement.v1",
+  "mapRevision": "sagajeong-reference.r3",
+  "mapHash": "4B81E60C3C389A69AA765C8CC8D20E4457102C359A5FFBCD7EBDFA880F7E84E3",
+  "slots": [
+    { "id": "synthetic:defense-roof:a", "label": "옥상 A", "buildingId": "osm:way:1112326971", "x": 684.65656, "z": 29.15408, "height": 44 },
+    { "id": "synthetic:defense-roof:b", "label": "옥상 B", "buildingId": "osm:way:1256615238", "x": 503.98993, "z": -114.75944, "height": 40 }
+  ]
+}

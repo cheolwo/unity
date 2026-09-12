@@ -2359,6 +2359,9 @@ namespace Ssalddel.Unity.Editor
             var diorama = root.GetComponent<사가정운영디오라마View>()
                           ?? root.gameObject.AddComponent<사가정운영디오라마View>();
             EditorUtility.SetDirty(diorama);
+            var defense = root.GetComponent<역방어준비Controller>()
+                          ?? root.gameObject.AddComponent<역방어준비Controller>();
+            EditorUtility.SetDirty(defense);
             EditorUtility.SetDirty(view);
             EditorUtility.SetDirty(controller);
         }
