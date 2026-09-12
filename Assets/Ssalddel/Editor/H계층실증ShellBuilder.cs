@@ -16,6 +16,10 @@ namespace Ssalddel.Unity.Editor
     /// 이론 H1~H3 기준안을 canonical SimulationWorldShell의 H5 상대 위치에 배치한다.
     /// 배치는 표현 증거이며 Simulation·운영 상태나 AreaSet 이동 권위를 만들지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class H계층실증ShellBuilder
     {
         public const string RootName = "H계층실증Root_PresentationOnly";

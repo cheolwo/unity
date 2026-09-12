@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.UrbanLogisticsCenter.Sample.Editor",
   "rootNamespace": "Ssalddel.Unity.Samples.UrbanLogisticsCenter.Editor",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.NpcMovement.Sample",
     "Ssalddel.Unity.UrbanLogisticsCenter.Sample",

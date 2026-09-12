@@ -28,6 +28,10 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
     /// 농장 전투 전용 Simulation API adapter입니다. 전체 생존 상태에서 전투·교전만
     /// 투영하며 운영 서버나 실제 업무 원장을 호출하지 않습니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class SimulationFarmCombatServerRepository
         : ISimulationFarmCombatAuthorityClient
     {

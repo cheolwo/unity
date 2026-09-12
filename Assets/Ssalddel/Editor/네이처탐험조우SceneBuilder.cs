@@ -12,6 +12,10 @@ namespace Ssalddel.Unity.Editor
     /// canonical Scene에 네이처 탐험·조우 표현 연결부만 좁게 추가합니다.
     /// 별도 공식 Scene이나 전투 권위를 만들지 않습니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class 네이처탐험조우SceneBuilder
     {
         public const string RootName = "NatureExplorationEncounterRoot_PresentationOnly";

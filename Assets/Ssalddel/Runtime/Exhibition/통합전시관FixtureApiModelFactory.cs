@@ -7,6 +7,10 @@ namespace Ssalddel.Unity.Runtime.ExhibitionFixtures
     /// 서버 연결 전에도 통합 전시관의 데이터 연결과 공개 범위를 검증할 수 있는
     /// 읽기 전용 예행 연습 상태를 만든다. 실운영 서버 상태를 대신하지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public static class 통합전시관FixtureApiModelFactory
     {
         public static 통합전시관ApiModel CreateFixtureApiModel()

@@ -9,6 +9,16 @@
       },
       "hash": "9931a9ea46906b1f43adaf9498c05ccf227b5d0b"
     },
+    "com.ssalddel.business-workflow": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.BusinessWorkflow/UnityPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.simulation.business-workflow": "0.1.0",
+        "com.ssalddel.simulation.contracts": "0.1.0",
+        "com.ssalddel.workflow-rules.contracts": "0.1.0"
+      }
+    },
     "com.ssalddel.code-metadata": {
       "version": "file:../../source/repos/Hongdal/Ssalddel.CodeMetadata",
       "depth": 0,
@@ -32,6 +42,15 @@
         "com.ssalddel.interior.contracts": "0.1.0"
       }
     },
+    "com.ssalddel.simulation.business-workflow": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.Simulation.BusinessWorkflow/UnityPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.simulation.contracts": "0.1.0",
+        "com.ssalddel.workflow-rules.contracts": "0.1.0"
+      }
+    },
     "com.ssalddel.simulation.contracts": {
       "version": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Contracts/UnityPackage",
       "depth": 0,
@@ -46,7 +65,8 @@
       "source": "local",
       "dependencies": {
         "com.ssalddel.code-metadata": "0.1.0",
-        "com.ssalddel.interior.contracts": "0.1.0"
+        "com.ssalddel.interior.contracts": "0.1.0",
+        "com.ssalddel.simulation.contracts": "0.1.0"
       }
     },
     "com.ssalddel.simulation.domain": {
@@ -65,6 +85,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
+        "com.ssalddel.business-workflow": "0.1.0",
         "com.ssalddel.code-metadata": "0.1.0",
         "com.ssalddel.simulation.contracts": "0.1.0",
         "com.ssalddel.simulation.domain": "0.1.0"

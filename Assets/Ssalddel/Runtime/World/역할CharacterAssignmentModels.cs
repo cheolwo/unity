@@ -193,6 +193,10 @@ namespace Ssalddel.Unity.Runtime.World
         public bool PresentationOnly = true;
     }
 
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public static class WorldCharacterAssignmentPolicy
     {
         public static WorldCharacterAssignmentResult Assign(

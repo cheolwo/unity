@@ -91,6 +91,10 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void ApplyHierarchyOverlay()
         {
+            // 전이회랑은 지지면이 아니라 H 관계 진단 표시다. 충돌/활성/계보는 보존한다.
+            if (corridorRoot != null)
+                foreach (var renderer in corridorRoot.GetComponentsInChildren<Renderer>(true))
+                    renderer.enabled = showHierarchyOverlayOnPlay;
             foreach (var root in areaSetRoots)
                 if (root != null)
                 {

@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.CityFarmWorldIntegration",
   "rootNamespace": "Ssalddel.Unity.Experiments.CityFarmWorldIntegration",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.Presentation",
     "Ssalddel.Unity.UrbanMarket.Sample",

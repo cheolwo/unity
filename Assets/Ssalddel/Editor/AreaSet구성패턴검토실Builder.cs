@@ -19,6 +19,10 @@ namespace Ssalddel.Unity.Editor
     /// Hongdal의 역할 슬롯 기반 AreaSet 구성 계획을 공용 검토 Scene에 투영한다.
     /// 구조와 Synty 표현을 함께 검토하지만 선택·업무 상태 권위는 만들지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class AreaSet구성패턴검토실Builder
     {
         public const string ScenePath =

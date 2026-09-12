@@ -11,6 +11,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 조우 생성·피해·승패는 결정하지 않습니다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 네이처조우Presenter : MonoBehaviour
     {
         [SerializeField] private 플레이어경관Controller player = null!;

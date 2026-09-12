@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.Farm.Sample",
   "rootNamespace": "Ssalddel.Unity.Samples.Farm",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "VContainer",
     "VContainer.Unity"

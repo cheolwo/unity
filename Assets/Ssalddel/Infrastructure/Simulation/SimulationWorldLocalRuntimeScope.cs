@@ -2,10 +2,12 @@ using System;
 using System.Linq;
 using Newtonsoft.Json;
 using Ssalddel.Simulation.Application;
+using Ssalddel.Simulation.BusinessWorkflow;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Domain;
 using Ssalddel.Unity.Runtime.World;
 using Ssalddel.WorkflowRules;
+using Ssalddel.WorkflowRules.Contracts;
 
 namespace Ssalddel.Unity.Infrastructure.Simulation
 {
@@ -13,6 +15,14 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
     {
         PlayableDefault = 0,
         E7Validation = 1,
+        HansFenceE5 = 2,
+        RestaurantObserver = 3,
+        SyntheticDelivery = 4,
+        WaitingFleet = 5,
+        MartCenter = 6,
+        OrderFlow = 7,
+        NeighborhoodLife = 8,
+        OfflineLife = 9,
     }
 
     /// <summary>
@@ -30,6 +40,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             bool recoveredFromBackup)
         {
             Runtime = runtime;
+            BusinessWorkflow = LocalBusinessWorkflowRuntimeFactory.Create(
+                runtime, BusinessWorkflowRuleEngine.기본);
             SessionStableId = sessionStableId;
             LaunchProfile = launchProfile;
             SlotStableId = slotStableId;
@@ -38,12 +50,46 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         }
 
         public LocalSimulationRuntime Runtime { get; }
+        /// <summary>
+        /// 같은 LocalSimulationRuntime 원장을 다섯 업무 관점으로 노출하는 명시 조립이다.
+        /// 별도 상태나 서버 fallback을 만들지 않는다.
+        /// </summary>
+        public IBusinessWorkflowRuntime BusinessWorkflow { get; }
         public string SessionStableId { get; }
         public Nature생존LaunchProfile LaunchProfile { get; }
         public string SlotStableId { get; }
         public bool RestoredFromSlot { get; }
         public bool RecoveredFromBackup { get; }
+        public 로컬생활시작묶음? OfflineBundle { get; private set; }
+        public static bool OfflineLifeRequested => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SSALDDEL_OFFLINE_LIFE_BUNDLE"));
         public static bool IsInstalled => current != null;
+        public static bool BusinessServerObserverConfigured => string.Equals(
+            Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"),
+            "6",
+            StringComparison.Ordinal);
+        public static bool BusinessServerObserverRequested
+        {
+            get
+            {
+                if (!BusinessServerObserverConfigured) return false;
+                if (!CanUseBusinessServerObserver(
+                        UnityEngine.Application.isEditor,
+                        UnityEngine.Debug.isDebugBuild))
+                    throw new InvalidOperationException(
+                        "BusinessServerObserverDevelopmentBuildOnly");
+                return true;
+            }
+        }
+        public static bool CanUseBusinessServerObserver(bool isEditor, bool isDebugBuild)
+            => isEditor || isDebugBuild;
+        public static bool NeighborhoodLifeRequested => OfflineLifeRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "5", StringComparison.Ordinal);
+        public static bool OrderFlowRequested => NeighborhoodLifeRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "4", StringComparison.Ordinal);
+        public static bool MartCenterRequested => OrderFlowRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "3", StringComparison.Ordinal);
+        public static bool WaitingFleetRequested => MartCenterRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "2", StringComparison.Ordinal);
+        public static bool SyntheticDeliveryRequested => BusinessServerObserverRequested || WaitingFleetRequested || string.Equals(
+            Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "1", StringComparison.Ordinal);
+        public static bool RestaurantObserverRequested => SyntheticDeliveryRequested || string.Equals(
+            Environment.GetEnvironmentVariable("SSALDDEL_RESTAURANT_OBSERVER"), "1", StringComparison.Ordinal);
 
         public static SimulationWorldLocalRuntimeScope Install()
             => Install(DetectLaunchProfile(), null);
@@ -51,6 +97,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         public static SimulationWorldLocalRuntimeScope Install(
             Nature생존LaunchProfile launchProfile, string? savesRootPath)
         {
+            if (BusinessServerObserverRequested) throw new InvalidOperationException("BusinessServerObserverLocalRuntimeForbidden");
             lock (Gate)
             {
                 if (current != null)
@@ -60,12 +107,17 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                             "SimulationLocalRuntimeProfileAlreadyInstalled");
                     return current;
                 }
+                var offline = launchProfile == Nature생존LaunchProfile.OfflineLife
+                    ? 로컬생활시작자료.Read(Environment.GetEnvironmentVariable("SSALDDEL_OFFLINE_LIFE_BUNDLE") ?? "",
+                        Environment.GetEnvironmentVariable("SSALDDEL_OFFLINE_LIFE_SHA256") ?? "") : null;
                 var runtime = string.IsNullOrWhiteSpace(savesRootPath)
                     ? LocalSimulationUnityRuntime.Create()
                     : LocalSimulationUnityRuntime.Create(savesRootPath!);
                 try
                 {
-                    var slotStableId = SlotFor(launchProfile);
+                    // 저장소의 64자 상한 안에서 프로필과 전체 묶음 해시를 함께 식별한다.
+                    var slotStableId = offline == null ? SlotFor(launchProfile) : 로컬생활시작자료.Hash(
+                        System.Text.Encoding.UTF8.GetBytes("offline-life-r1:" + offline.ContentSha256));
                     string sessionStableId;
                     var restoredFromSlot = false;
                     var recoveredFromBackup = false;
@@ -80,7 +132,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                     catch (SimulationNotFoundException error) when (
                         error.Message == "SimulationLocalSaveSlotNotFound")
                     {
-                        var request = CreateSessionRequest(launchProfile);
+                        var request = offline == null ? CreateSessionRequest(launchProfile) : 로컬생활시작자료.Copy(offline.Payload.InitialRequest);
+                        if(offline != null) request.ClientRequestId = Guid.NewGuid();
                         var created = runtime.Sessions.CreateAsync(request).AsTask()
                             .GetAwaiter().GetResult();
                         sessionStableId = created.SessionStableId;
@@ -88,9 +141,10 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                             AdvanceToValidationStart(runtime, sessionStableId,
                                 created.Revision);
                     }
+                    if(offline != null) runtime.GetLocalLifeReportAsync(sessionStableId,offline).AsTask().GetAwaiter().GetResult();
                     current = new SimulationWorldLocalRuntimeScope(runtime,
                         sessionStableId, launchProfile, slotStableId,
-                        restoredFromSlot, recoveredFromBackup);
+                        restoredFromSlot, recoveredFromBackup) {OfflineBundle=offline};
                     return current;
                 }
                 catch
@@ -132,20 +186,56 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         }
 
         public static Nature생존LaunchProfile DetectLaunchProfile()
-            => string.Equals(Environment.GetEnvironmentVariable(
+            => OfflineLifeRequested ? Nature생존LaunchProfile.OfflineLife
+                : NeighborhoodLifeRequested ? Nature생존LaunchProfile.NeighborhoodLife
+                : OrderFlowRequested ? Nature생존LaunchProfile.OrderFlow
+                : MartCenterRequested ? Nature생존LaunchProfile.MartCenter
+                : WaitingFleetRequested ? Nature생존LaunchProfile.WaitingFleet
+                : SyntheticDeliveryRequested ? Nature생존LaunchProfile.SyntheticDelivery
+                : RestaurantObserverRequested ? Nature생존LaunchProfile.RestaurantObserver
+                : string.Equals(Environment.GetEnvironmentVariable(
+                    "SSALDDEL_HANS_FENCE_E5"), "1", StringComparison.Ordinal)
+                ? Nature생존LaunchProfile.HansFenceE5
+                : string.Equals(Environment.GetEnvironmentVariable(
                     "SSALDDEL_NATURE_E7_VALIDATION"), "1",
                 StringComparison.Ordinal)
                 ? Nature생존LaunchProfile.E7Validation
                 : Nature생존LaunchProfile.PlayableDefault;
 
         private static string SlotFor(Nature생존LaunchProfile launchProfile)
-            => launchProfile == Nature생존LaunchProfile.E7Validation
-                ? "nature-e7-validation-r3-primary"
-                : "solo-local-r3-primary";
+            => launchProfile == Nature생존LaunchProfile.NeighborhoodLife
+                ? Ssalddel.Unity.Warehouse.가상배달관찰표본.NeighborhoodLifeSlotId
+                : launchProfile == Nature생존LaunchProfile.OrderFlow
+                ? Ssalddel.Unity.Warehouse.가상배달관찰표본.OrderFlowSlotId
+                : launchProfile == Nature생존LaunchProfile.MartCenter
+                ? Ssalddel.Unity.Warehouse.가상배달관찰표본.MartSlotId
+                : launchProfile == Nature생존LaunchProfile.WaitingFleet
+                ? Ssalddel.Unity.Warehouse.가상배달관찰표본.WaitingSlotId
+                : launchProfile == Nature생존LaunchProfile.SyntheticDelivery
+                ? Ssalddel.Unity.Warehouse.가상배달관찰표본.SlotId
+                : launchProfile == Nature생존LaunchProfile.RestaurantObserver
+                ? Ssalddel.Unity.Warehouse.음식점관찰표본.SlotId
+                : launchProfile == Nature생존LaunchProfile.HansFenceE5
+                ? "hans-fence-e5-r6-primary"
+                : launchProfile == Nature생존LaunchProfile.E7Validation
+                ? "nature-e7-validation-r5-primary"
+                : "solo-local-r5-primary";
 
         private static 경영SimulationSession생성Request CreateSessionRequest(
             Nature생존LaunchProfile launchProfile)
         {
+            if (launchProfile == Nature생존LaunchProfile.NeighborhoodLife)
+                return Ssalddel.Unity.Warehouse.가상배달관찰표본.CreateNeighborhoodLife(Guid.NewGuid(), dayEnabled: true);
+            if (launchProfile == Nature생존LaunchProfile.OrderFlow)
+                return Ssalddel.Unity.Warehouse.가상배달관찰표본.CreateOrderFlow(Guid.NewGuid());
+            if (launchProfile == Nature생존LaunchProfile.MartCenter)
+                return Ssalddel.Unity.Warehouse.가상배달관찰표본.CreateMart(Guid.NewGuid());
+            if (launchProfile == Nature생존LaunchProfile.WaitingFleet)
+                return Ssalddel.Unity.Warehouse.가상배달관찰표본.CreateWaiting(Guid.NewGuid());
+            if (launchProfile == Nature생존LaunchProfile.SyntheticDelivery)
+                return Ssalddel.Unity.Warehouse.가상배달관찰표본.Create(Guid.NewGuid());
+            if (launchProfile == Nature생존LaunchProfile.RestaurantObserver)
+                return Ssalddel.Unity.Warehouse.음식점관찰표본.Create(Guid.NewGuid());
             var request = JsonConvert.DeserializeObject<경영SimulationSession생성Request>(
                 JsonConvert.SerializeObject(
                     턴마감ServerAuthorityRepository.CreateSessionRequest()))
@@ -158,8 +248,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 : "scenario:unity.solo-local-world";
             request.ScenarioDataRevision = launchProfile ==
                 Nature생존LaunchProfile.E7Validation
-                ? "simulation-data:nature-e7-validation:2"
-                : "simulation-data:solo-local-world:2";
+                ? "simulation-data:nature-e7-validation:5"
+                : "simulation-data:solo-local-world:5";
             if (launchProfile == Nature생존LaunchProfile.E7Validation)
             {
                 request.ClientRequestId = Guid.Parse(
@@ -172,9 +262,11 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
             request.IntegratedWorld = null;
             request.NatureSurvival = new SimulationNatureSurvivalInitialStateRequest
             {
-                ProfileRevision = SimulationNatureSurvivalCodes.ProfileRevisionR2,
+                ProfileRevision = SimulationNatureSurvivalCodes.ProfileRevisionR5,
                 PlayerStableId = "player:session:owner",
                 StartsWithAxe = false,
+                BuildingProgressionCatalog =
+                    Simulation영역건물발전Catalog.CreateDefault(),
                 ResourceNodes = nature.ResourceNodes.Select(node =>
                     new SimulationNatureResourceNodeInitialStateRequest
                     {
@@ -185,9 +277,62 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                         LocalZ = node.LocalZ,
                     }).ToArray(),
             };
+            request.ActorEquipment = new SimulationActorEquipmentInitialStateRequest
+            {
+                ActorStableId = request.NatureSurvival.PlayerStableId,
+                ItemInstances = new[]
+                {
+                    new SimulationOwnedItemInstanceInitialState
+                    {
+                        ItemInstanceStableId =
+                            SimulationNatureSurvivalCodes.AxePickupStableId,
+                        ItemDefinitionStableId =
+                            SimulationActorEquipmentCodes.AxeDefinitionStableId,
+                        LocationCode = SimulationActorEquipmentCodes.WorldPickup,
+                        SourceSpatialStableId =
+                            SimulationNatureSurvivalCodes.AxePickupStableId,
+                    },
+                },
+            };
+            request.Atmosphere = new SimulationAtmosphereInitialStateRequest
+            {
+                ProfileStableId =
+                    WorldAtmosphereProfileCodes.NatureNightDay2FixtureR1,
+                RuleRevision = WorldAtmosphereRuleRevisions.R1,
+                ClockSourceCode =
+                    WorldAtmosphereClockSourceCodes.NatureCycleClock,
+            };
             var combatActor = "actor:sim:player-survivor";
             request.TeamRoleCards = CreateNatureCombatCards(request.ClientRequestId,
                 combatActor);
+            var natureObservation = PyeongchangSimulation공간상호작용Fixture
+                .CreateNatureTwilightActualE5Observation().Definitions;
+            var droppedTimberPickup = PyeongchangSimulation공간상호작용Fixture
+                .CreateNatureDroppedTimberActualE5().Definitions;
+            var existingSpatial = request.SpatialWorld?.Definitions
+                ?? Array.Empty<Simulation공간정의InitialRequest>();
+            request.SpatialWorld = new Simulation공간세계InitialStateRequest
+            {
+                Definitions = existingSpatial.Where(value =>
+                        value.SpatialStableId
+                            != SimulationNatureSurvivalCodes.ActualE5SpatialStableId(
+                                "WI-NATURE-01")
+                        && value.SpatialStableId
+                            != SimulationNatureSurvivalCodes.ActualE5SpatialStableId(
+                                "WI-NATURE-18"))
+                    .Concat(natureObservation)
+                    .Concat(droppedTimberPickup).ToArray(),
+            };
+            if (launchProfile == Nature생존LaunchProfile.HansFenceE5)
+            {
+                request.ScenarioStableId = "scenario:unity.hans-fence-e5";
+                request.ScenarioDataRevision = "simulation-data:hans-fence-e5:1";
+                request.NatureSurvival.ProfileRevision = SimulationNatureSurvivalCodes.ProfileRevisionR6;
+                request.NatureSurvival.HansFarmFenceRestorationEnabled = true;
+                request.NatureSurvival.StartsWithAxe = true;
+                // 기존 Solo 저장이나 E7 표본을 변경하지 않는 별도 시작 프로필이다.
+                request.ActorEquipment = null;
+            }
             return request;
         }
 

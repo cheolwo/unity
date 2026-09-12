@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Ssalddel.Unity.Runtime.World
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public interface I실제E5AreaSetNetworkRepository
     {
         Task<실제E5AreaSetNetworkData> LoadAreaSetNetworkAsync(

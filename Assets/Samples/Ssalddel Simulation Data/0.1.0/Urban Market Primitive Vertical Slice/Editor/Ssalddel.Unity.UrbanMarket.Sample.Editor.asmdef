@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.UrbanMarket.Sample.Editor",
   "rootNamespace": "Ssalddel.Unity.Samples.UrbanMarket.Editor",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.UrbanMarket.Sample",
     "Unity.AI.Navigation",

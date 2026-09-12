@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.CityFarmWorldIntegration.Editor",
   "rootNamespace": "Ssalddel.Unity.Experiments.CityFarmWorldIntegration.Editor",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.Runtime",
     "Ssalddel.Unity.Presentation",

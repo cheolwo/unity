@@ -10,6 +10,10 @@ using UnityEngine.UI;
 
 namespace Ssalddel.Unity.Editor
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class WorldBootstrapSceneBuilder
     {
         [MenuItem("Ssalddel/실험·참고 Scene/WorldBootstrap 참고 Scene 재생성")]

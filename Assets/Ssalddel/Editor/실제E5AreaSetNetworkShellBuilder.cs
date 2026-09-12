@@ -14,6 +14,10 @@ namespace Ssalddel.Unity.Editor
     /// 별도 공식 Scene을 만들지 않고 canonical SimulationWorldShell에 실제 E5 Network를 더한다.
     /// 기존 월드 스트리밍 모판은 보존하고 이 Builder가 소유한 Root와 HUD만 재생성한다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class 실제E5AreaSetNetworkShellBuilder
     {
         public const string RuntimeRootName = "ActualE5NetworkRoot";

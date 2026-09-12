@@ -1,6 +1,7 @@
 {
   "name": "Ssalddel.Unity.Farm.Sample.EditorTests",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.Farm.Sample",
     "Ssalddel.Unity.Farm.Sample.Editor"

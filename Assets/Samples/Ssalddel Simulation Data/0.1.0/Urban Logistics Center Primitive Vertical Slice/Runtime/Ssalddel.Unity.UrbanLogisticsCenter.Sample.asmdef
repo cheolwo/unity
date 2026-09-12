@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.UrbanLogisticsCenter.Sample",
   "rootNamespace": "Ssalddel.Unity.Samples.UrbanLogisticsCenter",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.NpcMovement.Sample",
     "VContainer",

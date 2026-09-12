@@ -8,6 +8,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 배치 판정용 원본 표고 표본을 변경하지 않고, 중앙 500m만 표현용 Mesh로 변환한다.
     /// 높이 과장은 이 Renderer 산출물에만 적용한다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class 공간PhysicalElevationMeshBuilder
     {
         public static Mesh BuildCoreMesh(

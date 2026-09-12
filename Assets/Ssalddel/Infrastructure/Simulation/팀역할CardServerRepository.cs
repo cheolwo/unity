@@ -8,6 +8,10 @@ using Ssalddel.Unity.TeamRoles;
 namespace Ssalddel.Unity.Infrastructure.Simulation
 {
     /// <summary>Simulation 서버의 공동 카드함 상태만 읽고 변경 요청을 전달한다.</summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 팀역할CardServerRepository : ITeamRoleCardAuthorityClient
     {
         private readonly ISimulationRehearsalUnityApiClient apiClient;

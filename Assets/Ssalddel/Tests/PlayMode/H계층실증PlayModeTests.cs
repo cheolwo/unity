@@ -8,6 +8,10 @@ using UnityEngine.TestTools;
 
 namespace Ssalddel.Unity.Tests.PlayMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class H계층실증PlayModeTests
     {
         private const string ShellRootName = "SimulationWorldShell";

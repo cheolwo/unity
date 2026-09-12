@@ -1,6 +1,7 @@
 {
   "name": "Ssalddel.Unity.UrbanLogisticsCenter.Sample.EditorTests",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.UrbanLogisticsCenter.Sample",
     "Ssalddel.Unity.UrbanLogisticsCenter.Sample.Editor"

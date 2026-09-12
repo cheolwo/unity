@@ -1,7 +1,7 @@
 {
   "name": "Ssalddel.Unity.Infrastructure",
   "rootNamespace": "Ssalddel.Unity.Infrastructure",
-  "references": ["Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Ssalddel.Simulation.Contracts", "Ssalddel.Simulation.Domain", "Ssalddel.Simulation.RuntimeCore", "Unity.Newtonsoft.Json"],
+  "references": ["Ssalddel.CodeMetadata", "Ssalddel.Unity.Data", "Ssalddel.Unity.Runtime", "Ssalddel.Simulation.BusinessWorkflow", "Ssalddel.Simulation.Contracts", "Ssalddel.Simulation.Domain", "Ssalddel.Simulation.RuntimeCore", "Ssalddel.WorkflowRules.Contracts", "Ssalddel.WorkflowRules", "Unity.Newtonsoft.Json"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

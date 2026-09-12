@@ -9,6 +9,10 @@ using UnityEngine.SceneManagement;
 
 namespace Ssalddel.Unity.Editor
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class 통합월드자유이동Builder
     {
         [MenuItem("Ssalddel/통합 월드/자유 이동/SimulationWorldShell 전체 지도 자유 이동 적용")]

@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.ResidentialPickup.Sample",
   "rootNamespace": "Ssalddel.Unity.Samples.ResidentialPickup",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "VContainer",
     "VContainer.Unity"

@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.UrbanMarket.Sample",
   "rootNamespace": "Ssalddel.Unity.Samples.UrbanMarket",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "VContainer",
     "VContainer.Unity"

@@ -10,6 +10,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 실제 그림자 거리는 URP 품질 프로필이 결정하며 이 View는 Simulation 권위를 갖지 않습니다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 자연경관ShadowPolicyView : MonoBehaviour
     {
         [SerializeField] private string shadowPolicyCode = string.Empty;

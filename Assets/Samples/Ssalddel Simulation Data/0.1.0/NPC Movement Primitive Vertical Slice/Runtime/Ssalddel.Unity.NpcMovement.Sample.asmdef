@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.NpcMovement.Sample",
   "rootNamespace": "Ssalddel.Unity.Samples.NpcMovement",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data"
   ],
   "includePlatforms": [],

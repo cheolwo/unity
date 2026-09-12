@@ -2,6 +2,7 @@
   "name": "Ssalddel.Unity.SyntyCityPackIntegration.Editor",
   "rootNamespace": "Ssalddel.Unity.Editor.Experiments",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.UrbanMarket.Sample",
     "Ssalddel.Unity.UrbanMarket.Sample.Editor",

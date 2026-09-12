@@ -1,6 +1,7 @@
 {
   "name": "Ssalddel.Unity.CityFarmWorldIntegration.EditorTests",
   "references": [
+    "Ssalddel.CodeMetadata",
     "Ssalddel.Unity.Data",
     "Ssalddel.Unity.Runtime",
     "Ssalddel.Unity.Presentation",

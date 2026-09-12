@@ -6,6 +6,10 @@ using UnityEngine;
 namespace Ssalddel.Unity.Presentation.World
 {
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E8,
+        "NPC 목표·행동·기억의 생활 연속성을 표현하거나 조율한다.",
+        Boundary = "NPC 표현 코드 존재만으로 E8 폐루프 완료를 주장하지 않는다.")]
     public sealed class Npc업무행동Presenter : MonoBehaviour
     {
         [SerializeField] private Npc업무행동View[] views = Array.Empty<Npc업무행동View>();

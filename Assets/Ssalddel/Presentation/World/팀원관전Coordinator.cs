@@ -11,6 +11,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// WorldTick은 만들지 않으며, 서버 거절 시 즉시 로컬 관전을 종료한다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E7,
+        "플레이어 입력·화면·피드백과 플레이 경험 표현을 조율한다.",
+        Boundary = "Unity 표현은 권위 상태 변경이나 실제 플레이 완료를 대신하지 않는다.")]
     public sealed class 팀원관전Coordinator : MonoBehaviour
     {
         [SerializeField] private 팀원관전CameraController cameraController = null!;

@@ -11,6 +11,10 @@ using UnityEngine;
 
 namespace Ssalddel.Unity.Tests.EditMode
 {
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E3,
+        "Unity 소비 계약·결정성·Save/Replay 또는 회귀 증거를 검증한다.",
+        Boundary = "자동 시험과 코드 검증을 실제 Play Mode·Game View 증거와 구분한다.")]
     public sealed class PublicWorldMapTests
     {
         private const string FixtureJson = "{\"DatasetCode\":\"public-world\",\"Revision\":\"world-map:2026-08-06\",\"GeneratedAtUtc\":\"2026-08-06T00:00:00Z\",\"Observations\":[{\"StableId\":\"publisher:kr-seoul-001\",\"DatasetCode\":\"public-world\",\"LayerCode\":\"news-publisher\",\"CountryCode\":\"KR\",\"CountryName\":\"대한민국\",\"Latitude\":37.5665,\"Longitude\":126.978,\"Title\":\"서울 공개 언론사\",\"Summary\":\"공개 RSS 출처\",\"SourceName\":\"공식 공개 출처\",\"EvidenceAsOfUtc\":\"2026-08-05T00:00:00Z\",\"EvidenceStatusCode\":\"Verified\",\"DetailHref\":\"/community/map/publisher:kr-seoul-001\",\"SourceHref\":\"https://example.test/source\",\"LocationPrecisionCode\":\"City\",\"FreshnessCode\":\"Current\",\"BoundaryNotice\":\"공개 정보이며 재고·계약·개인 위치를 의미하지 않습니다.\",\"Metrics\":[{\"Code\":\"article-count\",\"DisplayName\":\"기사 수\",\"Value\":12,\"Unit\":\"count\"}]}]}";

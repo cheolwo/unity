@@ -46,6 +46,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 이 Controller는 플레이어 표현 위치만 바꾸며 Simulation 상태를 변경하지 않는다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class 몰입경관InstanceController : MonoBehaviour
     {
         [SerializeField] private GameObject naturePersistentRoot = null!;

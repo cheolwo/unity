@@ -1,9 +1,11 @@
 {
   "dependencies": {
     "ai.undream.llm": "https://github.com/undreamai/LLMUnity.git#9931a9ea46906b1f43adaf9498c05ccf227b5d0b",
+    "com.ssalddel.business-workflow": "file:../../source/repos/Hongdal/Ssalddel.BusinessWorkflow/UnityPackage",
     "com.ssalddel.code-metadata": "file:../../source/repos/Hongdal/Ssalddel.CodeMetadata",
     "com.ssalddel.interior.contracts": "file:../../source/repos/Hongdal/Ssalddel.Interior.Contracts/UnityPackage",
     "com.ssalddel.interior.domain": "file:../../source/repos/Hongdal/Ssalddel.Interior.Domain/UnityPackage",
+    "com.ssalddel.simulation.business-workflow": "file:../../source/repos/Hongdal/Ssalddel.Simulation.BusinessWorkflow/UnityPackage",
     "com.ssalddel.simulation.contracts": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Contracts/UnityPackage",
     "com.ssalddel.simulation.domain": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Domain/UnityPackage",
     "com.ssalddel.simulation.runtime-core": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Application/RuntimeCore",

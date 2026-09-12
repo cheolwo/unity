@@ -11,6 +11,10 @@ namespace Ssalddel.Unity.Editor
     /// 정식 플레이는 하나의 영속 Scene에서 실행하고, 기능은 그 Scene에 조립되는 모듈로 관리한다.
     /// 기존 검토·실험 Scene은 참고 자산으로 보존하지만 Build 진입점으로 승격하지 않는다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public static class 통합WorldScenePolicy
     {
         public const string CanonicalScenePath =

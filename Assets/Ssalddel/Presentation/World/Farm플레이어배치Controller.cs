@@ -31,6 +31,10 @@ namespace Ssalddel.Unity.Presentation.World
     /// 비용·충돌·경사·연결 판정과 확정 상태는 authority가 반환한 결과만 사용합니다.
     /// </summary>
     [DisallowMultipleComponent]
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E5,
+        "Unity의 AreaSet·Graph·배치·통행과 제작 조립 책임을 제공한다.",
+        Boundary = "Builder와 Scene 조립 코드를 저장 Scene·실제 배치 증거와 구분한다.")]
     public sealed class Farm플레이어배치Controller : MonoBehaviour
     {
         [SerializeField] private Camera placementCamera = null!;

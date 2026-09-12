@@ -10,6 +10,10 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
     /// <summary>
     /// 세션 상태 사본에서 네이처 조우만 읽습니다. 전투 결과와 적 수는 Unity가 만들지 않습니다.
     /// </summary>
+    [Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceResponsibility(
+        Ssalddel.Contracts.Common.Metadata.SsalddelEvidenceStage.E2,
+        "Unity가 공통 Core 또는 원격 Host와 연결되는 실행 경계를 제공한다.",
+        Boundary = "Unity GameObject와 표현은 권위 상태를 직접 소유하지 않는다.")]
     public sealed class 네이처탐험조우ServerRepository
         : I네이처탐험조우AuthorityClient
     {
