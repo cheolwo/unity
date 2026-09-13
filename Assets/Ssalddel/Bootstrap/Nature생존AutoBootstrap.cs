@@ -30,6 +30,7 @@ namespace Ssalddel.Unity.Bootstrap
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         public static void InstallForCurrentScene()
         {
+            if (다중Os생명주기GameView검증Driver.CliCaptureRequested) return;
             if (SimulationWorldLocalRuntimeScope.RestaurantObserverRequested) return;
             if (SceneManager.GetActiveScene().name != "SimulationWorldShell"
                 || Object.FindFirstObjectByType<Nature생존Controller>(

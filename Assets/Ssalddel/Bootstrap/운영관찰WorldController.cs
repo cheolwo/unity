@@ -28,6 +28,7 @@ namespace Ssalddel.Unity.Bootstrap
         private 운영관찰검증ApiTransport transport;
         private OperationalWorldSceneClient client;
         private OperationalWorldScenePlacementPlanner planner;
+        private 다중Os생명주기검증Layer lifecycleView;
         private CancellationTokenSource lifetime;
         private Task<OperationalWorldSceneApplyResult> pendingRefresh;
         private float nextRefreshAt;
@@ -50,6 +51,10 @@ namespace Ssalddel.Unity.Bootstrap
         private void InitializeClient()
         {
             if (worldView == null) worldView = GetComponent<운영관찰WorldView>();
+            lifecycleView = GetComponent<다중Os생명주기검증Layer>()
+                            ?? gameObject.AddComponent<다중Os생명주기검증Layer>();
+            lifecycleView.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
+            lifecycleView.Configure(worldView, GetComponent<사가정운영디오라마View>());
             if (client != null) return;
             transport = new 운영관찰검증ApiTransport();
             client = new OperationalWorldSceneClient(
@@ -118,8 +123,12 @@ namespace Ssalddel.Unity.Bootstrap
                 return;
             }
             cursor = result.Cursor;
-            worldView.Apply(planner.Create(result), result.Diagnostics);
-            statusCode = worldView.UnplacedCount > 0 ? "SuccessWithUnplacedObjects"
+            var placement = planner.Create(result);
+            worldView.Apply(placement, result.Diagnostics);
+            lifecycleView.Apply(placement);
+            statusCode = lifecycleView.StateCount > 0 && lifecycleView.GeneralizedPlacementCount > 0
+                ? "SuccessWithGeneralizedLifecycleAnchors"
+                : worldView.UnplacedCount > 0 ? "SuccessWithUnplacedObjects"
                 : result.Diagnostics.Length == 0 ? "Success" : "SuccessWithFrozenObjects";
         }
 
@@ -128,6 +137,7 @@ namespace Ssalddel.Unity.Bootstrap
             lifetime?.Cancel();
             client?.Clear();
             worldView?.Clear();
+            lifecycleView?.Clear();
             cursor = 0;
             pendingRefresh = null;
             transport?.Dispose();
