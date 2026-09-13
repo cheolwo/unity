@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace Ssalddel.Unity.Presentation.World
 {
@@ -10,13 +12,24 @@ namespace Ssalddel.Unity.Presentation.World
     [DisallowMultipleComponent]
     public sealed class 사가정운영디오라마View : MonoBehaviour
     {
-        public const int ObservationLayer = 30;
+        public const int ObservationLayer = 관찰표현LayerContract.사가정운영관찰Layer;
+        public const float WholeViewPitch = 34f;
+        public const float WholeViewYaw = 40f;
+        public const float WholeMapWidthRatio = .94f;
+        public const float PostExposure = .15f;
+        public const float PostContrast = 12f;
+        public const float PostSaturation = 8f;
+        public const float PostVignette = .12f;
+        [SerializeField] private bool useSyntyPresentation;
+        [SerializeField] private bool showDecorativeGreenery = true;
+        public bool UsesSyntyPresentation => useSyntyPresentation;
         public static bool IsVisible { get; private set; }
         public string MapStatus { get; private set; } = "NotLoaded";
         public string HeightStatus { get; private set; } = "NotLoaded";
         public string RoadNameStatus { get; private set; } = "NotLoaded";
         public string SyntyStatus { get; private set; } = "NotLoaded";
-        public string VisualTargetRevision => syntyPlan?.Revision ?? "NotLoaded";
+        public string VisualTargetRevision => MapStatus == "NotLoaded" ? "NotLoaded"
+            : useSyntyPresentation ? syntyPlan?.Revision ?? "NotLoaded" : 사가정모형MeshBuilder.Revision;
         public int SyntyPlacementCount => syntyPlan?.AcceptedCount ?? 0;
         public int SyntyFallbackCount => syntyPlan?.FallbackCount ?? 0;
         public IReadOnlyList<사가정Synty표현Placement> SyntyPlacements
@@ -24,9 +37,30 @@ namespace Ssalddel.Unity.Presentation.World
         public Transform SyntyVisualRoot { get; private set; }
         public Dictionary<string, 운영관찰배치지점> Places { get; private set; }
         public Camera ObservationCamera { get; private set; }
+        public Volume PresentationVolume { get; private set; }
+        public 사가정모형MeshBuilder.BuildReport MiniatureBuildReport { get; private set; }
+        public bool StationDetailsVisible => stationDetailRoot != null && stationDetailRoot.gameObject.activeSelf;
+        public bool SpatialOverlayApplied => !useSyntyPresentation
+            && spatialComposition?.OverlayApplied == true;
+        public string SpatialPresentationRevision => useSyntyPresentation
+            ? 사가정공간표현OverlayComposer.BaseMapRevision
+            : spatialComposition?.Revision ?? "NotLoaded";
+        public string SpatialPresentationContentHash => useSyntyPresentation
+            ? 사가정공간표현OverlayComposer.BaseMapHash
+            : spatialComposition?.ContentHash ?? "NotLoaded";
+        public string SpatialPresentationStatus => useSyntyPresentation
+            ? "SagajeongReferenceR3Base · SpatialOverlayNotRenderedInSyntyMode"
+            : spatialComposition == null ? "NotLoaded"
+            : $"{spatialComposition.SourceStatus} · {spatialComposition.DiagnosticCode}";
+        public string SpatialPresentationAttribution { get; private set; } = "NotLoaded";
         private readonly List<UnityEngine.Object> owned = new();
+        private readonly Dictionary<string, Material> materialCache = new(StringComparer.Ordinal);
+        private readonly Transform[] miniatureChunks = new Transform[
+            사가정모형MeshBuilder.ChunkAxisCount * 사가정모형MeshBuilder.ChunkAxisCount];
         private 공간참고자료 map;
         private Transform geography;
+        private Transform miniatureChunkRoot;
+        private Transform stationDetailRoot;
         private Bounds bounds;
         private Vector3 focus;
         private float wholeSize;
@@ -34,6 +68,7 @@ namespace Ssalddel.Unity.Presentation.World
         private 운영관찰ObjectView selected;
         private 도로명주소표현조회 roadNames;
         private 사가정Synty표현Plan syntyPlan;
+        private 사가정공간표현Composition spatialComposition;
         private string selectedRoad = "";
         private int addressPage;
         public const int AddressPageSize = 6;
@@ -79,15 +114,35 @@ namespace Ssalddel.Unity.Presentation.World
                     JsonUtility.FromJson<운영관찰지역배치자료>(placements.text), map, asset.bytes);
                 roadNames = LoadRoadNames(map, asset.bytes);
                 var heights = LoadHeights(map, asset.bytes);
-                syntyPlan = LoadSyntyPlan(map, heights);
+                spatialComposition = useSyntyPresentation
+                    ? null
+                    : LoadSpatialComposition(map, asset.bytes);
+                SpatialPresentationAttribution = useSyntyPresentation
+                    ? heights == null
+                        ? "© OpenStreetMap contributors · ODbL 1.0"
+                        : "© OpenStreetMap contributors · ODbL 1.0 / 국토교통부 건축HUB"
+                    : Attribution(spatialComposition, heights != null);
+                syntyPlan = useSyntyPresentation ? LoadSyntyPlan(map, heights) : 사가정Synty표현Plan.Empty();
+                if (!useSyntyPresentation) SyntyStatus = "원문 윤곽 모형 표현";
                 geography = new GameObject("사가정 지리 배경").transform;
                 geography.SetParent(transform, false);
                 SyntyVisualRoot = new GameObject("Synty VisualRoot · 표현 전용").transform;
                 SyntyVisualRoot.SetParent(geography, false);
-                사가정지리MeshBuilder.Build(map, AddMesh, heights, syntyPlan);
-                BuildSyntyVisuals();
-                Block(geography, "지도 바탕 · 자료 없는 영역은 미확인", new Vector3(map.offsetX, -2, map.offsetZ),
-                    new Vector3(map.halfExtent * 2, 4, map.halfExtent * 2), new Color(.43f,.49f,.38f));
+                if (useSyntyPresentation)
+                {
+                    사가정지리MeshBuilder.Build(map, AddMesh, heights, syntyPlan);
+                    BuildSyntyVisuals();
+                }
+                else
+                {
+                    PrepareMiniatureRoots();
+                    MiniatureBuildReport = 사가정모형MeshBuilder.BuildBatches(
+                        map, heights, spatialComposition, CreateMiniatureMesh, showDecorativeGreenery);
+                }
+                Block(geography, "모형 받침대", new Vector3(map.offsetX, -15f, map.offsetZ),
+                    new Vector3(map.halfExtent * 2 + 2, 30, map.halfExtent * 2 + 2), new Color(.41f,.43f,.42f));
+                Block(geography, "모형 촬영 배경", new Vector3(map.offsetX,-33,map.offsetZ),
+                    new Vector3(6000,1,6000),new Color(.41f,.61f,.80f));
                 Block(geography, "사가정역 기준 표식", new Vector3(map.offsetX, 1, map.offsetZ),
                     new Vector3(8,2,8), new Color(.74f,.78f,.38f));
                 bounds = new Bounds(transform.TransformPoint(new Vector3(map.offsetX, 35, map.offsetZ)),
@@ -97,12 +152,19 @@ namespace Ssalddel.Unity.Presentation.World
                 ObservationCamera = cameraObject.AddComponent<Camera>();
                 ObservationCamera.orthographic = true;
                 ObservationCamera.depth = 200;
-                ObservationCamera.cullingMask = 1 << ObservationLayer;
+                ObservationCamera.cullingMask = 관찰표현LayerContract.사가정운영관찰Mask;
                 ObservationCamera.clearFlags = CameraClearFlags.SolidColor;
-                ObservationCamera.backgroundColor = new Color(.47f,.59f,.69f);
-                ObservationCamera.nearClipPlane = .1f;
-                ObservationCamera.farClipPlane = 4000;
+                ObservationCamera.backgroundColor = new Color(.38f,.56f,.72f);
+                ObservationCamera.allowMSAA = true;
+                var cameraData = cameraObject.AddComponent<UniversalAdditionalCameraData>();
+                cameraData.renderPostProcessing = true;
+                cameraData.volumeLayerMask = 관찰표현LayerContract.사가정운영관찰Mask;
+                cameraData.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+                cameraData.antialiasingQuality = AntialiasingQuality.High;
+                ObservationCamera.nearClipPlane = 700f;
+                ObservationCamera.farClipPlane = 3000f;
                 BuildPresentationLight();
+                BuildPresentationVolume();
                 MapStatus = "Ready";
                 RegisterEnvironment();
                 Show(true);
@@ -114,6 +176,34 @@ namespace Ssalddel.Unity.Presentation.World
                 MapStatus = "MapOrPlacementRejected";
                 Debug.LogWarning("사가정 관찰: 지도/배치 판본 검증 실패. 임의 배치를 하지 않습니다.");
             }
+        }
+
+        private static 사가정공간표현Composition LoadSpatialComposition(
+            공간참고자료 data, byte[] mapBytes)
+        {
+            var approved = 사가정공간표현OverlayPipeline.LoadApprovedResource(data, mapBytes,
+                name => Resources.Load<TextAsset>(name)?.bytes);
+            if (approved.OverlayApplied) return approved;
+
+            var local = 사가정공간표현OverlayPipeline.LoadLocalPrivateReviewForEditor(data, mapBytes);
+            return local;
+        }
+
+        private static string Attribution(
+            사가정공간표현Composition composition,
+            bool heightOverlayApplied)
+        {
+            var sources = new List<string>
+            {
+                "© OpenStreetMap contributors · ODbL 1.0"
+            };
+            if (heightOverlayApplied) sources.Add("국토교통부 건축HUB");
+            if (composition?.OverlayApplied == true)
+            {
+                sources.AddRange(composition.SourceReceipts
+                    .Select(value => $"{value.Provider} · {value.LicenseCode}"));
+            }
+            return string.Join(" / ", sources.Distinct(StringComparer.Ordinal));
         }
 
         private 사가정Synty표현Plan LoadSyntyPlan(공간참고자료 data, 건물높이보완조회 heights)
@@ -219,7 +309,50 @@ namespace Ssalddel.Unity.Presentation.World
             light.intensity = 1.15f;
             light.shadows = LightShadows.Soft;
             light.shadowStrength = .72f;
-            light.cullingMask = 1 << ObservationLayer;
+            light.cullingMask = 관찰표현LayerContract.사가정운영관찰Mask;
+        }
+
+        private void BuildPresentationVolume()
+        {
+            // Collider가 필요한 local-volume 대신 전용 layer에서만 읽는 camera-local global volume을 쓴다.
+            // 다른 카메라와 전역 환경의 후처리 상태에는 영향을 주지 않는다.
+            var volumeObject = new GameObject("사가정 카메라 전용 색보정") { layer = ObservationLayer };
+            volumeObject.transform.SetParent(geography, false);
+            PresentationVolume = volumeObject.AddComponent<Volume>();
+            PresentationVolume.isGlobal = true;
+            PresentationVolume.priority = 200f;
+            PresentationVolume.weight = 1f;
+            var profile = ScriptableObject.CreateInstance<VolumeProfile>();
+            profile.name = "사가정 카메라 전용 ACES 색보정";
+            owned.Add(profile);
+
+            var tone = profile.Add<Tonemapping>(true);
+            tone.mode.Override(TonemappingMode.ACES);
+            var color = profile.Add<ColorAdjustments>(true);
+            color.postExposure.Override(PostExposure);
+            color.contrast.Override(PostContrast);
+            color.saturation.Override(PostSaturation);
+            var vignette = profile.Add<Vignette>(true);
+            vignette.intensity.Override(PostVignette);
+            vignette.smoothness.Override(.32f);
+            // DepthOfField는 의도적으로 profile에 추가하지 않는다. 전체/역세권 모두 정보 판독이 우선이다.
+            PresentationVolume.sharedProfile = profile;
+        }
+
+        private void PrepareMiniatureRoots()
+        {
+            miniatureChunkRoot = new GameObject("사가정 4x4 표현 chunks").transform;
+            miniatureChunkRoot.SetParent(geography, false);
+            for (var z = 0; z < 사가정모형MeshBuilder.ChunkAxisCount; z++)
+                for (var x = 0; x < 사가정모형MeshBuilder.ChunkAxisCount; x++)
+                {
+                    var index = z * 사가정모형MeshBuilder.ChunkAxisCount + x;
+                    miniatureChunks[index] = new GameObject($"chunk {x}:{z}").transform;
+                    miniatureChunks[index].SetParent(miniatureChunkRoot, false);
+                }
+            stationDetailRoot = new GameObject("사가정역 관찰 전용 상세").transform;
+            stationDetailRoot.SetParent(geography, false);
+            stationDetailRoot.gameObject.SetActive(false);
         }
 
         private 건물높이보완조회 LoadHeights(공간참고자료 data, byte[] bytes)
@@ -262,6 +395,9 @@ namespace Ssalddel.Unity.Presentation.World
         {
             shown = value;
             IsVisible = value && ObservationCamera != null;
+            // 관찰을 닫으면 전용 layer의 geometry, 조명, global Volume까지 함께 비활성화해
+            // 다른 카메라의 culling/volume mask 설정과 무관하게 기존 화면에 새지 않게 한다.
+            if (geography != null) geography.gameObject.SetActive(IsVisible);
             if (ObservationCamera != null) ObservationCamera.enabled = IsVisible;
         }
 
@@ -280,8 +416,8 @@ namespace Ssalddel.Unity.Presentation.World
             SelectedAddress = "";
             addressPage = 0;
             focus = bounds.center;
-            wholeSize = 동네전체관찰CameraMath.맞춤크기(bounds, 동네전체관찰CameraMath.기본회전,
-                Mathf.Max(.1f, ObservationCamera.aspect), .12f);
+            wholeSize = WholeViewOrthographicSize(bounds, 관찰회전,
+                Mathf.Max(.1f, ObservationCamera.aspect));
             ObservationCamera.orthographicSize = wholeSize;
             UpdateCamera();
         }
@@ -340,8 +476,42 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void UpdateCamera()
         {
-            var rotation = 동네전체관찰CameraMath.기본회전;
+            var rotation = 관찰회전;
             ObservationCamera.transform.SetPositionAndRotation(focus - rotation * Vector3.forward * 1800, rotation);
+            UpdateStationDetailVisibility();
+        }
+        private static Quaternion 관찰회전 => Quaternion.Euler(WholeViewPitch, WholeViewYaw, 0f);
+
+        public static float WholeViewOrthographicSize(Bounds value, Quaternion rotation, float aspect)
+        {
+            if (aspect <= 0f || !float.IsFinite(aspect)) throw new ArgumentOutOfRangeException(nameof(aspect));
+            var inverse = Quaternion.Inverse(rotation);
+            var maximumHorizontal = 0f;
+            var maximumVertical = 0f;
+            for (var x = -1; x <= 1; x += 2)
+                for (var y = -1; y <= 1; y += 2)
+                    for (var z = -1; z <= 1; z += 2)
+                    {
+                        var corner = value.center + Vector3.Scale(value.extents, new Vector3(x, y, z));
+                        var local = inverse * (corner - value.center);
+                        maximumHorizontal = Mathf.Max(maximumHorizontal, Mathf.Abs(local.x));
+                        maximumVertical = Mathf.Max(maximumVertical, Mathf.Abs(local.y));
+                    }
+            return Mathf.Max(maximumVertical, maximumHorizontal / aspect) / WholeMapWidthRatio;
+        }
+
+        private void UpdateStationDetailVisibility()
+        {
+            if (stationDetailRoot == null || ObservationCamera == null || map == null) return;
+            var localFocus3 = transform.InverseTransformPoint(focus);
+            var horizontalFocus = new Vector2(localFocus3.x, localFocus3.z);
+            var station = new Vector2(map.offsetX, map.offsetZ);
+            var visible = ObservationCamera.orthographicSize <= 120f
+                          && (horizontalFocus - station).sqrMagnitude
+                          <= 사가정모형MeshBuilder.StationDetailRadius
+                          * 사가정모형MeshBuilder.StationDetailRadius;
+            if (stationDetailRoot.gameObject.activeSelf != visible)
+                stationDetailRoot.gameObject.SetActive(visible);
         }
 
         private void AddMesh(string name, List<Vector3> vertices, List<int> triangles, Color color)
@@ -356,6 +526,31 @@ namespace Ssalddel.Unity.Presentation.World
             CreateMesh(name,vertices,triangles,color);
         }
 
+        private void CreateMiniatureMesh(사가정모형MeshBuilder.MeshBatch batch)
+        {
+            var index = batch.ChunkZ * 사가정모형MeshBuilder.ChunkAxisCount + batch.ChunkX;
+            if (index < 0 || index >= miniatureChunks.Length || miniatureChunks[index] == null)
+                throw new InvalidOperationException("SagajeongMiniatureChunkMissing");
+            var parent = batch.IsStationDetail ? stationDetailRoot : miniatureChunks[index];
+            var go = new GameObject(batch.Name) { layer = ObservationLayer };
+            go.transform.SetParent(parent, false);
+            var mesh = new Mesh { name = batch.Name, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
+            mesh.SetVertices(batch.Vertices);
+            mesh.SetTriangles(batch.Triangles, 0);
+            mesh.SetColors(batch.Colors);
+            mesh.SetUVs(1, batch.SurfaceData);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            owned.Add(mesh);
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var renderer = go.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = Material(Color.white, batch.IsShadow, true);
+            renderer.shadowCastingMode = batch.IsShadow
+                ? UnityEngine.Rendering.ShadowCastingMode.Off
+                : UnityEngine.Rendering.ShadowCastingMode.On;
+            renderer.receiveShadows = !batch.IsShadow;
+        }
+
         private void CreateMesh(string name, List<Vector3> vertices, List<int> triangles, Color color)
         {
             var go = new GameObject(name) { layer = ObservationLayer };
@@ -364,16 +559,32 @@ namespace Ssalddel.Unity.Presentation.World
             mesh.SetVertices(vertices); mesh.SetTriangles(triangles, 0); mesh.RecalculateNormals();
             owned.Add(mesh);
             go.AddComponent<MeshFilter>().sharedMesh = mesh;
-            go.AddComponent<MeshRenderer>().sharedMaterial = Material(color);
+            var renderer=go.AddComponent<MeshRenderer>();
+            var shadow = name.Contains("접지 그림자");
+            renderer.sharedMaterial = Material(color, shadow, false);
+            renderer.shadowCastingMode = shadow
+                ? UnityEngine.Rendering.ShadowCastingMode.Off
+                : UnityEngine.Rendering.ShadowCastingMode.On;
+            renderer.receiveShadows = !shadow;
         }
 
-        private Material Material(Color color)
+        private Material Material(Color color, bool shadow = false, bool useVertexColor = false)
         {
-            var shader = Resources.Load<Shader>("관찰도형명암")
+            var shader = shadow ? Resources.Load<Shader>("사가정모형그림자")
+                : Resources.Load<Shader>("사가정모형명암");
+            shader ??= Resources.Load<Shader>("관찰도형명암")
                 ?? Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+            var rgba = (Color32)color;
+            var key = $"{shader.name}|{rgba.r:X2}{rgba.g:X2}{rgba.b:X2}{rgba.a:X2}|{useVertexColor}";
+            if (materialCache.TryGetValue(key, out var cached)) return cached;
             var value = new Material(shader) { color = color };
+            if (value.HasProperty("_BaseColor")) value.SetColor("_BaseColor", color);
+            if (value.HasProperty("_Color")) value.SetColor("_Color", color);
+            if (value.HasProperty("_VertexColorWeight"))
+                value.SetFloat("_VertexColorWeight", useVertexColor ? 1f : 0f);
             value.enableInstancing = true;
             owned.Add(value);
+            materialCache.Add(key, value);
             return value;
         }
 
@@ -419,13 +630,20 @@ namespace Ssalddel.Unity.Presentation.World
             GUI.Label(new Rect(24,56,345,52), "가상 업무 표본 · 실제 위치 추적 아님\n휠: 확대  |  오른쪽 드래그: 이동  |  표식: 선택", smallStyle);
             if (GUI.Button(new Rect(Screen.width-240,12,110,32), "전체 보기")) ShowWhole();
             if (GUI.Button(new Rect(Screen.width-124,12,110,32), "기존 화면")) Show(false);
-            var footerWidth=Mathf.Min(430,Screen.width*.30f);
-            GUI.Box(new Rect(12,Screen.height-110,footerWidth,98), GUIContent.none);
-            GUI.Label(new Rect(24,Screen.height-106,footerWidth-24,20), "음식 배달  ·  화물 운송  ·  창고  ·  마트",smallStyle);
-            GUI.Label(new Rect(24,Screen.height-84,footerWidth-24,20),
+            var footerWidth=Mathf.Min(560,Screen.width*.42f);
+            GUI.Box(new Rect(12,Screen.height-144,footerWidth,132), GUIContent.none);
+            GUI.Label(new Rect(24,Screen.height-140,footerWidth-24,20), "음식 배달  ·  화물 운송  ·  창고  ·  마트",smallStyle);
+            GUI.Label(new Rect(24,Screen.height-118,footerWidth-24,20),
                 $"{world?.ObjectCount ?? 0}개 업무 결과  |  {statusMessage} / {MapStatus}", smallStyle);
-            GUI.Label(new Rect(24,Screen.height-62,footerWidth-24,44),
-                $"© OSM contributors · ODbL 1.0 / 국토교통부 건축HUB\n{RoadNameStatus} · {HeightStatus}", smallStyle);
+            GUI.Label(new Rect(24,Screen.height-96,footerWidth-24,20),
+                $"공간 표현: {SpatialPresentationStatus} · {SpatialPresentationRevision} · "
+                + (SpatialPresentationContentHash.Length >= 12
+                    ? SpatialPresentationContentHash.Substring(0, 12)
+                    : SpatialPresentationContentHash), smallStyle);
+            GUI.Label(new Rect(24,Screen.height-74,footerWidth-24,22),
+                $"근거: {SpatialPresentationAttribution}", smallStyle);
+            GUI.Label(new Rect(24,Screen.height-50,footerWidth-24,28),
+                $"{RoadNameStatus} · {HeightStatus}", smallStyle);
             if (!string.IsNullOrEmpty(selectedRoad))
             {
                 var addresses=roadNames?.Addresses(selectedRoad)??Array.Empty<도로명건물주소>();
@@ -466,9 +684,9 @@ namespace Ssalddel.Unity.Presentation.World
                 foreach (var item in world.Objects)
                 {
                     var point = ObservationCamera.WorldToScreenPoint(item.transform.position + Vector3.up*15);
-                    if (point.z <= 0 || point.x < 0 || point.x > Screen.width || point.y < 80 || point.y > Screen.height-120) continue;
+                    if (point.z <= 0 || point.x < 0 || point.x > Screen.width || point.y < 80 || point.y > Screen.height-154) continue;
                     var label = Places.TryGetValue(item.SemanticPlaceStableId, out var p) ? p.label : "업무";
-                    var rect=PlaceLabel(new Rect(point.x-58,Screen.height-point.y,116,26),occupiedLabels,124,Screen.height-120);
+                    var rect=PlaceLabel(new Rect(point.x-58,Screen.height-point.y,116,26),occupiedLabels,124,Screen.height-154);
                     if (rect.width<=0) continue;
                     occupiedLabels.Add(rect);
                     if (GUI.Button(rect, label)) Focus(item);
@@ -483,9 +701,9 @@ namespace Ssalddel.Unity.Presentation.World
             foreach(var road in roadNames.SelectLabels(ObservationCamera.orthographicSize,focus.x,focus.z,maximum))
             {
                 var point=ObservationCamera.WorldToScreenPoint(transform.TransformPoint(new Vector3(road.x,.5f,road.z)));
-                if(point.z<=0||point.x<0||point.x>Screen.width||point.y<80||point.y>Screen.height-120)continue;
+                if(point.z<=0||point.x<0||point.x>Screen.width||point.y<80||point.y>Screen.height-154)continue;
                 var preferred=new Rect(point.x-52,Screen.height-point.y-11,104,23);
-                var rect=PlaceLabel(preferred,occupied,124,Screen.height-120);if(rect.width<=0)continue;
+                var rect=PlaceLabel(preferred,occupied,124,Screen.height-154);if(rect.width<=0)continue;
                 occupied.Add(rect);
                 var label=road.importanceCode=="Major"?"◆ "+road.name:road.name;
                 if(GUI.Button(rect,label))
@@ -502,6 +720,7 @@ namespace Ssalddel.Unity.Presentation.World
             if (e.type == EventType.ScrollWheel)
             {
                 ObservationCamera.orthographicSize = Mathf.Clamp(ObservationCamera.orthographicSize * Mathf.Exp(e.delta.y*.07f), 35, wholeSize);
+                UpdateStationDetailVisibility();
                 e.Use();
             }
             if (e.type == EventType.MouseDrag && e.button == 1)
@@ -546,7 +765,12 @@ namespace Ssalddel.Unity.Presentation.World
             if (geography != null) ReleaseObject(geography.gameObject);
             if (ObservationCamera != null) ReleaseObject(ObservationCamera.gameObject);
             geography = null;
+            miniatureChunkRoot = null;
+            stationDetailRoot = null;
+            Array.Clear(miniatureChunks, 0, miniatureChunks.Length);
             ObservationCamera = null;
+            PresentationVolume = null;
+            MiniatureBuildReport = null;
             Places = null;
             roadNames = null;
             selectedRoad = "";
@@ -556,6 +780,8 @@ namespace Ssalddel.Unity.Presentation.World
             HeightStatus = "NotLoaded";
             RoadNameStatus = "NotLoaded";
             SyntyStatus = "NotLoaded";
+            spatialComposition = null;
+            SpatialPresentationAttribution = "NotLoaded";
             SyntyVisualRoot = null;
             syntyPlan = null;
             performanceMeasurementActive = false;
@@ -565,6 +791,7 @@ namespace Ssalddel.Unity.Presentation.World
                 if (UnityEngine.Application.isPlaying) Destroy(item); else DestroyImmediate(item);
             }
             owned.Clear();
+            materialCache.Clear();
         }
         private static void ReleaseObject(GameObject value)
         {

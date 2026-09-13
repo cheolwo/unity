@@ -101,12 +101,22 @@ namespace Ssalddel.Unity.Tests.EditMode
             try
             {
                 var view = root.AddComponent<사가정운영디오라마View>();
+                typeof(사가정운영디오라마View).GetField("useSyntyPresentation",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(view, true);
                 view.Initialize();
                 Assert.That(view.MapStatus, Is.EqualTo("Ready"));
                 Assert.That(view.VisualTargetRevision, Is.EqualTo(사가정Synty표현Planner.Revision));
                 Assert.That(view.SyntyPlacementCount, Is.EqualTo(90));
                 Assert.That(view.SyntyFallbackCount, Is.EqualTo(30));
                 Assert.That(view.SyntyVisualRoot, Is.Not.Null);
+                Assert.That(view.SpatialOverlayApplied, Is.False,
+                    "Synty 분기는 r3 기준 지도만 그리므로 비공개 공간 overlay를 적용했다고 보고하면 안 됩니다.");
+                Assert.That(view.SpatialPresentationRevision,
+                    Is.EqualTo(사가정공간표현OverlayComposer.BaseMapRevision));
+                Assert.That(view.SpatialPresentationContentHash,
+                    Is.EqualTo(사가정공간표현OverlayComposer.BaseMapHash));
+                Assert.That(view.SpatialPresentationStatus,
+                    Does.Contain("SpatialOverlayNotRenderedInSyntyMode"));
                 Assert.That(root.GetComponentsInChildren<Transform>(true)
                     .Count(value => value.name == "Synty VisualRoot · 표현 전용"), Is.EqualTo(1));
                 Assert.That(view.SyntyVisualRoot.GetComponentsInChildren<Collider>(true), Is.Empty);

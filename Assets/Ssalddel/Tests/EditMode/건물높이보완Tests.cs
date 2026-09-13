@@ -104,14 +104,17 @@ namespace Ssalddel.Unity.Tests.EditMode
                 view.Initialize(); // EditMode에서는 일반 MonoBehaviour의 Awake를 자동 실행하지 않는다.
                 Assert.That(view.MapStatus,Is.EqualTo("Ready"));
                 Assert.That(view.HeightStatus,Is.EqualTo("대장 높이 후보 연결 2건"));
-                var fallbackHasHeight=root.GetComponentsInChildren<MeshFilter>()
-                    .Where(x=>x.name.Contains("건물"))
-                    .Any(x=>x.sharedMesh.vertices.Any(v=>Math.Abs(v.y-19.16f)<.001f));
+                // 공개/CI 기본 경계에서는 기존 대장 후보 19.1m를, 명시적으로 연결한
+                // 비공개 공간 overlay에서는 같은 footprint에 결속된 21.55m를 쓴다.
+                var expectedHeight=view.SpatialOverlayApplied?21.55f:19.1f;
+                var proceduralHasHeight=root.GetComponentsInChildren<MeshFilter>()
+                    .Any(x=>x.sharedMesh.vertices.Any(v=>Math.Abs(v.y-
+                        (expectedHeight+사가정모형MeshBuilder.BuildingBaseElevation))<.001f));
                 var syntyHasHeight=view.SyntyPlacements.Any(value=>
                     Math.Abs(value.TargetHeight-19.1f)<.001f
                     && Math.Abs(value.ActualHeight-value.TargetHeight)/value.TargetHeight
                     <=사가정Synty표현Planner.MaximumHeightErrorRatio);
-                Assert.That(fallbackHasHeight||syntyHasHeight,Is.True);
+                Assert.That(proceduralHasHeight||syntyHasHeight,Is.True);
                 Assert.That(view.Places.Count,Is.EqualTo(6));
                 typeof(사가정운영디오라마View).GetMethod("OnDisable",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(view,null);

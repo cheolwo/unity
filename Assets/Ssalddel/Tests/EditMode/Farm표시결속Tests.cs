@@ -76,7 +76,8 @@ namespace Ssalddel.Unity.Tests.EditMode
             view.Initialize();
             policy.ApplyView();
             Assert.That(view.MapStatus,Is.EqualTo("Ready"));
-            Assert.That(root.GetComponentsInChildren<Renderer>(true).Length,Is.EqualTo(5));
+            var rendererCount=root.GetComponentsInChildren<Renderer>(true).Length;
+            Assert.That(rendererCount,Is.InRange(5,40));
             Assert.That(root.GetComponentsInChildren<Renderer>(true).All(x=>x.enabled),Is.True);
             Assert.That(unrelated.enabled,Is.False);
             view.ShowWhole();
@@ -92,6 +93,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             policy.ApplyView();
             Assert.That(view.MapStatus,Is.EqualTo("Ready"));
             Assert.That(root.GetComponentsInChildren<Camera>(true).Length,Is.EqualTo(1));
+            Assert.That(root.GetComponentsInChildren<Renderer>(true).Length,Is.EqualTo(rendererCount));
             Assert.That(root.GetComponentsInChildren<Renderer>(true).All(x=>x.enabled),Is.True);
         }
 

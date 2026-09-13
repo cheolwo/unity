@@ -156,7 +156,7 @@ namespace Ssalddel.Unity.Presentation.World
             => road.kind is "pedestrian" or "cycleway" or "footway" or "path" or "steps";
         private static bool IsLocalRoad(참고도로 road) => !IsMajorRoad(road)&&!IsPedestrianRoad(road);
         // 단일 외곽 다각형의 오목 지붕. 실패 시 벽만 유지하며 잘못된 면을 채우지 않는다.
-        private static List<int> 참고지붕삼각형(List<Vector2> points)
+        internal static List<int> 참고지붕삼각형(List<Vector2> points)
         {
             float Cross(Vector2 a,Vector2 b,Vector2 c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
             var indices=new List<int>();for(int i=0;i<points.Count;i++)indices.Add(i);
