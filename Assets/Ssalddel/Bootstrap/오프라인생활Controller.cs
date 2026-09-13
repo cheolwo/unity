@@ -5,6 +5,7 @@ using System.Linq;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Unity.Infrastructure.Simulation;
+using Ssalddel.Unity.Presentation.World;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,7 +14,7 @@ namespace Ssalddel.Unity.Bootstrap
     /// <summary>명시적으로 선택한 JSON 시작 묶음의 표현만 소유한다. NPC의 업무 권위는 LocalSimulationRuntime이다.</summary>
     public sealed class 오프라인생활Controller : MonoBehaviour
     {
-        private const int ViewLayer = 30;
+        private const int ViewLayer = 관찰표현LayerContract.오프라인생활Layer;
         private readonly Dictionary<string,GameObject> objects = new(StringComparer.Ordinal);
         private readonly List<Material> materials = new();
         private SimulationWorldLocalRuntimeScope scope;
@@ -39,7 +40,8 @@ namespace Ssalddel.Unity.Bootstrap
         {
             try {
                 if(SimulationWorldLocalRuntimeScope.IsInstalled) throw new InvalidOperationException("OfflineLifeScopeAlreadyOwned");
-                if(FindObjectsByType<Transform>(FindObjectsInactive.Include,FindObjectsSortMode.None).Any(x=>x.gameObject.layer==ViewLayer))
+                if(ViewLayerOccupied(FindObjectsByType<Transform>(
+                       FindObjectsInactive.Include,FindObjectsSortMode.None)))
                     throw new InvalidOperationException("OfflineLifeViewLayerOccupied");
                 scope=SimulationWorldLocalRuntimeScope.Install(Nature생존LaunchProfile.OfflineLife,null);ownsScope=true;
                 bundle=로컬생활시작자료.Copy(scope.OfflineBundle);
@@ -50,6 +52,8 @@ namespace Ssalddel.Unity.Bootstrap
                 playing=!state.IsCompleted;message=scope.RestoredFromSlot?"저장된 시점부터 이어갑니다. 종료 시간 따라잡기 없음.":"오프라인 생활 시작 · 서버와 DB 요청 없음";
             } catch(Exception e) { Fail(e);CleanupView();if(ownsScope){SimulationWorldLocalRuntimeScope.Reset();ownsScope=false;} }
         }
+        private static bool ViewLayerOccupied(IEnumerable<Transform> candidates)
+            => candidates != null && candidates.Any(x => x != null && x.gameObject.layer == ViewLayer);
         private void Update()
         {
             if(!playing || failed || state==null || state.IsCompleted) {elapsed=0;return;}
@@ -82,7 +86,7 @@ namespace Ssalddel.Unity.Bootstrap
             cameraView=cam.AddComponent<Camera>();cameraView.orthographic=true;cameraView.orthographicSize=44;
             cameraView.transform.position=new Vector3(0,65,-47);cameraView.transform.LookAt(new Vector3(0,0,7));
             cameraView.clearFlags=CameraClearFlags.SolidColor;cameraView.backgroundColor=new Color(.10f,.13f,.16f);
-            cameraView.cullingMask=1<<ViewLayer;cameraView.depth=100;
+            cameraView.cullingMask=관찰표현LayerContract.오프라인생활Mask;cameraView.depth=100;
             foreach(var item in bundle.Payload.PlacementMap.GetProperty("instances").EnumerateArray()) {
                 var slot=item.GetProperty("id").GetString();var binding=bundle.Payload.InitialRequest.LocalLife.Facilities.FirstOrDefault(x=>x.SlotKey==slot);
                 var road=item.GetProperty("kind").GetString()=="Road";
