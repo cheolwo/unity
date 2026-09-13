@@ -13,6 +13,7 @@ code and Scene files.
 
 ## 최근 기록
 
+- [2026-09-13 사가정 네 OS 생명주기](2026-09-13-sagajeong-multi-os-lifecycle/README.md): 음식배달·화물·창고·마트 정상/회복 8개 표본, 음식점 아이콘 12개와 일반화 기준점 보간의 실제 Play Mode 검증
 - [2026-09-07 동네 관찰·운영 휴대폰](2026-09-07-observer-phone/README.md): 다섯 앱·기존 Session 입력/조회/저장 분리, 두 해상도 실제 입력·30분 관찰·저장 재진입 확인. 기록 증가에 따른 저장 지연은 남음
 - [2026-08-27 LH 지도와 Nature 세계자산배치 분리](2026-08-27-world-map-asset-placement/README.md): 지면·셀과 실외·실내 객체 생명주기를 분리하고 실제 Nature 입력을 확인했으나 밤 대상 식별성과 Console 잠금 오류로 Game View E6·E7 미통과
 - [2026-08-25 Hub 창고 정밀 배치](2026-08-25-hub-warehouse-precision-placement/README.md): 25×20m Synty 창고·7개 구역·NPC 업무 경로의 저장 Scene 구조(코드·시험 검증, Game View 미검증)
