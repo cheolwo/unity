@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="9" result="Passed" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.3393401">
+  <test-suite type="TestSuite" id="1000" name="ssalddel" fullname="ssalddel" runstate="Runnable" testcasecount="1307" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.339340" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="2572" name="Ssalddel.Unity.Tests.EditMode.dll" fullname="C:/Users/user/ssalddel-admin30-validation/Library/ScriptAssemblies/Ssalddel.Unity.Tests.EditMode.dll" runstate="Runnable" testcasecount="972" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.311354" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="87312" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="2573" name="Ssalddel" fullname="Ssalddel" runstate="Runnable" testcasecount="972" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.294932" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="2574" name="Unity" fullname="Ssalddel.Unity" runstate="Runnable" testcasecount="972" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.278433" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="2578" name="Tests" fullname="Ssalddel.Unity.Tests" runstate="Runnable" testcasecount="931" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.262168" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestSuite" id="2579" name="EditMode" fullname="Ssalddel.Unity.Tests.EditMode" runstate="Runnable" testcasecount="931" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.246360" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-suite type="TestFixture" id="2554" name="행정동디오라마검토Tests" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.226122" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="2557" name="geometryOnly검토는_표시오버레이가섞이면거절한다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.geometryOnly검토는_표시오버레이가섞이면거절한다" methodname="geometryOnly검토는_표시오버레이가섞이면거절한다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="1554730762" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.017963" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2561" name="View는_동하나만교체표시하고_선택과정리에Collider를만들지않는다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.View는_동하나만교체표시하고_선택과정리에Collider를만들지않는다" methodname="View는_동하나만교체표시하고_선택과정리에Collider를만들지않는다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="59190552" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.059037" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2563" name="거절된새자료는_이전동을남기지않는다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.거절된새자료는_이전동을남기지않는다" methodname="거절된새자료는_이전동을남기지않는다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="544030629" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.001010" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2556" name="권위나배포준비가있는자료는_검토사본에서거절한다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.권위나배포준비가있는자료는_검토사본에서거절한다" methodname="권위나배포준비가있는자료는_검토사본에서거절한다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="770720143" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.000882" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2559" name="도형Builder는_최대네개의결합Mesh와_동적Bounds를만든다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.도형Builder는_최대네개의결합Mesh와_동적Bounds를만든다" methodname="도형Builder는_최대네개의결합Mesh와_동적Bounds를만든다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="1931739634" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.001866" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2555" name="수용된ApplyResult는_중심정규화된_읽기전용깊은사본이된다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.수용된ApplyResult는_중심정규화된_읽기전용깊은사본이된다" methodname="수용된ApplyResult는_중심정규화된_읽기전용깊은사본이된다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="755236710" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.001358" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2560" name="알려진최대동규모의_4253개건물도_네Mesh예산안에묶는다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.알려진최대동규모의_4253개건물도_네Mesh예산안에묶는다" methodname="알려진최대동규모의_4253개건물도_네Mesh예산안에묶는다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="2034623877" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.121704" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2558" name="타일hash나건수선언이다르면_표현전에거절한다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.타일hash나건수선언이다르면_표현전에거절한다" methodname="타일hash나건수선언이다르면_표현전에거절한다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="1930441233" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.000624" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2562" name="화면Ray선택은_변환된Root에서도_건물기둥만고른다" fullname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests.화면Ray선택은_변환된Root에서도_건물기둥만고른다" methodname="화면Ray선택은_변환된Root에서도_건물기둥만고른다" classname="Ssalddel.Unity.Tests.EditMode.행정동디오라마검토Tests" runstate="Runnable" seed="1175005266" result="Passed" start-time="2026-09-14 17:59:11Z" end-time="2026-09-14 17:59:11Z" duration="0.004912" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Saving results to: C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel\TestResults.xml
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

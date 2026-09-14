@@ -6,6 +6,14 @@
 
 _현재 대표 화면 — 농장 1인칭에서 3×3 상세·5×5 활성·9×9 준비 창, 방향 선행 중심과 시야 기반 프록시→Synty 상세 승격을 진단 트리로 확인한 실제 Play Mode Game View_
 
+## 중랑구 역세권 관찰 디오라마
+
+| 사가정역 | 면목역 | 용마산역 |
+| --- | --- | --- |
+| [![사가정역 1km 디오라마](Documentation/Changes/2026-09-13-station-diorama-gallery/sagajeong-station-diorama.png)](Documentation/Changes/2026-09-13-station-diorama-gallery/sagajeong-station-diorama.png) | [![면목역 1km 디오라마](Documentation/Changes/2026-09-13-station-diorama-gallery/myeonmok-station-diorama.png)](Documentation/Changes/2026-09-13-station-diorama-gallery/myeonmok-station-diorama.png) | [![용마산역 1km 디오라마](Documentation/Changes/2026-09-13-station-diorama-gallery/yongmasan-station-diorama.png)](Documentation/Changes/2026-09-13-station-diorama-gallery/yongmasan-station-diorama.png) |
+
+세 화면은 역 기준점 주변 1km × 1km를 읽기 전용으로 표현한 실제 Play Mode Game View입니다. 역마다 확인된 건물·도로·표면과 `MissingCoverage`를 독립적으로 유지하며, Unity 화면은 서버의 업무 완료·통행·게임플레이 권위를 대신하지 않습니다. [자료 범위와 검증 경계](Documentation/Changes/2026-09-13-station-diorama-gallery/README.md)를 함께 확인할 수 있습니다.
+
 ## 현재 구현 범위
 
 - 감자 재배·수확부터 포장·상차, 물류 거점 입고·검수, 판로 분배와 도시 도착까지의 연구 Scene

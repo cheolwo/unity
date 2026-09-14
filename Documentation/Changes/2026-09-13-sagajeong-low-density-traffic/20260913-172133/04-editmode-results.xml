@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="42" result="Passed" total="42" passed="42" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.896046">
+  <test-suite type="TestSuite" id="1000" name="ssalddel" fullname="ssalddel" runstate="Runnable" testcasecount="1330" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.896046" total="42" passed="42" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="2600" name="Ssalddel.Unity.Tests.EditMode.dll" fullname="C:/Users/user/.codex/worktrees/sagajeong-traffic-validation/ssalddel/Library/ScriptAssemblies/Ssalddel.Unity.Tests.EditMode.dll" runstate="Runnable" testcasecount="995" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.856186" total="42" passed="42" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="86596" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="2601" name="Ssalddel" fullname="Ssalddel" runstate="Runnable" testcasecount="995" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.835483" total="42" passed="42" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="2602" name="Unity" fullname="Ssalddel.Unity" runstate="Runnable" testcasecount="995" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.816433" total="42" passed="42" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="2606" name="Tests" fullname="Ssalddel.Unity.Tests" runstate="Runnable" testcasecount="954" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.798183" total="42" passed="42" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestSuite" id="2607" name="EditMode" fullname="Ssalddel.Unity.Tests.EditMode" runstate="Runnable" testcasecount="954" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.781265" total="42" passed="42" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-suite type="TestFixture" id="2166" name="사가정저밀도교통Tests" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" testcasecount="42" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.762179" total="42" passed="42" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-suite type="ParameterizedMethod" id="2192" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.097247" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="2180" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;station&quot;,&quot;StationSyntheticTrafficStationMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;station&quot;,&quot;StationSyntheticTrafficStationMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1916148082" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.067487" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2181" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;region&quot;,&quot;StationSyntheticTrafficRegionMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;region&quot;,&quot;StationSyntheticTrafficRegionMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1879603553" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001773" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2182" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;administrative&quot;,&quot;StationSyntheticTrafficAdministrativeAreaMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;administrative&quot;,&quot;StationSyntheticTrafficAdministrativeAreaMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="620045531" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001620" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2183" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;sourceRevision&quot;,&quot;StationSyntheticTrafficSourceObservationRevisionMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;sourceRevision&quot;,&quot;StationSyntheticTrafficSourceObservationRevisionMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1896558415" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001443" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2184" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;graphRevision&quot;,&quot;StationSyntheticTrafficLaneGraphRevisionMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;graphRevision&quot;,&quot;StationSyntheticTrafficLaneGraphRevisionMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1101480066" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001439" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2185" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;graphHash&quot;,&quot;StationSyntheticTrafficLaneGraphHashMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;graphHash&quot;,&quot;StationSyntheticTrafficLaneGraphHashMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1313924178" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001977" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2186" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;signalPlan&quot;,&quot;StationSyntheticTrafficSignalPlanRevisionMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;signalPlan&quot;,&quot;StationSyntheticTrafficSignalPlanRevisionMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1207546960" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001393" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2187" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;profile&quot;,&quot;StationSyntheticTrafficProfileRevisionMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;profile&quot;,&quot;StationSyntheticTrafficProfileRevisionMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1763240373" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001347" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2188" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;journey&quot;,&quot;StationSyntheticTrafficCourierJourneyMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;journey&quot;,&quot;StationSyntheticTrafficCourierJourneyMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1751686782" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001341" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2189" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;route&quot;,&quot;StationSyntheticTrafficRouteFingerprintMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;route&quot;,&quot;StationSyntheticTrafficRouteFingerprintMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1293150156" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001438" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2190" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;configuration&quot;,&quot;StationSyntheticTrafficConfigurationFingerprintMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;configuration&quot;,&quot;StationSyntheticTrafficConfigurationFingerprintMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="727158961" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001041" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2191" name="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;input&quot;,&quot;StationSyntheticTrafficInputStateFingerprintMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.context와_동결판본_fingerprint가_다르면_부분적용하지_않는다(&quot;input&quot;,&quot;StationSyntheticTrafficInputStateFingerprintMismatch&quot;)" methodname="context와_동결판본_fingerprint가_다르면_부분적용하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="2065626844" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001293" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                </test-suite>
+                <test-case id="2212" name="presentation은_세_관찰선과_네_표시차로를_만들고_사라진_actor를_pool로_회수한다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.presentation은_세_관찰선과_네_표시차로를_만들고_사라진_actor를_pool로_회수한다" methodname="presentation은_세_관찰선과_네_표시차로를_만들고_사라진_actor를_pool로_회수한다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="259555886" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.086283" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-suite type="ParameterizedMethod" id="2202" name="simulationTick과_다른_신호자료는_거부된다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.simulationTick과_다른_신호자료는_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.008253" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="2199" name="simulationTick과_다른_신호자료는_거부된다(&quot;signal&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.simulationTick과_다른_신호자료는_거부된다(&quot;signal&quot;)" methodname="simulationTick과_다른_신호자료는_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="602915882" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.002763" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2200" name="simulationTick과_다른_신호자료는_거부된다(&quot;remaining&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.simulationTick과_다른_신호자료는_거부된다(&quot;remaining&quot;)" methodname="simulationTick과_다른_신호자료는_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="2126165778" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001678" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2201" name="simulationTick과_다른_신호자료는_거부된다(&quot;stopLine&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.simulationTick과_다른_신호자료는_거부된다(&quot;stopLine&quot;)" methodname="simulationTick과_다른_신호자료는_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1250376538" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001579" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                </test-suite>
+                <test-case id="2198" name="같은_revision은_멱등만_허용하고_stale_conflict_Reset은_원자적이다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.같은_revision은_멱등만_허용하고_stale_conflict_Reset은_원자적이다" methodname="같은_revision은_멱등만_허용하고_stale_conflict_Reset은_원자적이다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="2077656623" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.004975" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-suite type="ParameterizedMethod" id="2209" name="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.011461" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="2203" name="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;ambientAlley&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;ambientAlley&quot;)" methodname="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="2140661851" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.002289" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2204" name="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;routeKind&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;routeKind&quot;)" methodname="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="962775348" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:44Z" duration="0.001626" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2205" name="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;speed&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;speed&quot;)" methodname="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1249658602" result="Passed" start-time="2026-09-13 08:33:44Z" end-time="2026-09-13 08:33:45Z" duration="0.001612" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2206" name="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;heading&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;heading&quot;)" methodname="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="682555658" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001318" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2207" name="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;nan&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;nan&quot;)" methodname="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1334491828" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001088" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2208" name="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;duplicate&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다(&quot;duplicate&quot;)" methodname="골목과_저밀도_actor_불변조건을_어긴_사본은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1102638281" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001168" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                </test-suite>
+                <test-case id="2167" name="공간과_세_fingerprint는_서버의_동결_fixture와_같다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.공간과_세_fingerprint는_서버의_동결_fixture와_같다" methodname="공간과_세_fingerprint는_서버의_동결_fixture와_같다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="99671702" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.007804" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-suite type="ParameterizedMethod" id="2178" name="권위경계를_벗어난_사본은_정확한_코드로_거부된다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.권위경계를_벗어난_사본은_정확한_코드로_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.008167" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="2172" name="권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;schema&quot;,&quot;StationSyntheticTrafficSchemaMismatch&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;schema&quot;,&quot;StationSyntheticTrafficSchemaMismatch&quot;)" methodname="권위경계를_벗어난_사본은_정확한_코드로_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="2030339234" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001293" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2173" name="권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;source&quot;,&quot;StationSyntheticTrafficSourceKindUnsupported&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;source&quot;,&quot;StationSyntheticTrafficSourceKindUnsupported&quot;)" methodname="권위경계를_벗어난_사본은_정확한_코드로_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1649899494" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001031" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2174" name="권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;observation&quot;,&quot;StationSyntheticTrafficObservationBoundaryInvalid&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;observation&quot;,&quot;StationSyntheticTrafficObservationBoundaryInvalid&quot;)" methodname="권위경계를_벗어난_사본은_정확한_코드로_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1340334184" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.000997" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2175" name="권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;distribution&quot;,&quot;StationSyntheticTrafficDistributionForbidden&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;distribution&quot;,&quot;StationSyntheticTrafficDistributionForbidden&quot;)" methodname="권위경계를_벗어난_사본은_정확한_코드로_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1068463988" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001093" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2176" name="권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;traversal&quot;,&quot;StationSyntheticTrafficTraversalMustRemainUnready&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;traversal&quot;,&quot;StationSyntheticTrafficTraversalMustRemainUnready&quot;)" methodname="권위경계를_벗어난_사본은_정확한_코드로_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="472998027" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001048" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2177" name="권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;gameplay&quot;,&quot;StationSyntheticTrafficGameplayMustRemainUnready&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.권위경계를_벗어난_사본은_정확한_코드로_거부된다(&quot;gameplay&quot;,&quot;StationSyntheticTrafficGameplayMustRemainUnready&quot;)" methodname="권위경계를_벗어난_사본은_정확한_코드로_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1097557" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001229" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                </test-suite>
+                <test-case id="2179" name="비공개_preview가_아닌_context는_표시하지_않는다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.비공개_preview가_아닌_context는_표시하지_않는다" methodname="비공개_preview가_아닌_context는_표시하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1271034499" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.000622" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-suite type="ParameterizedMethod" id="2197" name="소문자이거나_형식이_다른_sha256은_거부된다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.소문자이거나_형식이_다른_sha256은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.003982" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="2193" name="소문자이거나_형식이_다른_sha256은_거부된다(&quot;graph&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.소문자이거나_형식이_다른_sha256은_거부된다(&quot;graph&quot;)" methodname="소문자이거나_형식이_다른_sha256은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="653991996" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001056" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2194" name="소문자이거나_형식이_다른_sha256은_거부된다(&quot;route&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.소문자이거나_형식이_다른_sha256은_거부된다(&quot;route&quot;)" methodname="소문자이거나_형식이_다른_sha256은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="740079658" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.000474" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2195" name="소문자이거나_형식이_다른_sha256은_거부된다(&quot;configuration&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.소문자이거나_형식이_다른_sha256은_거부된다(&quot;configuration&quot;)" methodname="소문자이거나_형식이_다른_sha256은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1613790072" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.000693" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2196" name="소문자이거나_형식이_다른_sha256은_거부된다(&quot;input&quot;)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.소문자이거나_형식이_다른_sha256은_거부된다(&quot;input&quot;)" methodname="소문자이거나_형식이_다른_sha256은_거부된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1193618256" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.000709" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                </test-suite>
+                <test-suite type="ParameterizedMethod" id="2171" name="엄격한_interpreter는_서버_합성상태사본을_원자수용한다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.엄격한_interpreter는_서버_합성상태사본을_원자수용한다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.009594" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="2168" name="엄격한_interpreter는_서버_합성상태사본을_원자수용한다(0L)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.엄격한_interpreter는_서버_합성상태사본을_원자수용한다(0L)" methodname="엄격한_interpreter는_서버_합성상태사본을_원자수용한다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="677427501" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.004227" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2169" name="엄격한_interpreter는_서버_합성상태사본을_원자수용한다(40L)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.엄격한_interpreter는_서버_합성상태사본을_원자수용한다(40L)" methodname="엄격한_interpreter는_서버_합성상태사본을_원자수용한다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="463200713" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.001755" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                  <test-case id="2170" name="엄격한_interpreter는_서버_합성상태사본을_원자수용한다(96L)" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.엄격한_interpreter는_서버_합성상태사본을_원자수용한다(96L)" methodname="엄격한_interpreter는_서버_합성상태사본을_원자수용한다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1736766211" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.002374" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                  </test-case>
+                </test-suite>
+                <test-case id="2214" name="자동_이동검증_완료_전에는_증거사진을_성공처리하지_않는다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.자동_이동검증_완료_전에는_증거사진을_성공처리하지_않는다" methodname="자동_이동검증_완료_전에는_증거사진을_성공처리하지_않는다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="2094386678" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.003765" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2211" name="주변차는_골목에_들어가지_않고_관찰범위를_벗어나면_사본에서_제외된다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.주변차는_골목에_들어가지_않고_관찰범위를_벗어나면_사본에서_제외된다" methodname="주변차는_골목에_들어가지_않고_관찰범위를_벗어나면_사본에서_제외된다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="544192280" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.424943" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2213" name="캡처_tick은_전체_신호대기_골목의_서로_다른_세_상태다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.캡처_tick은_전체_신호대기_골목의_서로_다른_세_상태다" methodname="캡처_tick은_전체_신호대기_골목의_서로_다른_세_상태다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="1143868196" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.003398" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="2210" name="합성적색정지_녹색재출발_골목왕복은_결정적이다" fullname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests.합성적색정지_녹색재출발_골목왕복은_결정적이다" methodname="합성적색정지_녹색재출발_골목왕복은_결정적이다" classname="Ssalddel.Unity.Tests.EditMode.사가정저밀도교통Tests" runstate="Runnable" seed="254594306" result="Passed" start-time="2026-09-13 08:33:45Z" end-time="2026-09-13 08:33:45Z" duration="0.078832" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Saving results to: C:/Users/user/AppData/LocalLow/DefaultCompany/ssalddel\TestResults.xml
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
