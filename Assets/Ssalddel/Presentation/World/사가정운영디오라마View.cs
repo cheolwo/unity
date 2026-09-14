@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -10,7 +11,7 @@ namespace Ssalddel.Unity.Presentation.World
 {
     /// <summary>지역 배경과 관찰 카메라. 지리 자료는 동결 자산이며 업무 사본은 이 객체에 저장하지 않습니다.</summary>
     [DisallowMultipleComponent]
-    public sealed class 사가정운영디오라마View : MonoBehaviour
+    public sealed class 사가정운영디오라마View : MonoBehaviour, IStationDioramaModuleAdapter
     {
         public const int ObservationLayer = 관찰표현LayerContract.사가정운영관찰Layer;
         public const float WholeViewPitch = 34f;
@@ -40,6 +41,10 @@ namespace Ssalddel.Unity.Presentation.World
         public Volume PresentationVolume { get; private set; }
         public 사가정모형MeshBuilder.BuildReport MiniatureBuildReport { get; private set; }
         public bool StationDetailsVisible => stationDetailRoot != null && stationDetailRoot.gameObject.activeSelf;
+        public string StationExitAnchorStatus { get; private set; } = "NotLoaded";
+        public int StationExitAnchorCount => stationExitAnchorBuild?.AnchorCount ?? 0;
+        public IReadOnlyList<역세권방향기준점> StationExitAnchors
+            => stationExitAnchorBuild?.Anchors ?? Array.Empty<역세권방향기준점>();
         public bool SpatialOverlayApplied => !useSyntyPresentation
             && spatialComposition?.OverlayApplied == true;
         public string SpatialPresentationRevision => useSyntyPresentation
@@ -53,6 +58,20 @@ namespace Ssalddel.Unity.Presentation.World
             : spatialComposition == null ? "NotLoaded"
             : $"{spatialComposition.SourceStatus} · {spatialComposition.DiagnosticCode}";
         public string SpatialPresentationAttribution { get; private set; } = "NotLoaded";
+        public string HSelectionStatus { get; private set; } = "NotLoaded";
+        public int HSelectionBuildingCount => hSpaceSelection?.BuildingCount ?? 0;
+        public 사가정건물H선택Result SelectedBuilding => hSpaceSelection?.Selected;
+        public 사가정건물RoleProfile SelectedBuildingRole
+            => SelectedBuilding?.RoleProfiles == null || SelectedBuilding.RoleProfiles.Count == 0
+                ? null
+                : SelectedBuilding.RoleProfiles[Mathf.Clamp(selectedBuildingRoleIndex, 0,
+                    SelectedBuilding.RoleProfiles.Count - 1)];
+        public bool BuildingRoleFollowUpVisible { get; private set; }
+        public string BuildingRoleFollowUpStatus { get; private set; } = "NotSelected";
+        public string TransitStationStableId =>
+            StationDioramaProfileCatalog.SagajeongStationStableId;
+        public bool ModuleVisible => IsVisible;
+        public ActiveStationDioramaHost ModuleHost { get; private set; }
         private readonly List<UnityEngine.Object> owned = new();
         private readonly Dictionary<string, Material> materialCache = new(StringComparer.Ordinal);
         private readonly Transform[] miniatureChunks = new Transform[
@@ -69,6 +88,10 @@ namespace Ssalddel.Unity.Presentation.World
         private 도로명주소표현조회 roadNames;
         private 사가정Synty표현Plan syntyPlan;
         private 사가정공간표현Composition spatialComposition;
+        private 사가정H공간선택Layer hSpaceSelection;
+        private 사가정역방향기준점Builder.BuildReport stationExitAnchorBuild;
+        private int selectedBuildingRoleIndex;
+        private bool ownsSelectedFoodRoute;
         private string selectedRoad = "";
         private int addressPage;
         public const int AddressPageSize = 6;
@@ -117,6 +140,7 @@ namespace Ssalddel.Unity.Presentation.World
                 spatialComposition = useSyntyPresentation
                     ? null
                     : LoadSpatialComposition(map, asset.bytes);
+                LoadHSpaceSelection(map, asset.bytes, heights, spatialComposition);
                 SpatialPresentationAttribution = useSyntyPresentation
                     ? heights == null
                         ? "© OpenStreetMap contributors · ODbL 1.0"
@@ -139,6 +163,7 @@ namespace Ssalddel.Unity.Presentation.World
                     MiniatureBuildReport = 사가정모형MeshBuilder.BuildBatches(
                         map, heights, spatialComposition, CreateMiniatureMesh, showDecorativeGreenery);
                 }
+                LoadStationExitOrientationAnchors(map, asset.bytes);
                 Block(geography, "모형 받침대", new Vector3(map.offsetX, -15f, map.offsetZ),
                     new Vector3(map.halfExtent * 2 + 2, 30, map.halfExtent * 2 + 2), new Color(.41f,.43f,.42f));
                 Block(geography, "모형 촬영 배경", new Vector3(map.offsetX,-33,map.offsetZ),
@@ -176,6 +201,50 @@ namespace Ssalddel.Unity.Presentation.World
                 MapStatus = "MapOrPlacementRejected";
                 Debug.LogWarning("사가정 관찰: 지도/배치 판본 검증 실패. 임의 배치를 하지 않습니다.");
             }
+            finally
+            {
+                RegisterModuleHost();
+            }
+        }
+
+        public IReadOnlyList<StationDioramaModuleLayerRuntimeState> DescribeModuleLayers()
+        {
+            var dataReady = string.Equals(MapStatus, "Ready", StringComparison.Ordinal);
+            var presentationReady = dataReady && geography != null && ObservationCamera != null;
+            var spatialMeaningReady = hSpaceSelection != null;
+            return new[]
+            {
+                ModuleLayer(StationDioramaModuleLayerIds.DataEvidence, dataReady,
+                    SpatialPresentationRevision,
+                    dataReady ? SpatialPresentationStatus : MapStatus),
+                ModuleLayer(StationDioramaModuleLayerIds.BaseSpatialPresentation,
+                    presentationReady, VisualTargetRevision,
+                    presentationReady ? "SagajeongPresentationReady" : "PresentationNotReady"),
+                ModuleLayer(StationDioramaModuleLayerIds.SpatialMeaning,
+                    spatialMeaningReady, spatialMeaningReady ? "sagajeong-h-selection.r16" : string.Empty,
+                    HSelectionStatus),
+                ModuleLayer(StationDioramaModuleLayerIds.Interaction,
+                    spatialMeaningReady,
+                    spatialMeaningReady ? "sagajeong-building-role-cards.r16" : string.Empty,
+                    spatialMeaningReady ? "ReadOnlyBuildingRoleFollowUp" : HSelectionStatus)
+            };
+        }
+
+        public void SetModuleVisible(bool value) => Show(value);
+
+        private static StationDioramaModuleLayerRuntimeState ModuleLayer(string layerStableId,
+            bool available, string revision, string diagnostic)
+            => new(layerStableId,
+                available
+                    ? StationDioramaModuleLayerStateCodes.PrivateReview
+                    : StationDioramaModuleLayerStateCodes.Blocked,
+                revision, diagnostic);
+
+        private void RegisterModuleHost()
+        {
+            ModuleHost = GetComponent<ActiveStationDioramaHost>()
+                         ?? gameObject.AddComponent<ActiveStationDioramaHost>();
+            ModuleHost.Register(this);
         }
 
         private static 사가정공간표현Composition LoadSpatialComposition(
@@ -204,6 +273,29 @@ namespace Ssalddel.Unity.Presentation.World
                     .Select(value => $"{value.Provider} · {value.LicenseCode}"));
             }
             return string.Join(" / ", sources.Distinct(StringComparer.Ordinal));
+        }
+
+        private void LoadHSpaceSelection(공간참고자료 data, byte[] mapBytes,
+            건물높이보완조회 heights, 사가정공간표현Composition composition)
+        {
+            if (useSyntyPresentation)
+            {
+                hSpaceSelection = null;
+                HSelectionStatus = "건물 선택 보류 · r3 모형 표현 전용";
+                return;
+            }
+            try
+            {
+                hSpaceSelection = 사가정H공간선택Layer.Create(data, mapBytes, heights, composition);
+                HSelectionStatus = $"건물 선택 {hSpaceSelection.BuildingCount} · "
+                                   + $"역할 후보 {hSpaceSelection.RoleBoundBuildingCount} · H 후보 2";
+            }
+            catch (ArgumentException)
+            {
+                hSpaceSelection = null;
+                HSelectionStatus = "건물 선택 거부 · 지도 유지";
+                Debug.LogWarning("사가정 H 공간 선택층 검증 실패. 지도는 유지하고 건물 선택만 보류합니다.");
+            }
         }
 
         private 사가정Synty표현Plan LoadSyntyPlan(공간참고자료 data, 건물높이보완조회 heights)
@@ -373,6 +465,27 @@ namespace Ssalddel.Unity.Presentation.World
             }
         }
 
+        private void LoadStationExitOrientationAnchors(공간참고자료 data, byte[] mapBytes)
+        {
+            try
+            {
+                var asset = Resources.Load<TextAsset>("SagajeongStationOrientationAnchors");
+                if (asset == null) throw new ArgumentException("StationOrientationAnchorAssetMissing");
+                var source = 사가정역방향기준점조회.Validate(
+                    JsonUtility.FromJson<역세권방향기준점자료>(asset.text), data, mapBytes);
+                stationExitAnchorBuild = 사가정역방향기준점Builder.Build(
+                    source, data, geography, Block);
+                StationExitAnchorStatus = $"출구 방향 기준점 {stationExitAnchorBuild.AnchorCount} · "
+                                          + $"{source.Revision} · 읽기 전용";
+            }
+            catch (ArgumentException)
+            {
+                stationExitAnchorBuild = null;
+                StationExitAnchorStatus = "출구 방향 기준점 거부 · 지도 유지";
+                Debug.LogWarning("사가정역 출구 방향 기준점 검증 실패. 지도는 유지하고 출구 표식만 보류합니다.");
+            }
+        }
+
         private 도로명주소표현조회 LoadRoadNames(공간참고자료 data, byte[] bytes)
         {
             try
@@ -394,6 +507,7 @@ namespace Ssalddel.Unity.Presentation.World
         public void Show(bool value)
         {
             shown = value;
+            if (!value) ClearBuildingSelection();
             IsVisible = value && ObservationCamera != null;
             // 관찰을 닫으면 전용 layer의 geometry, 조명, global Volume까지 함께 비활성화해
             // 다른 카메라의 culling/volume mask 설정과 무관하게 기존 화면에 새지 않게 한다.
@@ -415,6 +529,7 @@ namespace Ssalddel.Unity.Presentation.World
             selectedRoad = "";
             SelectedAddress = "";
             addressPage = 0;
+            ClearBuildingSelection();
             focus = bounds.center;
             wholeSize = WholeViewOrthographicSize(bounds, 관찰회전,
                 Mathf.Max(.1f, ObservationCamera.aspect));
@@ -428,6 +543,7 @@ namespace Ssalddel.Unity.Presentation.World
             selectedRoad = "";
             SelectedAddress = "";
             addressPage = 0;
+            ClearBuildingSelection();
             selected = value;
             FocusPoint(value.transform.position);
         }
@@ -447,6 +563,7 @@ namespace Ssalddel.Unity.Presentation.World
                 if (road.name == name)
                 {
                     selected = null;
+                    ClearBuildingSelection();
                     selectedRoad = name;
                     SelectedAddress = "";
                     addressPage = 0;
@@ -466,12 +583,118 @@ namespace Ssalddel.Unity.Presentation.World
                 if (addresses[i].BuildingId == buildingId)
                 {
                     var address = addresses[i];
+                    ClearBuildingSelection();
                     SelectedAddress = address.Label;
                     addressPage = i / AddressPageSize;
                     FocusPoint(transform.TransformPoint(new Vector3(address.X, address.Y, address.Z)));
                     return true;
                 }
             return false;
+        }
+
+        public bool SelectBuilding(string buildingStableId, bool focusSelected = false)
+        {
+            if (hSpaceSelection == null || ObservationCamera == null
+                || !hSpaceSelection.TryGetByStableId(buildingStableId, out var value)) return false;
+            ClearOtherSelectionsForBuilding();
+            ResetBuildingRoleUi();
+            if (focusSelected) FocusSelectedBuilding(value);
+            return true;
+        }
+
+        public bool TrySelectBuilding(Ray worldRay)
+        {
+            if (hSpaceSelection == null || ObservationCamera == null
+                || !hSpaceSelection.TrySelectWorldRay(worldRay, transform, out _)) return false;
+            ClearOtherSelectionsForBuilding();
+            ResetBuildingRoleUi();
+            return true;
+        }
+
+        public bool TrySelectBuildingAtScreen(Vector2 screenPoint)
+        {
+            if (ObservationCamera == null || !IsVisible) return false;
+            return TrySelectBuilding(ObservationCamera.ScreenPointToRay(screenPoint));
+        }
+
+        public void ClearBuildingSelection()
+        {
+            ClearBuildingRoleFollowUp();
+            hSpaceSelection?.ClearSelection();
+            selectedBuildingRoleIndex = 0;
+            BuildingRoleFollowUpStatus = "NotSelected";
+        }
+
+        public bool SelectBuildingRole(int index)
+        {
+            var roles = SelectedBuilding?.RoleProfiles;
+            if (roles == null || index < 0 || index >= roles.Count) return false;
+            ClearBuildingRoleFollowUp();
+            selectedBuildingRoleIndex = index;
+            BuildingRoleFollowUpStatus = "Ready";
+            return true;
+        }
+
+        public bool OpenSelectedBuildingRoleFollowUp()
+        {
+            var profile = SelectedBuildingRole;
+            if (profile == null || !profile.HasFollowUp) return false;
+
+            var playback = GetComponentInChildren<음식배달JourneyPlaybackLayer>(true);
+            var availableRoutes = Array.Empty<string>();
+            if (profile.FollowUpCode == 사가정건물FollowUpCodes.FoodDeliveryJourney
+                && playback != null
+                && playback.TryGetVisualState(profile.FollowUpTargetStableId, out _))
+                availableRoutes = new[] { profile.FollowUpTargetStableId };
+
+            if (!사가정건물RoleFollowUpResolver.TryResolve(profile, availableRoutes,
+                    out var result)) return false;
+            BuildingRoleFollowUpVisible = true;
+            BuildingRoleFollowUpStatus = result.StatusCode;
+            if (result.RouteSnapshotAvailable)
+            {
+                playback.SetSelectedRoute(profile.FollowUpTargetStableId);
+                ownsSelectedFoodRoute = true;
+            }
+            return true;
+        }
+
+        public void ClearBuildingRoleFollowUp()
+        {
+            if (ownsSelectedFoodRoute)
+            {
+                var playback = GetComponentInChildren<음식배달JourneyPlaybackLayer>(true);
+                if (playback != null) playback.SetSelectedRoute(string.Empty);
+            }
+            ownsSelectedFoodRoute = false;
+            BuildingRoleFollowUpVisible = false;
+            if (SelectedBuilding != null) BuildingRoleFollowUpStatus = "Ready";
+        }
+
+        private void ResetBuildingRoleUi()
+        {
+            ClearBuildingRoleFollowUp();
+            selectedBuildingRoleIndex = 0;
+            BuildingRoleFollowUpStatus = "Ready";
+        }
+
+        public void FocusSelectedBuilding()
+        {
+            if (SelectedBuilding != null) FocusSelectedBuilding(SelectedBuilding);
+        }
+
+        private void FocusSelectedBuilding(사가정건물H선택Result value)
+        {
+            FocusPoint(transform.TransformPoint(new Vector3(value.LocalCentroid.x,
+                Mathf.Max(1f, value.DisplayedHeight * .5f), value.LocalCentroid.y)));
+        }
+
+        private void ClearOtherSelectionsForBuilding()
+        {
+            selected = null;
+            selectedRoad = "";
+            SelectedAddress = "";
+            addressPage = 0;
         }
 
         private void UpdateCamera()
@@ -627,7 +850,7 @@ namespace Ssalddel.Unity.Presentation.World
             smallStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 13, wordWrap = true };
             GUI.Box(new Rect(12,12,370,106), GUIContent.none);
             GUI.Label(new Rect(24,20,345,32), "사가정 생활 디오라마", titleStyle);
-            GUI.Label(new Rect(24,56,345,52), "가상 업무 표본 · 실제 위치 추적 아님\n휠: 확대  |  오른쪽 드래그: 이동  |  표식: 선택", smallStyle);
+            GUI.Label(new Rect(24,56,345,52), "가상 업무 표본 · 실제 위치 추적 아님\n휠: 확대  |  오른쪽 드래그: 이동  |  표식·건물: 선택", smallStyle);
             if (GUI.Button(new Rect(Screen.width-240,12,110,32), "전체 보기")) ShowWhole();
             if (GUI.Button(new Rect(Screen.width-124,12,110,32), "기존 화면")) Show(false);
             var footerWidth=Mathf.Min(560,Screen.width*.42f);
@@ -643,8 +866,12 @@ namespace Ssalddel.Unity.Presentation.World
             GUI.Label(new Rect(24,Screen.height-74,footerWidth-24,22),
                 $"근거: {SpatialPresentationAttribution}", smallStyle);
             GUI.Label(new Rect(24,Screen.height-50,footerWidth-24,28),
-                $"{RoadNameStatus} · {HeightStatus}", smallStyle);
-            if (!string.IsNullOrEmpty(selectedRoad))
+                $"{RoadNameStatus} · {HeightStatus} · 출구 기준점 {StationExitAnchorCount} · {HSelectionStatus}", smallStyle);
+            if (SelectedBuilding != null)
+            {
+                DrawBuildingSelectionPanel();
+            }
+            else if (!string.IsNullOrEmpty(selectedRoad))
             {
                 var addresses=roadNames?.Addresses(selectedRoad)??Array.Empty<도로명건물주소>();
                 // 방어 준비 진입 버튼(상단 52~86px) 아래에 두고 모든 주소에 페이지로 접근한다.
@@ -677,8 +904,11 @@ namespace Ssalddel.Unity.Presentation.World
                     $"{label}\n완료 업무 관찰 · 실존 업소와 무관\n상태: {state}\n판본: {selected.Revision} / {(selected.Frozen ? "갱신 보류" : "정상")}\n가상 표식이며 현재 위치가 아닙니다.", smallStyle);
             }
             var occupiedLabels=new List<Rect>();
-            if (!string.IsNullOrEmpty(selectedRoad)) occupiedLabels.Add(new Rect(Screen.width-300,96,286,326));
+            if (SelectedBuilding != null) occupiedLabels.Add(BuildingPanelRect());
+            else if (!string.IsNullOrEmpty(selectedRoad)) occupiedLabels.Add(new Rect(Screen.width-300,96,286,326));
             else if (selected != null) occupiedLabels.Add(new Rect(Screen.width-288,58,274,158));
+            DrawBuildingSelectionMarker(occupiedLabels);
+            DrawStationExitAnchorLabels(occupiedLabels);
             DrawRoadLabels(occupiedLabels);
             if (world != null && ObservationCamera != null)
                 foreach (var item in world.Objects)
@@ -691,7 +921,123 @@ namespace Ssalddel.Unity.Presentation.World
                     occupiedLabels.Add(rect);
                     if (GUI.Button(rect, label)) Focus(item);
                 }
+            HandleBuildingSelectionInput(occupiedLabels);
             HandleCameraInput();
+        }
+
+        private static Rect BuildingPanelRect()
+            // 상단 52~86px의 기존 역 방어 준비 진입을 가리지 않는다.
+            => new(Screen.width - 394, 96, 380, Mathf.Min(480, Screen.height - 106));
+
+        private void DrawBuildingSelectionPanel()
+        {
+            var value = SelectedBuilding;
+            if (value == null) return;
+            var panel = BuildingPanelRect();
+            GUI.Box(panel, GUIContent.none);
+            GUI.Label(new Rect(panel.x + 12, panel.y + 10, panel.width - 82, 24),
+                "건물 공간 계층 · 읽기 전용", smallStyle);
+            if (GUI.Button(new Rect(panel.xMax - 60, panel.y + 8, 48, 24), "닫기"))
+            {
+                ClearBuildingSelection();
+                return;
+            }
+
+            GUI.Label(new Rect(panel.x + 12, panel.y + 34, panel.width - 24, 18),
+                "가상 역할·H 후보 · 실제 업소·거주·업무 결속 아님", smallStyle);
+            var sourceLabel = string.IsNullOrWhiteSpace(value.SourceName)
+                ? value.SourceAddress : value.SourceName + " · " + value.SourceAddress;
+            GUI.Label(new Rect(panel.x + 12, panel.y + 56, panel.width - 24, 52),
+                $"{sourceLabel}\n{value.BuildingStableId}\n"
+                + $"{value.BuildingKind} · 표현 {value.DisplayedHeight:0.#}m ({value.DisplayedHeightKind})",
+                smallStyle);
+
+            var roles = value.RoleProfiles;
+            var tabWidth = Mathf.Min(112f, (panel.width - 24f) / Mathf.Max(1, roles.Count));
+            for (var index = 0; index < roles.Count; index++)
+            {
+                var role = roles[index];
+                GUI.enabled = index != selectedBuildingRoleIndex;
+                if (GUI.Button(new Rect(panel.x + 12 + index * tabWidth, panel.y + 110,
+                        tabWidth - 4, 25), $"[{role.IconLabel}] {role.DisplayNameKo}"))
+                    SelectBuildingRole(index);
+            }
+            GUI.enabled = true;
+
+            var selectedRole = SelectedBuildingRole;
+            var roleH1 = selectedRole == null || selectedRole.H1ActionStableIds.Count == 0
+                ? "H1 행동 지점 결속 대기"
+                : "역할별 H1  " + string.Join(" · ", selectedRole.H1ActionStableIds);
+            GUI.Label(new Rect(panel.x + 12, panel.y + 140, panel.width - 24, 72),
+                selectedRole == null ? "역할 자료 없음"
+                    : $"{selectedRole.EvidenceStatusCode} · 실제 업체 사실 아님\n"
+                      + $"{roleH1}\n{selectedRole.LifecycleSummaryKo}", smallStyle);
+
+            var hierarchy = value.H1BindingStatus == 사가정H공간선택Layer.CandidateBinding
+                ? $"H1  {value.H1StableId}\n"
+                  + $" └ H2  {string.Join(" · ", value.H2StableIds)}\n"
+                  + $"    └ H3  {value.H3StableId} / {value.H3RoleCode}\n"
+                  + $"       └ H4 구성  {value.CompositionStateCode}"
+                : "H1 → H2 → H3 → H4 구성\nWaitingForGraphMapBinding\n원본 주소·종류로 H 소속을 추정하지 않습니다.";
+            GUI.Label(new Rect(panel.x + 12, panel.y + 216, panel.width - 24, 82),
+                hierarchy, smallStyle);
+
+            if (BuildingRoleFollowUpVisible && selectedRole != null)
+                GUI.Label(new Rect(panel.x + 12, panel.y + 300, panel.width - 24, 52),
+                    $"읽기 전용 후속 보기 · {BuildingRoleFollowUpStatus}\n"
+                    + selectedRole.LifecycleSummaryKo, smallStyle);
+
+            GUI.Label(new Rect(panel.x + 12, panel.yMax - 88, panel.width - 24, 48),
+                "CandidateOnly · ActualE5=false · TraversalReady=false\n"
+                + "GameplayReady=false · ServerProjectionReady=false", smallStyle);
+            if (GUI.Button(new Rect(panel.x + 12, panel.yMax - 34, 104, 25), "건물 확대"))
+                FocusSelectedBuilding();
+            if (selectedRole?.HasFollowUp == true
+                && GUI.Button(new Rect(panel.x + 122, panel.yMax - 34, 154, 25),
+                    selectedRole.FollowUpLabelKo))
+                OpenSelectedBuildingRoleFollowUp();
+            GUI.Label(new Rect(panel.x + 282, panel.yMax - 32, 86, 24),
+                "읽기 전용", smallStyle);
+        }
+
+        private void DrawBuildingSelectionMarker(List<Rect> occupied)
+        {
+            var value = SelectedBuilding;
+            if (value == null || ObservationCamera == null) return;
+            var worldPoint = transform.TransformPoint(new Vector3(value.LocalCentroid.x,
+                value.DisplayedHeight + 2f, value.LocalCentroid.y));
+            var point = ObservationCamera.WorldToScreenPoint(worldPoint);
+            if (point.z <= 0f || point.x < 0f || point.x > Screen.width
+                || point.y < 80f || point.y > Screen.height - 154f) return;
+            var preferred = new Rect(point.x - 24f, Screen.height - point.y - 13f, 48f, 26f);
+            var rect = PlaceLabel(preferred, occupied, 124f, Screen.height - 154f);
+            if (rect.width <= 0f) return;
+            var previousColor = GUI.color;
+            GUI.color = new Color(.65f, .94f, 1f, 1f);
+            GUI.Box(rect, "◆ H");
+            GUI.color = previousColor;
+            occupied.Add(rect);
+        }
+
+        private void HandleBuildingSelectionInput(IReadOnlyList<Rect> occupied)
+        {
+            if (hSpaceSelection == null || ObservationCamera == null) return;
+            var current = Event.current;
+            // 다른 OnGUI layer가 MouseDown에서 잡은 버튼을 우리 MouseUp이 가로채지 않는다.
+            if (current.type != EventType.MouseUp || current.button != 0
+                || GUIUtility.hotControl != 0
+                || (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())) return;
+            var mouse = current.mousePosition;
+            var fixedUi = new[]
+            {
+                new Rect(12, 12, 370, 106),
+                new Rect(Screen.width - 240, 12, 226, 32),
+                new Rect(Screen.width - 240, 52, 226, 34),
+                new Rect(12, Screen.height - 144, Mathf.Min(560, Screen.width * .42f), 132),
+            };
+            if (fixedUi.Any(rect => rect.Contains(mouse)) || occupied.Any(rect => rect.Contains(mouse))) return;
+            TrySelectBuildingAtScreen(new Vector2(mouse.x, Screen.height - mouse.y));
+            current.Use();
         }
 
         private void DrawRoadLabels(List<Rect> occupied)
@@ -710,6 +1056,26 @@ namespace Ssalddel.Unity.Presentation.World
                 {
                     SelectRoad(road.name);
                 }
+            }
+        }
+
+        private void DrawStationExitAnchorLabels(List<Rect> occupied)
+        {
+            if (stationExitAnchorBuild == null || ObservationCamera == null) return;
+            foreach (var anchor in stationExitAnchorBuild.Anchors)
+            {
+                var worldPoint = transform.TransformPoint(new Vector3(anchor.x, 6f, anchor.z));
+                var point = ObservationCamera.WorldToScreenPoint(worldPoint);
+                if (point.z <= 0f || point.x < 0f || point.x > Screen.width
+                    || point.y < 80f || point.y > Screen.height - 154f) continue;
+                var preferred = new Rect(point.x - 38f, Screen.height - point.y - 12f, 76f, 24f);
+                var rect = PlaceLabel(preferred, occupied, 124f, Screen.height - 154f);
+                if (rect.width <= 0f) continue;
+                var previousColor = GUI.color;
+                GUI.color = new Color(.86f, .91f, .42f, 1f);
+                GUI.Box(rect, $"{anchor.exitNumber}번 출구");
+                GUI.color = previousColor;
+                occupied.Add(rect);
             }
         }
 
@@ -750,6 +1116,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnDisable()
         {
+            ModuleHost?.Unregister(this);
             IsVisible = false;
             if (ObservationCamera != null) ObservationCamera.enabled = false;
             if (viewPolicy != null) viewPolicy.UnregisterRuntimeEnvironment(transform,this);
@@ -773,12 +1140,16 @@ namespace Ssalddel.Unity.Presentation.World
             MiniatureBuildReport = null;
             Places = null;
             roadNames = null;
+            hSpaceSelection = null;
+            stationExitAnchorBuild = null;
             selectedRoad = "";
             SelectedAddress = "";
             addressPage = 0;
             MapStatus = "NotLoaded";
             HeightStatus = "NotLoaded";
             RoadNameStatus = "NotLoaded";
+            HSelectionStatus = "NotLoaded";
+            StationExitAnchorStatus = "NotLoaded";
             SyntyStatus = "NotLoaded";
             spatialComposition = null;
             SpatialPresentationAttribution = "NotLoaded";
@@ -799,6 +1170,11 @@ namespace Ssalddel.Unity.Presentation.World
             value.name += "__released";
             if (UnityEngine.Application.isPlaying) Destroy(value); else DestroyImmediate(value);
         }
-        private void OnDestroy() { IsVisible = false; ReleaseGeometry(); }
+        private void OnDestroy()
+        {
+            ModuleHost?.Unregister(this);
+            IsVisible = false;
+            ReleaseGeometry();
+        }
     }
 }
