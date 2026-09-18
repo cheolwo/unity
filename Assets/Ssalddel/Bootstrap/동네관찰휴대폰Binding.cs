@@ -9,6 +9,9 @@ namespace Ssalddel.Unity.Bootstrap
 {
     public sealed partial class 가상배달관찰Controller
     {
+        public event Action<동네관찰ScreenModel>? ObservationApplied;
+        public 동네관찰ScreenModel? CurrentObservationModel => 휴대폰모델;
+
         private 동네관찰SessionController 동네실행;
         private 동네관찰휴대폰View 휴대폰;
         private 동네관찰ScreenModel 휴대폰모델;
@@ -62,7 +65,12 @@ namespace Ssalddel.Unity.Bootstrap
             state = 동네실행.State; playing = 동네실행.Playing; busy = 동네실행.Busy; 저장복구필요 = 동네실행.SaveBlocked;
             message = 동네실행.Message;
             if (!ReferenceEquals(마지막표시사본, state))
-            { 마지막표시사본 = state; 휴대폰모델 = 동네관찰Presenter.생성(state); Render(); }
+            {
+                마지막표시사본 = state;
+                휴대폰모델 = 동네관찰Presenter.생성(state);
+                Render();
+                ObservationApplied?.Invoke(휴대폰모델);
+            }
             휴대폰.Draft.동기화(state);
             휴대폰.표시(휴대폰모델, playing, busy, 저장복구필요, state.IsCompleted, message,
                 $"저장 {동네실행.LastSaveMs:F1}ms · 최대 {동네실행.PeakSaveMs:F1}ms\n명령+조회+저장 {동네실행.LastOperationMs:F1}ms\n이 실행에서 저장 {동네실행.SaveCount}회", 동네실행.CommandPending);

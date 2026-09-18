@@ -36,6 +36,7 @@ namespace Ssalddel.Unity.Bootstrap
         public string StatusCode => statusCode;
         public long Cursor => cursor;
         public int ObjectCount => worldView != null ? worldView.ObjectCount : 0;
+        public event Action<OperationalWorldSceneApplyResult> SnapshotApplied;
 
         public void Configure(운영관찰WorldView view)
         {
@@ -126,6 +127,7 @@ namespace Ssalddel.Unity.Bootstrap
             var placement = planner.Create(result);
             worldView.Apply(placement, result.Diagnostics);
             lifecycleView.Apply(placement);
+            SnapshotApplied?.Invoke(result);
             statusCode = lifecycleView.StateCount > 0 && lifecycleView.GeneralizedPlacementCount > 0
                 ? "SuccessWithGeneralizedLifecycleAnchors"
                 : worldView.UnplacedCount > 0 ? "SuccessWithUnplacedObjects"

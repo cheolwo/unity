@@ -32,11 +32,13 @@ namespace Ssalddel.Unity.Presentation.World
 
         public event Action? RefreshRequested;
         public event Action<CardWorkspaceItem, string>? ActionRequested;
+        public event Action<CardWorkspaceSnapshot>? SnapshotApplied;
 
         public bool IsOpen => panel != null && panel.activeSelf;
         public CardWorkspaceItem? SelectedItem => snapshot.Items.Length == 0
             ? null : snapshot.Items[Mathf.Clamp(selectedIndex, 0, snapshot.Items.Length - 1)];
         public string Status => statusText != null ? statusText.text : string.Empty;
+        public CardWorkspaceSnapshot CurrentSnapshot => snapshot;
 
         public void Configure(GameObject surface, Text title, Text content,
             Text selection, Text status, Button previous, Button next,
@@ -89,6 +91,7 @@ namespace Ssalddel.Unity.Presentation.World
             selectedIndex = snapshot.Items.Length == 0 ? 0
                 : Mathf.Clamp(selectedIndex, 0, snapshot.Items.Length - 1);
             Render();
+            SnapshotApplied?.Invoke(snapshot);
         }
 
         public void SetOpen(bool open)

@@ -99,6 +99,8 @@ namespace Ssalddel.Unity.Editor
                 ui.Back,
                 ui.Pause,
                 ui.Speed);
+            ConfigureSeasonalCampaignObservationRoot(root.transform,
+                presenter);
             cameraSystem.GetComponentInChildren<전략카메라Controller>(true)
                 .BindShellPresenter(presenter);
             Build정착지상호작용(ui.Canvas, presenter, shellRuntimeRoot.transform);
@@ -2356,6 +2358,12 @@ namespace Ssalddel.Unity.Editor
             var controller = root.GetComponent<운영관찰WorldController>()
                              ?? root.gameObject.AddComponent<운영관찰WorldController>();
             controller.Configure(view);
+            var campaignView = root.GetComponent<절기운영CampaignWorldView>()
+                               ?? root.gameObject.AddComponent<절기운영CampaignWorldView>();
+            var shell = shellRoot.GetComponentInChildren<
+                SimulationWorldShellPresenter>(true);
+            if (shell != null)
+                ConfigureSeasonalCampaignObservationRoot(shellRoot, shell);
             var diorama = root.GetComponent<사가정운영디오라마View>()
                           ?? root.gameObject.AddComponent<사가정운영디오라마View>();
             EditorUtility.SetDirty(diorama);
@@ -2364,6 +2372,33 @@ namespace Ssalddel.Unity.Editor
             EditorUtility.SetDirty(defense);
             EditorUtility.SetDirty(view);
             EditorUtility.SetDirty(controller);
+            EditorUtility.SetDirty(campaignView);
+        }
+
+        private static void ConfigureSeasonalCampaignObservationRoot(
+            Transform shellRoot, SimulationWorldShellPresenter shell)
+        {
+            var root = Required(shellRoot, OperationalWorldRootName);
+            var settings = AssetDatabase.LoadAssetAtPath<
+                UnityClientRuntimeSettings>(
+                "Assets/Ssalddel/Settings/UnityClientRuntimeSettings.asset")
+                ?? throw new InvalidOperationException(
+                    "UnityClientRuntimeSettingsMissing");
+            var campaignView = root.GetComponent<절기운영CampaignWorldView>()
+                               ?? root.gameObject.AddComponent<
+                                   절기운영CampaignWorldView>();
+            var campaignController = root.GetComponent<
+                절기운영CampaignWorldController>()
+                ?? root.gameObject.AddComponent<
+                    절기운영CampaignWorldController>();
+            var operationalController = root.GetComponent<
+                운영관찰WorldController>()
+                ?? throw new InvalidOperationException(
+                    "OperationalWorldObservationControllerMissing");
+            campaignController.Configure(settings, shell, campaignView,
+                operationalController);
+            EditorUtility.SetDirty(campaignView);
+            EditorUtility.SetDirty(campaignController);
         }
 
         private static GameObject SeedbedObjectPlacement(
