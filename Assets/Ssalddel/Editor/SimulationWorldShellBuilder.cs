@@ -1052,6 +1052,7 @@ namespace Ssalddel.Unity.Editor
                     new Vector3(2.8f, 1.1f + index % 2 * .5f, 2.8f),
                     Rgb(.12f, .25f, .17f));
             }
+            세계지구본Builder.EnsureGlobe(root);
         }
 
         private static void BuildSettlementHierarchy(Transform root)

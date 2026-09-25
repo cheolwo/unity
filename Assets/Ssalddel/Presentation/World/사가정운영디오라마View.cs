@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
+using Ssalddel.Unity.Runtime.WorldMap;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -839,6 +840,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnGUI()
         {
+            if (세계지도표현상태.GlobeOverlayVisible) return;
             GUI.depth = -100;
             if (!shown)
             {
@@ -866,7 +868,8 @@ namespace Ssalddel.Unity.Presentation.World
             GUI.Label(new Rect(24,Screen.height-74,footerWidth-24,22),
                 $"근거: {SpatialPresentationAttribution}", smallStyle);
             GUI.Label(new Rect(24,Screen.height-50,footerWidth-24,28),
-                $"{RoadNameStatus} · {HeightStatus} · 출구 기준점 {StationExitAnchorCount} · {HSelectionStatus}", smallStyle);
+                $"표현 건물 {MiniatureBuildReport?.RenderedBuildingCount ?? map?.buildings?.Length ?? 0} · "
+                + $"{RoadNameStatus} · {HeightStatus} · 출구 기준점 {StationExitAnchorCount} · {HSelectionStatus}", smallStyle);
             if (SelectedBuilding != null)
             {
                 DrawBuildingSelectionPanel();

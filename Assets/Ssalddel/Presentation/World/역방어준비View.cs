@@ -4,6 +4,7 @@ using System.Linq;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Unity.Runtime.World;
 using UnityEngine;
+using Ssalddel.Unity.Runtime.WorldMap;
 
 namespace Ssalddel.Unity.Presentation.World
 {
@@ -112,6 +113,7 @@ namespace Ssalddel.Unity.Presentation.World
         }
         private void OnGUI()
         {
+            if (세계지도표현상태.GlobeOverlayVisible) return;
             GUI.depth=-110;
             if(map==null||!사가정운영디오라마View.IsVisible)return;
             if(!IsOpen)

@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "korean-peninsula-corridor-catalog.v1",
+  "revision": "western-corridor-research.r18",
+  "generatedAtUtc": "2026-09-21T00:00:00Z",
+  "observationPresentationOnly": true,
+  "operationalAuthority": false,
+  "detailedGeometryAllowed": false,
+  "boundaryNotice": "공식 출처의 사건·회랑 기술을 요약한 읽기 전용 자료이며 현재 통행·운행·정밀 지리를 확정하지 않습니다.",
+  "sources": [
+    {
+      "sourceReceiptStableId": "source-receipt:unikorea:rail-test-2007-05-13",
+      "providerName": "통일부 남북회담본부",
+      "documentTitle": "남북철도연결구간 열차시험운행 합의서",
+      "sourceUrl": "https://dialogue.unikorea.go.kr/ukd/ca/usrtalkmanage/View.do?agreement_type=&id=173&tab=5",
+      "evidenceStateCode": "OfficialHistoricalDocument"
+    },
+    {
+      "sourceReceiptStableId": "source-receipt:unikorea:freight-committee-2007-12-01",
+      "providerName": "통일부 남북회담본부",
+      "documentTitle": "남북철도운영공동위원회 제1차 회의",
+      "sourceUrl": "https://dialogue.unikorea.go.kr/ukd/a/ad/usrtaltotal/View.do?id=143",
+      "evidenceStateCode": "OfficialHistoricalDocument"
+    },
+    {
+      "sourceReceiptStableId": "source-receipt:unikorea:dmz-peace-train-2026-04-09",
+      "providerName": "통일부",
+      "documentTitle": "도라산역 평화이음 열차 운행 재개",
+      "sourceUrl": "https://unikorea.go.kr/web/unikorea/bbs/bbs_0000000000000004/59177",
+      "evidenceStateCode": "OfficialCurrentDocument"
+    },
+    {
+      "sourceReceiptStableId": "source-receipt:mnd:severance-briefing-2024-10-17",
+      "providerName": "국방부",
+      "documentTitle": "국방부 일일 정례 브리핑",
+      "sourceUrl": "https://www.korea.kr/news/policyNewsView.do?newsId=156655297",
+      "evidenceStateCode": "OfficialCurrentObservation"
+    },
+    {
+      "sourceReceiptStableId": "source-receipt:unescap:tar-agreement-2022",
+      "providerName": "UN ESCAP",
+      "documentTitle": "Intergovernmental Agreement on the Trans-Asian Railway Network",
+      "sourceUrl": "https://www.unescap.org/sites/default/d8files/2022-11/Intergovernmental_Agreement_TAR_2022-EN.pdf",
+      "evidenceStateCode": "InternationalCorridorDocument"
+    }
+  ],
+  "hubs": [
+    {
+      "researchSubjectId": "corridor-hub:busan",
+      "displayName": "부산",
+      "displayOrder": 1,
+      "evidenceStateCode": "ResearchPending",
+      "operationStateCode": "ResearchPending",
+      "maximumObservationLevel": "Z2",
+      "limitationText": "이번 자료군에는 부산–서울 세부 노선 근거가 포함되지 않았습니다.",
+      "sourceReceiptStableIds": ["source-receipt:unescap:tar-agreement-2022"]
+    },
+    {
+      "researchSubjectId": "corridor-hub:seoul",
+      "displayName": "서울",
+      "displayOrder": 2,
+      "evidenceStateCode": "ResearchPending",
+      "operationStateCode": "ResearchPending",
+      "maximumObservationLevel": "Z2",
+      "limitationText": "서울–도라산 국내 관찰의 광역 기점이며 세부 노선은 후속 자료가 필요합니다.",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:dmz-peace-train-2026-04-09"]
+    },
+    {
+      "researchSubjectId": "corridor-hub:dorasan",
+      "displayName": "도라산",
+      "displayOrder": 3,
+      "evidenceStateCode": "ConfirmedCurrentDomestic",
+      "operationStateCode": "OperationalDomestic",
+      "maximumObservationLevel": "Z4",
+      "limitationText": "현재 확인 범위는 서울–도라산 국내 관광 운행입니다. 이북 운행 근거가 아닙니다.",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:rail-test-2007-05-13", "source-receipt:unikorea:freight-committee-2007-12-01", "source-receipt:unikorea:dmz-peace-train-2026-04-09"]
+    },
+    {
+      "researchSubjectId": "corridor-hub:panmun",
+      "displayName": "판문",
+      "displayOrder": 4,
+      "evidenceStateCode": "AwaitingIdentityReview",
+      "operationStateCode": "Disconnected",
+      "maximumObservationLevel": "Z3",
+      "limitationText": "판문역과 봉동역의 동일성·개명·공간 관계는 검토 중입니다.",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:rail-test-2007-05-13", "source-receipt:unikorea:freight-committee-2007-12-01", "source-receipt:mnd:severance-briefing-2024-10-17"]
+    },
+    {
+      "researchSubjectId": "corridor-hub:bongdong",
+      "displayName": "봉동",
+      "displayOrder": 5,
+      "evidenceStateCode": "AwaitingIdentityReview",
+      "operationStateCode": "AwaitingIdentityReview",
+      "maximumObservationLevel": "Z3",
+      "limitationText": "판문과 합치지 않으며 국제 회랑·역사 문서의 명칭 관계를 추가 검토합니다.",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:freight-committee-2007-12-01", "source-receipt:unescap:tar-agreement-2022"]
+    },
+    {
+      "researchSubjectId": "corridor-hub:kaesong",
+      "displayName": "개성",
+      "displayOrder": 6,
+      "evidenceStateCode": "ConfirmedHistoricalEvent",
+      "operationStateCode": "HistoricalConnection",
+      "maximumObservationLevel": "Z3",
+      "limitationText": "2007년 시험운행의 역사적 도착 거점이며 현재 운행을 뜻하지 않습니다.",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:rail-test-2007-05-13", "source-receipt:unescap:tar-agreement-2022"]
+    },
+    {
+      "researchSubjectId": "corridor-hub:pyongyang",
+      "displayName": "평양",
+      "displayOrder": 7,
+      "evidenceStateCode": "ConfirmedInternationalCorridorDescription",
+      "operationStateCode": "InternationalCorridorDescription",
+      "maximumObservationLevel": "Z2",
+      "limitationText": "국제 회랑 기술 수준이며 정밀 역·노선·현재 운행 자료가 아닙니다.",
+      "sourceReceiptStableIds": ["source-receipt:unescap:tar-agreement-2022"]
+    },
+    {
+      "researchSubjectId": "corridor-hub:sinuiju",
+      "displayName": "신의주",
+      "displayOrder": 8,
+      "evidenceStateCode": "ConfirmedInternationalCorridorDescription",
+      "operationStateCode": "InternationalCorridorDescription",
+      "maximumObservationLevel": "Z2",
+      "limitationText": "국제 회랑 기술 수준이며 정밀 역·노선·현재 운행 자료가 아닙니다.",
+      "sourceReceiptStableIds": ["source-receipt:unescap:tar-agreement-2022"]
+    }
+  ],
+  "segments": [
+    {
+      "segmentStableId": "corridor-segment:busan-seoul",
+      "fromResearchSubjectId": "corridor-hub:busan",
+      "toResearchSubjectId": "corridor-hub:seoul",
+      "segmentStateCode": "ResearchPending",
+      "displayStyleCode": "DataPending",
+      "sourceReceiptStableIds": []
+    },
+    {
+      "segmentStableId": "corridor-segment:seoul-dorasan",
+      "fromResearchSubjectId": "corridor-hub:seoul",
+      "toResearchSubjectId": "corridor-hub:dorasan",
+      "segmentStateCode": "OperationalDomestic",
+      "displayStyleCode": "CurrentSolid",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:dmz-peace-train-2026-04-09"]
+    },
+    {
+      "segmentStableId": "corridor-segment:dorasan-panmun",
+      "fromResearchSubjectId": "corridor-hub:dorasan",
+      "toResearchSubjectId": "corridor-hub:panmun",
+      "segmentStateCode": "Disconnected",
+      "displayStyleCode": "DisconnectedBroken",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:rail-test-2007-05-13", "source-receipt:unikorea:freight-committee-2007-12-01", "source-receipt:mnd:severance-briefing-2024-10-17"]
+    },
+    {
+      "segmentStableId": "corridor-segment:panmun-bongdong-review",
+      "fromResearchSubjectId": "corridor-hub:panmun",
+      "toResearchSubjectId": "corridor-hub:bongdong",
+      "segmentStateCode": "AwaitingIdentityReview",
+      "displayStyleCode": "IdentityReview",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:freight-committee-2007-12-01"]
+    },
+    {
+      "segmentStableId": "corridor-segment:bongdong-kaesong",
+      "fromResearchSubjectId": "corridor-hub:bongdong",
+      "toResearchSubjectId": "corridor-hub:kaesong",
+      "segmentStateCode": "HistoricalConnection",
+      "displayStyleCode": "HistoricalGray",
+      "sourceReceiptStableIds": ["source-receipt:unikorea:rail-test-2007-05-13", "source-receipt:unescap:tar-agreement-2022"]
+    },
+    {
+      "segmentStableId": "corridor-segment:kaesong-pyongyang",
+      "fromResearchSubjectId": "corridor-hub:kaesong",
+      "toResearchSubjectId": "corridor-hub:pyongyang",
+      "segmentStateCode": "InternationalCorridorDescription",
+      "displayStyleCode": "ScenarioDotted",
+      "sourceReceiptStableIds": ["source-receipt:unescap:tar-agreement-2022"]
+    },
+    {
+      "segmentStableId": "corridor-segment:pyongyang-sinuiju",
+      "fromResearchSubjectId": "corridor-hub:pyongyang",
+      "toResearchSubjectId": "corridor-hub:sinuiju",
+      "segmentStateCode": "InternationalCorridorDescription",
+      "displayStyleCode": "ScenarioDotted",
+      "sourceReceiptStableIds": ["source-receipt:unescap:tar-agreement-2022"]
+    }
+  ]
+}

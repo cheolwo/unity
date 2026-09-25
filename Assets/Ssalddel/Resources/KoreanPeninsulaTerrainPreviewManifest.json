@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "korean-peninsula-terrain-preview.v1",
+  "revision": "natural-earth-preview.r1",
+  "generatedAtUtc": "2026-09-21T00:00:00Z",
+  "distributionApproved": true,
+  "observationPresentationOnly": true,
+  "finalTerrainAuthority": false,
+  "traversalReady": false,
+  "gameplayReady": false,
+  "maximumPreviewStageCode": "Hubs",
+  "coordinateReferenceSystem": "EPSG:4326",
+  "boundaryNotice": "Natural Earth 공개 자료를 123°E~132°E, 32°N~44°N으로 잘라 만든 관찰 전용 미리보기입니다. 최종 지형, 법적 경계, 통행 가능 구역, 게임플레이 지형을 확정하지 않습니다.",
+  "bounds": {
+    "minLongitude": 123.0,
+    "maxLongitude": 132.0,
+    "minLatitude": 32.0,
+    "maxLatitude": 44.0
+  },
+  "textureResourceName": "KoreanPeninsulaTerrainPreview",
+  "riverTextureResourceName": "KoreanPeninsulaVerifiedRiversPreview",
+  "sources": [
+    {
+      "sourceId": "natural-earth-1-raster-10m",
+      "datasetId": "NE1_LR_LC_SR_W_DR",
+      "providerName": "Natural Earth",
+      "sourceLandingPageUrl": "https://www.naturalearthdata.com/downloads/10m-raster-data/10m-natural-earth-1/",
+      "sourceDownloadUrl": "https://naciscdn.org/naturalearth/10m/raster/NE1_LR_LC_SR_W_DR.zip",
+      "sourceRevision": "3.2.0",
+      "archiveRevision": "2.0.0",
+      "licenseCode": "PublicDomain",
+      "attribution": "Made with Natural Earth",
+      "sourceArchiveHashSha256": "6B10E2B304ADF74ECE19B3C1E0FF5BED89355834438599DBC36A7CBC8AABEFCC",
+      "derivedAssetHashSha256": "7FDDD2892C3E1481A278D301DFA074D44502DA576608229E14BC4ADB0163E52B",
+      "resourceName": "KoreanPeninsulaTerrainPreview",
+      "derivedAssetByteLength": 358018,
+      "derivedAssetWidth": 405,
+      "derivedAssetHeight": 540,
+      "versionNotice": "공식 다운로드 페이지 표기는 3.2.0이지만 내려받은 archive 내부 VERSION/README는 2.0.0으로 표기되어 두 값을 함께 보존합니다."
+    },
+    {
+      "sourceId": "natural-earth-rivers-lake-centerlines-10m",
+      "datasetId": "ne_10m_rivers_lake_centerlines",
+      "providerName": "Natural Earth",
+      "sourceLandingPageUrl": "https://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-rivers-lake-centerlines/",
+      "sourceDownloadUrl": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_rivers_lake_centerlines.zip",
+      "sourceRevision": "5.0.0",
+      "archiveRevision": "5.0.0",
+      "licenseCode": "PublicDomain",
+      "attribution": "Made with Natural Earth",
+      "sourceArchiveHashSha256": "DED71B01870855CCFE19B51F2EC14C9BB48FAE23C0E9F3C11974D426433B5C38",
+      "derivedAssetHashSha256": "2D5C54ED2AE6F9B40EEE91BE2ABE46DC514A1B342C4CED8679E5E1B6860CEC99",
+      "resourceName": "KoreanPeninsulaVerifiedRiversPreview",
+      "derivedAssetByteLength": 14833,
+      "derivedAssetWidth": 405,
+      "derivedAssetHeight": 540,
+      "versionNotice": "전체 1,473개 feature 중 이름과 외부 식별자를 함께 확인한 한강, 압록강, 두만강만 파생 overlay에 포함합니다."
+    }
+  ],
+  "verifiedRiverNames": ["한강", "압록강", "두만강"],
+  "missingRiverNames": ["대동강"],
+  "verifiedRivers": [
+    {
+      "displayName": "한강",
+      "englishName": "Han",
+      "sourceFeatureIndices": [506],
+      "naturalEarthIds": ["1159123863"],
+      "wikidataId": "Q55500",
+      "evidenceStateCode": "VerifiedSourceFeature"
+    },
+    {
+      "displayName": "압록강",
+      "englishName": "Yalu",
+      "sourceFeatureIndices": [154, 155],
+      "naturalEarthIds": ["1159125347", "1159125357"],
+      "wikidataId": "Q55498",
+      "evidenceStateCode": "VerifiedSourceFeature"
+    },
+    {
+      "displayName": "두만강",
+      "englishName": "Tumen",
+      "sourceFeatureIndices": [90],
+      "naturalEarthIds": ["1159111267"],
+      "wikidataId": "Q55499",
+      "evidenceStateCode": "VerifiedSourceFeature"
+    }
+  ],
+  "missingRivers": [
+    {
+      "displayName": "대동강",
+      "englishName": "Taedong",
+      "evidenceStateCode": "NotFoundInNaturalEarth10mSource",
+      "limitationText": "Natural Earth 10m rivers/lake centerlines 1,473개 feature에서 이름 또는 외부 식별자를 확인하지 못했으므로 이번 미리보기에는 임의 생성하지 않습니다."
+    }
+  ]
+}
