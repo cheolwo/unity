@@ -6,7 +6,7 @@
   "files": [
     {
       "relativePath": "catalog.json",
-      "sha256": "c1c52c1852b04bcf5c173b117589e21f5a069d990ed8fee573c0861da446e76d"
+      "sha256": "e655ab886d73f892d7e2aec5d79d3783a3eb110979909e1d6f337001ba7a154f"
     },
     {
       "relativePath": "definitions/farm-production.v1.json",
