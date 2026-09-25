@@ -307,7 +307,7 @@ namespace Ssalddel.Unity.Runtime.World
                     continue;
                 }
 
-                var stage = Stages[instruction.LifecycleStageCode];
+                TryGetStage(instruction, out var stage);
                 states.Add(new 다중Os생명주기표현State
                 {
                     ObjectStableId = instruction.ObjectStableId,
@@ -353,7 +353,7 @@ namespace Ssalddel.Unity.Runtime.World
                 return 다중Os생명주기표현DiagnosticCodes.IdentityMissing;
             if (!OsLabels.ContainsKey(value.OperatingSystemId))
                 return 다중Os생명주기표현DiagnosticCodes.OperatingSystemUnsupported;
-            if (!Stages.ContainsKey(value.LifecycleStageCode))
+            if (!TryGetStage(value, out _))
                 return 다중Os생명주기표현DiagnosticCodes.StageUnsupported;
             if (!SupportedAttention(value.AttentionStateCode))
                 return 다중Os생명주기표현DiagnosticCodes.AttentionUnsupported;
@@ -363,6 +363,25 @@ namespace Ssalddel.Unity.Runtime.World
                     OperationalWorldSceneSourceKinds.OperationalProjection, StringComparison.Ordinal))
                 return 다중Os생명주기표현DiagnosticCodes.SourceUnsupported;
             return string.Empty;
+        }
+
+        // 운영 API의 어휘를 표본 단계로 덮어쓰지 않는다. 전달 완료는 수령 확인이 아니다.
+        private static bool TryGetStage(OperationalWorldPlacementInstruction value, out StageDescriptor stage)
+        {
+            if (value.OperatingSystemId == OperationalWorldOperatingSystemIds.FoodDelivery
+                && value.SourceKindCode == OperationalWorldSceneSourceKinds.OperationalProjection)
+            {
+                switch (value.LifecycleStageCode)
+                {
+                    case "주문대기": stage = new StageDescriptor("주문 접수 대기", .08f); return true;
+                    case "조리중": stage = new StageDescriptor("조리 중", .3f); return true;
+                    case "픽업대기": stage = new StageDescriptor("조리 완료·픽업 대기", .4f); return true;
+                    case "기사배정": stage = new StageDescriptor("기사 배정", .42f); return true;
+                    case "픽업완료": stage = new StageDescriptor("픽업 완료·배송 중", .55f); return true;
+                    case "전달완료": stage = new StageDescriptor("전달 완료·수령 확인 대기", .72f); return true;
+                }
+            }
+            return Stages.TryGetValue(value.LifecycleStageCode, out stage);
         }
 
         private static bool SupportedAttention(string value)
@@ -385,6 +404,9 @@ namespace Ssalddel.Unity.Runtime.World
                 return "Recovery";
             if (attention == OperationalWorldAttentionStateCodes.Completed)
                 return "Result";
+            if (stage == "주문대기" || stage == "기사배정") return "Waiting";
+            if (stage == "조리중") return "Working";
+            if (stage == "픽업대기" || stage == "전달완료") return "Handoff";
             if (stage.IndexOf("handoff", StringComparison.Ordinal) >= 0)
                 return "Handoff";
             if (stage.IndexOf("cooking", StringComparison.Ordinal) >= 0

@@ -19,6 +19,37 @@ namespace Ssalddel.Unity.Tests.EditMode
         private static readonly DateTime Epoch =
             new(2026, 9, 13, 0, 0, 0, DateTimeKind.Utc);
 
+        [TestCase("주문대기", "주문 접수 대기", "Waiting")]
+        [TestCase("조리중", "조리 중", "Working")]
+        [TestCase("픽업대기", "조리 완료·픽업 대기", "Handoff")]
+        [TestCase("기사배정", "기사 배정", "Waiting")]
+        [TestCase("픽업완료", "픽업 완료·배송 중", "Moving")]
+        [TestCase("전달완료", "전달 완료·수령 확인 대기", "Handoff")]
+        public void 운영음식단계는_원문판본을보존하고_수령완료를예측하지않는다(string code, string label, string cue)
+        {
+            var instruction = new OperationalWorldPlacementInstruction
+            {
+                ObjectStableId = "food:active", WorkStableId = "work:active", Revision = 3,
+                OperatingSystemId = OperationalWorldOperatingSystemIds.FoodDelivery,
+                SourceKindCode = OperationalWorldSceneSourceKinds.OperationalProjection,
+                LifecycleStageCode = code, ActivityCode = code,
+                SemanticPlaceStableId = "semantic-place:area:food-restaurant",
+                AttentionStateCode = OperationalWorldAttentionStateCodes.Active
+            };
+            var plan = new OperationalWorldPlacementPlan { Accepted = true, Instructions = new[] { instruction } };
+            var result = new 다중Os생명주기표현Projector().Create(plan);
+            Assert.That(result.Diagnostics, Is.Empty);
+            var state = result.States.Single();
+            Assert.That(state.LifecycleStageCode, Is.EqualTo(code));
+            Assert.That(state.LifecycleStageLabel, Is.EqualTo(label));
+            Assert.That(state.CueCode, Is.EqualTo(cue));
+            Assert.That(state.Revision, Is.EqualTo(3));
+            Assert.That(state.Progress01, Is.LessThan(1f));
+            Assert.That(state.AttentionStateCode, Is.EqualTo(OperationalWorldAttentionStateCodes.Active));
+            instruction.OperatingSystemId = OperationalWorldOperatingSystemIds.DomesticCargoTransport;
+            Assert.That(new 다중Os생명주기표현Projector().Create(plan).States, Is.Empty);
+        }
+
         [Test]
         public void 동결표현타임라인은_서버R4의_여덟사례전단계를그대로사용한다()
         {
