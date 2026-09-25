@@ -130,6 +130,7 @@ namespace Ssalddel.Unity.Presentation.World
             public bool OverlayApplied { get; internal set; }
             public int OverlayBuildingCount { get; internal set; }
             public int OverlaySurfaceCount { get; internal set; }
+            public int RenderedBuildingCount { get; internal set; }
             public string SourceRevision { get; internal set; }
             public string SourceContentHash { get; internal set; }
         }
@@ -447,6 +448,7 @@ namespace Ssalddel.Unity.Presentation.World
             var usage = Usage(kind);
             heightBands.Add(heightBand);
             usageKinds.Add(usage);
+            report.RenderedBuildingCount++;
             var hash = Hash(id);
             var facade = FacadeColor(usage, hash);
             var roofColor = RoofColor(usage, hash);

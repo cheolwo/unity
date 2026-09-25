@@ -265,6 +265,37 @@ namespace Ssalddel.Unity.Tests.EditMode
             Assert.That(composition.SourceStatus, Is.EqualTo("LocalPrivateReview"));
         }
 
+        [Test]
+        public void Overture공개건물보조자료는_엄격한원천영수증으로_로컬검토에만합성한다()
+        {
+            var data = ValidOverture();
+
+            var composition = Compose(data);
+
+            Assert.That(composition.OverlayApplied, Is.True);
+            Assert.That(composition.Revision,
+                Is.EqualTo(사가정공간표현OverlayComposer.OverturePrivateReviewRevision));
+            Assert.That(composition.SourceStatus, Is.EqualTo("LocalPrivateReview"));
+            Assert.That(composition.SourceReceipts, Has.Count.EqualTo(1));
+            Assert.That(composition.Surfaces, Is.Empty);
+            Assert.That(composition.Buildings, Has.Count.EqualTo(1));
+            Assert.That(composition.LegacyBuildingBindingCount, Is.Zero);
+        }
+
+        [Test]
+        public void Overture공개건물보조자료의_동결hash가다르면_r3로복귀한다()
+        {
+            var data = ValidOverture();
+            data.sourceReceipts[0].rawHash = new string('0', 64);
+
+            var composition = Compose(data);
+
+            Assert.That(composition.OverlayApplied, Is.False);
+            Assert.That(composition.SourceStatus, Is.EqualTo("SagajeongReferenceR3Fallback"));
+            Assert.That(composition.DiagnosticCode,
+                Is.EqualTo("SpatialOverlayOvertureSourceReceiptMismatch"));
+        }
+
         [TestCase("schema")]
         [TestCase("revision")]
         [TestCase("status")]
@@ -557,6 +588,37 @@ namespace Ssalddel.Unity.Tests.EditMode
                 },
                 contentHash = string.Empty
             };
+        }
+
+        private static 사가정공간표현OverlayData ValidOverture()
+        {
+            var data = Valid();
+            data.revision = 사가정공간표현OverlayComposer.OverturePrivateReviewRevision;
+            data.sourceReceipts = new[]
+            {
+                new 사가정공간표현SourceReceiptData
+                {
+                    provider = 사가정공간표현OverlayComposer.OvertureProvider,
+                    datasetId = 사가정공간표현OverlayComposer.OvertureDatasetId,
+                    sourceUrl = 사가정공간표현OverlayComposer.OvertureSourceUrl,
+                    licenseCode = 사가정공간표현OverlayComposer.OvertureLicenseCode,
+                    licenseUrl = 사가정공간표현OverlayComposer.OvertureLicenseUrl,
+                    datasetDate = "2026-08-19",
+                    fetchedAtUtc = "2026-09-21T01:18:39.804683Z",
+                    rawHash = 사가정공간표현OverlayComposer.OvertureRawHash,
+                    rawLength = 사가정공간표현OverlayComposer.OvertureRawLength,
+                    originalCrs = "EPSG:4326",
+                    reviewStatus = "LocalPrivateReview"
+                }
+            };
+            data.surfaces = Array.Empty<사가정공간표현SurfaceData>();
+            data.buildings[0].legacyOsmIds = Array.Empty<string>();
+            data.buildings[0].legacyMatch = new 사가정공간표현LegacyMatchData
+            {
+                method = "None",
+                ambiguous = false
+            };
+            return data;
         }
 
         private static 사가정공간표현PolygonPartData Part(사가정공간표현RingData outer)

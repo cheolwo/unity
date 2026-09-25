@@ -16,6 +16,8 @@ namespace Ssalddel.Unity.Runtime.World
         public const string SchemaVersion = "ssalddel.spatial-presentation-overlay.v1";
         public const string PrivateReviewRevision =
             "sagajeong-spatial-presentation.private-review.r2";
+        public const string OverturePrivateReviewRevision =
+            "sagajeong-spatial-presentation.overture-private-review.r1";
         public const string PublicRevisionPrefix = "sagajeong-spatial-presentation.public.";
         public const string LocalPrivateReviewStatus = "LocalPrivateReview";
         public const string PublicOpenDataStatus = "PublicOpenData";
@@ -48,6 +50,17 @@ namespace Ssalddel.Unity.Runtime.World
             "https://api.openstreetmap.org/api/0.6/map?bbox=127.0825,37.5762,127.0942,37.5854";
         public const string OsmLicenseUrl = "https://www.openstreetmap.org/copyright";
         public const string OsmSurfaceSourceId = "openstreetmap:sagajeong-r2-map";
+        public const string OvertureProvider = "Overture Maps Foundation";
+        public const string OvertureDatasetId =
+            "overture-buildings-2026-08-19.0-sagajeong";
+        public const string OvertureSourceUrl =
+            "https://docs.overturemaps.org/getting-data/";
+        public const string OvertureLicenseCode = "ODbL-1.0";
+        public const string OvertureLicenseUrl =
+            "https://docs.overturemaps.org/attribution/";
+        public const string OvertureRawHash =
+            "96DC6451392391A9A31BB34AE17F3CB2501E1967EAF8155ECD74CC0FBAA560F9";
+        public const long OvertureRawLength = 1738246L;
 
         private const int MaximumSourceReceipts = 64;
         private const int MaximumBuildings = 20000;
@@ -231,7 +244,8 @@ namespace Ssalddel.Unity.Runtime.World
             {
                 case 사가정공간표현OverlayBoundary.LocalPrivateReview:
                     Require(data.status == LocalPrivateReviewStatus
-                            && data.revision == PrivateReviewRevision
+                            && (data.revision == PrivateReviewRevision
+                                || data.revision == OverturePrivateReviewRevision)
                             && !data.distributionApproved,
                         "SpatialOverlayPrivateBoundaryMismatch");
                     break;
@@ -299,6 +313,15 @@ namespace Ssalddel.Unity.Runtime.World
                 result.Add(new 사가정공간표현SourceReceipt(source));
             }
 
+            if (boundary == 사가정공간표현OverlayBoundary.LocalPrivateReview
+                && overlay.revision == OverturePrivateReviewRevision)
+            {
+                Require(overlay.sourceReceipts.Length == 1
+                        && IsExpectedOverturePrivateReceipt(overlay.sourceReceipts[0]),
+                    "SpatialOverlayOvertureSourceReceiptMismatch");
+                return result.AsReadOnly();
+            }
+
             var required = overlay.sourceReceipts.Where(source =>
                     source.provider == RequiredSpatialProvider
                     && source.datasetId == RequiredSpatialDatasetId
@@ -359,6 +382,21 @@ namespace Ssalddel.Unity.Runtime.World
                && receipt.rawLength == OsmRawLength
                && receipt.originalCrs == "EPSG:4326"
                && receipt.reviewStatus == PublicOpenDataStatus;
+
+        private static bool IsExpectedOverturePrivateReceipt(
+            사가정공간표현SourceReceiptData receipt)
+            => receipt != null
+               && receipt.provider == OvertureProvider
+               && receipt.datasetId == OvertureDatasetId
+               && receipt.sourceUrl == OvertureSourceUrl
+               && receipt.licenseCode == OvertureLicenseCode
+               && receipt.licenseUrl == OvertureLicenseUrl
+               && receipt.datasetDate == "2026-08-19"
+               && string.Equals(receipt.rawHash, OvertureRawHash,
+                   StringComparison.OrdinalIgnoreCase)
+               && receipt.rawLength == OvertureRawLength
+               && receipt.originalCrs == "EPSG:4326"
+               && receipt.reviewStatus == LocalPrivateReviewStatus;
 
         private static void ValidateLegacyMatch(사가정공간표현LegacyMatchData match,
             IReadOnlyList<string> aliases,

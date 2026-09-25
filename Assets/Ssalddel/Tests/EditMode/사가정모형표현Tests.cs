@@ -133,7 +133,15 @@ namespace Ssalddel.Unity.Tests.EditMode
                 if (view.SpatialOverlayApplied)
                 {
                     Assert.That(view.MiniatureBuildReport.OverlayBuildingCount, Is.GreaterThan(0));
-                    Assert.That(view.MiniatureBuildReport.OverlaySurfaceCount, Is.GreaterThan(0));
+                    if (view.SpatialPresentationRevision ==
+                        사가정공간표현OverlayComposer.OverturePrivateReviewRevision)
+                        Assert.That(view.MiniatureBuildReport.OverlaySurfaceCount, Is.Zero);
+                    else
+                        Assert.That(view.MiniatureBuildReport.OverlaySurfaceCount, Is.GreaterThan(0));
+                    if (view.SpatialPresentationRevision ==
+                        사가정공간표현OverlayComposer.OverturePrivateReviewRevision)
+                        Assert.That(view.MiniatureBuildReport.RenderedBuildingCount,
+                            Is.EqualTo(2849));
                 }
                 Assert.That(view.MiniatureBuildReport.RendererBatchCount,
                     Is.LessThanOrEqualTo(사가정모형MeshBuilder.MaximumRendererCount));
