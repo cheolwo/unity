@@ -31,8 +31,23 @@ namespace Ssalddel.Unity.Presentation.World
         private bool shown = true;
 
         public 행정동디오라마검토Snapshot Snapshot { get; private set; }
+        public 행정동디오라마깊이Plan DepthPlan => Snapshot?.DepthPlan;
+        public 행정동디오라마비공개관찰OverlaySet PrivateObservationOverlay =>
+            Snapshot?.PrivateObservationOverlay;
+        public 행정동디오라마비공개보행망OverlaySet PrivateWalkNetworkOverlay =>
+            Snapshot?.PrivateWalkNetworkOverlay;
+        public 행정동디오라마비공개도로방향OverlaySet PrivateRoadDirectionOverlay =>
+            Snapshot?.PrivateRoadDirectionOverlay;
+        public 행정동디오라마비공개비오톱OverlaySet PrivateBiotopeOverlay =>
+            Snapshot?.PrivateBiotopeOverlay;
+        public 행정동디오라마비공개차선표시OverlaySet PrivateLaneMarkingOverlay =>
+            Snapshot?.PrivateLaneMarkingOverlay;
+        public 행정동디오라마비공개수평등고선추적OverlaySet
+            PrivateHorizontalContourTraceOverlay =>
+            Snapshot?.PrivateHorizontalContourTraceOverlay;
         public 행정동디오라마검토MeshBuilder.BuildReport BuildReport { get; private set; }
         public 행정동디오라마검토Building SelectedBuilding { get; private set; }
+        public 행정동건물내부Ring검토Geometry FocusedBuildingGeometry { get; private set; }
         public Camera ObservationCamera { get; private set; }
         public Transform ModelRoot => modelRoot;
         public string ActiveAdministrativeAreaStableId =>
@@ -40,6 +55,7 @@ namespace Ssalddel.Unity.Presentation.World
         public string DiagnosticCode { get; private set; } = "NotLoaded";
         public bool IsVisible => shown && modelRoot != null && modelRoot.gameObject.activeSelf;
         public bool HasSelection => SelectedBuilding != null;
+        public bool CompactEvidenceHud { get; set; }
 
         public bool TryApply(AdministrativeDongDioramaApplyResult source,
             out string diagnosticCode)
@@ -76,16 +92,210 @@ namespace Ssalddel.Unity.Presentation.World
             }
         }
 
+        public bool TryApply(AdministrativeDongDioramaApplyResult source,
+            행정동디오라마비공개관찰OverlaySetData privateObservationOverlay,
+            행정동디오라마비공개보행망OverlaySetData privateWalkNetworkOverlay,
+            행정동디오라마비공개도로방향OverlaySetData privateRoadDirectionOverlay,
+            행정동디오라마비공개비오톱OverlaySetData privateBiotopeOverlay,
+            bool includeObservationCamera, out string diagnosticCode)
+        {
+            if (!행정동디오라마검토Projection.TryCreate(source, privateObservationOverlay,
+                    privateWalkNetworkOverlay, privateRoadDirectionOverlay, privateBiotopeOverlay,
+                    out var snapshot, out diagnosticCode))
+            {
+                ClearGenerated(); Snapshot = null; DiagnosticCode = diagnosticCode; return false;
+            }
+            try { BuildFromSnapshot(snapshot, includeObservationCamera); DiagnosticCode=diagnosticCode; return true; }
+            catch (Exception exception) when (exception is InvalidOperationException || exception is ArgumentException)
+            { ClearGenerated(); Snapshot=null; diagnosticCode=exception.Message; DiagnosticCode=diagnosticCode; return false; }
+        }
+
+        public bool TryApply(AdministrativeDongDioramaApplyResult source,
+            행정동디오라마비공개관찰OverlaySetData privateObservationOverlay,
+            행정동디오라마비공개보행망OverlaySetData privateWalkNetworkOverlay,
+            행정동디오라마비공개도로방향OverlaySetData privateRoadDirectionOverlay,
+            행정동디오라마비공개비오톱OverlaySetData privateBiotopeOverlay,
+            행정동디오라마비공개차선표시OverlaySetData privateLaneMarkingOverlay,
+            bool includeObservationCamera, out string diagnosticCode)
+        {
+            if (!행정동디오라마검토Projection.TryCreate(source, privateObservationOverlay,
+                    privateWalkNetworkOverlay, privateRoadDirectionOverlay, privateBiotopeOverlay,
+                    privateLaneMarkingOverlay, out var snapshot, out diagnosticCode))
+            {
+                ClearGenerated(); Snapshot = null; DiagnosticCode = diagnosticCode; return false;
+            }
+            try
+            {
+                BuildFromSnapshot(snapshot, includeObservationCamera);
+                DiagnosticCode = diagnosticCode;
+                return true;
+            }
+            catch (Exception exception) when (exception is InvalidOperationException
+                                              || exception is ArgumentException)
+            {
+                ClearGenerated(); Snapshot = null; diagnosticCode = exception.Message;
+                DiagnosticCode = diagnosticCode; return false;
+            }
+        }
+
+        public bool TryApply(AdministrativeDongDioramaApplyResult source,
+            행정동디오라마비공개관찰OverlaySetData privateObservationOverlay,
+            행정동디오라마비공개보행망OverlaySetData privateWalkNetworkOverlay,
+            행정동디오라마비공개도로방향OverlaySetData privateRoadDirectionOverlay,
+            행정동디오라마비공개비오톱OverlaySetData privateBiotopeOverlay,
+            행정동디오라마비공개차선표시OverlaySetData privateLaneMarkingOverlay,
+            행정동디오라마비공개수평등고선추적OverlaySetData
+                privateHorizontalContourTraceOverlay,
+            bool includeObservationCamera, out string diagnosticCode)
+        {
+            if (!행정동디오라마검토Projection.TryCreate(source, privateObservationOverlay,
+                    privateWalkNetworkOverlay, privateRoadDirectionOverlay, privateBiotopeOverlay,
+                    privateLaneMarkingOverlay, privateHorizontalContourTraceOverlay,
+                    out var snapshot, out diagnosticCode))
+            {
+                ClearGenerated(); Snapshot = null; DiagnosticCode = diagnosticCode; return false;
+            }
+            try
+            {
+                BuildFromSnapshot(snapshot, includeObservationCamera);
+                DiagnosticCode = diagnosticCode;
+                return true;
+            }
+            catch (Exception exception) when (exception is InvalidOperationException
+                                              || exception is ArgumentException)
+            {
+                ClearGenerated(); Snapshot = null; diagnosticCode = exception.Message;
+                DiagnosticCode = diagnosticCode; return false;
+            }
+        }
+
+        public bool TryApply(AdministrativeDongDioramaApplyResult source,
+            행정동디오라마비공개관찰OverlaySetData privateObservationOverlay,
+            out string diagnosticCode)
+            => TryApply(source, privateObservationOverlay, createObservationCamera,
+                out diagnosticCode);
+
+        public bool TryApply(AdministrativeDongDioramaApplyResult source,
+            행정동디오라마비공개관찰OverlaySetData privateObservationOverlay,
+            bool includeObservationCamera, out string diagnosticCode)
+        {
+            if (!행정동디오라마검토Projection.TryCreate(source,
+                    privateObservationOverlay, out var snapshot, out diagnosticCode))
+            {
+                ClearGenerated();
+                Snapshot = null;
+                DiagnosticCode = diagnosticCode;
+                return false;
+            }
+
+            try
+            {
+                BuildFromSnapshot(snapshot, includeObservationCamera);
+                DiagnosticCode = diagnosticCode;
+                return true;
+            }
+            catch (Exception exception) when (exception is InvalidOperationException
+                                              || exception is ArgumentException)
+            {
+                ClearGenerated();
+                Snapshot = null;
+                diagnosticCode = string.IsNullOrWhiteSpace(exception.Message)
+                    ? "AdministrativeDongReviewPresentationBuildFailed"
+                    : exception.Message;
+                DiagnosticCode = diagnosticCode;
+                return false;
+            }
+        }
+
+        public bool TryApply(AdministrativeDongDioramaApplyResult source,
+            행정동디오라마비공개관찰OverlaySetData privateObservationOverlay,
+            행정동디오라마비공개보행망OverlaySetData privateWalkNetworkOverlay,
+            out string diagnosticCode)
+            => TryApply(source, privateObservationOverlay, privateWalkNetworkOverlay,
+                createObservationCamera, out diagnosticCode);
+
+        public bool TryApply(AdministrativeDongDioramaApplyResult source,
+            행정동디오라마비공개관찰OverlaySetData privateObservationOverlay,
+            행정동디오라마비공개보행망OverlaySetData privateWalkNetworkOverlay,
+            bool includeObservationCamera, out string diagnosticCode)
+        {
+            if (!행정동디오라마검토Projection.TryCreate(source,
+                    privateObservationOverlay, privateWalkNetworkOverlay,
+                    out var snapshot, out diagnosticCode))
+            {
+                ClearGenerated();
+                Snapshot = null;
+                DiagnosticCode = diagnosticCode;
+                return false;
+            }
+
+            try
+            {
+                BuildFromSnapshot(snapshot, includeObservationCamera);
+                DiagnosticCode = diagnosticCode;
+                return true;
+            }
+            catch (Exception exception) when (exception is InvalidOperationException
+                                              || exception is ArgumentException)
+            {
+                ClearGenerated();
+                Snapshot = null;
+                diagnosticCode = string.IsNullOrWhiteSpace(exception.Message)
+                    ? "AdministrativeDongReviewPresentationBuildFailed"
+                    : exception.Message;
+                DiagnosticCode = diagnosticCode;
+                return false;
+            }
+        }
+
+        public bool TryApply(AdministrativeDongDioramaApplyResult source,
+            행정동디오라마비공개관찰OverlaySetData privateObservationOverlay,
+            행정동디오라마비공개보행망OverlaySetData privateWalkNetworkOverlay,
+            행정동디오라마비공개도로방향OverlaySetData privateRoadDirectionOverlay,
+            bool includeObservationCamera, out string diagnosticCode)
+        {
+            if (!행정동디오라마검토Projection.TryCreate(source,
+                    privateObservationOverlay, privateWalkNetworkOverlay,
+                    privateRoadDirectionOverlay, out var snapshot, out diagnosticCode))
+            {
+                ClearGenerated();
+                Snapshot = null;
+                DiagnosticCode = diagnosticCode;
+                return false;
+            }
+
+            try
+            {
+                BuildFromSnapshot(snapshot, includeObservationCamera);
+                DiagnosticCode = diagnosticCode;
+                return true;
+            }
+            catch (Exception exception) when (exception is InvalidOperationException
+                                              || exception is ArgumentException)
+            {
+                ClearGenerated();
+                Snapshot = null;
+                diagnosticCode = string.IsNullOrWhiteSpace(exception.Message)
+                    ? "AdministrativeDongReviewPresentationBuildFailed"
+                    : exception.Message;
+                DiagnosticCode = diagnosticCode;
+                return false;
+            }
+        }
+
         public void BuildFromSnapshot(행정동디오라마검토Snapshot snapshot,
-            bool includeObservationCamera = true)
+            bool includeObservationCamera = true,
+            행정동건물내부Ring검토Geometry focusedGeometry = null)
         {
             if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
             if (!snapshot.ObservationPresentationOnly || snapshot.DistributionApproved
                 || snapshot.TraversalReady || snapshot.GameplayReady)
                 throw new InvalidOperationException("AdministrativeDongReviewSnapshotAuthorityInvalid");
 
+            focusedGeometry?.ValidateBinding(snapshot);
             ClearGenerated();
             Snapshot = snapshot;
+            FocusedBuildingGeometry = focusedGeometry;
             modelRoot = new GameObject(
                 $"{snapshot.DisplayName} · 행정동 도형 검토 · {snapshot.ReadinessCode}")
                 .transform;
@@ -93,7 +303,7 @@ namespace Ssalddel.Unity.Presentation.World
             modelRoot.gameObject.layer = ObservationLayer;
             owned.Add(modelRoot.gameObject);
             modelMaterial = CreateMaterial();
-            BuildReport = 행정동디오라마검토MeshBuilder.Build(snapshot, CreateMesh);
+            BuildReport = 행정동디오라마검토MeshBuilder.Build(snapshot, CreateMesh, focusedGeometry);
             modelBounds = BuildReport.ModelBounds;
 
             if (includeObservationCamera)
@@ -135,7 +345,9 @@ namespace Ssalddel.Unity.Presentation.World
         public bool TrySelectLocalPoint(Vector2 localXZ, bool focus = false)
         {
             if (Snapshot == null || !Snapshot.TrySelectBuildingAt(localXZ.x, localXZ.y,
-                    out var building))
+                    out var building) || (FocusedBuildingGeometry != null
+                    && building.BuildingStableId == FocusedBuildingGeometry.BuildingStableId
+                    && !FocusedBuildingGeometry.ContainsRoof(localXZ.x, localXZ.y)))
             {
                 ClearSelection();
                 return false;
@@ -354,6 +566,12 @@ namespace Ssalddel.Unity.Presentation.World
                     Point(building.Footprint[index], y),
                     Point(building.Footprint[next], y), SelectionLineWidth, color);
             }
+            if (FocusedBuildingGeometry != null
+                && building.BuildingStableId == FocusedBuildingGeometry.BuildingStableId)
+                foreach (var ring in FocusedBuildingGeometry.InteriorRings)
+                    for (var index = 0; index < ring.Count; index++)
+                        AddStrip(vertices, triangles, colors, Point(ring[index], y),
+                            Point(ring[(index + 1) % ring.Count], y), SelectionLineWidth, color);
             var mesh = new Mesh
             {
                 name = $"선택 건물 윤곽 · {building.BuildingStableId}",
@@ -375,23 +593,56 @@ namespace Ssalddel.Unity.Presentation.World
         private void OnGUI()
         {
             if (!shown || ObservationCamera == null || Snapshot == null) return;
-            GUI.Box(new Rect(12f, 12f, 520f, 110f), GUIContent.none);
-            GUI.Label(new Rect(24f, 20f, 490f, 24f),
+            if (CompactEvidenceHud)
+            {
+                DrawCompactEvidenceHud();
+                return;
+            }
+            GUI.Box(new Rect(12f, 12f, 650f, 304f), GUIContent.none);
+            GUI.Label(new Rect(24f, 20f, 626f, 24f),
                 $"{Snapshot.DisplayName} · 행정동 도형 검토");
-            GUI.Label(new Rect(24f, 45f, 490f, 68f),
+            GUI.Label(new Rect(24f, 45f, 626f, 264f),
                 $"{Snapshot.ReadinessCode} · 읽기 전용 · 배포 불가\n"
-                + "역사 경계 후보 · 주소/필지/통행/차선/신호/보도 미검증\n"
+                + DepthSummary(Snapshot.DepthPlan) + "\n"
+                + PrivateObservationSummary(Snapshot.PrivateObservationOverlay) + "\n"
+                + PrivateWalkNetworkSummary(Snapshot.PrivateWalkNetworkOverlay) + "\n"
+                + PrivateRoadDirectionSummary(Snapshot.PrivateRoadDirectionOverlay) + "\n"
+                + PrivateBiotopeSummary(Snapshot.PrivateBiotopeOverlay) + "\n"
+                + PrivateLaneMarkingSummary(Snapshot.PrivateLaneMarkingOverlay) + "\n"
+                + PrivateHorizontalContourTraceSummary(
+                    Snapshot.PrivateHorizontalContourTraceOverlay) + "\n"
+                + "역사 경계 후보 · 주소/필지/통행/차선/신호/보도/높이/지형 미검증\n"
+                + $"depth {Short(Snapshot.DepthPlan.PlanHashSha256)} · "
                 + $"projection {Short(Snapshot.ProjectionHashSha256)}");
 
             if (BuildReport != null)
             {
-                GUI.Box(new Rect(12f, Screen.height - 70f, 650f, 58f), GUIContent.none);
-                GUI.Label(new Rect(24f, Screen.height - 62f, 625f, 44f),
+                GUI.Box(new Rect(12f, Screen.height - 140f, 650f, 128f), GUIContent.none);
+                GUI.Label(new Rect(24f, Screen.height - 132f, 625f, 112f),
                     $"건물 {BuildReport.BuildingCount:N0} · 도로 중심선 "
                     + $"{BuildReport.RoadSegmentCount:N0} · 경계 "
                     + $"{BuildReport.BoundarySegmentCount:N0} · Mesh "
                     + $"{BuildReport.RendererBatchCount:N0}\n"
-                    + "표현 사본은 서버·Simulation·업무 상태를 변경하지 않음");
+                    + $"보행망 후보 노드 {BuildReport.WalkNetworkNodePointCount:N0} · fragment "
+                    + $"{BuildReport.WalkNetworkLinkFragmentCount:N0} · walk vertex "
+                    + $"{BuildReport.PrivateWalkNetworkOverlayVertexCount:N0}\n"
+                    + $"방향 후보 {BuildReport.RoadDirectionPointCandidateCount:N0} · "
+                    + $"방향 미해석 {BuildReport.RoadDirectionUnresolvedCount:N0} · "
+                    + $"위치 표식 정점 {BuildReport.PrivateRoadDirectionOverlayVertexCount:N0}\n"
+                    + $"비오톱 후보 {BuildReport.BiotopeCandidateCount:N0} · 조각 {BuildReport.BiotopePolygonPartCount:N0} · "
+                    + $"내부 ring {BuildReport.BiotopeInteriorRingCount:N0} · ring 점 {BuildReport.BiotopeRingVertexCount:N0}\n"
+                    + $"비오톱 원본/표시 선분 {BuildReport.BiotopeSourceSegmentCount:N0}/{BuildReport.BiotopeRenderedSegmentCount:N0} · "
+                    + $"≤1mm 생략 {BuildReport.BiotopeSkippedAtOrBelowOneMillimeterSegmentCount:N0} · "
+                    + $"정점/인덱스 {BuildReport.PrivateBiotopeOverlayVertexCount:N0}/{BuildReport.PrivateBiotopeOverlayIndexCount:N0} · 검토 전용\n"
+                    + $"차선 선형 {BuildReport.LaneMarkingCandidateCount:N0} · 조각 {BuildReport.LaneMarkingFragmentCount:N0} · "
+                    + $"선분 {BuildReport.LaneMarkingRenderedSegmentCount:N0} · 정점/인덱스 "
+                    + $"{BuildReport.PrivateLaneMarkingOverlayVertexCount:N0}/{BuildReport.PrivateLaneMarkingOverlayIndexCount:N0}\n"
+                    + $"평면 등고선 {BuildReport.HorizontalContourTraceCandidateCount:N0} · 조각 "
+                    + $"{BuildReport.HorizontalContourTraceFragmentCount:N0} · 선분 "
+                    + $"{BuildReport.HorizontalContourTraceRenderedSegmentCount:N0} · 정점/인덱스 "
+                    + $"{BuildReport.PrivateHorizontalContourTraceOverlayVertexCount:N0}/"
+                    + $"{BuildReport.PrivateHorizontalContourTraceOverlayIndexCount:N0}\n"
+                   + "표현 사본은 서버·Simulation·업무 상태를 변경하지 않음");
             }
 
             if (SelectedBuilding == null) return;
@@ -404,8 +655,26 @@ namespace Ssalddel.Unity.Presentation.World
                 + "주소·업체·H 역할 미결속");
         }
 
+        private void DrawCompactEvidenceHud()
+        {
+            var width = Mathf.Min(650f, Mathf.Max(320f, Screen.width - 24f));
+            GUI.Box(new Rect(12f, 12f, width, 82f), GUIContent.none);
+            GUI.Label(new Rect(24f, 20f, width - 24f, 68f),
+                $"{Snapshot.DisplayName} · 비공개 도형 검토 · 배포 불가\n"
+                + (BuildReport == null
+                    ? "Mesh 집계 대기"
+                    : $"건물 {BuildReport.BuildingCount:N0} · 도로 {BuildReport.RoadSegmentCount:N0} · "
+                      + $"보행 노드 {BuildReport.WalkNetworkNodePointCount:N0}\n"
+                      + $"방향 후보 {BuildReport.RoadDirectionPointCandidateCount:N0} · "
+                      + $"비오톱 {BuildReport.BiotopeCandidateCount:N0} · "
+                      + $"차선표시 {BuildReport.LaneMarkingCandidateCount:N0} · "
+                      + $"평면 등고선 {BuildReport.HorizontalContourTraceCandidateCount:N0}\n"
+                      + "2023 역사 경계 · 현재성/주소/필지/통행/차선/방향/신호/보도/생태/높이/지형 권위 없음"));
+        }
+
         private void ClearGenerated()
         {
+            FocusedBuildingGeometry = null;
             ClearSelection();
             if (modelRoot != null) modelRoot.gameObject.SetActive(false);
             if (ObservationCamera != null) ObservationCamera.enabled = false;
@@ -426,7 +695,101 @@ namespace Ssalddel.Unity.Presentation.World
             else UnityEngine.Object.DestroyImmediate(value);
         }
 
-        private static bool RayIntersectsPrism(Vector3 origin, Vector3 direction,
+        private static string DepthSummary(행정동디오라마깊이Plan plan)
+        {
+            if (plan == null) return "공통 깊이 계획 없음";
+            var available = new List<string>();
+            var blocked = new List<string>();
+            var missing = new List<string>();
+            foreach (var layer in plan.Layers)
+            {
+                var target = layer.StateCode == 행정동디오라마깊이StateCodes.PrivateReview
+                    ? available
+                    : layer.StateCode == 행정동디오라마깊이StateCodes.Blocked
+                        ? blocked
+                        : missing;
+                target.Add(DepthLabel(layer.LayerKindCode));
+            }
+            return $"공통 깊이 슬롯 {plan.Layers.Count}/8 · 현재 검토 {available.Count} · {string.Join("·", available)}\n"
+                   + $"차단 {string.Join("·", blocked)}\n"
+                   + $"미제공 {string.Join("·", missing)}";
+        }
+
+        private static string PrivateObservationSummary(
+            행정동디오라마비공개관찰OverlaySet overlay)
+        {
+            if (overlay == null) return "비공개 후보 관찰 없음";
+            return $"비공개 후보 · 횡단보도 {overlay.CrosswalkPoints.Count:N0} · "
+                   + $"교차로 {overlay.IntersectionPoints.Count:N0} · "
+                   + $"set {Short(overlay.OverlaySetHashSha256)}\n"
+                   + "역사 bootstrap·private review 전용 · 공개/통행/실행 권위 없음";
+        }
+
+        private static string PrivateWalkNetworkSummary(
+            행정동디오라마비공개보행망OverlaySet overlay)
+        {
+            if (overlay == null) return "비공개 보행망 후보 없음";
+            return $"비공개 보행망 후보 · 노드 {overlay.NodePoints.Count:N0} · "
+                   + $"fragment {overlay.LinkFragments.Count:N0} · path 점 "
+                   + $"{overlay.LinkPathVertexCount:N0} · "
+                   + $"set {Short(overlay.OverlaySetHashSha256)}\n"
+                   + "2020 후보·private review 전용 · Mobility/Traversal 차단";
+        }
+
+        private static string PrivateRoadDirectionSummary(
+            행정동디오라마비공개도로방향OverlaySet overlay)
+        {
+            if (overlay == null) return "비공개 도로 방향 후보 없음";
+            return $"비공개 도로 방향 위치 후보 {overlay.CandidatePoints.Count:N0} · "
+                   + "방향 미해석 · 중립 마름모만 표시\n"
+                   + "DRN 각도/LENX 단위 미검증 · 회전/길이/통행 권위 없음";
+        }
+
+        private static string PrivateBiotopeSummary(
+            행정동디오라마비공개비오톱OverlaySet overlay)
+        {
+            if (overlay == null) return "비공개 비오톱 후보 없음";
+            return $"2025 비오톱 비공개 후보 {overlay.Candidates.Count:N0} · "
+                   + $"조각 {overlay.PolygonPartCount:N0} · 내부 ring "
+                   + $"{overlay.InteriorRingCount:N0} · set {Short(overlay.OverlaySetHashSha256)}\n"
+                   + "2023 역사 경계 절단 · 현재성/종/법적/안전/통행 권위 없음";
+        }
+
+        private static string PrivateLaneMarkingSummary(
+            행정동디오라마비공개차선표시OverlaySet overlay)
+        {
+            if (overlay == null) return "비공개 차선 표시 선형 후보 없음";
+            return $"2021 차선 표시 선형 비공개 후보 {overlay.Candidates.Count:N0} · "
+                   + $"조각 {overlay.FragmentCount:N0} · 선분 {overlay.SegmentCount:N0} · "
+                   + $"set {Short(overlay.OverlaySetHashSha256)}\n"
+                   + "형상 윤곽 검토 전용 · 차로/방향/통행/정지선/신호 권위 없음";
+        }
+
+        private static string PrivateHorizontalContourTraceSummary(
+            행정동디오라마비공개수평등고선추적OverlaySet overlay)
+        {
+            if (overlay == null) return "비공개 수평 등고선 선형 후보 없음";
+            return $"2025 평면 등고선 비공개 후보 {overlay.Candidates.Count:N0} · "
+                   + $"조각 {overlay.FragmentCount:N0} · 선분 {overlay.SegmentCount:N0} · "
+                   + $"set {Short(overlay.OverlaySetHashSha256)}\n"
+                   + "수평 형상만·높이값 미읽기 · 표고/지형/통행 권위 없음";
+        }
+
+        private static string DepthLabel(string kindCode)
+            => kindCode switch
+            {
+                "DataEvidence" => "자료근거",
+                "BaseSpatialPresentation" => "기본공간",
+                "SpatialMeaning" => "공간의미",
+                "Mobility" => "이동",
+                "Interaction" => "선택조회",
+                "LifeSimulation" => "생활",
+                "BusinessOverlay" => "사업장",
+                "EnvironmentPresentation" => "환경",
+                _ => ValueOrUnknown(kindCode)
+            };
+
+        private bool RayIntersectsPrism(Vector3 origin, Vector3 direction,
             행정동디오라마검토Building building, out float bestDistance)
         {
             var hitDistance = float.PositiveInfinity;
@@ -438,10 +801,15 @@ namespace Ssalddel.Unity.Presentation.World
 
             var rayDirection = new Vector2(direction.x, direction.z);
             var rayOrigin = new Vector2(origin.x, origin.z);
-            for (var index = 0; index < building.Footprint.Count; index++)
+            var rings = new List<IReadOnlyList<행정동디오라마검토Point>> { building.Footprint };
+            if (FocusedBuildingGeometry != null
+                && building.BuildingStableId == FocusedBuildingGeometry.BuildingStableId)
+                rings.AddRange(FocusedBuildingGeometry.InteriorRings);
+            foreach (var ring in rings)
+            for (var index = 0; index < ring.Count; index++)
             {
-                var a = Point2(building.Footprint[index]);
-                var b = Point2(building.Footprint[(index + 1) % building.Footprint.Count]);
+                var a = Point2(ring[index]);
+                var b = Point2(ring[(index + 1) % ring.Count]);
                 var edge = b - a;
                 var denominator = Cross(rayDirection, edge);
                 if (Mathf.Abs(denominator) <= Epsilon) continue;
@@ -464,7 +832,10 @@ namespace Ssalddel.Unity.Presentation.World
                 if (distance < -Epsilon) return;
                 var point = new Vector2(origin.x + direction.x * distance,
                     origin.z + direction.z * distance);
-                if (Contains(building.Footprint, point))
+                if (Contains(building.Footprint, point)
+                    && (FocusedBuildingGeometry == null
+                        || building.BuildingStableId != FocusedBuildingGeometry.BuildingStableId
+                        || FocusedBuildingGeometry.ContainsRoof(point.x, point.y)))
                     hitDistance = Mathf.Min(hitDistance, Mathf.Max(0f, distance));
             }
         }
