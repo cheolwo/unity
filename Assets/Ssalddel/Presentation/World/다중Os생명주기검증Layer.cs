@@ -22,6 +22,8 @@ namespace Ssalddel.Unity.Presentation.World
         private readonly 다중Os생명주기표현Projector projector = new();
         private readonly Dictionary<string, 다중Os생명주기MarkerView> markers =
             new(StringComparer.Ordinal);
+        private readonly Dictionary<string, (bool Visible, bool Retain)> 운영계통별표현 =
+            new(StringComparer.Ordinal);
         private readonly List<다중Os생명주기표현Diagnostic> diagnostics = new();
         private 운영관찰WorldView worldView;
         private 사가정운영디오라마View diorama;
@@ -63,6 +65,65 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void SetOverlayVisible(bool value) => overlayVisible = value;
 
+        /// <summary>최신 상태 사본은 유지하고 해당 OS marker의 표시와 보존만 조정합니다.</summary>
+        public void SetOperatingSystemPresentation(string operatingSystemId, bool visible, bool retain)
+        {
+            if (string.IsNullOrWhiteSpace(operatingSystemId))
+                throw new ArgumentException("OperatingSystemIdMissing", nameof(operatingSystemId));
+            if (운영계통별표현.TryGetValue(operatingSystemId, out var previous)
+                && previous.Visible == visible && previous.Retain == retain) return;
+            운영계통별표현[operatingSystemId] = (visible, retain);
+            foreach (var marker in markers.Values.Where(value => value != null
+                         && string.Equals(value.OperatingSystemId, operatingSystemId,
+                             StringComparison.Ordinal)).ToArray())
+            {
+                if (retain) marker.gameObject.SetActive(visible);
+                else
+                {
+                    markers.Remove(marker.ObjectStableId);
+                    DestroyRuntimeObject(marker.gameObject);
+                }
+            }
+        }
+
+        /// <summary>권한 철회·관찰 종료 시 해당 OS의 메모리 사본과 표현을 즉시 삭제합니다.</summary>
+        public void ClearOperatingSystem(string operatingSystemId)
+        {
+            if (string.IsNullOrWhiteSpace(operatingSystemId))
+                throw new ArgumentException("OperatingSystemIdMissing", nameof(operatingSystemId));
+            foreach (var marker in markers.Values.Where(value => value != null
+                         && string.Equals(value.OperatingSystemId, operatingSystemId,
+                             StringComparison.Ordinal)).ToArray())
+            {
+                markers.Remove(marker.ObjectStableId);
+                DestroyRuntimeObject(marker.gameObject);
+            }
+            currentStates = currentStates.Where(value => !string.Equals(value.OperatingSystemId,
+                operatingSystemId, StringComparison.Ordinal)).ToArray();
+            diagnostics.RemoveAll(value => string.Equals(value.OperatingSystemId,
+                operatingSystemId, StringComparison.Ordinal));
+            GeneralizedPlacementCount = diagnostics.Count(value =>
+                value.Code == "LifecycleSyntheticPlaceGeneralized");
+        }
+
+        public void Expire(DateTime utcNow)
+        {
+            var expired = new HashSet<string>(currentStates
+                .Where(value => value.ExpiresAtUtc <= utcNow)
+                .Select(value => value.ObjectStableId), StringComparer.Ordinal);
+            if (expired.Count == 0) return;
+            foreach (var id in expired)
+            {
+                if (!markers.TryGetValue(id, out var marker)) continue;
+                markers.Remove(id);
+                if (marker != null) DestroyRuntimeObject(marker.gameObject);
+            }
+            currentStates = currentStates.Where(value => !expired.Contains(value.ObjectStableId)).ToArray();
+            diagnostics.RemoveAll(value => expired.Contains(value.ObjectStableId));
+            GeneralizedPlacementCount = diagnostics.Count(value =>
+                value.Code == "LifecycleSyntheticPlaceGeneralized");
+        }
+
         public bool TryLoadRestaurantFixture(string requestedPath = null)
         {
             EnsureRestaurantLayer();
@@ -98,8 +159,15 @@ namespace Ssalddel.Unity.Presentation.World
             var worldObjects = worldView.Objects.ToDictionary(
                 value => value.ObjectStableId, StringComparer.Ordinal);
             var resolved = new List<ResolvedPlacement>();
+            var accepted = new List<다중Os생명주기표현State>();
             foreach (var state in plan.States)
             {
+                if (!표현유지(state.OperatingSystemId))
+                {
+                    // 표현 해제는 검증된 업무 상태 사본을 삭제하거나 위치를 만들어내지 않습니다.
+                    accepted.Add(state);
+                    continue;
+                }
                 if (string.Equals(state.SourceKindCode,
                         Ssalddel.WorkflowRules.Contracts.OperationalWorldSceneSourceKinds.VerificationSample,
                         StringComparison.Ordinal)
@@ -140,7 +208,6 @@ namespace Ssalddel.Unity.Presentation.World
                 });
             }
             var offsets = BuildOffsets(resolved);
-            var accepted = new List<다중Os생명주기표현State>();
             var incoming = new HashSet<string>(StringComparer.Ordinal);
             foreach (var placement in resolved)
             {
@@ -152,6 +219,7 @@ namespace Ssalddel.Unity.Presentation.World
                 var localPosition = placement.LocalPosition + offsets[state.ObjectStableId];
                 marker.Apply(state, placement.Frozen, localPosition,
                     diorama != null ? diorama.ObservationCamera : null);
+                marker.gameObject.SetActive(표현표시(state.OperatingSystemId));
             }
 
             foreach (var stale in markers.Keys.Where(value => !incoming.Contains(value)).ToArray())
@@ -325,10 +393,11 @@ namespace Ssalddel.Unity.Presentation.World
             var width = Mathf.Min(520f, Screen.width - 24f);
             var height = 64f + currentStates.Length * 42f;
             var x = Mathf.Max(12f, (Screen.width - width) * .5f);
-            GUI.Box(new Rect(x, 12f, width, height), GUIContent.none);
-            GUI.Label(new Rect(x + 12f, 18f, width - 24f, 24f),
+            var y = GetComponent<생활관찰표현Layer>() != null ? 124f : 12f;
+            GUI.Box(new Rect(x, y, width, height), GUIContent.none);
+            GUI.Label(new Rect(x + 12f, y + 6f, width - 24f, 24f),
                 "사가정 · 네 OS 생명주기 관찰", titleStyle);
-            GUI.Label(new Rect(x + 12f, 41f, width - 24f, 18f),
+            GUI.Label(new Rect(x + 12f, y + 29f, width - 24f, 18f),
                 다중Os생명주기검증Policy.Disclosure + " · " + RestaurantIconInputStatus,
                 noteStyle);
             for (var index = 0; index < currentStates.Length; index++)
@@ -339,7 +408,7 @@ namespace Ssalddel.Unity.Presentation.World
                 var label = $"{state.OperatingSystemLabel}  {state.ActivityLabel}"
                             + $" · {state.LifecycleStageLabel}"
                             + $"  [{state.AttentionLabel}{frozen}]  r{state.Revision}";
-                if (GUI.Button(new Rect(x + 12f, 62f + index * 42f,
+                if (GUI.Button(new Rect(x + 12f, y + 50f + index * 42f,
                         width - 24f, 34f), label, rowStyle))
                     Focus(state.ObjectStableId);
             }
@@ -371,12 +440,24 @@ namespace Ssalddel.Unity.Presentation.World
             => new(value.Select(character => char.IsLetterOrDigit(character)
                 ? character : '_').ToArray());
 
+        private bool 표현유지(string operatingSystemId)
+            => !운영계통별표현.TryGetValue(operatingSystemId, out var state) || state.Retain;
+
+        private bool 표현표시(string operatingSystemId)
+            => !운영계통별표현.TryGetValue(operatingSystemId, out var state)
+               || state.Visible && state.Retain;
+
         internal static HideFlags RuntimeHideFlags
             => HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
 
         internal static void DestroyRuntimeObject(UnityEngine.Object value)
         {
             if (value == null) return;
+            if (value is GameObject gameObject)
+            {
+                gameObject.SetActive(false);
+                gameObject.transform.SetParent(null, false);
+            }
             if (UnityEngine.Application.isPlaying) Destroy(value);
             else DestroyImmediate(value);
         }

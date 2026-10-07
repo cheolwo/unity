@@ -29,6 +29,7 @@ namespace Ssalddel.Unity.Bootstrap
         private OperationalWorldSceneClient client;
         private OperationalWorldScenePlacementPlanner planner;
         private 다중Os생명주기검증Layer lifecycleView;
+        private 생활관찰표현Layer livingView;
         private CancellationTokenSource lifetime;
         private Task<OperationalWorldSceneApplyResult> pendingRefresh;
         private float nextRefreshAt;
@@ -56,6 +57,11 @@ namespace Ssalddel.Unity.Bootstrap
                             ?? gameObject.AddComponent<다중Os생명주기검증Layer>();
             lifecycleView.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
             lifecycleView.Configure(worldView, GetComponent<사가정운영디오라마View>());
+            livingView = GetComponent<생활관찰표현Layer>()
+                         ?? gameObject.AddComponent<생활관찰표현Layer>();
+            livingView.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
+            livingView.Configure(worldView, lifecycleView, GetComponent<사가정운영디오라마View>(),
+                관찰운영검증RunnerArea.AreaStableId);
             if (client != null) return;
             transport = new 운영관찰검증ApiTransport();
             client = new OperationalWorldSceneClient(
@@ -125,10 +131,10 @@ namespace Ssalddel.Unity.Bootstrap
             }
             cursor = result.Cursor;
             var placement = planner.Create(result);
-            worldView.Apply(placement, result.Diagnostics);
-            lifecycleView.Apply(placement);
+            var livingAccepted = livingView.Apply(placement, result.Diagnostics, DateTime.UtcNow);
             SnapshotApplied?.Invoke(result);
-            statusCode = lifecycleView.StateCount > 0 && lifecycleView.GeneralizedPlacementCount > 0
+            statusCode = !livingAccepted ? "SuccessWithLivingObservationHeld"
+                : lifecycleView.StateCount > 0 && lifecycleView.GeneralizedPlacementCount > 0
                 ? "SuccessWithGeneralizedLifecycleAnchors"
                 : worldView.UnplacedCount > 0 ? "SuccessWithUnplacedObjects"
                 : result.Diagnostics.Length == 0 ? "Success" : "SuccessWithFrozenObjects";
@@ -138,6 +144,7 @@ namespace Ssalddel.Unity.Bootstrap
         {
             lifetime?.Cancel();
             client?.Clear();
+            livingView?.Clear();
             worldView?.Clear();
             lifecycleView?.Clear();
             cursor = 0;

@@ -39,6 +39,7 @@ namespace Ssalddel.Unity.Presentation.World
         public Transform SyntyVisualRoot { get; private set; }
         public Dictionary<string, 운영관찰배치지점> Places { get; private set; }
         public Camera ObservationCamera { get; private set; }
+        public float WholeViewSize => wholeSize;
         public Volume PresentationVolume { get; private set; }
         public 사가정모형MeshBuilder.BuildReport MiniatureBuildReport { get; private set; }
         public bool StationDetailsVisible => stationDetailRoot != null && stationDetailRoot.gameObject.activeSelf;
@@ -120,6 +121,7 @@ namespace Ssalddel.Unity.Presentation.World
             }
         }
         public bool GameOverlayVisible { get; set; }
+        public bool ExternalGeometryReviewUiHidden { get; set; }
         public void SetStatus(string value) { statusMessage = value; }
 
         private void Awake() { Initialize(); }
@@ -557,6 +559,22 @@ namespace Ssalddel.Unity.Presentation.World
             UpdateCamera();
         }
 
+        /// <summary>기존 표본의 관찰 배율만 변경합니다. 구 전체 지형이나 새 업무 공간을 생성하지 않습니다.</summary>
+        public void SetLivingObservationStage(Ssalddel.Unity.Data.WorldProjection.생활관찰단계 stage,
+            Vector3? detailPoint = null)
+        {
+            if (ObservationCamera == null) return;
+            if (stage == Ssalddel.Unity.Data.WorldProjection.생활관찰단계.Street)
+                FocusPoint(detailPoint ?? focus);
+            else
+            {
+                ShowWhole();
+                if (stage == Ssalddel.Unity.Data.WorldProjection.생활관찰단계.District)
+                    ObservationCamera.orthographicSize = wholeSize * 1.45f;
+            }
+            UpdateStationDetailVisibility();
+        }
+
         public bool SelectRoad(string name)
         {
             if (roadNames == null || ObservationCamera == null) return false;
@@ -840,6 +858,7 @@ namespace Ssalddel.Unity.Presentation.World
 
         private void OnGUI()
         {
+            if (ExternalGeometryReviewUiHidden) return;
             if (세계지도표현상태.GlobeOverlayVisible) return;
             GUI.depth = -100;
             if (!shown)
@@ -1088,7 +1107,7 @@ namespace Ssalddel.Unity.Presentation.World
             var e = Event.current;
             if (e.type == EventType.ScrollWheel)
             {
-                ObservationCamera.orthographicSize = Mathf.Clamp(ObservationCamera.orthographicSize * Mathf.Exp(e.delta.y*.07f), 35, wholeSize);
+                ObservationCamera.orthographicSize = Mathf.Clamp(ObservationCamera.orthographicSize * Mathf.Exp(e.delta.y*.07f), 35, wholeSize * 1.6f);
                 UpdateStationDetailVisibility();
                 e.Use();
             }

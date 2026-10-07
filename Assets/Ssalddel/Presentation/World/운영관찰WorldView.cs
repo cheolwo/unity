@@ -18,13 +18,38 @@ namespace Ssalddel.Unity.Presentation.World
     {
         private readonly Dictionary<string, 운영관찰ObjectView> objects =
             new(StringComparer.Ordinal);
+        private readonly Dictionary<string, (bool Visible, bool Retain)> 운영계통별표현 =
+            new(StringComparer.Ordinal);
 
         private Dictionary<string, 운영관찰배치지점> places;
         private bool presentationVisible = true;
         public void SetPresentationVisible(bool value)
         {
             presentationVisible = value;
-            foreach (var item in objects.Values) if (item != null) item.gameObject.SetActive(value);
+            foreach (var item in objects.Values)
+                if (item != null) item.gameObject.SetActive(표현표시(item.OperatingSystemId));
+        }
+
+        /// <summary>업무 상태를 변경하지 않고 해당 OS의 표현 보존과 표시만 조정합니다.</summary>
+        public void SetOperatingSystemPresentation(string operatingSystemId, bool visible, bool retain)
+        {
+            if (string.IsNullOrWhiteSpace(operatingSystemId))
+                throw new ArgumentException("OperatingSystemIdMissing", nameof(operatingSystemId));
+            if (운영계통별표현.TryGetValue(operatingSystemId, out var previous)
+                && previous.Visible == visible && previous.Retain == retain) return;
+            운영계통별표현[operatingSystemId] = (visible, retain);
+            RebuildIndex();
+            foreach (var item in objects.Values.Where(value => value != null
+                         && string.Equals(value.OperatingSystemId, operatingSystemId,
+                             StringComparison.Ordinal)).ToArray())
+            {
+                if (retain) item.gameObject.SetActive(표현표시(operatingSystemId));
+                else
+                {
+                    objects.Remove(item.ObjectStableId);
+                    표현해제(item);
+                }
+            }
         }
         public int UnplacedCount { get; private set; }
         public string PlacementStatus { get; private set; } = "NotLoaded";
@@ -71,17 +96,19 @@ namespace Ssalddel.Unity.Presentation.World
                     || !places.TryGetValue(instruction.SemanticPlaceStableId, out var place))
                 { UnplacedCount++; continue; }
                 if (instruction.ExpiresAtUtc <= DateTime.UtcNow) continue;
+                if (!표현유지(instruction.OperatingSystemId)) continue;
                 incomingIds.Add(instruction.ObjectStableId);
                 if (!objects.TryGetValue(instruction.ObjectStableId, out var view))
                     view = Create(instruction, place);
                 view.Apply(instruction, frozenIds.Contains(instruction.ObjectStableId), place);
+                view.gameObject.SetActive(표현표시(view.OperatingSystemId));
             }
 
             foreach (var stale in objects.Keys.Where(id => !incomingIds.Contains(id)).ToArray())
             {
                 var view = objects[stale];
                 objects.Remove(stale);
-                if (view != null) DestroyObject(view.gameObject);
+                if (view != null) 표현해제(view);
             }
         }
 
@@ -89,7 +116,7 @@ namespace Ssalddel.Unity.Presentation.World
         {
             RebuildIndex();
             foreach (var view in objects.Values.Where(value => value != null).ToArray())
-                DestroyObject(view.gameObject);
+                표현해제(view);
             objects.Clear();
         }
 
@@ -98,7 +125,7 @@ namespace Ssalddel.Unity.Presentation.World
             foreach (var stale in objects.Values.Where(x => x != null && x.ExpiresAtUtc <= utcNow).ToArray())
             {
                 objects.Remove(stale.ObjectStableId);
-                DestroyObject(stale.gameObject);
+                표현해제(stale);
             }
         }
 
@@ -129,8 +156,26 @@ namespace Ssalddel.Unity.Presentation.World
             roof.transform.localScale = new Vector3(1.15f,.2f,1.15f);
             roof.GetComponent<Renderer>().sharedMaterial = material;
             objects.Add(instruction.ObjectStableId, view);
-            primitive.SetActive(presentationVisible);
+            primitive.SetActive(표현표시(instruction.OperatingSystemId));
             return view;
+        }
+
+        private bool 표현유지(string operatingSystemId)
+            => !운영계통별표현.TryGetValue(operatingSystemId, out var state) || state.Retain;
+
+        private bool 표현표시(string operatingSystemId)
+            => presentationVisible && (!운영계통별표현.TryGetValue(operatingSystemId, out var state)
+                                        || state.Visible && state.Retain);
+
+        private void 표현해제(운영관찰ObjectView view)
+        {
+            var group = view.transform.parent;
+            var ownedGroup = group != null && group.parent == transform
+                             && group.name == GroupName(view.OperatingSystemId);
+            view.gameObject.SetActive(false);
+            view.ReleaseOwnedMaterial();
+            DestroyObject(view.gameObject);
+            if (ownedGroup && group.childCount == 0) DestroyObject(group.gameObject);
         }
 
         private void RebuildIndex()
@@ -150,6 +195,9 @@ namespace Ssalddel.Unity.Presentation.World
 
         private static void DestroyObject(GameObject value)
         {
+            // Play Mode의 지연 파기 전에 색인과 활성 표현에서 즉시 분리합니다.
+            value.SetActive(false);
+            value.transform.SetParent(null, false);
             if (UnityEngine.Application.isPlaying) Destroy(value);
             else DestroyImmediate(value);
         }
@@ -177,11 +225,17 @@ namespace Ssalddel.Unity.Presentation.World
         private Material ownedMaterial;
         public DateTime ExpiresAtUtc => expiresAtUtc;
         public void OwnMaterial(Material material) { ownedMaterial = material; }
-        private void OnDestroy()
+
+        /// <summary>실행되지 않은 EditMode 객체도 소유 재료를 해제하도록 파기 전에 명시적으로 호출합니다.</summary>
+        public void ReleaseOwnedMaterial()
         {
-            if (ownedMaterial == null) return;
-            if (UnityEngine.Application.isPlaying) Destroy(ownedMaterial); else DestroyImmediate(ownedMaterial);
+            var material = ownedMaterial;
+            ownedMaterial = null;
+            if (material == null) return;
+            if (UnityEngine.Application.isPlaying) Destroy(material); else DestroyImmediate(material);
         }
+
+        private void OnDestroy() => ReleaseOwnedMaterial();
 
         public string ObjectStableId => objectStableId;
         public string OperatingSystemId => operatingSystemId;

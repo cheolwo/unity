@@ -1,0 +1,1110 @@
+{
+  "schema": "living-observation-capture.r46.v2",
+  "profilePassed": true,
+  "failureCode": "",
+  "sourceKindCode": "VerificationSample",
+  "sourceMode": "ExplicitIsolatedFixtureThroughInterpreterAndPlacementPlanner",
+  "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f",
+  "scope": "FoodNormalAndRecoveryTwoWorksWithOneCargoPreservationProbe",
+  "maximumPlayProfileSeconds": 60,
+  "fiveMinuteOrTenMinuteStabilityClaimed": false,
+  "usesActualHttp": false,
+  "operationalEffectsAllowed": false,
+  "sceneSaveCalled": false,
+  "evidenceStageClaimed": null,
+  "gameViewTargetWidth": 1280,
+  "gameViewTargetHeight": 720,
+  "gameViewSettingsRestored": true,
+  "officialDioramaTransitionRequired": true,
+  "captureCameraGuardRequired": true,
+  "humanVisualReviewRequired": true,
+  "humanVisualReviewStatus": "Pending",
+  "lastCameraEvidence": {
+    "frame": 1656,
+    "actualStage": "Neighborhood",
+    "currentObservationLayer": "Diorama",
+    "globeOverlayVisible": false,
+    "dioramaTransitioning": false,
+    "globeCameraFound": true,
+    "globeCameraEnabled": false,
+    "observationCameraEnabled": true,
+    "observationCameraDepth": 200.0,
+    "observationOrthographicSize": 476.374329,
+    "wholeViewSize": 476.374329,
+    "activeCameras": [
+      {
+        "name": "Main Camera",
+        "depth": 0.0,
+        "isObservationCamera": false,
+        "isGlobeCamera": false,
+        "cullingMask": -1,
+        "targetDisplay": 0,
+        "rendersToTexture": false,
+        "orthographic": false,
+        "orthographicSize": 5.0,
+        "pixelWidth": 1280,
+        "pixelHeight": 720
+      },
+      {
+        "name": "사가정 운영 관찰 카메라",
+        "depth": 200.0,
+        "isObservationCamera": true,
+        "isGlobeCamera": false,
+        "cullingMask": 1073741824,
+        "targetDisplay": 0,
+        "rendersToTexture": false,
+        "orthographic": true,
+        "orthographicSize": 476.374329,
+        "pixelWidth": 1280,
+        "pixelHeight": 720
+      }
+    ]
+  },
+  "startedUtc": "2026-09-26T07:21:19.5280989Z",
+  "playStartedUtc": "2026-09-26T07:21:33.0747326Z",
+  "finishedUtc": "2026-09-26T07:21:47.7565502Z",
+  "scenePath": "Assets/Ssalddel/Scenes/SimulationWorldShell.unity",
+  "sceneHashBefore": "c31167703c4a7683da374e237cba3c9584a5f1de4b5fb5746939a3632635ac65",
+  "sceneHashAfter": "c31167703c4a7683da374e237cba3c9584a5f1de4b5fb5746939a3632635ac65",
+  "savedSceneUnchanged": true,
+  "disabledOperationalObservationControllers": 1,
+  "otherControllersDisabledByHelper": 0,
+  "unrelatedSceneControllersMayAttemptHttp": true,
+  "consoleErrorsAtStart": 0,
+  "consoleErrorsAtEnd": 9,
+  "runErrorCount": 2,
+  "runExceptionCount": 6,
+  "runAssertCount": 0,
+  "runErrorAndExceptionTotal": 8,
+  "runWarningCount": 3,
+  "consoleRawMessagesStored": false,
+  "consoleCleanDuringProfile": false,
+  "checkpoints": [
+    {
+      "code": "street-initial",
+      "observedUtc": "2026-09-26T07:21:36.5210947Z",
+      "playElapsedSeconds": 4.67945119756236,
+      "stage": "Street",
+      "detailVisible": true,
+      "detailRetained": true,
+      "workCount": 2,
+      "copyCount": 2,
+      "foodMarkerCount": 2,
+      "activeFoodMarkerCount": 2,
+      "worldObjectCount": 1,
+      "lifecycleMarkerCount": 3,
+      "boundMaterialCount": 2,
+      "globalMaterialCount": 644,
+      "otherOsSameInstance": true,
+      "camera": {
+        "frame": 86,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "revisions": [
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-normal",
+          "revision": 8,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        },
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-recovery",
+          "revision": 7,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        }
+      ]
+    },
+    {
+      "code": "neighborhood-hidden-retained",
+      "observedUtc": "2026-09-26T07:21:38.104615Z",
+      "playElapsedSeconds": 6.2703897959183674,
+      "stage": "Neighborhood",
+      "detailVisible": false,
+      "detailRetained": true,
+      "workCount": 2,
+      "copyCount": 2,
+      "foodMarkerCount": 2,
+      "activeFoodMarkerCount": 0,
+      "worldObjectCount": 1,
+      "lifecycleMarkerCount": 3,
+      "boundMaterialCount": 2,
+      "globalMaterialCount": 644,
+      "otherOsSameInstance": true,
+      "camera": {
+        "frame": 254,
+        "actualStage": "Neighborhood",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 476.374329,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 476.374329,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "revisions": [
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-normal",
+          "revision": 8,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        },
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-recovery",
+          "revision": 7,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        }
+      ]
+    },
+    {
+      "code": "district-summary",
+      "observedUtc": "2026-09-26T07:21:39.6704326Z",
+      "playElapsedSeconds": 7.8379518990929693,
+      "stage": "District",
+      "detailVisible": false,
+      "detailRetained": true,
+      "workCount": 2,
+      "copyCount": 2,
+      "foodMarkerCount": 2,
+      "activeFoodMarkerCount": 0,
+      "worldObjectCount": 1,
+      "lifecycleMarkerCount": 3,
+      "boundMaterialCount": 2,
+      "globalMaterialCount": 644,
+      "otherOsSameInstance": true,
+      "camera": {
+        "frame": 463,
+        "actualStage": "District",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 690.7428,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 690.7428,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "revisions": [
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-normal",
+          "revision": 8,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        },
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-recovery",
+          "revision": 7,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        }
+      ]
+    },
+    {
+      "code": "released-after-real-five-seconds",
+      "observedUtc": "2026-09-26T07:21:43.3035364Z",
+      "playElapsedSeconds": 11.47163560090703,
+      "stage": "District",
+      "detailVisible": false,
+      "detailRetained": false,
+      "workCount": 2,
+      "copyCount": 2,
+      "foodMarkerCount": 0,
+      "activeFoodMarkerCount": 0,
+      "worldObjectCount": 0,
+      "lifecycleMarkerCount": 1,
+      "boundMaterialCount": 2,
+      "globalMaterialCount": 643,
+      "otherOsSameInstance": true,
+      "camera": {
+        "frame": 993,
+        "actualStage": "District",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 690.7428,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 690.7428,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "revisions": [
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-normal",
+          "revision": 8,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        },
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-recovery",
+          "revision": 7,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        }
+      ]
+    },
+    {
+      "code": "street-latest-revision-reentered",
+      "observedUtc": "2026-09-26T07:21:44.8060884Z",
+      "playElapsedSeconds": 12.97249800170068,
+      "stage": "Street",
+      "detailVisible": true,
+      "detailRetained": true,
+      "workCount": 2,
+      "copyCount": 2,
+      "foodMarkerCount": 2,
+      "activeFoodMarkerCount": 2,
+      "worldObjectCount": 0,
+      "lifecycleMarkerCount": 3,
+      "boundMaterialCount": 2,
+      "globalMaterialCount": 643,
+      "otherOsSameInstance": true,
+      "camera": {
+        "frame": 1227,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "revisions": [
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-normal",
+          "revision": 9,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        },
+        {
+          "objectStableId": "sample-observation:living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f:food-recovery",
+          "revision": 10,
+          "sourceKindCode": "VerificationSample",
+          "scenarioRunStableId": "living-observation-r46:46d8ec47b1d44adb8324fd95558bd03f"
+        }
+      ]
+    },
+    {
+      "code": "expired-on-real-utc-clock",
+      "observedUtc": "2026-09-26T07:21:47.3700763Z",
+      "playElapsedSeconds": 15.538012301587303,
+      "stage": "Street",
+      "detailVisible": true,
+      "detailRetained": true,
+      "workCount": 0,
+      "copyCount": 0,
+      "foodMarkerCount": 0,
+      "activeFoodMarkerCount": 0,
+      "worldObjectCount": 0,
+      "lifecycleMarkerCount": 1,
+      "boundMaterialCount": 2,
+      "globalMaterialCount": 643,
+      "otherOsSameInstance": true,
+      "camera": {
+        "frame": 1615,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "revisions": []
+    },
+    {
+      "code": "cleared-with-other-os-preserved",
+      "observedUtc": "2026-09-26T07:21:47.6833744Z",
+      "playElapsedSeconds": 15.852185600907029,
+      "stage": "Neighborhood",
+      "detailVisible": false,
+      "detailRetained": false,
+      "workCount": 0,
+      "copyCount": 0,
+      "foodMarkerCount": 0,
+      "activeFoodMarkerCount": 0,
+      "worldObjectCount": 0,
+      "lifecycleMarkerCount": 1,
+      "boundMaterialCount": 2,
+      "globalMaterialCount": 643,
+      "otherOsSameInstance": true,
+      "camera": {
+        "frame": 1654,
+        "actualStage": "Neighborhood",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 476.374329,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 476.374329,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "revisions": []
+    }
+  ],
+  "captures": [
+    {
+      "fileName": "01-street.png",
+      "sha256": "453a1049aeaccd851d1efd37cd016d958bd47f61eac8b9c556116c3b5e9382b8",
+      "bytes": 923370,
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true,
+      "expectedStage": "Street",
+      "cameraAtCaptureRequest": {
+        "frame": 86,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "cameraAtCaptureCompletion": {
+        "frame": 88,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      }
+    },
+    {
+      "fileName": "02-neighborhood.png",
+      "sha256": "8686d16974867ea211cfa10c541f8fd90cbe7ab78c314ef390cde28d508137f6",
+      "bytes": 946111,
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true,
+      "expectedStage": "Neighborhood",
+      "cameraAtCaptureRequest": {
+        "frame": 254,
+        "actualStage": "Neighborhood",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 476.374329,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 476.374329,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "cameraAtCaptureCompletion": {
+        "frame": 256,
+        "actualStage": "Neighborhood",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 476.374329,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 476.374329,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      }
+    },
+    {
+      "fileName": "03-district.png",
+      "sha256": "9424709dfc980f055eb0eb7904ff135f727510ecd995a2f49a0943124eb04009",
+      "bytes": 838858,
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true,
+      "expectedStage": "District",
+      "cameraAtCaptureRequest": {
+        "frame": 463,
+        "actualStage": "District",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 690.7428,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 690.7428,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "cameraAtCaptureCompletion": {
+        "frame": 465,
+        "actualStage": "District",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 690.7428,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 690.7428,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      }
+    },
+    {
+      "fileName": "04-street-latest-revision.png",
+      "sha256": "ee7ac2f940ce319fec37ad65cc3fcfead4a9844b6a66c66755349385bff1f540",
+      "bytes": 953002,
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true,
+      "expectedStage": "Street",
+      "cameraAtCaptureRequest": {
+        "frame": 1227,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "cameraAtCaptureCompletion": {
+        "frame": 1229,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      }
+    },
+    {
+      "fileName": "05-expired.png",
+      "sha256": "c9ca4c34689c0048a7c8a2b31bef0b553f8d8203a7f71098486be25aeaae1094",
+      "bytes": 957807,
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true,
+      "expectedStage": "Street",
+      "cameraAtCaptureRequest": {
+        "frame": 1615,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "cameraAtCaptureCompletion": {
+        "frame": 1617,
+        "actualStage": "Street",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 90.0,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 90.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      }
+    },
+    {
+      "fileName": "06-cleared.png",
+      "sha256": "f5214b80a0b16c1e77cd5ec6eee0089db294a79c93ab9dcc1dbde72d940cf26e",
+      "bytes": 961421,
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true,
+      "expectedStage": "Neighborhood",
+      "cameraAtCaptureRequest": {
+        "frame": 1654,
+        "actualStage": "Neighborhood",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 476.374329,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 476.374329,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      },
+      "cameraAtCaptureCompletion": {
+        "frame": 1656,
+        "actualStage": "Neighborhood",
+        "currentObservationLayer": "Diorama",
+        "globeOverlayVisible": false,
+        "dioramaTransitioning": false,
+        "globeCameraFound": true,
+        "globeCameraEnabled": false,
+        "observationCameraEnabled": true,
+        "observationCameraDepth": 200.0,
+        "observationOrthographicSize": 476.374329,
+        "wholeViewSize": 476.374329,
+        "activeCameras": [
+          {
+            "name": "Main Camera",
+            "depth": 0.0,
+            "isObservationCamera": false,
+            "isGlobeCamera": false,
+            "cullingMask": -1,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": false,
+            "orthographicSize": 5.0,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          },
+          {
+            "name": "사가정 운영 관찰 카메라",
+            "depth": 200.0,
+            "isObservationCamera": true,
+            "isGlobeCamera": false,
+            "cullingMask": 1073741824,
+            "targetDisplay": 0,
+            "rendersToTexture": false,
+            "orthographic": true,
+            "orthographicSize": 476.374329,
+            "pixelWidth": 1280,
+            "pixelHeight": 720
+          }
+        ]
+      }
+    }
+  ]
+}

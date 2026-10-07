@@ -353,10 +353,12 @@ namespace Ssalddel.Unity.Tests.EditMode
                 var controller = root.AddComponent<운영관찰WorldController>();
                 controller.Configure(world);
                 Invoke(controller, "InitializeClient");
+                // Controller는 실제 UTC TTL을 적용하므로 과거 고정 Epoch 사본을 현재 입력으로 쓰지 않습니다.
+                var current = DateTime.UtcNow;
                 var response = 다중Os생명주기검증Fixture.CreateResponse(
-                    "controller-v2", 465, Epoch);
+                    "controller-v2", 465, current.AddSeconds(-465));
                 var applied = new OperationalWorldSceneInterpreter().Apply(
-                    response, Epoch.AddSeconds(465));
+                    response, current);
 
                 Invoke(controller, "CompleteRefresh", Task.FromResult(applied));
 
