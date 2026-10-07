@@ -26,6 +26,7 @@ namespace Ssalddel.Unity.Bootstrap
         private Camera observer;
         private bool playing, busy, follow;
         private bool 저장복구필요;
+        private bool 공간표시차단;
         private float elapsed;
         private string lastCourierPresentationSessionStableId = string.Empty;
         private long lastCourierPresentationSessionRevision = -1;
@@ -40,6 +41,7 @@ namespace Ssalddel.Unity.Bootstrap
         private void OnApplicationPause(bool paused) { if (paused) { playing = false; elapsed = 0; 동네실행?.정지(); } }
         private void OnDestroy()
         {
+            사가정음식생활종료();
             foreach (var mesh in 참고Meshes) if(mesh != null) { if(UnityEngine.Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
             마트서버관찰종료();
             if (운영지도중) 운영지도카메라복원();
@@ -63,18 +65,21 @@ namespace Ssalddel.Unity.Bootstrap
             if (SimulationWorldLocalRuntimeScope.BusinessServerObserverRequested) { 업무서버관찰시작(); return; }
             try
             {
+                if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) 사가정음식생활준비();
                 scope = SimulationWorldLocalRuntimeScope.Install();
                 singleCourierObservation = scope.LaunchProfile == Nature생존LaunchProfile.SyntheticDelivery;
                 state = await scope.Runtime.Sessions.GetAsync(scope.SessionStableId);
                 Build();
                 if (Render()) message = "정지 · 재생을 눌러 시작하세요. 종료 시간은 따라잡지 않습니다.";
-                if (scope.LaunchProfile == Nature생존LaunchProfile.NeighborhoodLife) 휴대폰연결();
+                if (scope.LaunchProfile == Nature생존LaunchProfile.NeighborhoodLife
+                    || scope.LaunchProfile == Nature생존LaunchProfile.SagajeongFoodLife) 휴대폰연결();
             }
             catch (Exception e) { message = "시작 실패: " + e.Message; Debug.LogException(e); }
         }
 
         private async void Update()
         {
+            if (공간표시차단) return;
             if (SimulationWorldLocalRuntimeScope.BusinessServerObserverRequested) { 업무서버관찰갱신(); return; }
             if (동네실행 != null) { await 동네실행.시간진행Async(Time.unscaledDeltaTime); return; }
             if (!playing || busy || 저장복구필요 || state == null || state.IsCompleted) { elapsed = 0; return; }
@@ -107,6 +112,19 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void OnGUI()
         {
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested && 휴대폰 == null)
+            {
+                GUILayout.BeginArea(new Rect(12, 12, 520, 130), GUI.skin.box);
+                GUILayout.Label("사가정 음식 생활 관찰"); GUILayout.Label(message);
+                GUILayout.Label("자료 확인에 실패하면 Play Mode를 종료한 뒤 결속 자료를 확인하세요.");
+                GUILayout.EndArea(); return;
+            }
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested)
+            {
+                GUI.Label(new Rect(12, Screen.height - 44, Mathf.Max(200, Screen.width - 430), 40),
+                    "© OpenStreetMap contributors · ODbL 1.0\n게임용 접근·주거·이동 경로");
+                return;
+            }
             if (Ssalddel.Unity.Presentation.World.사가정운영디오라마View.IsVisible) return;
             확장선택그리기();
             if (SimulationWorldLocalRuntimeScope.NeighborhoodLifeRequested || SimulationWorldLocalRuntimeScope.BusinessServerObserverRequested) return;
@@ -188,6 +206,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void Build()
         {
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) { BuildSagajeongFoodLife(); return; }
             Block("바닥", new Vector3(12,-.12f,8), new Vector3(58,.2f,58), new Color(.3f,.45f,.28f));
             배치도형("road:east", "도로 동서", 0,.1f,Color.gray);
             배치도형("road:trunk", "도로 남북", 0,.1f,Color.gray);
@@ -318,6 +337,17 @@ namespace Ssalddel.Unity.Bootstrap
         private bool Render()
         {
             if (observer == null) return false;
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested)
+            {
+                try { RenderSagajeongFoodLife(); 공간표시차단 = false; return true; }
+                catch (Exception error)
+                {
+                    playing = false; 공간표시차단 = true;
+                    message = "공간 표시 차단: " + error.Message;
+                    if (동네실행?.Playing == true) 동네실행.정지();
+                    Debug.LogError(message, this); return false;
+                }
+            }
             var data = state.SyntheticCourier;
             if (data == null) { courier.position = new Vector3(0,.9f,0); vehicle.position = new Vector3(0,.5f,0); parcel.gameObject.SetActive(false); }
             if (data != null)

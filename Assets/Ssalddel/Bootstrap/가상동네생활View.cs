@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Ssalddel.Simulation.Contracts;
 using Ssalddel.Simulation.Application;
 using Ssalddel.Unity.Warehouse;
+using Ssalddel.Unity.Infrastructure.Simulation;
 using UnityEngine;
 
 namespace Ssalddel.Unity.Bootstrap
@@ -95,6 +96,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void 동네입체카메라갱신()
         {
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) { 사가정음식생활카메라갱신(); return; }
             if (observer == null || state?.WaitingFleet?.NeighborhoodLife == null) return;
             var target = new Vector3(0, 0, 5);
             if (follow && 선택생활주체.Length > 0)
@@ -121,6 +123,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void 확장선택그리기()
         {
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) return;
             if (state?.WaitingFleet?.NeighborhoodLife == null) return;
             if (확장개요) GUI.Label(new Rect(12, Screen.height - 78, 700, 28), "사가정역 중심 1km × 1km · © OpenStreetMap contributors · ODbL 1.0 · 폭/미상 높이는 기호");
             if (GUI.Button(new Rect(12, Screen.height - 44, 240, 32), 확장개요 ? "기존 동네 집중" : "사가정역 · 1km 확장 보기"))

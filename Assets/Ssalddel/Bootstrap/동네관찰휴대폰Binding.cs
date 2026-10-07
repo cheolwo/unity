@@ -38,10 +38,13 @@ namespace Ssalddel.Unity.Bootstrap
             휴대폰.생활현장복귀요청 += 운영지도복귀;
             동네실행.Changed += 휴대폰상태갱신;
             휴대폰상태갱신();
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) { 휴대폰.열기(); 휴대폰.이동(동네휴대폰App.동네); }
         }
         private async void 휴대폰명령(string command)
         {
             if (동네실행 == null) return;
+            if (공간표시차단) return;
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested && !사가정음식생활관찰Profile.관찰명령허용(command)) return;
             switch (command)
             {
                 case "play": 동네실행.재생전환(); break;
@@ -63,16 +66,17 @@ namespace Ssalddel.Unity.Bootstrap
         {
             if (this == null || 휴대폰 == null) return;
             state = 동네실행.State; playing = 동네실행.Playing; busy = 동네실행.Busy; 저장복구필요 = 동네실행.SaveBlocked;
-            message = 동네실행.Message;
+            if (!공간표시차단) message = 동네실행.Message;
             if (!ReferenceEquals(마지막표시사본, state))
             {
                 마지막표시사본 = state;
-                휴대폰모델 = 동네관찰Presenter.생성(state);
+                휴대폰모델 = SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested
+                    ? 사가정음식생활관찰Profile.조회(state) : 동네관찰Presenter.생성(state);
                 Render();
                 ObservationApplied?.Invoke(휴대폰모델);
             }
             휴대폰.Draft.동기화(state);
-            휴대폰.표시(휴대폰모델, playing, busy, 저장복구필요, state.IsCompleted, message,
+            휴대폰.표시(휴대폰모델, playing, busy, 저장복구필요 || 공간표시차단, state.IsCompleted, message,
                 $"저장 {동네실행.LastSaveMs:F1}ms · 최대 {동네실행.PeakSaveMs:F1}ms\n명령+조회+저장 {동네실행.LastOperationMs:F1}ms\n이 실행에서 저장 {동네실행.SaveCount}회", 동네실행.CommandPending);
             운영지도목록갱신();
             시설카메라갱신();
@@ -94,6 +98,7 @@ namespace Ssalddel.Unity.Bootstrap
         private void 시설카메라갱신()
         {
             if (선택시설.Length == 0 || observer == null) return;
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) { 사가정음식생활시설관찰(선택시설); return; }
             var target = 선택시설 switch {
                 "depot" => new Vector3(-26, 0, -12), "mart" => new Vector3(-3, 0, -12),
                 "restaurant" => new Vector3(10, 0, 7), "home-a" => new Vector3(30, 0, 27), _ => new Vector3(10, 0, 27) };
@@ -103,6 +108,7 @@ namespace Ssalddel.Unity.Bootstrap
         private void 운영지도목록갱신()
         {
             if (휴대폰 == null) return;
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) return;
             if (!운영지도찾기(out var reason))
             {
                 휴대폰.운영지도표시(Array.Empty<운영지도AreaViewModel>(), reason);
@@ -153,6 +159,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private async void 운영지도관찰(string areaSetStableId)
         {
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) return;
             if (!운영지도찾기(out var reason))
             {
                 휴대폰?.운영지도표시(Array.Empty<운영지도AreaViewModel>(), reason);

@@ -1,0 +1,797 @@
+{
+  "schemaVersion": "sagajeong-food-life-binding.v1",
+  "revision": "sagajeong-food-life.r1",
+  "mapRevision": "sagajeong-reference.r3",
+  "mapSha256": "4B81E60C3C389A69AA765C8CC8D20E4457102C359A5FFBCD7EBDFA880F7E84E3",
+  "coordinateMethod": "WGS84-ECEF-ENU-at-zero-altitude",
+  "originLatitude": 37.5806971,
+  "originLongitude": 127.0884106,
+  "offsetX": 550,
+  "offsetZ": 8,
+  "storeName": "샐러리아 샌드위치&샐러드&포케 사가정점",
+  "storeAddress": "서울 중랑구 용마산로51길 50 1층",
+  "storeLatitude": 37.5802023,
+  "storeLongitude": 127.0892977,
+  "buildingId": "osm:way:1256615245",
+  "buildingPoint": {
+    "x": 628.35823555,
+    "z": -46.91676589
+  },
+  "authority": "ReferenceOnly;NoTraversal;NoOperational",
+  "gameRouteNotice": "게임용 접근·주거·재구성 경로 · 실제 진입/배송 경로 아님",
+  "attribution": "© OpenStreetMap contributors · ODbL 1.0",
+  "facadeVisible": true,
+  "anchors": [
+    {
+      "id": "restaurant",
+      "logical": {
+        "x": 10,
+        "z": 5
+      },
+      "game": {
+        "x": 628.35823555,
+        "z": -46.91676589
+      }
+    },
+    {
+      "id": "pickup",
+      "logical": {
+        "x": 10,
+        "z": 4
+      },
+      "game": {
+        "x": 627.310765,
+        "z": -47.8702
+      }
+    },
+    {
+      "id": "home-a",
+      "logical": {
+        "x": 30,
+        "z": 24
+      },
+      "game": {
+        "x": 649.597,
+        "z": -143.307
+      }
+    },
+    {
+      "id": "home-b",
+      "logical": {
+        "x": 10,
+        "z": 24
+      },
+      "game": {
+        "x": 686.122,
+        "z": -109.888
+      }
+    },
+    {
+      "id": "mart",
+      "logical": {
+        "x": -10,
+        "z": -8
+      },
+      "game": {
+        "x": 592.746077,
+        "z": -42.520846
+      }
+    }
+  ],
+  "segments": [
+    {
+      "id": "main:-26:-14",
+      "logicalStart": {
+        "x": -26,
+        "z": 0
+      },
+      "logicalEnd": {
+        "x": -14,
+        "z": 0
+      },
+      "gamePoints": [
+        {
+          "x": 583.407,
+          "z": -72.567
+        },
+        {
+          "x": 593.411308,
+          "z": -53.782385
+        }
+      ],
+      "sourceRoadIds": [
+        "osm:way:381212389:segment:6"
+      ],
+      "kind": "ReferenceRoadReconstruction"
+    },
+    {
+      "id": "main:-14:-10",
+      "logicalStart": {
+        "x": -14,
+        "z": 0
+      },
+      "logicalEnd": {
+        "x": -10,
+        "z": 0
+      },
+      "gamePoints": [
+        {
+          "x": 593.411308,
+          "z": -53.782385
+        },
+        {
+          "x": 596.746077,
+          "z": -47.520846
+        }
+      ],
+      "sourceRoadIds": [
+        "osm:way:381212389:segment:6"
+      ],
+      "kind": "ReferenceRoadReconstruction"
+    },
+    {
+      "id": "main:-10:0",
+      "logicalStart": {
+        "x": -10,
+        "z": 0
+      },
+      "logicalEnd": {
+        "x": 0,
+        "z": 0
+      },
+      "gamePoints": [
+        {
+          "x": 596.746077,
+          "z": -47.520846
+        },
+        {
+          "x": 605.083,
+          "z": -31.867
+        }
+      ],
+      "sourceRoadIds": [
+        "osm:way:381212389:segment:6"
+      ],
+      "kind": "ReferenceRoadReconstruction"
+    },
+    {
+      "id": "main:0:10",
+      "logicalStart": {
+        "x": 0,
+        "z": 0
+      },
+      "logicalEnd": {
+        "x": 10,
+        "z": 0
+      },
+      "gamePoints": [
+        {
+          "x": 605.083,
+          "z": -31.867
+        },
+        {
+          "x": 623.120883,
+          "z": -51.683938
+        }
+      ],
+      "sourceRoadIds": [
+        "osm:way:379034597:segment:0"
+      ],
+      "kind": "ReferenceRoadReconstruction"
+    },
+    {
+      "id": "main:10:20",
+      "logicalStart": {
+        "x": 10,
+        "z": 0
+      },
+      "logicalEnd": {
+        "x": 20,
+        "z": 0
+      },
+      "gamePoints": [
+        {
+          "x": 623.120883,
+          "z": -51.683938
+        },
+        {
+          "x": 658.029,
+          "z": -90.035
+        }
+      ],
+      "sourceRoadIds": [
+        "osm:way:379034597:segment:0"
+      ],
+      "kind": "ReferenceRoadReconstruction"
+    },
+    {
+      "id": "trunk",
+      "logicalStart": {
+        "x": 20,
+        "z": 0
+      },
+      "logicalEnd": {
+        "x": 20,
+        "z": 20
+      },
+      "gamePoints": [
+        {
+          "x": 658.029,
+          "z": -90.035
+        },
+        {
+          "x": 683.619,
+          "z": -118.149
+        }
+      ],
+      "sourceRoadIds": [
+        "osm:way:379034597:segment:1"
+      ],
+      "kind": "ReferenceRoadReconstruction"
+    },
+    {
+      "id": "home:west",
+      "logicalStart": {
+        "x": 10,
+        "z": 20
+      },
+      "logicalEnd": {
+        "x": 20,
+        "z": 20
+      },
+      "gamePoints": [
+        {
+          "x": 689.122,
+          "z": -112.888
+        },
+        {
+          "x": 683.619,
+          "z": -118.149
+        }
+      ],
+      "sourceRoadIds": [
+        "osm:way:416819512:segment:2"
+      ],
+      "kind": "ReferenceRoadReconstruction"
+    },
+    {
+      "id": "home:east",
+      "logicalStart": {
+        "x": 20,
+        "z": 20
+      },
+      "logicalEnd": {
+        "x": 30,
+        "z": 20
+      },
+      "gamePoints": [
+        {
+          "x": 683.619,
+          "z": -118.149
+        },
+        {
+          "x": 652.597,
+          "z": -146.307
+        }
+      ],
+      "sourceRoadIds": [
+        "osm:way:416819512:segment:3"
+      ],
+      "kind": "ReferenceRoadReconstruction"
+    },
+    {
+      "id": "restaurant-access",
+      "logicalStart": {
+        "x": 10,
+        "z": 0
+      },
+      "logicalEnd": {
+        "x": 10,
+        "z": 5
+      },
+      "gamePoints": [
+        {
+          "x": 623.120883,
+          "z": -51.683938
+        },
+        {
+          "x": 628.35823555,
+          "z": -46.91676589
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "restaurant-rest",
+      "logicalStart": {
+        "x": 10,
+        "z": 5
+      },
+      "logicalEnd": {
+        "x": 11.5,
+        "z": 5
+      },
+      "gamePoints": [
+        {
+          "x": 628.35823555,
+          "z": -46.91676589
+        },
+        {
+          "x": 629.85823555,
+          "z": -46.91676589
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "mart-pickup",
+      "logicalStart": {
+        "x": -10,
+        "z": 0
+      },
+      "logicalEnd": {
+        "x": -10,
+        "z": -8
+      },
+      "gamePoints": [
+        {
+          "x": 596.746077,
+          "z": -47.520846
+        },
+        {
+          "x": 592.746077,
+          "z": -42.520846
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting:0",
+      "logicalStart": {
+        "x": -6,
+        "z": -4
+      },
+      "logicalEnd": {
+        "x": 0,
+        "z": 0
+      },
+      "gamePoints": [
+        {
+          "x": 603.083,
+          "z": -27.867
+        },
+        {
+          "x": 605.083,
+          "z": -31.867
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting-rest:0",
+      "logicalStart": {
+        "x": -6,
+        "z": -4
+      },
+      "logicalEnd": {
+        "x": -4.5,
+        "z": -4
+      },
+      "gamePoints": [
+        {
+          "x": 603.083,
+          "z": -27.867
+        },
+        {
+          "x": 604.583,
+          "z": -27.867
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting:1",
+      "logicalStart": {
+        "x": 0,
+        "z": -4
+      },
+      "logicalEnd": {
+        "x": 0,
+        "z": 0
+      },
+      "gamePoints": [
+        {
+          "x": 605.083,
+          "z": -27.867
+        },
+        {
+          "x": 605.083,
+          "z": -31.867
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting-rest:1",
+      "logicalStart": {
+        "x": 0,
+        "z": -4
+      },
+      "logicalEnd": {
+        "x": 1.5,
+        "z": -4
+      },
+      "gamePoints": [
+        {
+          "x": 605.083,
+          "z": -27.867
+        },
+        {
+          "x": 606.583,
+          "z": -27.867
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting:2",
+      "logicalStart": {
+        "x": 6,
+        "z": -4
+      },
+      "logicalEnd": {
+        "x": 10,
+        "z": 0
+      },
+      "gamePoints": [
+        {
+          "x": 625.120883,
+          "z": -47.683938
+        },
+        {
+          "x": 623.120883,
+          "z": -51.683938
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting-rest:2",
+      "logicalStart": {
+        "x": 6,
+        "z": -4
+      },
+      "logicalEnd": {
+        "x": 7.5,
+        "z": -4
+      },
+      "gamePoints": [
+        {
+          "x": 625.120883,
+          "z": -47.683938
+        },
+        {
+          "x": 626.620883,
+          "z": -47.683938
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting:3",
+      "logicalStart": {
+        "x": 10,
+        "z": 16
+      },
+      "logicalEnd": {
+        "x": 10,
+        "z": 20
+      },
+      "gamePoints": [
+        {
+          "x": 693.122,
+          "z": -108.888
+        },
+        {
+          "x": 689.122,
+          "z": -112.888
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting-rest:3",
+      "logicalStart": {
+        "x": 10,
+        "z": 16
+      },
+      "logicalEnd": {
+        "x": 11.5,
+        "z": 16
+      },
+      "gamePoints": [
+        {
+          "x": 693.122,
+          "z": -108.888
+        },
+        {
+          "x": 694.622,
+          "z": -108.888
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting:4",
+      "logicalStart": {
+        "x": 30,
+        "z": 16
+      },
+      "logicalEnd": {
+        "x": 30,
+        "z": 20
+      },
+      "gamePoints": [
+        {
+          "x": 658.597,
+          "z": -142.307
+        },
+        {
+          "x": 652.597,
+          "z": -146.307
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "waiting-rest:4",
+      "logicalStart": {
+        "x": 30,
+        "z": 16
+      },
+      "logicalEnd": {
+        "x": 31.5,
+        "z": 16
+      },
+      "gamePoints": [
+        {
+          "x": 658.597,
+          "z": -142.307
+        },
+        {
+          "x": 660.097,
+          "z": -142.307
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "home-access:10",
+      "logicalStart": {
+        "x": 10,
+        "z": 20
+      },
+      "logicalEnd": {
+        "x": 10,
+        "z": 24
+      },
+      "gamePoints": [
+        {
+          "x": 689.122,
+          "z": -112.888
+        },
+        {
+          "x": 686.122,
+          "z": -109.888
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "home-room:10",
+      "logicalStart": {
+        "x": 9,
+        "z": 24
+      },
+      "logicalEnd": {
+        "x": 13,
+        "z": 24
+      },
+      "gamePoints": [
+        {
+          "x": 685.122,
+          "z": -109.888
+        },
+        {
+          "x": 689.122,
+          "z": -109.888
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "resident:10",
+      "logicalStart": {
+        "x": 9,
+        "z": 24
+      },
+      "logicalEnd": {
+        "x": 9,
+        "z": 26
+      },
+      "gamePoints": [
+        {
+          "x": 685.122,
+          "z": -109.888
+        },
+        {
+          "x": 685.122,
+          "z": -107.888
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "home-access:30",
+      "logicalStart": {
+        "x": 30,
+        "z": 20
+      },
+      "logicalEnd": {
+        "x": 30,
+        "z": 24
+      },
+      "gamePoints": [
+        {
+          "x": 652.597,
+          "z": -146.307
+        },
+        {
+          "x": 649.597,
+          "z": -143.307
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "home-room:30",
+      "logicalStart": {
+        "x": 29,
+        "z": 24
+      },
+      "logicalEnd": {
+        "x": 33,
+        "z": 24
+      },
+      "gamePoints": [
+        {
+          "x": 648.597,
+          "z": -143.307
+        },
+        {
+          "x": 652.597,
+          "z": -143.307
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    },
+    {
+      "id": "resident:30",
+      "logicalStart": {
+        "x": 29,
+        "z": 24
+      },
+      "logicalEnd": {
+        "x": 29,
+        "z": 26
+      },
+      "gamePoints": [
+        {
+          "x": 648.597,
+          "z": -143.307
+        },
+        {
+          "x": 648.597,
+          "z": -141.307
+        }
+      ],
+      "sourceRoadIds": [],
+      "kind": "FictionalGameAccess"
+    }
+  ],
+  "restAreas": [
+    {
+      "id": "game-rest-slot:0",
+      "work": {
+        "x": -6,
+        "z": -4
+      },
+      "roadEnd": {
+        "x": 0,
+        "z": 0
+      },
+      "rest": {
+        "x": -4.5,
+        "z": -4
+      }
+    },
+    {
+      "id": "game-rest-slot:1",
+      "work": {
+        "x": 0,
+        "z": -4
+      },
+      "roadEnd": {
+        "x": 0,
+        "z": 0
+      },
+      "rest": {
+        "x": 1.5,
+        "z": -4
+      }
+    },
+    {
+      "id": "game-rest-slot:2",
+      "work": {
+        "x": 6,
+        "z": -4
+      },
+      "roadEnd": {
+        "x": 10,
+        "z": 0
+      },
+      "rest": {
+        "x": 7.5,
+        "z": -4
+      }
+    },
+    {
+      "id": "game-rest-slot:3",
+      "work": {
+        "x": 10,
+        "z": 16
+      },
+      "roadEnd": {
+        "x": 10,
+        "z": 20
+      },
+      "rest": {
+        "x": 11.5,
+        "z": 16
+      }
+    },
+    {
+      "id": "game-rest-slot:4",
+      "work": {
+        "x": 30,
+        "z": 16
+      },
+      "roadEnd": {
+        "x": 30,
+        "z": 20
+      },
+      "rest": {
+        "x": 31.5,
+        "z": 16
+      }
+    }
+  ]
+}

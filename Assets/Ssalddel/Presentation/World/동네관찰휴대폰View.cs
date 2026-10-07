@@ -109,7 +109,10 @@ namespace Ssalddel.Unity.Presentation.World
             var previous = history.Pop(); SelectedApp = previous.app; detailId = previous.id; 새화면();
         }
         public void 이동(동네휴대폰App app, string id = "")
-        { history.Push((SelectedApp, detailId)); SelectedApp = app; detailId = id; confirmRestart = false; 새화면(); }
+        {
+            if (model?.ObservationOnly == true && (app == 동네휴대폰App.정책 || app == 동네휴대폰App.운영지도)) return;
+            history.Push((SelectedApp, detailId)); SelectedApp = app; detailId = id; confirmRestart = false; 새화면();
+        }
         private void 새화면() { 그리기(); scroll.verticalNormalizedPosition = 1; }
         private void Update()
         {
@@ -119,7 +122,7 @@ namespace Ssalddel.Unity.Presentation.World
         {
             if (외부카드 != null) { 외부그리기(); return; }
             if (model == null) return;
-            title.text = SelectedApp == 동네휴대폰App.홈 ? "동네 관찰·운영" : SelectedApp.ToString();
+            title.text = SelectedApp == 동네휴대폰App.홈 ? (model.ObservationOnly ? model.PlaceName : "동네 관찰·운영") : SelectedApp.ToString();
             int count = 0;
             void Row(string name, string body = "", Action click = null, bool enabled = true, bool primary = false)
             {
@@ -145,7 +148,10 @@ namespace Ssalddel.Unity.Presentation.World
             {
                 Row("지금, 동네는", model.Summary);
                 Row("관찰 경계", model.BoundaryNotice);
-                foreach (var app in new[] { 동네휴대폰App.운영지도, 동네휴대폰App.동네, 동네휴대폰App.주문, 동네휴대폰App.NPC, 동네휴대폰App.창고, 동네휴대폰App.정책 })
+                var apps = model.ObservationOnly
+                    ? new[] { 동네휴대폰App.동네, 동네휴대폰App.주문, 동네휴대폰App.NPC, 동네휴대폰App.방문기록 }
+                    : new[] { 동네휴대폰App.운영지도, 동네휴대폰App.동네, 동네휴대폰App.주문, 동네휴대폰App.NPC, 동네휴대폰App.창고, 동네휴대폰App.정책 };
+                foreach (var app in apps)
                 { var target = app; Row(app.ToString(), 설명(app), () => 이동(target), true, app == 동네휴대폰App.동네); }
             }
             else if (SelectedApp == 동네휴대폰App.운영지도)
@@ -165,7 +171,15 @@ namespace Ssalddel.Unity.Presentation.World
             }
             else if (SelectedApp == 동네휴대폰App.동네)
             {
-                Row("30분 동네 관찰", model.Summary + "\n" + model.BoundaryNotice);
+                // 시작/정지와 조망은 스크롤 없이 접근한다. 정책 초안은 이 모드의 입력이 아니다.
+                if (model.ObservationOnly)
+                {
+                    Row(playing ? "일시정지" : "재생", "가상 생활을 관찰합니다 · 자동 재시작 없음", () => 명령요청?.Invoke("play"), !blocked && !complete, true);
+                    Row(blocked ? "저장 다시 시도" : "지금 저장", "현재 생활 상태를 보존합니다", () => 명령요청?.Invoke("save"), !pending);
+                    Row("전체 지도 보기", "NPC 추적을 종료합니다", () => 명령요청?.Invoke("overview"));
+                }
+                Row(model.ObservationOnly ? model.PlaceName : "30분 동네 관찰", model.Summary + "\n" + model.BoundaryNotice);
+                if (model.ObservationOnly) Row("매장·방문 메뉴 기록", "2026.09.28 실제 방문과 가상 생활을 구분해 확인", () => 이동(동네휴대폰App.방문기록));
                 Row("자율 음식 배달", "재생 한 번 후 주문·수락·조리·배차·픽업·수령을 NPC가 처리합니다.\n기존 음식/마트 교대와 표본 종료 규칙을 유지합니다.");
                 foreach (var cycle in model.FoodLifeCycles)
                 {
@@ -178,10 +192,10 @@ namespace Ssalddel.Unity.Presentation.World
                     Row(target.Title, target.Body, () => 이동(동네휴대폰App.NPC, target.ActorId));
                 }
                 Row(pending ? "요청 대기·처리 중…" : busy ? "진행·저장 중…" : message, "앱을 닫아도 열어도 현재 재생 상태를 유지합니다.");
-                Row(playing ? "일시정지" : "재생", "진행 중 저장은 마무리합니다. 종료 시간 따라잡기 없음", () => 명령요청?.Invoke("play"), !blocked && !complete, true);
+                if (!model.ObservationOnly) Row(playing ? "일시정지" : "재생", "진행 중 저장은 마무리합니다. 종료 시간 따라잡기 없음", () => 명령요청?.Invoke("play"), !blocked && !complete, true);
                 Row("1초 진행", "현재 저장 뒤 정지 상태에서 한 단계 확인", () => 명령요청?.Invoke("step"), !pending && !blocked && !complete);
-                Row(blocked ? "저장 다시 시도" : "지금 저장", "진행 중 저장 뒤 한 건만 요청합니다", () => 명령요청?.Invoke("save"), !pending);
-                Row("전체 지도 보기", "주체 따라가기를 종료", () => 명령요청?.Invoke("overview"));
+                if (!model.ObservationOnly) Row(blocked ? "저장 다시 시도" : "지금 저장", "진행 중 저장 뒤 한 건만 요청합니다", () => 명령요청?.Invoke("save"), !pending);
+                if (!model.ObservationOnly) Row("전체 지도 보기", "주체 따라가기를 종료", () => 명령요청?.Invoke("overview"));
                 if (complete)
                 {
                     Row(confirmRestart ? "새 표본 시작 확인" : "새 30분 표본", "완료된 전용 저장을 새 표본으로 교체합니다", () => {
@@ -192,7 +206,13 @@ namespace Ssalddel.Unity.Presentation.World
                 Row(debug ? "개발 정보 접기" : "개발 정보", "저장 성능과 조회 판본", () => { debug = !debug; 그리기(); });
                 if (debug) Row("조회 판본 " + model.Revision, metrics);
             }
-            else if (SelectedApp == 동네휴대폰App.정책)
+            else if (SelectedApp == 동네휴대폰App.방문기록)
+            {
+                foreach (var item in model.VisitHistory)
+                    Row(item.Title, item.Body);
+                if (model.ObservationOnly) Row("게임용 매장 위치 보기", "카메라만 이동합니다", () => 시설관찰요청?.Invoke("restaurant"));
+            }
+            else if (SelectedApp == 동네휴대폰App.정책 && !model.ObservationOnly)
             {
                 Row(Draft.Dirty ? "편집 중 · 아직 적용하지 않음" : "현재 적용된 정책", "세계가 진행되어도 편집 내용은 유지됩니다.");
                 Row("자동 업무 · " + (Draft.Automation ? "켜짐" : "꺼짐"), "새 업무 수락/배정. 기존 업무는 마무리합니다", () => { Draft.변경(automation: !Draft.Automation); 그리기(); }, !pending);
@@ -220,7 +240,7 @@ namespace Ssalddel.Unity.Presentation.World
                     if (foodLife != null)
                     {
                         Row("주문자 · " + 동네관찰Presenter.이름(foodLife.OrdererActorId), "NPC 상세에서 명시적으로 따라가기", () => 이동(동네휴대폰App.NPC, foodLife.OrdererActorId));
-                        Row("음식점 · " + 동네관찰Presenter.이름(foodLife.RestaurantActorId), "NPC 상세 또는 시설 위치를 선택", () => 이동(동네휴대폰App.NPC, foodLife.RestaurantActorId));
+                        Row("음식점 · " + (model.ObservationOnly ? "가상 음식점 담당" : 동네관찰Presenter.이름(foodLife.RestaurantActorId)), "NPC 상세 또는 시설 위치를 선택", () => 이동(동네휴대폰App.NPC, foodLife.RestaurantActorId));
                         if (foodLife.DriverActorId.Length > 0)
                             Row("배달 기사 · " + 동네관찰Presenter.이름(foodLife.DriverActorId), "NPC 상세에서 명시적으로 따라가기", () => 이동(동네휴대폰App.NPC, foodLife.DriverActorId));
                         Row("현재 관련 시설 · " + 동네관찰Presenter.시설이름(foodLife.CurrentFacilityId), "사용자가 선택할 때만 카메라 이동", () => 시설관찰요청?.Invoke(foodLife.CurrentFacilityId));
@@ -243,6 +263,7 @@ namespace Ssalddel.Unity.Presentation.World
             for (int i = count; i < rows.Count; i++) rows[i].Root.SetActive(false);
         }
         private static string 설명(동네휴대폰App app) => app switch {
+            동네휴대폰App.방문기록 => "실제 매장·과거 메뉴 · 가상 생활과 구분",
             동네휴대폰App.운영지도 => "Nature · Farm · Hub · Town 실제 E5 AreaSet 관찰",
             동네휴대폰App.동네 => "흐르는 시간 · 재생과 저장", 동네휴대폰App.주문 => "음식과 마트 · 준비에서 수령까지",
             동네휴대폰App.NPC => "지금 하는 일 · 따라가기", 동네휴대폰App.창고 => "보관 · 예약 · 보충 운송", _ => "자동 업무 · 조리 · 근무와 휴식" };

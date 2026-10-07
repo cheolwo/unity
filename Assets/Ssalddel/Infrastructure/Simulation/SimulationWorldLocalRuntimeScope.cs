@@ -23,6 +23,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         OrderFlow = 7,
         NeighborhoodLife = 8,
         OfflineLife = 9,
+        SagajeongFoodLife = 10,
     }
 
     /// <summary>
@@ -82,7 +83,9 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         }
         public static bool CanUseBusinessServerObserver(bool isEditor, bool isDebugBuild)
             => isEditor || isDebugBuild;
-        public static bool NeighborhoodLifeRequested => OfflineLifeRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "5", StringComparison.Ordinal);
+        public static bool SagajeongFoodLifeRequested => current?.LaunchProfile == Nature생존LaunchProfile.SagajeongFoodLife
+            || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SAGAJEONG_FOOD_LIFE"), "1", StringComparison.Ordinal);
+        public static bool NeighborhoodLifeRequested => SagajeongFoodLifeRequested || OfflineLifeRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "5", StringComparison.Ordinal);
         public static bool OrderFlowRequested => NeighborhoodLifeRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "4", StringComparison.Ordinal);
         public static bool MartCenterRequested => OrderFlowRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "3", StringComparison.Ordinal);
         public static bool WaitingFleetRequested => MartCenterRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "2", StringComparison.Ordinal);
@@ -186,7 +189,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         }
 
         public static Nature생존LaunchProfile DetectLaunchProfile()
-            => OfflineLifeRequested ? Nature생존LaunchProfile.OfflineLife
+            => SagajeongFoodLifeRequested ? Nature생존LaunchProfile.SagajeongFoodLife
+                : OfflineLifeRequested ? Nature생존LaunchProfile.OfflineLife
                 : NeighborhoodLifeRequested ? Nature생존LaunchProfile.NeighborhoodLife
                 : OrderFlowRequested ? Nature생존LaunchProfile.OrderFlow
                 : MartCenterRequested ? Nature생존LaunchProfile.MartCenter
@@ -203,7 +207,9 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 : Nature생존LaunchProfile.PlayableDefault;
 
         private static string SlotFor(Nature생존LaunchProfile launchProfile)
-            => launchProfile == Nature생존LaunchProfile.NeighborhoodLife
+            => launchProfile == Nature생존LaunchProfile.SagajeongFoodLife
+                ? Ssalddel.Unity.Observation.사가정음식생활관찰Profile.SlotId
+                : launchProfile == Nature생존LaunchProfile.NeighborhoodLife
                 ? Ssalddel.Unity.Warehouse.가상배달관찰표본.NeighborhoodLifeSlotId
                 : launchProfile == Nature생존LaunchProfile.OrderFlow
                 ? Ssalddel.Unity.Warehouse.가상배달관찰표본.OrderFlowSlotId
@@ -224,6 +230,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         private static 경영SimulationSession생성Request CreateSessionRequest(
             Nature생존LaunchProfile launchProfile)
         {
+            if (launchProfile == Nature생존LaunchProfile.SagajeongFoodLife)
+                return Ssalddel.Unity.Observation.사가정음식생활관찰Profile.생성(Guid.NewGuid());
             if (launchProfile == Nature생존LaunchProfile.NeighborhoodLife)
                 return Ssalddel.Unity.Warehouse.가상배달관찰표본.CreateNeighborhoodLife(Guid.NewGuid(), dayEnabled: true);
             if (launchProfile == Nature생존LaunchProfile.OrderFlow)
