@@ -1,0 +1,19 @@
+{
+    "name": "Ssalddel.WindowsGame.Kernel",
+    "rootNamespace": "Ssalddel.WindowsGame.Kernel",
+    "references": [
+        "Ssalddel.Sagajeong.Core",
+        "Ssalddel.WorkflowRules",
+        "Ssalddel.WorkflowRules.Contracts",
+        "Unity.Newtonsoft.Json"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

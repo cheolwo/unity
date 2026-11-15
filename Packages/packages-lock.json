@@ -42,6 +42,15 @@
         "com.ssalddel.interior.contracts": "0.1.0"
       }
     },
+    "com.ssalddel.sagajeong.core": {
+      "version": "file:../../source/repos/Hongdal/Ssalddel.Sagajeong.Core/UnityPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.ssalddel.workflow-rules": "0.1.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.2"
+      }
+    },
     "com.ssalddel.simulation.business-workflow": {
       "version": "file:../../source/repos/Hongdal/Ssalddel.Simulation.BusinessWorkflow/UnityPackage",
       "depth": 0,

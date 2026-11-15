@@ -5,6 +5,7 @@
     "com.ssalddel.code-metadata": "file:../../source/repos/Hongdal/Ssalddel.CodeMetadata",
     "com.ssalddel.interior.contracts": "file:../../source/repos/Hongdal/Ssalddel.Interior.Contracts/UnityPackage",
     "com.ssalddel.interior.domain": "file:../../source/repos/Hongdal/Ssalddel.Interior.Domain/UnityPackage",
+    "com.ssalddel.sagajeong.core": "file:../../source/repos/Hongdal/Ssalddel.Sagajeong.Core/UnityPackage",
     "com.ssalddel.simulation.business-workflow": "file:../../source/repos/Hongdal/Ssalddel.Simulation.BusinessWorkflow/UnityPackage",
     "com.ssalddel.simulation.contracts": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Contracts/UnityPackage",
     "com.ssalddel.simulation.domain": "file:../../source/repos/Hongdal/Ssalddel.Simulation.Domain/UnityPackage",

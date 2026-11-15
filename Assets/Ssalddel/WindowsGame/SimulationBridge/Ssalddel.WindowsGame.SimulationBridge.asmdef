@@ -1,0 +1,26 @@
+{
+    "name": "Ssalddel.WindowsGame.SimulationBridge",
+    "rootNamespace": "Ssalddel.WindowsGame.SimulationBridge",
+    "references": [
+        "Ssalddel.WindowsGame.Kernel",
+        "Ssalddel.Simulation.Domain",
+        "Ssalddel.Simulation.Contracts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "HONGDAL_SIMULATION_DOMAIN"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.ssalddel.simulation.domain",
+            "expression": "0.0.1",
+            "define": "HONGDAL_SIMULATION_DOMAIN"
+        }
+    ],
+    "noEngineReferences": true
+}

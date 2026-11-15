@@ -1,0 +1,36 @@
+{
+ "schema": "hongdal-business-pack.v1",
+ "id": "business.franchise.cafe.first-chain",
+ "version": "2026.11.12-1",
+ "note": "업종 팩 1판. PLAN-SYSTEM-FRANCHISE-OPERATIONS r71 '첫 모의 검증'의 우유 5팩 사슬에 쓰는 가상 자료다. 본부·공급사·센터·점포·가격·시간은 모두 가상이고, 개인 배달 기록은 들어 있지 않다. 식별자는 ASCII만 쓴다.",
+ "network": {
+  "id": "franchise-network:hongdal-cafe",
+  "headquarters": { "id": "franchise-hq:hongdal-cafe", "code": "HQ-HONGDAL", "name": "홍달 카페 본부 (가상)" },
+  "supplier": { "id": "franchise-supplier:namyangju-dairy", "code": "NYJ-DAIRY", "name": "남양주 유제품 공급사 (가상)" },
+  "store": { "id": "franchise-store:cafe-1", "code": "CAFE-001", "name": "카페 1호점", "placeId": "place:cafe-1", "membershipId": "franchise-membership:cafe-1" }
+ },
+ "item": {
+  "productId": "product:milk-1l",
+  "name": "우유 1L",
+  "orderUnit": "팩",
+  "contentQuantity": 1000,
+  "contentUnit": "mL",
+  "storage": "냉장",
+  "supplyPrice": 2100,
+  "storePrice": 2400,
+  "minimum": 1,
+  "maximum": 20
+ },
+ "recommendedOrderQuantity": 5,
+ "waitingCups": 1,
+ "center": {
+  "id": "place:center-namyangju",
+  "name": "남양주 물류센터 (가상)",
+  "lots": [ { "id": "lot:milk-1l-a", "available": 120 } ],
+  "pickSeconds": 60,
+  "loadSeconds": 30
+ },
+ "transport": { "vehicleId": "truck:1", "vehicleName": "화물 1", "vehicleKind": "1톤 냉장", "travelSeconds": 240 },
+ "inspection": { "suggestAccept": 4, "suggestQuarantine": 1, "reason": "상자가 눌린 1팩은 따로 둡니다" },
+ "recipe": { "menu": "라떼", "contentPerCup": 170, "price": 4500 }
+}
