@@ -118,8 +118,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             => semanticTransitionView?.DiagnosticCode ?? "NotInitialized";
         public bool IsSemanticTransitionVisible
             => semanticTransitionView != null && semanticTransitionView.IsVisible;
-        public bool CanOpenPreparedDiorama
-            => semanticTransitionView != null && semanticTransitionView.CanOpenPreparedDiorama;
         public 한반도교류축Hub SelectedPeninsulaHub => peninsulaView?.SelectedHub;
         public bool IsObservationRequestPending => observationRequestGate.대기중;
         public float TerrainZoomBlend => terrainPreviewView?.ZoomBlend ?? 0f;
@@ -201,12 +199,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             globeCamera.enabled=!visible;
             globeCanvas.enabled=!visible;
         }
-        public bool OpenRegionalDiorama()
-        {
-            var opened=TryShowPreparedSagajeongDiorama();
-            if(opened)regionalPreviewVisible=false;
-            return opened;
-        }
 
         public 세계국가관찰자료 SelectCountryAtForTests(
             double latitude,
@@ -271,12 +263,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
         {
             Initialize();
             return semanticTransitionView.RetreatForTests();
-        }
-
-        public bool OpenPreparedDioramaForTests()
-        {
-            Initialize();
-            return semanticTransitionView.OpenPreparedDioramaForTests();
         }
 
         public void ReturnFromDetailForTests()
@@ -358,7 +344,7 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             terrainPreviewView.Initialize(catalog, globeCanvas, visualRoot);
             semanticTransitionView = GetComponent<공간의미확대전환View>()
                 ?? gameObject.AddComponent<공간의미확대전환View>();
-            semanticTransitionView.Initialize(globeCanvas, TryShowPreparedSagajeongDiorama);
+            semanticTransitionView.Initialize(globeCanvas);
             initialized = true;
             ShowGlobe();
             if (!UnityEngine.Application.isPlaying) MarkEditorPreviewTransient();
@@ -534,9 +520,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
                 var regional=GetComponent<서울중간공간View>();
                 if(scroll>0 && cameraDistance<=MinimumCameraDistance+.01f && regional!=null && regional.CanEnterFromGlobe)
                 { regional.ShowOverview();return; }
-                // 선택된 준비 지역에 한해, 최대 확대에서 한 번 더 휠을 돌리면 진입한다.
-                if (scroll > 0f && cameraDistance <= MinimumCameraDistance + .01f
-                    && CanOpenPreparedDiorama && OpenPreparedDioramaForTests()) return;
                 cameraDistance = Mathf.Clamp(cameraDistance - scroll * 2.6f,
                     MinimumCameraDistance, MaximumCameraDistance);
                 ApplyCameraDistance();
@@ -661,17 +644,18 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             if (selectedCountry == null
                 || !string.Equals(selectedCountry.iso2, "KR", StringComparison.Ordinal))
                 return;
-            peninsulaView?.Hide();
-            HideTerrainPreviewImmediately();
-            globeVisible = false;
-            세계지도표현상태.SetGlobeOverlayVisible(false);
-            globeCamera.enabled = false;
-            globeCanvas.enabled = false;
-            RestoreSuspendedCanvases();
+            var regional = GetComponent<서울중간공간View>();
+            if (regional != null && regional.AreaCount > 0)
+            {
+                regional.ShowOverview();
+                return;
+            }
+            ShowPeninsulaObservation();
             returnCanvas.enabled = true;
         }
 
-        private bool TryShowPreparedSagajeongDiorama()
+#if UNITY_EDITOR
+        public bool OpenSagajeongForEditorVerification()
         {
             if (!UnityEngine.Application.isPlaying || transitioning || openedStationDiorama != null) return false;
             var station = FindFirstObjectByType<사가정운영디오라마View>(
@@ -687,8 +671,10 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             returnRotation = visualRoot.rotation;
             dragging = false;
             StartCoroutine(TransitionDiorama(station, false));
+            regionalPreviewVisible = false;
             return true;
         }
+#endif
 
         private IEnumerator TransitionDiorama(사가정운영디오라마View station, bool returning)
         {
@@ -784,6 +770,7 @@ namespace Ssalddel.Unity.Presentation.WorldMap
 
         private void ShowGlobe()
         {
+            peninsulaView?.Hide();
             if (UnityEngine.Application.isPlaying) SuspendOtherScreenCanvases();
             globeVisible = true;
             if (UnityEngine.Application.isPlaying)

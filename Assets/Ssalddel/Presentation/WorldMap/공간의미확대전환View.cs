@@ -15,7 +15,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
         public const string PanelName = "SpatialSemanticTransitionPanel";
 
         private readonly 공간의미확대전환흐름 flow = new();
-        private Func<bool> openPreparedDiorama;
         private GameObject panel;
         private Text title;
         private Text stableId;
@@ -23,21 +22,18 @@ namespace Ssalddel.Unity.Presentation.WorldMap
         private Text actionStatus;
         private Button backButton;
         private Button nextButton;
-        private Button openButton;
         private bool initialized;
 
         public 공간의미확대전환단계 CurrentStage => flow.CurrentStage;
         public string CurrentStableId => flow.CurrentStableId;
         public string DiagnosticCode => flow.DiagnosticCode;
         public bool IsVisible => panel != null && panel.activeSelf;
-        public bool CanOpenPreparedDiorama => flow.CanOpenPreparedDiorama;
         public string LastActionStatus { get; private set; } = "WaitingForHubLevel";
 
-        public void Initialize(Canvas hostCanvas, Func<bool> openDiorama)
+        public void Initialize(Canvas hostCanvas)
         {
             if (initialized) return;
             if (hostCanvas == null) throw new ArgumentNullException(nameof(hostCanvas));
-            openPreparedDiorama = openDiorama ?? throw new ArgumentNullException(nameof(openDiorama));
             BuildInterface(hostCanvas.transform);
             initialized = true;
             UpdatePresentation();
@@ -66,27 +62,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             if (changed) LastActionStatus = flow.DiagnosticCode;
             UpdatePresentation();
             return changed;
-        }
-
-        public bool OpenPreparedDioramaForTests()
-        {
-            if (!flow.CanOpenPreparedDiorama)
-            {
-                LastActionStatus = "StationAreaSelectionRequired";
-                UpdatePresentation();
-                return false;
-            }
-            if (!openPreparedDiorama())
-            {
-                LastActionStatus = "PreparedDioramaUnavailable";
-                UpdatePresentation();
-                return false;
-            }
-
-            flow.MarkLocalDioramaOpened();
-            LastActionStatus = flow.DiagnosticCode;
-            UpdatePresentation();
-            return true;
         }
 
         public void RestoreStationArea()
@@ -126,10 +101,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
                 new Vector2(136f, -244f), new Vector2(116f, 48f),
                 new Color(.16f, .42f, .60f));
             nextButton.onClick.AddListener(() => AdvanceForTests());
-            openButton = Button(panel.transform, "OpenPreparedDioramaButton", "디오라마 열기",
-                new Vector2(262f, -244f), new Vector2(110f, 48f),
-                new Color(.20f, .48f, .34f));
-            openButton.onClick.AddListener(() => OpenPreparedDioramaForTests());
         }
 
         private void UpdatePresentation()
@@ -143,10 +114,11 @@ namespace Ssalddel.Unity.Presentation.WorldMap
                 title.text = $"공간 의미 확대 · {StageCode(flow.CurrentStage)}\n{flow.CurrentDisplayName}";
                 stableId.text = $"고유 식별자\n{flow.CurrentStableId}";
                 boundary.text = flow.TruthBoundary;
-                actionStatus.text = "상태 · " + LastActionStatus;
+                actionStatus.text = flow.CurrentStage == 공간의미확대전환단계.StationArea
+                    ? "동네 경영은 홍달 경영 시뮬레이션에서 진행합니다."
+                    : "상태 · " + LastActionStatus;
                 backButton.interactable = flow.CanRetreat;
                 nextButton.interactable = flow.CanAdvance;
-                openButton.interactable = flow.CanOpenPreparedDiorama;
             }
             UpdateRuntimeLayer();
         }

@@ -245,6 +245,10 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Assert.That(view.ModuleHost.ActivePlan.CanPresentObservation, Is.True);
                 Assert.That(view.ModuleHost.ActiveTransitStationStableId,
                     Is.EqualTo(StationDioramaProfileCatalog.SagajeongStationStableId));
+                Assert.That(view.ModuleVisible, Is.False);
+                Assert.That(view.ModuleHost.TryActivate(view.TransitStationStableId), Is.True);
+                Assert.That(view.ModuleVisible, Is.False);
+                view.Show(true);
                 Assert.That(view.ModuleVisible, Is.True);
                 Assert.That(view.MiniatureBuildReport, Is.Not.Null);
                 Assert.That(view.MiniatureBuildReport.ChunkCount, Is.EqualTo(16));

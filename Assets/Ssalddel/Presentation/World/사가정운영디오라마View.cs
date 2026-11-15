@@ -102,7 +102,7 @@ namespace Ssalddel.Unity.Presentation.World
         public int AddressPage => addressPage;
         public int AddressPageCount => Math.Max(1, ((roadNames?.Addresses(selectedRoad).Count ?? 0) + AddressPageSize - 1) / AddressPageSize);
         private GUIStyle titleStyle, smallStyle;
-        private bool shown = true;
+        private bool shown;
         private 단일PlayerViewController viewPolicy;
         private string statusMessage = "WaitingForConnection";
         private readonly List<float> performanceFrameTimes = new();
@@ -195,7 +195,7 @@ namespace Ssalddel.Unity.Presentation.World
                 BuildPresentationVolume();
                 MapStatus = "Ready";
                 RegisterEnvironment();
-                Show(true);
+                ApplyVisibility(shown);
                 ShowWhole();
             }
             catch (ArgumentException)
@@ -233,7 +233,7 @@ namespace Ssalddel.Unity.Presentation.World
             };
         }
 
-        public void SetModuleVisible(bool value) => Show(value);
+        public void SetModuleVisible(bool value) => ApplyVisibility(value && shown);
 
         private static StationDioramaModuleLayerRuntimeState ModuleLayer(string layerStableId,
             bool available, string revision, string diagnostic)
@@ -510,6 +510,11 @@ namespace Ssalddel.Unity.Presentation.World
         public void Show(bool value)
         {
             shown = value;
+            ApplyVisibility(value);
+        }
+
+        private void ApplyVisibility(bool value)
+        {
             if (!value) ClearBuildingSelection();
             IsVisible = value && ObservationCamera != null;
             // 관찰을 닫으면 전용 layer의 geometry, 조명, global Volume까지 함께 비활성화해
@@ -861,11 +866,7 @@ namespace Ssalddel.Unity.Presentation.World
             if (ExternalGeometryReviewUiHidden) return;
             if (세계지도표현상태.GlobeOverlayVisible) return;
             GUI.depth = -100;
-            if (!shown)
-            {
-                if (GUI.Button(new Rect(12,12,180,32), "사가정 운영 관찰")) Show(true);
-                return;
-            }
+            if (!IsVisible) return;
             if (GameOverlayVisible) { HandleCameraInput(); return; }
             titleStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 23, fontStyle = FontStyle.Bold };
             smallStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 13, wordWrap = true };

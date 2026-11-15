@@ -259,7 +259,11 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Assert.That(view.AdvanceSpatialTransitionForTests(), Is.True);
                 Assert.That(view.SemanticTransitionStage,
                     Is.EqualTo(공간의미확대전환단계.StationArea));
-                Assert.That(view.CanOpenPreparedDiorama, Is.True);
+                var panel = GameObject.Find(공간의미확대전환View.PanelName);
+                Assert.That(panel, Is.Not.Null);
+                Assert.That(panel.transform.Find("OpenPreparedDioramaButton"), Is.Null);
+                Assert.That(view.RetreatSpatialTransitionForTests(), Is.True);
+                Assert.That(view.AdvanceSpatialTransitionForTests(), Is.True);
                 Assert.That(view.SemanticTransitionStableId,
                     Is.EqualTo(StationDioramaProfileCatalog.SagajeongStationStableId));
             }
@@ -539,10 +543,12 @@ namespace Ssalddel.Unity.Tests.EditMode
                 Assert.That(view.SelectedCountry, Is.SameAs(korea));
 
                 view.ShowKoreaDetailForTests();
-                Assert.That(view.IsGlobeVisible, Is.False);
+                Assert.That(view.IsGlobeVisible, Is.True);
+                Assert.That(view.IsPeninsulaVisible, Is.True);
                 Assert.That(세계지도표현상태.GlobeOverlayVisible, Is.False);
                 view.ReturnToGlobeForTests();
                 Assert.That(view.IsGlobeVisible, Is.True);
+                Assert.That(view.IsPeninsulaVisible, Is.False);
                 Assert.That(세계지도표현상태.GlobeOverlayVisible, Is.False,
                     "편집 미리보기 복귀도 런타임 표현 상태를 변경하지 않는다.");
                 Assert.That(view.SelectedCountry?.stableId, Is.EqualTo("country:kr"));

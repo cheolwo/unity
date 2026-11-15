@@ -54,8 +54,13 @@ namespace Ssalddel.Unity.Bootstrap
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Install()
         {
+            if (SceneManager.GetActiveScene().name != "SimulationWorldShell") return;
+            if (SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested)
+            {
+                Debug.Log("사가정 음식 생활은 홍달 경영 시뮬레이션 Windows판으로 통합되었습니다.");
+                return;
+            }
             if (SimulationWorldLocalRuntimeScope.OfflineLifeRequested || !SimulationWorldLocalRuntimeScope.SyntheticDeliveryRequested
-                || SceneManager.GetActiveScene().name != "SimulationWorldShell"
                 || FindAnyObjectByType<가상배달관찰Controller>() != null) return;
             new GameObject("가상 동네 배달 관찰").AddComponent<가상배달관찰Controller>();
         }

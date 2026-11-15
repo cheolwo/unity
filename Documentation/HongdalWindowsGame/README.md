@@ -2,6 +2,8 @@
 
 게임의 커널·모듈, 2.5D 지도와 역할 휴대폰 화면, Windows 빌드 진입점은 [WindowsGame](../../Assets/Ssalddel/WindowsGame/)에 있다. 이 소스에는 가상 우유 공급 사슬의 설정과 두 디오라마 셰이더가 들어 있다. 지도 자료의 수집·검사·굽기에 쓰는 작성자 도구는 [Tools~](../../Assets/Ssalddel/WindowsGame/Tools~/)에 있다.
 
+Windows에서 플레이할 때는 배포 폴더의 `HongdalSimulation.exe`를 실행한다. 편집기에서는 `Ssalddel/Hongdal Windows/Build Player`로 같은 실행판을 만든다. 사가정 개인용 관찰판과 독립 배차 실험의 게임 진입은 종료했다. 공용 `SimulationWorldShell`에서는 한반도·행정 경계와 역 위치를 살펴볼 수 있다. 편집기 검증은 기존 공간 모듈을 명시적으로 열어 검사한다.
+
 ## 개발 환경
 
 - Unity 6000.5.6f1과 .NET 10 SDK를 사용한다.

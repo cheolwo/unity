@@ -97,7 +97,7 @@ namespace Ssalddel.Unity.Presentation.WorldMap
     public sealed class 서울중간공간View : MonoBehaviour
     {
         // 2023 경계에서 사가정 원점(127.0884106,37.5806971)을 포함하는 동.
-        // 동 전체 재현이 아닌 기존 역세권 일부 보기 연결이다.
+        // 경계 참고 자료에서 사가정역 기준점을 찾을 때 사용한다.
         public static bool HasStationPreview(string code) => code=="11260570";
         public static bool ContainsPoint(서울경계Area area,Vector2 point)
         {
@@ -197,7 +197,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
         private readonly List<GameObject> districtRoots=new List<GameObject>();
         private readonly List<UnityEngine.Object> owned=new List<UnityEngine.Object>();
         private float targetSize=24;
-        private bool waitingReturn;
         private Vector3 targetCenter;
         private string selectedDistrict="11260";
         private string selectedName="중랑구";
@@ -353,6 +352,7 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             terrainInspection=false;
             if(root==null)return;
             if(level==1){ShowDistrict("11260");return;}
+            SelectionMessage="";
             selectedLevel=level;targetCenter=Vector3.zero;
             BeginObservation();
             if(curved)focus=지구위경도선View.Coordinate(level==2?37.5806971:37.5665,level==2?127.0884106:126.978,Radius);
@@ -375,33 +375,20 @@ namespace Ssalddel.Unity.Presentation.WorldMap
         private void RefreshDongs(){foreach(var item in dongRoots)item.SetActive(selectedLevel>0&&hierarchy.IsChild(item.name,selectedDistrict));}
         public void ReturnGlobe()
         {
-            RestoreCamera();IsVisible=false;waitingReturn=false;if(root!=null)root.SetActive(false);globe.SetRegionalPreviewVisible(false);
-        }
-        public bool EnterDiorama()
-        {
-            if(!IsVisible || selectedLevel!=2)return false;
-            return OpenPreparedDiorama();
+            RestoreCamera();IsVisible=false;if(root!=null)root.SetActive(false);globe.SetRegionalPreviewVisible(false);
         }
         public bool SelectDong(string code)
         {
             if(!IsVisible || selectedLevel==0)return false;
             var area=data.areas.FirstOrDefault(a=>a.level==1&&a.code==code&&hierarchy.IsChild(a.code,selectedDistrict));
             if(area==null)return false;
-            if(!HasStationPreview(code)){SelectionMessage=area.name+" · 디오라마 준비 중";return false;}
-            SelectionMessage=area.name+" · 사가정 역세권 일부 보기 (동 전체 재현 아님)";
-            if(OpenPreparedDiorama())return true;
-            SelectionMessage=area.name+" · 사가정 모듈을 열 수 없습니다. 지도를 유지합니다.";return false;
-        }
-        private bool OpenPreparedDiorama()
-        {
-            RestoreCamera();
-            if(!globe.OpenRegionalDiorama()){BeginObservation();return false;}
-            IsVisible=false;root.SetActive(false);waitingReturn=true;return true;
+            SelectionMessage = HasStationPreview(code)
+                ? area.name + " · 사가정역 위치 · 동네 경영은 홍달 경영 시뮬레이션에서 진행합니다."
+                : area.name + " · 행정 경계";
+            return true;
         }
         void Update()
         {
-            if(waitingReturn && !globe.IsDioramaTransitioning && globe.IsGlobeVisible)
-            {waitingReturn=false;BeginObservation();RefreshDongs();}
             if(!IsVisible || mapCamera==null)return;
             foreach(var line in contextLines)line.widthMultiplier=Mathf.Max(.00004f,targetSize*KmScale*.006f);
             if(terrainRoot!=null)terrainRoot.SetActive(IsVisible&&selectedLevel<0&&targetSize<=120);
@@ -426,7 +413,6 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             var mouse=Mouse.current;if(mouse==null)return;
             var position=mouse.position.ReadValue();if(position.y>Screen.height-110||position.y<50)return;
             var scroll=mouse.scroll.ReadValue().y/120f;
-            if(scroll>0 && targetSize<=.85f){if(selectedLevel==2)EnterDiorama();return;}
             float maximum=selectedLevel<0?500:24;
             if(scroll<0 && targetSize>=maximum){ReturnGlobe();return;}
             // 확대만으로 중랑구를 임의 선택하지 않는다. 사용자가 선택한 지역의 자료만 연다.
@@ -435,7 +421,7 @@ namespace Ssalddel.Unity.Presentation.WorldMap
         void OnGUI()
         {
             if(data==null)return;
-            if(!IsVisible){if(!waitingReturn && CanEnterFromGlobe && globe.CameraDistance<=35 && GUI.Button(new Rect(18,76,190,40),"행정 권역 확대"))ShowOverview();return;}
+            if(!IsVisible){if(CanEnterFromGlobe && globe.CameraDistance<=35 && GUI.Button(new Rect(18,76,190,40),"행정 권역 확대"))ShowOverview();return;}
             if(selectedLevel<0)
             {
                 if(GUI.Button(new Rect(18,18,100,34),"지구본"))ReturnGlobe();
@@ -466,8 +452,7 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             if(GUI.Button(new Rect(140,22,90,32),"서울"))ShowLevel(0);
             if(ContextAreaCount>0&&GUI.Button(new Rect(580,22,100,32),"수도권으로"))ShowContext(true);
             if(GUI.Button(new Rect(240,22,90,32),"중랑구"))ShowLevel(1);
-            if(GUI.Button(new Rect(340,22,100,32),"사가정"))ShowLevel(2);
-            if(selectedLevel==2 && GUI.Button(new Rect(450,22,110,32),"디오라마 진입"))EnterDiorama();
+            if(GUI.Button(new Rect(340,22,100,32),"사가정역 위치"))ShowLevel(2);
             var prepared=hierarchy.Children(null).Where(a=>hierarchy.HasChildren(a.Id)).ToArray();
             for(int i=0;i<prepared.Length;i++)if(GUI.Button(new Rect(20+i*110,65,100,32),prepared[i].Name))ShowDistrict(prepared[i].Id);
             GUI.Label(new Rect(20,Screen.height-42,900,32),Stage+" · "+data.sourceDate+" 참고 경계 · "+data.attribution+" · 휠 확대/축소");
@@ -481,7 +466,7 @@ namespace Ssalddel.Unity.Presentation.WorldMap
                     var rect=new Rect(p.x-35,Screen.height-p.y,105,24);
                     if(labelRects.Any(r=>r.Overlaps(rect)))continue;
                     labelRects.Add(new Rect(rect.x-3,rect.y-3,rect.width+6,rect.height+6));
-                    if(area.level==1){if(GUI.Button(rect,area.name+(HasStationPreview(area.code)?" ↗":"")))SelectDong(area.code);}
+                    if(area.level==1){if(GUI.Button(rect,area.name))SelectDong(area.code);}
                     else if(GUI.Button(rect,area.name))ShowDistrict(area.code);
                 }
             }
@@ -511,7 +496,7 @@ namespace Ssalddel.Unity.Presentation.WorldMap
             if(selectedLevel==2){var station=mapCamera.WorldToScreenPoint(curved?surface.TransformPoint(focus):Offset);
             GUI.Label(new Rect(station.x-45,Screen.height-station.y-24,130,28),"● 사가정역");}
         }
-        void Clear(){RestoreCamera();if(root!=null)DestroyImmediate(root);foreach(var obj in owned)if(obj!=null)DestroyImmediate(obj);owned.Clear();coarseLand=null;originalLand=null;trimmedLand=null;terrainRoot=null;riverLines.Clear();terrainInspection=false;dongRoots.Clear();districtRoots.Clear();boundaryColliders.Clear();contextLines.Clear();IsVisible=false;waitingReturn=false;}
+        void Clear(){RestoreCamera();if(root!=null)DestroyImmediate(root);foreach(var obj in owned)if(obj!=null)DestroyImmediate(obj);owned.Clear();coarseLand=null;originalLand=null;trimmedLand=null;terrainRoot=null;riverLines.Clear();terrainInspection=false;dongRoots.Clear();districtRoots.Clear();boundaryColliders.Clear();contextLines.Clear();IsVisible=false;}
         void OnDestroy(){if(IsVisible&&globe!=null)globe.SetRegionalPreviewVisible(false);Clear();}
     }
 }

@@ -16,6 +16,24 @@ namespace Ssalddel.Unity.Tests.EditMode
 {
     public sealed class 사가정음식생활관찰UiTests
     {
+        [TestCase(false)]
+        [TestCase(true)]
+        public void 퇴역한_사가정_진입은_저장소를_열기_전에_중단한다(bool 예전실행기)
+        {
+            const string flag = "SSALDDEL_SAGAJEONG_FOOD_LIFE";
+            var previous = Environment.GetEnvironmentVariable(flag);
+            var folder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            try
+            {
+                Environment.SetEnvironmentVariable(flag, 예전실행기 ? "1" : null);
+                var profile = 예전실행기 ? Nature생존LaunchProfile.PlayableDefault : Nature생존LaunchProfile.SagajeongFoodLife;
+                var error = Assert.Throws<InvalidOperationException>(() => SimulationWorldLocalRuntimeScope.Install(profile, folder));
+                Assert.That(error.Message, Is.EqualTo("SagajeongFoodLifeRetired"));
+                Assert.That(Directory.Exists(folder), Is.False);
+            }
+            finally { Environment.SetEnvironmentVariable(flag, previous); }
+        }
+
         [Test]
         public void 관찰모드는_정책진입을거부하고_역사설명과명시추적만제공한다()
         {

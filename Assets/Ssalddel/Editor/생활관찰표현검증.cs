@@ -276,7 +276,7 @@ namespace Ssalddel.Unity.Editor
             // 상태 플래그만 바꾸면 depth 1000의 지구본 카메라가 Game View를 계속 덮습니다.
             // 기존 공식 전환이 카메라·Canvas·관찰 계층을 함께 전환하도록 요청합니다.
             globe = SceneComponents<세계지구본View>().Single();
-            Require(globe.OpenRegionalDiorama(), "LivingObservationOfficialDioramaTransitionRejected");
+            Require(globe.OpenSagajeongForEditorVerification(), "LivingObservationVerificationDioramaUnavailable");
             SetPhase(15);
         }
 

@@ -109,7 +109,6 @@ namespace Ssalddel.WindowsGame.Editor
             new GameObject("Hongdal Windows").AddComponent<SagajeongDispatchView>();
             var path = folder + "/HongdalWindows.unity";
             EditorSceneManager.SaveScene(scene, path);
-            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(path, true) };
             return path;
         }
 

@@ -100,6 +100,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         public static SimulationWorldLocalRuntimeScope Install(
             Nature생존LaunchProfile launchProfile, string? savesRootPath)
         {
+            if (launchProfile == Nature생존LaunchProfile.SagajeongFoodLife || SagajeongFoodLifeRequested)
+                throw new InvalidOperationException("SagajeongFoodLifeRetired");
             if (BusinessServerObserverRequested) throw new InvalidOperationException("BusinessServerObserverLocalRuntimeForbidden");
             lock (Gate)
             {

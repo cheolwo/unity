@@ -16,18 +16,6 @@ namespace Ssalddel.Unity.EditorTools
                 ?? throw new InvalidOperationException("DioramaMissing");
         }
 
-        [MenuItem("Ssalddel/통합 월드/운영 관찰/사가정 전체 보기")]
-        public static void Whole() { View().Show(true); View().ShowWhole(); }
-
-        [MenuItem("Ssalddel/통합 월드/운영 관찰/사가정 첫 업무 선택")]
-        public static void Focus()
-        {
-            var view=View();
-            var item=view.GetComponent<운영관찰WorldView>().Objects.FirstOrDefault()
-                ?? throw new InvalidOperationException("ObservationObjectsMissing");
-            view.Focus(item);
-        }
-
         [MenuItem("Ssalddel/통합 월드/운영 관찰/사가정 Runtime 검증")]
         public static void Validate()
         {
