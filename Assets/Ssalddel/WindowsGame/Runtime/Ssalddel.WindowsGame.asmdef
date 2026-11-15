@@ -1,0 +1,17 @@
+{
+    "name": "Ssalddel.WindowsGame",
+    "rootNamespace": "Ssalddel.WindowsGame",
+    "references": [
+        "Ssalddel.Sagajeong.Core",
+        "Ssalddel.WindowsGame.Kernel"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
