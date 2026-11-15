@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- 행정동 모듈 디오라마(r54 첫 조각, 2026-11-13)의 순수 검사. Unity 빌드의 kernel-checks.txt에도 같은 검사가 붙는다. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="../../Runtime/행정동모듈Policy.cs" Link="행정동모듈Policy.cs" />
+    <Compile Include="../../Runtime/디오라마시점.cs" Link="디오라마시점.cs" />
+    <Compile Include="../../Runtime/관리건물Policy.cs" Link="관리건물Policy.cs" />
+    <Compile Include="../../Runtime/역중심Policy.cs" Link="역중심Policy.cs" />
+    <Compile Include="../../Runtime/행정동모듈Checks.cs" Link="행정동모듈Checks.cs" />
+    <Compile Include="../../Runtime/결정순회Policy.cs" Link="결정순회Policy.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#141f29}canvas{display:block}</style></head><body><canvas id="c"></canvas>
+<!-- 구 지도 바탕 굽기 (bake_gu.js가 헤드리스 브라우저로 연다).
+     gu.js        차선·구 경계 (구지도-스크립트/prep.py)
+     roads.js     서울 밖의 길 (prep_gu_roads.py의 roads.json을 window.GU_ROADS로 감싼 것)
+     cover_shaded.png  토지피복에 산의 음영을 입힌 그림 (make_gu_packs.py의 --shade 단계)
+     쿼리: w = 그림의 가로 점 수, x0·y0·x1·y1 = 구울 범위(미터, 없으면 전체) -->
+<script src="gu.js"></script><script src="roads.js"></script><script>
+ const q = new URLSearchParams(location.search), G = window.GU, R = window.GU_ROADS || { outside: [] };
+ const x0 = +(q.get('x0') || 0), y0 = +(q.get('y0') || 0), x1 = +(q.get('x1') || G.w), y1 = +(q.get('y1') || G.h);
+ const W = +(q.get('w') || 4096), ppm = W / (x1 - x0), H = Math.round((y1 - y0) * ppm), cv = document.getElementById('c'); cv.width = W; cv.height = H;
+ const b = cv.getContext('2d'), X = x => (x - x0) * ppm, Y = y => (y1 - y) * ppm, k = W / 3600;
+ const seen = l => { let a = 1e9, c = -1e9, d = 1e9, e = -1e9; for (let i = 1; i < l.length; i += 2) { a = Math.min(a, l[i]); c = Math.max(c, l[i]); d = Math.min(d, l[i + 1]); e = Math.max(e, l[i + 1]); } return !(c < x0 - 50 || a > x1 + 50 || e < y0 - 50 || d > y1 + 50); };
+ const img = new Image(); img.onload = () => { b.fillStyle = '#141f29'; b.fillRect(0, 0, W, H); b.imageSmoothingQuality = 'high';
+   const sx = img.width / G.w, sy = img.height / G.h; b.drawImage(img, x0 * sx, (G.h - y1) * sy, (x1 - x0) * sx, (y1 - y0) * sy, 0, 0, W, H);
+   b.lineJoin = 'round'; b.lineCap = 'round';
+   // 서울 밖: 노드링크. 차로 수만큼 굵게.
+   for (const wide of [0, 1]) { for (const l of R.outside) { if ((l[0] >= 2) != wide || !seen(l)) continue; b.beginPath(); b.moveTo(X(l[1]), Y(l[2])); for (let i = 3; i < l.length; i += 2) b.lineTo(X(l[i]), Y(l[i + 1])); b.strokeStyle = wide ? 'rgba(248,234,196,0.55)' : 'rgba(206,222,234,0.34)'; b.lineWidth = Math.max((wide ? 1.5 : 1.15) * k, l[0] * 3.4 * ppm); b.stroke(); } }
+   // 서울 안: 차선 한 줄이 선 하나. 넓은 길일수록 저절로 굵고 밝다.
+   for (const major of [0, 1]) { b.beginPath(); for (const l of G.lanes) { if (l[0] !== major || !seen(l)) continue; b.moveTo(X(l[1]), Y(l[2])); for (let i = 3; i < l.length; i += 2) b.lineTo(X(l[i]), Y(l[i + 1])); } b.strokeStyle = major ? 'rgba(248,234,196,0.50)' : 'rgba(206,222,234,0.28)'; b.lineWidth = Math.max((major ? 1.5 : 1.15) * k, 3.4 * ppm * 1.15); b.stroke(); }
+   // 구 경계는 바탕에 옅게 구워 둔다. 내 영역의 구만 실행할 때 또렷하게 덧그린다.
+   for (const g of G.sigs) { b.beginPath(); for (const r of g.rings) { for (let i = 0; i < r.length; i += 2) i ? b.lineTo(X(r[i]), Y(r[i + 1])) : b.moveTo(X(r[i]), Y(r[i + 1])); b.closePath(); } b.strokeStyle = 'rgba(214,226,234,0.30)'; b.lineWidth = 1.6 * Math.max(k, 1.2); b.stroke(); }
+   window.SIZE = [W, H]; window.EXPORT = () => cv.toDataURL('image/png'); document.title = 'done'; }; img.src = 'cover_shaded.png';
+</script></body></html>

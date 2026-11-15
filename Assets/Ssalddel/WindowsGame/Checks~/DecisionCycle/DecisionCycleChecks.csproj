@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- 결정 순회 뼈대(2026-11-13)의 순수 검사. Unity 빌드의 kernel-checks.txt에도 같은 검사가 붙는다. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="../../Runtime/결정순회Policy.cs" Link="결정순회Policy.cs" />
+    <Compile Include="../../Runtime/결정순회Checks.cs" Link="결정순회Checks.cs" />
+  </ItemGroup>
+</Project>
