@@ -319,6 +319,16 @@ namespace Ssalddel.WindowsGame
             public int soakAutopilotAssigns;      //   맡김의 배차
             public int soakMindBrokenMost;        //   무념이 깨진 기사(가장 많을 때)
             public int soakWaitingNow;            //   끝에서 기다리는 주문
+            public bool nationShown;              // 전국 지도 촬영(관찰용, 실패 판정 밖): 시설 빛 시안의 바탕 (SagajeongDispatchNationProof.cs)
+            public float nationFieldX;
+            public float nationFieldY;
+            public float nationOriginX;           //   처음 보기의 세계 → 화면 맞춤
+            public float nationOriginY;
+            public float nationScale;
+            public float nationZoomOriginX;       //   수도권 확대
+            public float nationZoomOriginY;
+            public float nationZoomScale;
+            public bool nationBack;               //   동네 지도로 돌아왔나
             public bool workSummaryDrawn;         //   업무 요약을 그렸나
             public int iconCount;                 // 그1: 읽어 들인 아이콘 수(29)
             public int iconAtlasWidth;            // 아이콘 그림의 크기(512 × 256)
@@ -471,6 +481,7 @@ namespace Ssalddel.WindowsGame
             yield return ViewProofPlace(directory, receipt);         // 홍달 플레이스 주문자 뷰 (SagajeongDispatchPlace.cs)
             yield return ViewProofRiderPhone(directory, receipt);    // 홍달 기사 휴대폰 재연 (SagajeongDispatchRiderPhone.cs)
             yield return ViewProofSoak(directory, receipt);          // 생명주기 확인: 맡김으로 사흘 (SagajeongDispatchSoakProof.cs, 관찰용)
+            yield return ViewProofNationLights(directory, receipt);  // 전국 지도 촬영: 시설 빛 시안의 바탕 (SagajeongDispatchNationProof.cs, 관찰용)
 
             // 기본 방향에서의 비율을 기준으로, 다른 방향에서도 옥상 가운데가 같은 건물로 골라지는지 본다.
             var first = receipt.shots[0];
