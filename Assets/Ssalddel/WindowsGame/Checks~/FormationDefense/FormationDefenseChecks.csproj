@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <Compile Include="Program.cs" />
+    <Compile Include="../../Kernel/진형방어*.cs" Link="%(Filename)%(Extension)" />
+    <Compile Include="../../Kernel/GameKernel.cs" Link="GameKernel.cs" />
+    <Compile Include="../../Kernel/KernelContracts.cs" Link="KernelContracts.cs" />
+    <Compile Include="../../Kernel/KernelSignals.cs" Link="KernelSignals.cs" />
+  </ItemGroup>
+</Project>
