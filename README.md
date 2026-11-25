@@ -11,13 +11,13 @@
 
 ## 휴대폰에서 바로 해 보기 (안드로이드)
 
-[**안드로이드 시험판 0.2.0 내려받기 (APK, 약 112 MB)**](https://github.com/cheolwo/unity/releases/download/hongdal-android-v0.2.0/hongdal-0.2.0.apk) · [릴리스 안내 페이지](https://github.com/cheolwo/unity/releases/tag/hongdal-android-v0.2.0)
+[**안드로이드 시험판 내려받기 (최신판 APK, 약 117 MB)**](https://github.com/cheolwo/unity/releases/latest/download/hongdal-android.apk) · [릴리스 안내 페이지](https://github.com/cheolwo/unity/releases/latest)
 
 1. 휴대폰에서 위 링크를 눌러 APK를 받습니다.
 2. 받은 파일을 열고 「출처를 알 수 없는 앱」 설치를 허용한 뒤 설치합니다. Play 프로텍트 경고가 뜨면 「그래도 설치」를 누릅니다(스토어를 거치지 않은 앱이라 뜨는 경고입니다).
 3. 해 보시고 이상한 곳이나 바라는 점은 [Issues](https://github.com/cheolwo/unity/issues)에 남겨 주세요.
 
-안드로이드 64비트 휴대폰 · 세로 화면용 시험판입니다. 지도와 생활 자료의 출처 · 라이선스는 게임 안 지도 아래 「출처 전체」에서 볼 수 있습니다.
+안드로이드 8.0 이상 64비트 휴대폰 · 세로 화면용 무료 시험판입니다. 인터넷 권한이 없어 아무 정보도 밖으로 보내지 않습니다. 지도와 생활 자료의 출처 · 라이선스는 게임 안 지도 아래 「출처 전체」에서 볼 수 있습니다.
 
 ## 어떤 게임인가요?
 
