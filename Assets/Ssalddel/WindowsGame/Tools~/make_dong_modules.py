@@ -14,7 +14,7 @@
 표현값(측정값 아님): 도로 폭과 자리(노드링크는 폭을 주지 않는다. 건물 사이에 맞춰 깐다), 14 m 위 높이 압축, 용도별 색, 빛 방향.
 높이: 원본 높이(상징 높이가 아닐 때) → 지상 층수×3 m → 상징 높이 4 m 순서. 어느 것을 썼는지 색인에 남긴다.
 
-사용: python3 -I make_dong_modules.py <scope-manifest.json> <modules-dir> <codes,...> <osm-index.json> <roles.json> <out-dir> <report.json> [<생태현황도 zip> [<횡단보도 xlsx>]]
+사용: python3 -I make_dong_modules.py <scope-manifest.json> <modules-dir> <codes,...> <osm-index.json> <roles.json> <out-dir> <report.json> [<생태현황도 zip> [<횡단보도 xlsx> [<차선 폭 json> [<차선 묶음 json> [measure-only]]]]]
 
 구성 (3D 기반 B1, 2026-11-14): 한 동을 굽는 일이 확인(verify_module) · 좌표(Points) · 바닥(bake_ground) · 건물(bake_buildings) ·
 도로(bake_roads) · 쓰기(write_module)로 나뉜다. 골목을 그리거나(B3), 건물 외곽을 들이는(B4) 일은 이 함수들을 하나씩 바꾸는 일이다.
@@ -50,6 +50,27 @@
   * 자리는 자료(OA-23081, EPSG:5186로 보고 옮김), 줄무늬 · 점자블록 모양 · 보도 범위는 표현 · 계산이다. 대각선 · 차도 현을 못 찾은 곳은 세어 둔다.
   * 이 계산에는 openpyxl이 더 필요하다.
 
+다른 서울 동(지도 자료 적용 S1, 2026-11-16): make_dong_inputs.py가 Codex 서울 입력(GIS건물통합정보 2026-11-09 · 행정동 편집 후보 2026-10-01 ·
+노드링크)에서 같은 형식의 범위 명세와 동 모듈을 만든다. 이 도구는 그대로 읽는다. 범위 명세에 buildingSource · buildingSourceDate가 있으면
+건물 색인의 원천 · 기준일로 쓴다(없으면 전과 같다). 면목 묶음과 따로 굽고(띄워 보기 자리가 섞이지 않게), 역할표는 빈 표를 준다.
+
+차선 폭 · 자리 (공통 지도 정밀화 W4, 2026-11-16): 열째 인자 링크별 차로 수 · 잰 폭(map-ledger의 seoul-link-lane-width.json),
+열한째 인자 링크별 차선 묶음 자리(scope-link-lane-band.json, '-'이면 없음)를 주면 노드링크 선마다 차도를 차선에 맞춰 깐다.
+  * 알게 된 것: 서울 판 노드링크는 방향마다 따로 그은 선이 실제 길에서 몇 m씩 비켜 있다(반대 방향 선끼리 흔히 12 m 안팎,
+    차선 묶음 가운데가 선에서 가운데값 5.9 m). 선을 가운데로 놓고 폭만 바꾸면 차도가 차선과 어긋난다.
+  * 묶음이 있는 링크(범위 59%): 차도 = [묶음 lo − 0.5 m, 묶음 hi + 0.5 m](선의 왼쪽이 +). 0.5 m는 바깥 차선 밖 길어깨(표현).
+    묶음 폭이 차로 수 × 2 × 2.8 m보다 좁으면(가운데 겹선만 잡힌 경우 등) 묶음 가운데를 두고 그 폭까지 넓힌다.
+  * 묶음이 없고 차로 수만 있는 링크: 차도 폭 = 차로 수 표(서울 차선에서 얻은 양방향 폭 가운데값).
+    16 m 안에 막히지 않은 짝 줄(반대 방향 선)이 있으면 두 선의 가운데에, 없으면 선을 가운데로 깐다.
+  * 연석은 차도 양쪽에 붙인다. 차도 + 연석은 건물이 없는 조각 안으로 자른다(건물을 덮지 않는 것은 그대로).
+    차도에서 건물까지 남는 곳은 거리 층이 보도로 칠한다(6 m 안).
+  * 차로 수가 없는 링크 · 파일을 주지 않으면 전과 같다(선 양쪽 4 m를 건물 사이에 맞춤).
+  * 차선을 쓸 때만 바뀌는 둘레: 차도 + 연석에서 6 m(보도 띠) 안에는 골목 선을 긋지 않는다(넓던 차도 밑에 숨어 있던
+    길가 골목 선이 보도 위로 드러나지 않게). 그래서 골목 끝을 큰길에 잇는 거리를 14 → 20 m로 늘린다.
+    길 그래프는 줄인 꺾은선이 건물을 지나면 차도 가운데 점을 모두 쓰고, 그래도 지나는 한 칸은 잇지 않는다.
+  * 마지막 인자 measure-only: 폭을 바꾸지 않고, 그린 차도 폭과 잰 폭의 차이만 보고서에 적는다(전후 비교용).
+  * 차선 파일은 2021년 것이고, 잰 폭은 칠한 선 사이라 칠하지 않은 길어깨 · 주차면은 빠진다(map-ledger 영수증).
+
 도로 맞춤 (3D 기반 B2, 2026-11-14): 도로는 모든 동의 건물을 다 세운 뒤에 깐다(prepare_module → fit_roads → finish_module).
 경계의 길은 건너편 동의 건물과 닿고, 큰길의 두 방향 줄은 경계를 사이에 두고 서로 다른 동에 들어 있기 때문이다.
 그래서 동 하나만 구워도 되지만, 이웃 동을 함께 구워야 경계의 길이 이웃 건물을 피한다. 필요한 것은 넘파이뿐이다.
@@ -60,6 +81,15 @@ import numpy as np
 SCOPE, MODULES, CODES, OSM_INDEX, ROLES, OUT, REPORT = sys.argv[1:8]
 BIOTOPE = sys.argv[8] if len(sys.argv) > 8 else None
 CROSSINGS = sys.argv[9] if len(sys.argv) > 9 else None
+LANE_WIDTHS = sys.argv[10] if len(sys.argv) > 10 else None
+LANE_BANDS = sys.argv[11] if len(sys.argv) > 11 and sys.argv[11] != '-' else None
+LANE_APPLY = LANE_WIDTHS is not None and not (len(sys.argv) > 12 and sys.argv[12] == 'measure-only')
+# 열넷째 인자(2026-11-17): 주소 자료 덧입힘(make_juso_extras.py가 PC 안에서 동별로 잘라 게임 좌표로 옮긴 것). 없으면 예전과 바이트까지 같다
+EXTRAS_PATH = sys.argv[13] if len(sys.argv) > 13 and sys.argv[13] != '-' else None
+import gzip
+EXTRAS = json.load(gzip.open(EXTRAS_PATH, 'rt', encoding='utf-8')) if EXTRAS_PATH else None
+ENTRANCE_SNAP = 3.0                   # 출입구 점에서 이 거리 안의 건물 테두리에만 붙인다(주소 건물과 굽기 건물의 테두리 차이)
+ENTRANCE_ID_REACH = 25.0              # 건물관리번호로 이은 출입구(대문 등)는 그 건물에서 이 거리 안일 때만 쓴다
 CODES = [c.strip() for c in CODES.split(',') if c.strip()]
 M_LAT = 111200.0
 A, F = 6378137.0, 1 / 298.257223563
@@ -288,6 +318,43 @@ MATE_COS = math.cos(math.radians(30.0))
 ROAD_WINDOW = max(MATE_REACH, 2 * (ROAD_HALF + KERB)) + 1.0
 FAN_STEP = math.radians(22.5)
 GRID = 24.0
+LANE_W_DEFAULT = 3.52                  # 서울 차선으로 잰 차로당 폭의 가운데값(map-ledger-20261116-r1)
+ROAD_TOTAL_BY_LANES = {1: 7.56, 2: 13.77, 3: 20.49, 4: 26.52, 5: 30.51}     # 한 방향 차로 수 → 양방향 폭(가운데값)
+LANE_EDGE = 0.5                        # 바깥 차선 밖 길어깨(표현)
+LANE_MIN_W = 2.8                       # 묶음이 이보다 좁으면(차로당) 넓힌다
+PAIR_REACH = 16.0                      # 이 안의 막히지 않은 짝 줄은 반대 방향 선으로 보고 두 선 가운데에 깐다
+LANE_TABLE, LANE_BAND = {}, {}
+if LANE_WIDTHS:
+    LANE_TABLE = json.load(open(LANE_WIDTHS, encoding='utf-8'))
+if LANE_BANDS:
+    LANE_BAND = json.load(open(LANE_BANDS, encoding='utf-8'))
+
+
+def lane_halves(link):
+    """링크의 (fit_slab에 줄 차선 정보 또는 None, 막다른 끝 부채의 반폭, 근거).
+    차선 정보: {'band': (lo, hi, 방향) 또는 None, 'total': 묶음이 없을 때 차도 폭}. 차로 수가 없으면 None · 4 m(전과 같음)."""
+    v = LANE_TABLE.get(link)
+    if not v or not v.get('lanes'): return None, ROAD_HALF, 'none'
+    n = int(v['lanes']); b = LANE_BAND.get(link)
+    source = 'band' if b else 'lanes'
+    if not LANE_APPLY: return None, ROAD_HALF, source
+    total = ROAD_TOTAL_BY_LANES.get(n, 2 * n * LANE_W_DEFAULT)
+    band = None
+    if b:
+        lo, hi = b['lo'] - LANE_EDGE, b['hi'] + LANE_EDGE
+        least = 2 * n * LANE_MIN_W
+        if hi - lo < least: c = (lo + hi) / 2; lo, hi = c - least / 2, c + least / 2
+        band = (lo, hi, tuple(b['dir']))
+    half = (band[1] - band[0]) / 2 if band else total / 2
+    return {'band': band, 'total': total}, min(ROAD_WINDOW - KERB - 1.0, half), source
+
+
+def oriented(lane, u):
+    """선분 방향 u에 맞춰 묶음의 부호를 바꾼다(묶음은 링크 처음 → 끝 방향 기준)."""
+    if lane is None or lane['band'] is None: return lane
+    lo, hi, d = lane['band']
+    if u[0] * d[0] + u[1] * d[1] >= 0: return lane
+    return {'band': (-hi, -lo, d), 'total': lane['total']}
 
 
 class Obstacles:
@@ -393,7 +460,7 @@ def free_pieces(zone_lo, zone_hi):
     return pieces
 
 
-def fit_slab(free, mates, usual=None):
+def fit_slab(free, mates, usual=None, half=None):
     """한 칸의 가로 폭을 정한다. free: 건물이 없는 조각들, mates: 짝 줄 후보의 가로 자리들,
     usual: 이 링크에서 짝이 없는 쪽의 흔한 폭 (오른쪽, 왼쪽). 없으면 정한 폭으로 맞춰 본다(1차).
     돌려주는 값: (연석 낮은 쪽, 연석 높은 쪽, 차도 낮은 쪽, 차도 높은 쪽, 오른쪽에 나란한 줄이 있는가, 왼쪽에 있는가) 또는 None.
@@ -408,8 +475,11 @@ def fit_slab(free, mates, usual=None):
         side = 1 if t > 0 else 0
         beside[side] = True
         if paired(t): reach[side] = max(reach[side], abs(t))
-    want_lo = -(max(ROAD_HALF, reach[0]) + (0.0 if reach[0] else KERB))
-    want_hi = max(ROAD_HALF, reach[1]) + (0.0 if reach[1] else KERB)
+    if half is not None:
+        return lane_slab(free, half, reach, beside)
+    h_lo = h_hi = ROAD_HALF
+    want_lo = -(max(h_lo, reach[0]) + (0.0 if reach[0] else KERB))
+    want_hi = max(h_hi, reach[1]) + (0.0 if reach[1] else KERB)
     if usual is not None:
         if not beside[0] and usual[0] is not None: want_lo = max(want_lo, -usual[0])
         if not beside[1] and usual[1] is not None: want_hi = min(want_hi, usual[1])
@@ -430,6 +500,29 @@ def fit_slab(free, mates, usual=None):
     kerb_lo = kerb if (not reach[0] or cut_lo) else 0.0
     kerb_hi = kerb if (not reach[1] or cut_hi) else 0.0
     return lo, hi, lo + kerb_lo, hi - kerb_hi, beside[0], beside[1]
+
+
+def lane_slab(free, lane, reach, beside):
+    """차선(W4)으로 한 칸의 차도를 정한다. 묶음이 있으면 그 자리, 없으면 짝 줄 가운데(16 m 안) 또는 선 가운데에 차로 수 표의 폭.
+    연석은 양쪽에 붙이고, 건물이 없는 조각 안으로 자른다. 돌려주는 값은 fit_slab과 같다."""
+    if lane['band'] is not None:
+        road_lo, road_hi = lane['band'][0], lane['band'][1]
+    else:
+        c = 0.0
+        near = [r for r in (-reach[0], reach[1]) if r and abs(r) <= PAIR_REACH]
+        if len(near) == 1: c = near[0] / 2
+        road_lo, road_hi = c - lane['total'] / 2, c + lane['total'] / 2
+    want_lo, want_hi = road_lo - KERB, road_hi + KERB
+    best, best_overlap = None, 0.0
+    for lo, hi in free:
+        overlap = min(hi, want_hi) - max(lo, want_lo)
+        if overlap > best_overlap + 1e-9: best, best_overlap = (lo, hi), overlap
+    if best is None or best_overlap < ROAD_MIN: return None
+    lo, hi = max(want_lo, best[0]), min(want_hi, best[1])
+    width = hi - lo
+    if width < ROAD_MIN: return None
+    kerb = min(KERB, 0.25 * width)
+    return lo, hi, lo + kerb, hi - kerb, beside[0], beside[1]
 
 
 def fit_segment(a, b_, others, obstacles):
@@ -540,13 +633,16 @@ def fit_roads(segs_by_module, links_by_module, obstacles):
     stats = {'slabs': 0, 'empty': 0, 'merged': 0, 'narrowed': 0, 'fans': 0, 'fansDropped': 0}
     # 1차: 선분마다 빈 조각과 짝을 찾고, 정한 폭으로 맞춰 본다. 링크마다 짝이 없는 쪽의 폭을 모은다
     found, seen, count = [], {}, {}
+    halves = {link: lane_halves(link) for _, _, _, link in flat}
+    stats['lanes'] = collections.Counter(h[2] for h in halves.values())
     for index, (m, a, b_, link) in enumerate(flat):
         rest = np.ones(len(flat), dtype=bool); rest[index] = False
         fitted = fit_segment(a, b_, (o1[rest], o2[rest]), obstacles)
         found.append(fitted)
         if fitted is None: continue
+        lane = oriented(halves[link][0], fitted[3])
         for free, mates in zip(fitted[1], fitted[2]):
-            slab = fit_slab(free, mates) if free else None
+            slab = fit_slab(free, mates, None, lane) if free else None
             if slab is None: continue
             count[link] = count.get(link, 0) + 1
             if not slab[4]: seen.setdefault((link, 0), []).append(-slab[0])
@@ -558,7 +654,8 @@ def fit_roads(segs_by_module, links_by_module, obstacles):
         if fitted is None: continue
         bounds, frees, mates, u, n = fitted
         limit = (usual.get((link, 0)), usual.get((link, 1)))
-        slabs = [fit_slab(free, mate, limit) if free else None for free, mate in zip(frees, mates)]
+        lane = oriented(halves[link][0], u)
+        slabs = [fit_slab(free, mate, limit, lane) if free else None for free, mate in zip(frees, mates)]
         origin = np.array(a, dtype=float)
         stats['slabs'] += len(slabs); stats['empty'] += sum(s is None for s in slabs)
         stats['merged'] += sum(s is not None and (s[1] - s[0]) > 2 * (ROAD_HALF + KERB) + 1e-6 for s in slabs)
@@ -586,7 +683,7 @@ def fit_roads(segs_by_module, links_by_module, obstacles):
             away = u if at_start else -u
             left = (slab[1], slab[3]) if at_start else (-slab[0], -slab[2])
             right = (-slab[0], -slab[2]) if at_start else (slab[1], slab[3])
-            ends.setdefault((round(point[0], 2), round(point[1], 2)), []).append((math.atan2(away[1], away[0]), m, left, right, point))
+            ends.setdefault((round(point[0], 2), round(point[1], 2)), []).append((math.atan2(away[1], away[0]), m, left, right, point, halves[link][1]))
     # 꺾이는 마디의 바깥쪽 쐐기와 막다른 끝을 부채꼴로 메운다. 건물에 닿는 부채 조각은 버린다
     for key in sorted(ends):
         group = sorted(ends[key], key=lambda e: e[0])
@@ -601,7 +698,7 @@ def fit_roads(segs_by_module, links_by_module, obstacles):
             centre = np.array(first[4], dtype=float)
             for layer in (0, 1):
                 r0, r1 = first[2][layer], second[3][layer]
-                if dead_end: r0, r1 = min(r0, ROAD_HALF + (KERB if layer == 0 else 0.0)), min(r1, ROAD_HALF + (KERB if layer == 0 else 0.0))
+                if dead_end: r0, r1 = min(r0, first[5] + (KERB if layer == 0 else 0.0)), min(r1, first[5] + (KERB if layer == 0 else 0.0))
                 if max(r0, r1) < 0.05: continue
                 rim = []
                 for j in range(steps + 1):
@@ -615,6 +712,62 @@ def fit_roads(segs_by_module, links_by_module, obstacles):
                     if obstacles.hits(tri, ROAD_GAP): stats['fansDropped'] += 1; continue
                     out[first[1]][layer].append(tri); stats['fans'] += 1
     return out, stats, tracks
+
+
+def drawn_vs_measured(fitted, prepared, cell=0.5):
+    """확인(W4): 그린 차도(모든 동의 차도 조각 합)의 폭을 링크 선분마다 10 m 간격의 가로선으로 재어, 링크 가운데값을 잰 폭(차선)과 견준다.
+    차선 폭 파일이 있을 때만 쓴다. 전후 비교를 위해 measure-only로도 돈다."""
+    from PIL import Image, ImageDraw
+    pieces = [piece for pair in fitted for piece in pair[1]]
+    if not pieces: return {}
+    allp = np.concatenate([np.asarray(q, dtype=float) for q in pieces])
+    x0, z0 = allp.min(0) - 2; x1, z1 = allp.max(0) + 2
+    W, H = int((x1 - x0) / cell) + 1, int((z1 - z0) / cell) + 1
+    img = Image.new('1', (W, H), 0); d = ImageDraw.Draw(img)
+    for q in pieces: d.polygon([((x - x0) / cell, (z - z0) / cell) for x, z in q], fill=1)
+    grid = np.asarray(img, dtype=bool)
+    def width_at(p, n):
+        def run(sign):
+            k = 0
+            while k < 80:
+                q = p + n * sign * (k + 1) * cell
+                c, r = int((q[0] - x0) / cell), int((q[1] - z0) / cell)
+                if not (0 <= r < H and 0 <= c < W and grid[r, c]): break
+                k += 1
+            return k * cell
+        c, r = int((p[0] - x0) / cell), int((p[1] - z0) / cell)
+        if not (0 <= r < H and 0 <= c < W and grid[r, c]): return None
+        return run(1) + run(-1) + cell
+    per_link = {}
+    for pr in prepared:
+        for (a, b_), link in zip(pr['segs'], pr['links']):
+            a, b_ = np.array(a, dtype=float), np.array(b_, dtype=float)
+            L = float(np.hypot(*(b_ - a)))
+            if L < 12: continue
+            u = (b_ - a) / L; n = np.array([-u[1], u[0]])
+            for t in np.arange(6.0, L - 6.0 + 1e-6, 10.0):
+                w = width_at(a + u * t, n)
+                if w is not None: per_link.setdefault(link, []).append(w)
+    rows, by_lanes = [], {}
+    for link, ws in per_link.items():
+        v = LANE_TABLE.get(link)
+        if not v or not v.get('lanes'): continue
+        n_ = int(v['lanes']); b = LANE_BAND.get(link)
+        band_w = max(b['hi'] - b['lo'] + 2 * LANE_EDGE, 2 * n_ * LANE_MIN_W) if b else None
+        target = band_w or ROAD_TOTAL_BY_LANES.get(n_)
+        if target: by_lanes.setdefault(n_, []).append((float(np.median(ws)), target))
+        if band_w: rows.append((float(np.median(ws)), band_w))
+    if not rows: return {'drawnLinks': len(per_link)}
+    drawn = np.array([r[0] for r in rows]); meas = np.array([r[1] for r in rows])
+    lanes_part = {str(k): {'links': len(v), 'drawnMedian': round(float(np.median([a for a, _ in v])), 2),
+                           'targetMedian': round(float(np.median([b for _, b in v])), 2)} for k, v in sorted(by_lanes.items())}
+    return {'drawnLinks': len(per_link), 'comparedLinks': len(rows),
+            'drawnMedian': round(float(np.median(drawn)), 2), 'measuredMedian': round(float(np.median(meas)), 2),
+            'medianAbsErrorMetres': round(float(np.median(np.abs(drawn - meas))), 2),
+            'meanAbsErrorMetres': round(float(np.mean(np.abs(drawn - meas))), 2),
+            'within2mShare': round(float(np.mean(np.abs(drawn - meas) <= 2.0)), 3),
+            'byLanes': lanes_part,
+            'note': '그린 차도 = 모든 동의 차도 조각 합(연석 띠 제외). 견줄 폭 = 차선 묶음 폭 + 길어깨 2 × 0.5 m(묶음이 있는 링크). byLanes의 target = 그 폭, 없으면 차로 수 표'}
 
 
 def road_overlaps(pieces, obstacles, gap=0.0):
@@ -638,6 +791,7 @@ def road_overlaps(pieces, obstacles, gap=0.0):
 # 건물이 없는 땅을 0.5 m 격자에 그리고, 양쪽 건물에서 같은 거리에 있는 가운데 선을 찾는다. 폭이 3 m 이상인 통로만 남긴다.
 # 필요한 것: 넘파이, PIL, scipy, scikit-image.
 ALLEY_CELL = 0.5
+ALLEY_MAX_CELLS = 60_000_000           # 골목 격자 칸 수 한도. 넘는 큰 동(산 · 공원이 넓은 동)만 격자를 키운다(메모리, 2026-11-17 서울 전체 굽기)
 ALLEY_MIN = 1.5                        # 건물까지 이만큼 이상 떨어진 가운데 선만 쓴다(통로 폭 3 m 이상)
 ALLEY_NEAR = 14.0                      # 건물에서 이보다 먼 빈터는 골목이 아니다
 ALLEY_HALF = 1.6                       # 그리는 반폭의 위쪽 끝(폭 3.2 m)
@@ -648,6 +802,22 @@ ALLEY_BEND = 0.4                       # 가운데 선을 꺾은선으로 줄일
 C_ALLEY = 0x2A3B49
 
 
+COARSE_GRIDS = []                      # 격자를 키운 동(보고서에 남긴다)
+
+
+def grid_cell(width, height, cell, limit, layer, boundary):
+    """격자 칸 크기(m). 칸 수가 한도 안이면 cell 그대로(보통 동은 결과가 앞과 바이트까지 같다). 넘으면 칸을 키운다."""
+    def cells(c): return (math.ceil(width / c) + 1) * (math.ceil(height / c) + 1)
+    if cells(cell) <= limit: return cell
+    for factor in (1.5, 2.0, 3.0, 4.0, 6.0, 8.0, 12.0, 16.0):
+        if cells(cell * factor) <= limit: break
+    ring = np.asarray(boundary, dtype=float)
+    COARSE_GRIDS.append({'layer': layer, 'centre': [round(float(v), 1) for v in ring.mean(0)], 'baseMetres': cell,
+                         'cellMetres': cell * factor, 'cellsAtBase': cells(cell), 'cells': cells(cell * factor)})
+    print('coarse grid', COARSE_GRIDS[-1], flush=True)
+    return cell * factor
+
+
 def alley_lines(boundary, rings, road_pieces):
     """한 동의 골목 가운데 선. 돌려주는 값: 꺾은선 목록. 꺾은선의 점은 (x, z, 건물까지의 거리)."""
     from PIL import Image, ImageDraw
@@ -656,6 +826,7 @@ def alley_lines(boundary, rings, road_pieces):
     edge = np.array(boundary)
     x0, z0 = edge.min(0) - 40.0
     x1, z1 = edge.max(0) + 40.0
+    ALLEY_CELL = grid_cell(x1 - x0, z1 - z0, globals()['ALLEY_CELL'], ALLEY_MAX_CELLS, 'alley', boundary)
     W, H = int((x1 - x0) / ALLEY_CELL) + 1, int((z1 - z0) / ALLEY_CELL) + 1
     def mask(polys):
         image = Image.new('1', (W, H), 0)
@@ -669,6 +840,8 @@ def alley_lines(boundary, rings, road_pieces):
     apart = ndimage.distance_transform_edt(~built) * ALLEY_CELL          # 건물까지의 거리
     free = ~built & mask([boundary]) & (apart < ALLEY_NEAR)
     middle = medial_axis(free, rng=0) & (apart >= ALLEY_MIN)       # rng를 정해 두지 않으면 구울 때마다 가운데 선이 조금씩 달라진다 & ~ndimage.binary_dilation(mask(road_pieces), iterations=2)
+    if LANE_APPLY:                                                 # W4: 보도 띠 안의 길가 골목 선을 지운다
+        middle &= ndimage.distance_transform_edt(~mask(road_pieces)) * ALLEY_CELL > ALLEY_ROAD_CUT
     middle = skeletonize(middle)
     label, count = ndimage.label(middle, structure=np.ones((3, 3)))
     if count:
@@ -754,6 +927,8 @@ def alley_pieces(lines, obstacles):
 # 쓰는 곳: Resources/hongdal-dong-routes.bytes (HRTE v1). 모두 표현값이다.
 ROUTE_BEND = 0.3                       # 큰길 가운데 선을 꺾은선으로 줄일 때 허용하는 어긋남
 ROUTE_JOIN = 14.0                      # 골목의 막다른 끝을 이 거리 안의 큰길에 잇는다
+ROUTE_JOIN_LANE = 20.0                 # 차선을 쓸 때(W4): 보도 띠 밖에서 끝나는 골목을 잇는다
+ALLEY_ROAD_CUT = 6.0                   # 차선을 쓸 때(W4): 차도 + 연석에서 이 거리 안에는 골목 선을 긋지 않는다(보도 띠)
 ROUTE_DOOR = 30.0                      # 건물에서 이 거리 안에 길이 없으면 출입구를 잡지 않는다
 KIND_ROAD, KIND_ALLEY, KIND_LINK = 0, 1, 2
 
@@ -775,7 +950,37 @@ def clear_line(obstacles, p, q):
     return not obstacles.hits([tuple(p + side), tuple(q + side), tuple(q - side), tuple(p - side)])
 
 
-def build_routes(tracks, alley_segments, rings, obstacles):
+OFFICIAL_DOORS = set()                 # 공식 출입구로 문을 잡은 건물 번호(색인 순서와 같다)
+
+
+def point_in_ring(pt, ring):
+    x, z = float(pt[0]), float(pt[1]); r = np.asarray(ring, float); a, b = r, np.roll(r, -1, axis=0)
+    m = (a[:, 1] > z) != (b[:, 1] > z)
+    if not m.any(): return False
+    xi = (b[m, 0] - a[m, 0]) * (z - a[m, 1]) / (b[m, 1] - a[m, 1]) + a[m, 0]
+    return bool(np.count_nonzero(x < xi) % 2)
+
+
+def entrance_hints(rings, points):
+    """출입구 점(N×2)을 가장 가까운 건물 테두리(ENTRANCE_SNAP 안)에 붙인다. 돌려주는 값: 건물 번호 → 점 목록."""
+    hints, cells = {}, {}
+    boxes = [(np.asarray(r, float).min(0), np.asarray(r, float).max(0)) for r in rings]
+    for k, (lo, hi) in enumerate(boxes):
+        Obstacles._put(cells, np.floor((lo - ENTRANCE_SNAP) / GRID).astype(int), np.floor((hi + ENTRANCE_SNAP) / GRID).astype(int), k)
+    matched = 0
+    for p in points:
+        cand = cells.get((int(math.floor(p[0] / GRID)), int(math.floor(p[1] / GRID))), [])
+        best, bk = ENTRANCE_SNAP, -1
+        for k in cand:
+            r = np.asarray(rings[k], float)
+            d, _ = foot_on_segments(np.asarray([p], float), r, np.roll(r, -1, axis=0))
+            dk = float(d.min())
+            if dk <= best: best, bk = dk, k
+        if bk >= 0: hints.setdefault(bk, []).append((float(p[0]), float(p[1]))); matched += 1
+    return hints, matched
+
+
+def build_routes(tracks, alley_segments, rings, obstacles, hints=None):
     """돌려주는 값: 마디(N×2), 변(E×2), 변의 종류(E), 건물마다 (변 번호, 변 위 자리, 문 x, 문 z), 센 값."""
     nodes, where = [], {}
     def node(p):
@@ -791,8 +996,14 @@ def build_routes(tracks, alley_segments, rings, obstacles):
     for track in tracks:
         points = track['points']
         kept = bend_points([(p[0], p[1], 0.0) for p in points], ROUTE_BEND) if len(points) > 2 else list(range(len(points)))
-        ids = [node(points[k]) for k in kept]
-        for i, j in zip(ids, ids[1:]): edge(i, j, KIND_ROAD)
+        if LANE_APPLY:                          # W4: 차도 가운데가 묶음을 따라 옆으로 옮겨 다니므로, 건물을 지나는 변을 막는다
+            if not all(clear_line(obstacles, points[a], points[b]) for a, b in zip(kept, kept[1:])): kept = list(range(len(points)))
+            ids = [node(points[k]) for k in kept]
+            for (a, b), (i, j) in zip(zip(kept, kept[1:]), zip(ids, ids[1:])):
+                if clear_line(obstacles, nodes[i], nodes[j]): edge(i, j, KIND_ROAD)
+        else:
+            ids = [node(points[k]) for k in kept]
+            for i, j in zip(ids, ids[1:]): edge(i, j, KIND_ROAD)
         if track['start'] is not None: joins.setdefault(track['start'], []).append(ids[0])
         if track['end'] is not None: joins.setdefault(track['end'], []).append(ids[-1])
     for key in sorted(joins):
@@ -823,11 +1034,12 @@ def build_routes(tracks, alley_segments, rings, obstacles):
     splits, links, linked = {}, [], 0
     for i in np.nonzero(alley_node & (degree == 1))[0]:
         p = xy[i]
-        near = Obstacles._near(cells, p[0] - ROUTE_JOIN, p[1] - ROUTE_JOIN, p[0] + ROUTE_JOIN, p[1] + ROUTE_JOIN)
+        join = ROUTE_JOIN_LANE if LANE_APPLY else ROUTE_JOIN
+        near = Obstacles._near(cells, p[0] - join, p[1] - join, p[0] + join, p[1] + join)
         if not len(near): continue
         dist, t = foot_on_segments(p[None], ra[near], rb[near])
         k = int(np.argmin(dist[0]))
-        if dist[0, k] > ROUTE_JOIN or dist[0, k] < 1e-6: continue
+        if dist[0, k] > join or dist[0, k] < 1e-6: continue
         foot = ra[near[k]] + (rb[near[k]] - ra[near[k]]) * t[0, k]
         along = (foot - p) / dist[0, k]
         side = np.array([-along[1], along[0]]) * 0.3
@@ -865,12 +1077,29 @@ def build_routes(tracks, alley_segments, rings, obstacles):
     cells = {}
     lo = np.floor(np.minimum(xy[ea], xy[eb]) / GRID).astype(int); hi = np.floor(np.maximum(xy[ea], xy[eb]) / GRID).astype(int)
     for k in np.nonzero(in_main)[0]: Obstacles._put(cells, lo[k], hi[k], int(k))
-    doors, far = [], 0
-    for ring in rings:
+    doors, far, official, blocked = [], 0, 0, 0
+    for k_ring, ring in enumerate(rings):
         r = np.asarray(ring, dtype=float)
         near = Obstacles._near(cells, r[:, 0].min() - ROUTE_DOOR, r[:, 1].min() - ROUTE_DOOR, r[:, 0].max() + ROUTE_DOOR, r[:, 1].max() + ROUTE_DOOR)
         if not len(near): doors.append((-1, 0.0, 0.0, 0.0)); far += 1; continue
         a, b_ = xy[ea[near]], xy[eb[near]]
+        if hints and k_ring in hints:                                  # 공식 출입구(주소 자료): 그 점이 문이고, 건물을 지나지 않는 가장 가까운 길에 잇는다
+            hp = np.asarray(hints[k_ring], dtype=float)
+            dh, th = foot_on_segments(hp, a, b_)
+            placed = False
+            for flat in np.argsort(dh, axis=None)[:12]:
+                ip, ie = np.unravel_index(int(flat), dh.shape)
+                if float(dh[ip, ie]) > ROUTE_DOOR: break
+                p0 = hp[ip]; q0 = a[ie] + (b_[ie] - a[ie]) * th[ip, ie]; L = float(np.hypot(*(q0 - p0)))
+                if L < 1e-6:
+                    doors.append((int(near[ie]), float(th[ip, ie]), float(p0[0]), float(p0[1]))); official += 1; placed = True; OFFICIAL_DOORS.add(k_ring); break
+                u = (q0 - p0) / L; s = 0.0
+                while s < min(L, 8.0) and point_in_ring(p0 + u * s, r): s += 0.25   # 주소 건물과 굽기 건물의 테두리 차이: 제 건물을 벗어나는 자리를 문으로
+                door_p = p0 + u * s
+                if L - s < 0.3 or clear_line(obstacles, door_p + u * 0.3, q0):
+                    doors.append((int(near[ie]), float(th[ip, ie]), float(door_p[0]), float(door_p[1]))); official += 1; placed = True; OFFICIAL_DOORS.add(k_ring); break
+            if placed: continue
+            blocked += 1                                               # 막히면 가상 출입구로
         d1, t1 = foot_on_segments(r, a, b_)                                # 건물 모서리 → 길
         i1 = np.unravel_index(int(np.argmin(d1)), d1.shape)
         ends = np.concatenate([a, b_])                                     # 길의 끝점 → 건물 변
@@ -888,6 +1117,7 @@ def build_routes(tracks, alley_segments, rings, obstacles):
              'alleyMetres': round(float(length[np.array(kinds) == KIND_ALLEY].sum()), 1), 'linkMetres': round(float(length[np.array(kinds) == KIND_LINK].sum()), 1),
              'alleyEndsLinked': linked, 'pieces': len(totals), 'mainShare': round(totals[main] / float(length.sum()), 4),
              'buildings': len(rings), 'buildingsWithDoor': len(rings) - far,
+             **({'officialDoors': official, 'virtualDoors': len(rings) - far - official, 'officialBlocked': blocked} if hints is not None else {}),
              'edgesThroughBuildings': sum(0 if clear_line(obstacles, xy[i], xy[j]) else 1 for i, j in edges)}
     return xy, np.array(edges, dtype='<i4'), np.array(kinds, dtype='u1'), doors, stats
 
@@ -921,6 +1151,28 @@ def check(name, ok, detail=''):
     if not ok: print('CHECK FAILED', name, detail)
 
 def game_xz(lat, lon): return (lon - LON0) * M_LON, (lat - LAT0) * M_LAT
+
+
+if EXTRAS:   # 덧입힘(출입구 · 역)은 굽기 입력과 같은 ENU로 온다. 건물 · 길은 게임 좌표(위경도 근사)로 굽으므로 같은 좌표로 바꾼다.
+    # (2026-11-18 r2: r1은 ENU 그대로 써서 원점에서 멀수록 어긋났다. 양천 약 54 m · -31 m)
+    _ef = EXTRAS.get('coordinateFrame') or {}
+    assert _ef.get('method') == frame_def['method'] and _ef.get('originLatitude') == LAT0 and _ef.get('originLongitude') == LON0, _ef
+    def _extras_to_game(xy):
+        if not len(xy): return np.zeros((0, 2))
+        a_ = np.asarray(xy, dtype=float)[:, :2]; lat_, lon_, _ = frame.inv(a_[:, 0], a_[:, 1]); gx_, gz_ = game_xz(lat_, lon_)
+        return np.round(np.stack([gx_, gz_], 1), 2)
+    for _dd in EXTRAS['dongs'].values():
+        _dd['entrances'] = [tuple(q) for q in _extras_to_game(_dd.get('entrances', [])).tolist()]
+        _g = _extras_to_game([(s_['x'], s_['z']) for s_ in _dd.get('stations', [])])
+        for s_, q in zip(_dd.get('stations', []), _g.tolist()): s_['x'], s_['z'] = q
+        _g = _extras_to_game([e_[:2] for e_ in _dd.get('stationEntrances', [])])
+        _dd['stationEntrances'] = [[q[0], q[1], e_[2]] for e_, q in zip(_dd.get('stationEntrances', []), _g.tolist())]
+    _ids = [k_ for k_, v_ in (EXTRAS.get('doors') or {}).items() for _ in v_]
+    _g = _extras_to_game([q for v_ in (EXTRAS.get('doors') or {}).values() for q in v_])
+    _doors = {}
+    for k_, q in zip(_ids, _g.tolist()): _doors.setdefault(k_, []).append(tuple(q))
+    EXTRAS['doors'] = _doors
+    EXTRAS['coordinateFrame'] = dict(_ef, convertedTo='game-latlon-approx')
 
 modules_out, index_buildings, all_shapes = [], [], []
 union = [180.0, 90.0, -180.0, -90.0]   # west, south, east, north
@@ -995,6 +1247,11 @@ def bake_buildings(mesh, shadow, m, points, region):
                                 'road': '', 'number': '', 'postcode': '', 'dong': m['displayName'].split()[-1],
                                 'district': m['displayName'].split()[1], 'city': m['displayName'].split()[0], 'name': '',
                                 'region': region, 'floors': int(floors or 0), 'area': round(float(b['buildingAreaSquareMeters'] or 0), 1)})
+        if b.get('sourceId'):                       # 건물통합식별번호(2026-11-17 J1): 판이 바뀌어도 같은 건물을 잇는 열쇠. r2 입력에는 없어 그대로
+            index_buildings[-1]['sourceId'] = b['sourceId']
+        if EXTRAS and b['buildingStableId'] in EXTRAS['addresses']:     # 도로명주소 · 건물명(주소 자료 2026-10)
+            road_, number_, post_, name_ = EXTRAS['addresses'][b['buildingStableId']]
+            index_buildings[-1].update({'road': road_, 'number': number_, 'postcode': post_ or '', 'name': name_ or ''})
         all_shapes.append((ring, code_use, region, len(index_buildings) - 1))
     return heights, skipped
 
@@ -1117,11 +1374,76 @@ def densify(ring, step):
     return np.concatenate(out)
 
 
+# 다각형 칠하기(2026-11-18): 공식 경계는 꼭짓점이 열 배쯤 많아 skimage.draw.polygon(칸마다 모든 변을 본다)이 굽기 시간의 절반을 먹었다.
+# 같은 칸을 주는 줄 단위 칠하기(fast_fill)로 바꾼다. 무작위 · 실제 도형을 skimage와 대조했고, 동 굽기 결과가 바이트까지 같음을 확인했다.
+POLY_EPS = 1e-12                       # skimage point_in_polygon의 꼭짓점 허용치
+POLY_NEAR = 1e-6                       # 교점이 칸 중심에서 이보다 가까우면 그 칸은 skimage 식 그대로 따로 판정한다
+
+
+def polygon_exact(xp, yp, X, Y):
+    """skimage(0.26) point_in_polygon(O'Rourke)을 칸 묶음에 그대로 옮긴 것. 안 · 꼭짓점 · 변 위면 True."""
+    out = np.zeros(len(X), bool)
+    for s in range(0, len(X), 4096):
+        x = X[s:s + 4096, None]; y = Y[s:s + 4096, None]
+        x0 = xp[None, :] - x; y0 = yp[None, :] - y
+        x1 = np.roll(x0, 1, axis=1); y1 = np.roll(y0, 1, axis=1)
+        vertex = ((-POLY_EPS < x0) & (x0 < POLY_EPS) & (-POLY_EPS < y0) & (y0 < POLY_EPS)).any(1)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            val = (x0 * y1 - x1 * y0) / (y1 - y0)
+        rc = (((y0 > 0) != (y1 > 0)) & (val > 0)).sum(1); lc = (((y0 < 0) != (y1 < 0)) & (val < 0)).sum(1)
+        out[s:s + 4096] = vertex | (rc % 2 == 1) | (lc % 2 == 1)
+    return out
+
+
+def fast_fill(mask, r, c, shape=None, row_offset=0):
+    """mask[row_offset + rr, cc] = True 와 같다(rr, cc = skimage.draw.polygon(r, c, shape)). 도형의 상자만 한 임시 판에 칠해 붙이므로
+    큰 도형에서도 칸 번호 배열을 만들지 않는다(메모리)."""
+    yp = np.ascontiguousarray(r, dtype=np.float64); xp = np.ascontiguousarray(c, dtype=np.float64)
+    if len(xp) == 0: return
+    minr = int(max(0, yp.min())); maxr = int(math.ceil(yp.max()))
+    minc = int(max(0, xp.min())); maxc = int(math.ceil(xp.max()))
+    if shape is not None: maxr = min(shape[0] - 1, maxr); maxc = min(shape[1] - 1, maxc)
+    if maxr < minr or maxc < minc: return
+    nr, nc = maxr - minr + 1, maxc - minc + 1
+    local = np.zeros((nr, nc + 1), np.int8)
+    yj, xj = np.roll(yp, 1), np.roll(xp, 1)
+    lo, hi = np.minimum(yp, yj), np.maximum(yp, yj)
+    r0 = np.maximum(np.ceil(lo), minr); r1 = np.minimum(np.ceil(hi) - 1, maxr)
+    idx = np.nonzero((lo < hi) & (r0 <= r1))[0]
+    near_r = near_c = np.zeros(0, np.int64)
+    if len(idx):
+        cnt = (r1[idx] - r0[idx] + 1).astype(np.int64)
+        e = np.repeat(idx, cnt)
+        start = np.repeat(np.cumsum(cnt) - cnt, cnt)
+        y = np.repeat(r0[idx], cnt) + (np.arange(int(cnt.sum()), dtype=np.int64) - start)
+        X = (xj[e] - xp[e]) * (y - yp[e]) / (yj[e] - yp[e]) + xp[e]
+        order = np.lexsort((X, y)); y, X = y[order], X[order]
+        first = np.ones(len(y), bool); first[1:] = y[1:] != y[:-1]
+        rank = np.arange(len(y)) - np.maximum.accumulate(np.where(first, np.arange(len(y)), 0))
+        a = np.nonzero(rank % 2 == 0)[0]; b = a + 1
+        if (len(a) and b[-1] >= len(y)) or np.any(y[a] != y[np.minimum(b, len(y) - 1)]): raise ValueError('odd crossings')
+        cl = np.maximum(np.ceil(X[a]), minc).astype(np.int64); ch = np.minimum(np.ceil(X[b]) - 1, maxc).astype(np.int64)
+        ok = cl <= ch
+        rows = y[a][ok].astype(np.int64) - minr
+        np.add.at(local, (rows, cl[ok] - minc), 1); np.add.at(local, (rows, ch[ok] + 1 - minc), -1)
+        rx = np.round(X); m = (np.abs(X - rx) < POLY_NEAR) & (rx >= minc) & (rx <= maxc)
+        near_r, near_c = y[m].astype(np.int64), rx[m].astype(np.int64)
+    fill = np.cumsum(local, axis=1, dtype=np.int16)[:, :nc] > 0
+    del local
+    if len(near_r):
+        inside = polygon_exact(xp, yp, near_c.astype(np.float64), near_r.astype(np.float64))
+        fill[near_r - minr, near_c - minc] = inside
+    vr = np.round(yp); vm = (np.abs(yp - vr) < 1e-9) & (vr >= minr) & (vr <= maxr)
+    for fr in np.unique(vr[vm].astype(np.int64)):
+        cols = np.arange(minc, maxc + 1, dtype=np.int64)
+        fill[fr - minr] = polygon_exact(xp, yp, cols.astype(np.float64), np.full(len(cols), float(fr)))
+    mask[row_offset + minr:row_offset + maxr + 1, minc:maxc + 1] |= fill
+
+
 def bake_greens(mesh, boundary, greens):
     """동 경계 안의 녹지를 한 겹으로 깐다. 돌려주는 값: 갈래별 넓이(삼각형), 갈래별 넓이(1 m 격자로 센 값), 정점 수, 삼각형 수."""
     from scipy.spatial import Delaunay
     from skimage.measure import points_in_poly
-    from skimage.draw import polygon as fill_polygon
     ring = np.array(boundary, dtype=float)
     x0, z0 = ring.min(0); x1, z1 = ring.max(0)
     names = {cid: name for cid, _, name in GREEN_CLASSES.values()}
@@ -1142,8 +1464,7 @@ def bake_greens(mesh, boundary, greens):
     cls = np.zeros(len(C), dtype=int)
     # 1 m 격자로 넓이를 따로 센다(확인용)
     W, H = int(math.ceil(x1 - x0)) + 1, int(math.ceil(z1 - z0)) + 1
-    rr, cc = fill_polygon(ring[:, 1] - z0, ring[:, 0] - x0, (H, W))
-    dong_mask = np.zeros((H, W), dtype=bool); dong_mask[rr, cc] = True
+    dong_mask = np.zeros((H, W), dtype=bool); fast_fill(dong_mask, ring[:, 1] - z0, ring[:, 0] - x0, (H, W))
     for g in near:
         b = g['box']
         cid = GREEN_CLASSES[g['cls']][0]
@@ -1152,8 +1473,7 @@ def bake_greens(mesh, boundary, greens):
         mask = np.zeros((H, W), dtype=bool)
         for r in g['rings']:
             if len(sel): hit ^= points_in_poly(C[sel], r)
-            rr, cc = fill_polygon(r[:, 1] - z0, r[:, 0] - x0, (H, W))
-            part = np.zeros((H, W), dtype=bool); part[rr, cc] = True
+            part = np.zeros((H, W), dtype=bool); fast_fill(part, r[:, 1] - z0, r[:, 0] - x0, (H, W))
             mask ^= part
         cls[sel[hit]] = cid
         counted[names[cid]] += float((mask & dong_mask).sum())
@@ -1173,6 +1493,8 @@ def bake_greens(mesh, boundary, greens):
 
 # ── 보도 · 횡단보도 (거리 풍경 보1 · 거1, 2026-11-15) ────────────────────────
 ST_CELL = 0.25                       # 격자(m)
+ST_STRIP = 1024                      # 큰 도형을 칠할 때 한 번에 다루는 줄 수(메모리)
+ST_MAX_CELLS = 100_000_000           # 보도 격자 칸 수 한도. 신내1동 9,500만 칸까지 구웠고 공릉2동 1억 8,500만 칸에서 메모리가 넘쳤다(7.8 GB)
 ST_REACH = 6.0                       # 차도에서 이만큼까지를 보도로 본다(건물 · 녹지가 없을 때)
 ST_MIN_AREA = 4.0                    # 이보다 작은 보도 조각은 버린다(m²)
 ST_STEP = 1.5                        # 보도 테두리를 이 간격으로 나눈다
@@ -1223,15 +1545,18 @@ def street_layers(code, boundary, road_pieces, kerb_pieces, shapes, greens, cros
     """한 동의 보도 · 시설물대 · 연석선 · 점자블록 · 횡단보도 조각을 계산한다. 메시에 붙이는 것은 bake_street가 한다."""
     from scipy import ndimage
     from scipy.spatial import Delaunay
-    from skimage.draw import polygon as fill_polygon
     from skimage import measure
     ring = np.array(boundary, dtype=float)
     x0, z0 = ring.min(0) - 8.0; x1, z1 = ring.max(0) + 8.0
+    ST_CELL = grid_cell(x1 - x0, z1 - z0, globals()['ST_CELL'], ST_MAX_CELLS, 'street', boundary)   # 보통 동은 0.25 m 그대로
     W, H = int(math.ceil((x1 - x0) / ST_CELL)) + 1, int(math.ceil((z1 - z0) / ST_CELL)) + 1
     def paint(mask, poly):
         p = np.asarray(poly, dtype=float)
         if p[:, 0].max() < x0 or p[:, 0].min() > x1 or p[:, 1].max() < z0 or p[:, 1].min() > z1: return
-        rr, cc = fill_polygon((p[:, 1] - z0) / ST_CELL, (p[:, 0] - x0) / ST_CELL, (H, W)); mask[rr, cc] = True
+        rows, cols = (p[:, 1] - z0) / ST_CELL, (p[:, 0] - x0) / ST_CELL
+        top, bottom = max(0, int(math.floor(rows.min()))), min(H, int(math.ceil(rows.max())) + 1)
+        for k in range(top, bottom, ST_STRIP):      # 큰 도형(산 · 공원이 넓은 동)은 가로 띠로 나눠 칠한다(메모리). 칸 판정이 같아 결과도 같다
+            fast_fill(mask, rows - k, cols, (min(ST_STRIP, H - k), W), k)
     road = np.zeros((H, W), bool); bld = np.zeros((H, W), bool); dong = np.zeros((H, W), bool); green = np.zeros((H, W), bool)
     for piece in road_pieces: paint(road, piece)
     for shape in shapes: paint(bld, shape)
@@ -1242,7 +1567,7 @@ def street_layers(code, boundary, road_pieces, kerb_pieces, shapes, greens, cros
         for r in g['rings']:
             part = np.zeros((H, W), bool); paint(part, r); m ^= part
         green |= m
-    d_road = ndimage.distance_transform_edt(~road) * ST_CELL
+    d_road = ndimage.distance_transform_edt(~road); d_road *= ST_CELL       # 제자리 곱(같은 값, 메모리 한 벌 덜)
     side = (~road) & (~bld) & (~green) & dong & (d_road <= ST_REACH)
     lab, n = ndimage.label(side)
     if n:
@@ -1316,7 +1641,7 @@ def street_layers(code, boundary, road_pieces, kerb_pieces, shapes, greens, cros
                        'e1': [round(float(e1[0]), 2), round(float(e1[1]), 2)], 'e2': [round(float(e2[0]), 2), round(float(e2[1]), 2)], 'width': width})
     # 시설물대: 이 동의 연석 띠 조각 그대로
     return {'sidewalk': tris_xz, 'sidewalkArea': sidewalk_area, 'kerbLine': kerb_quads, 'furniture': kerb_pieces, 'stripes': stripes,
-            'tactile': tactile, 'placed': placed, 'skipped': dict(skipped), 'grid': (x0, z0, H, W), 'masks': (road_in, side, dong)}
+            'tactile': tactile, 'placed': placed, 'skipped': dict(skipped), 'grid': (x0, z0, H, W), 'masks': (road_in, side, dong), 'cell': ST_CELL}
 
 
 def bake_street(mesh, st):
@@ -1484,7 +1809,7 @@ for p, (kerb, road) in zip(prepared, fitted):
                 for t in np.linspace(0.1, 0.9, 5):
                     for s_ in (0.25, 0.75):
                         pnt = (q[0] * (1 - t) + q[1] * t) * (1 - s_) + (q[3] * (1 - t) + q[2] * t) * s_
-                        r_, c_ = int((pnt[1] - sz0) / ST_CELL), int((pnt[0] - sx0) / ST_CELL)
+                        r_, c_ = int((pnt[1] - sz0) / street['cell']), int((pnt[0] - sx0) / street['cell'])
                         tot += 1; hit += 1 if 0 <= r_ < sH and 0 <= c_ < sW and mask[r_, c_] else 0
             return hit / tot if tot else 1.0
         share_s = inside_share(street['stripes'], road_in); share_t = inside_share(street['tactile'], side_m | road_in)
@@ -1492,22 +1817,59 @@ for p, (kerb, road) in zip(prepared, fitted):
         check(f"{p['code']} 점자블록이 보도 · 차도 칸 안(85 % 넘게)", share_t >= 0.85, round(share_t, 3))
         street.pop('masks')
     modules_out.append(finish_module(p, kerb, road, alley, street))
+    p['mesh'] = p['shadow'] = None                  # 쓴 동의 메시는 놓는다(중랑구 16동처럼 많이 구울 때 메모리). 결과 바이트는 같다
+lane_counts = dict(road_stats.pop('lanes'))
 report['roads'] = {'stepMetres': ROAD_STEP, 'gapMetres': ROAD_GAP, 'minimumMetres': ROAD_MIN, 'easeMetres': ROAD_EASE, 'usualPercentile': ROAD_USUAL,
                    'mateReachMetres': MATE_REACH, 'blockedMetres': ROAD_BLOCKED, 'openShare': ROAD_OPEN} | {k: int(v) for k, v in road_stats.items()}
+if LANE_WIDTHS:
+    report['laneWidths'] = {'file': os.path.basename(LANE_WIDTHS), 'fileSha256': sha256(LANE_WIDTHS),
+                            'bandFile': os.path.basename(LANE_BANDS) if LANE_BANDS else None, 'bandFileSha256': sha256(LANE_BANDS) if LANE_BANDS else None,
+                            'applied': LANE_APPLY, 'linksBySource': lane_counts, 'edgeMetres': LANE_EDGE, 'leastLaneMetres': LANE_MIN_W,
+                            'pairReachMetres': PAIR_REACH, 'roadTotalByLanes': ROAD_TOTAL_BY_LANES} | drawn_vs_measured(fitted, prepared)
+    print('laneWidths', report['laneWidths'])
+if COARSE_GRIDS: report['coarseGrids'] = {'note': '격자 칸 수 한도를 넘는 큰 동만 칸을 키웠다(메모리). 보도 · 골목의 모양이 그만큼 거칠다(표현)', 'grids': COARSE_GRIDS}
 report['alleys'] = {'cellMetres': ALLEY_CELL, 'minimumClearMetres': ALLEY_MIN, 'nearMetres': ALLEY_NEAR, 'halfMetres': ALLEY_HALF, 'gapMetres': ALLEY_GAP,
                     'lines': alley_stats['lines'], 'pieces': alley_stats['pieces'], 'dropped': alley_stats['dropped'], 'metres': round(alley_stats['metres'], 1)}
 print('roads', report['roads'])
 print('alleys', report['alleys'])
 
 # 길 그래프와 가상 출입구 (R1)
-route_xy, route_edges, route_kinds, route_doors, route_stats = build_routes(road_tracks, alley_segments, [shape[0] for shape in all_shapes], obstacles)
+ENTRANCE_HINTS = None
+if EXTRAS:
+    ent_points = [p for code in CODES for p in EXTRAS['dongs'].get(code, {}).get('entrances', [])]
+    ENTRANCE_HINTS, ent_matched = entrance_hints([shape[0] for shape in all_shapes], ent_points)
+    id_doors, by_id, id_far = EXTRAS.get('doors') or {}, 0, 0      # 주소 건물(건물관리번호)로 이은 출입구가 먼저다. 거리로 붙인 것은 그다음
+    for k, b in enumerate(index_buildings):
+        pts = id_doors.get(b['id'])
+        if not pts: continue
+        r = np.asarray(all_shapes[k][0], float)
+        dd, _ = foot_on_segments(np.asarray(pts, float), r, np.roll(r, -1, axis=0))
+        keep = [tuple(p) for p, dist in zip(pts, dd.min(1)) if dist <= ENTRANCE_ID_REACH or point_in_ring(p, r)]
+        if keep: ENTRANCE_HINTS[k] = keep; by_id += 1
+        else: id_far += 1
+    report['juso'] = {'file': os.path.basename(EXTRAS_PATH), 'sha256': sha256(EXTRAS_PATH), 'note': EXTRAS.get('note'),
+                      'entrances': len(ent_points), 'entrancesOnBuildings': ent_matched, 'buildingsWithEntrance': len(ENTRANCE_HINTS),
+                      'buildingsWithEntranceById': by_id, 'idEntranceTooFar': id_far, 'idReachMetres': ENTRANCE_ID_REACH,
+                      'addresses': sum(1 for b in index_buildings if b.get('road')), 'buildings': len(index_buildings), 'snapMetres': ENTRANCE_SNAP}
+    print('juso', report['juso'])
+route_xy, route_edges, route_kinds, route_doors, route_stats = build_routes(road_tracks, alley_segments, [shape[0] for shape in all_shapes], obstacles, ENTRANCE_HINTS)
 routes_path = os.path.join(OUT, 'hongdal-dong-routes.bytes')
 write_routes(routes_path, route_xy, route_edges, route_kinds, route_doors)
+for k in OFFICIAL_DOORS: index_buildings[k]['door'] = 'juso'          # 색인: 문이 공식 출입구(주소 자료)인 건물만 적는다
 check('길 그래프: 가장 큰 덩어리가 길이의 90% 이상', route_stats['mainShare'] >= 0.9, route_stats['mainShare'])
 check('길 그래프: 건물의 95% 이상에 가상 출입구가 있음', route_stats['buildingsWithDoor'] >= 0.95 * route_stats['buildings'], route_stats['buildingsWithDoor'])
 check('길 그래프: 건물 수가 색인과 같음', len(route_doors) == len(index_buildings), len(route_doors))
 check('길 그래프: 건물을 지나는 변이 없음', route_stats['edgesThroughBuildings'] == 0, route_stats['edgesThroughBuildings'])
-report['routes'] = route_stats | {'bytes': os.path.getsize(routes_path), 'sha256': sha256(routes_path), 'label': '가상 출입구 · 공식 출입구 자료 아님 · 내부 검토용'}
+report['routes'] = route_stats | {'bytes': os.path.getsize(routes_path), 'sha256': sha256(routes_path),
+                                  'label': ('공식 출입구(도로명주소 2026-10) · 없는 건물은 가상 출입구 · 내부 검토용' if ENTRANCE_HINTS is not None else '가상 출입구 · 공식 출입구 자료 아님 · 내부 검토용')}
+if EXTRAS:                                          # 지하철역 · 출입구(주소 자료 2026-10): 역 판의 역 목록 재료
+    stations_out = {'schema': 'hongdal-dong-stations.v1', 'note': '주소 자료(2026-10) 지하철역 · 출입구를 동별로. 게임 좌표(건물 · 길과 같은 위경도 근사). 내부 검토용 · 배포 아님', 'stations': [], 'entrances': []}
+    for code in CODES:
+        dd = EXTRAS['dongs'].get(code, {})
+        stations_out['stations'] += [{'regionId': 'region:kr:hjd:' + code, **s} for s in dd.get('stations', [])]
+        stations_out['entrances'] += [{'regionId': 'region:kr:hjd:' + code, 'x': e[0], 'z': e[1], 'number': e[2]} for e in dd.get('stationEntrances', [])]
+    with open(os.path.join(OUT, 'hongdal-dong-stations.json'), 'w', encoding='utf-8', newline='\n') as fh: json.dump(stations_out, fh, ensure_ascii=False, indent=1)
+    report['juso']['stations'] = len(stations_out['stations']); report['juso']['stationEntrances'] = len(stations_out['entrances'])
 print('routes', report['routes'])
 
 check('ENU→위경도 되돌림 오차 1 mm 안', max_err < 1e-3, max_err)
@@ -1551,7 +1913,8 @@ for role in roles['roles']:
 check('역할 4곳이 모두 모듈 건물에 대응', all(r['to'] for r in role_map), [r['method'] for r in role_map])
 report['roleMap'] = role_map
 
-index = {'schema': 'hongdal-building-index.v1', 'source': '국토교통부 GIS건물통합정보 AL_D010 (r2 행정동 모듈)', 'sourceDate': '2026-08-09',
+index = {'schema': 'hongdal-building-index.v1', 'source': scope.get('buildingSource', '국토교통부 GIS건물통합정보 AL_D010 (r2 행정동 모듈)'),
+         'sourceDate': scope.get('buildingSourceDate', '2026-08-09'),
          'sourceSha256': report['scopeContentHashSha256'], 'licence': '권리 미해결 · 내부 검토용 · 배포 아님',
          'origin': {'latitude': LAT0, 'longitude': LON0}, 'metresPerDegreeLongitude': M_LON, 'metresPerDegreeLatitude': M_LAT,
          'buildings': index_buildings}
@@ -1619,7 +1982,9 @@ manifest = {'schema': 'hongdal-dong-modules.v1', 'scopeRevision': scope['revisio
             'scopeContentHash': scope['contentHashSha256'], 'sourceVintage': scope['sourceVintage'],
             'readiness': scope['desiredReadinessCode'], 'distributionApproved': scope['distributionApproved'],
             'traversalReady': scope['traversalReady'], 'gameplayReady': scope['gameplayReady'],
-            'label': '2023 역사 경계 후보 · 내부 검토용 · 배포 아님',
+            'label': ('2026-10-01 편집 후보 경계 · 내부 검토용 · 배포 아님' if str(scope['sourceVintage']).startswith('admdongkor-20261001')   # 2026-11-17 J2: 경계 판을 그대로
+                      else '도로명주소 행정동 경계(2026-10) · 내부 검토용 · 배포 아님' if str(scope['sourceVintage']).startswith('juso-gemd-202610')
+                      else '2023 역사 경계 후보 · 내부 검토용 · 배포 아님'),
             'attribution': ('건물 GIS·노드링크 · 녹지·횡단보도 서울시 · © OSM' if CROSSING_POINTS is not None else '건물 GIS·노드링크 · 녹지 서울시 · 경로 © OSM') if GREENS is not None else '건물 GIS·노드링크 · 경로 © OSM',
             'scopeModuleCount': len(scope['modules']),
             'originLatitude': LAT0, 'originLongitude': LON0, 'metresPerDegreeLatitude': M_LAT, 'metresPerDegreeLongitude': M_LON,

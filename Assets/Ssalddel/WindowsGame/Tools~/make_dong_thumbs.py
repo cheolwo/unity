@@ -9,7 +9,8 @@
 boundary · buildings · roads .geojson.gz, EPSG:4326). 이 여섯 동은 2026-11-15 점검 도구(check_dong_package.py)에서
 지금 모듈의 입력과 경계(0.7 mm 안) · 건물 ID가 같음을 확인했다. 내부 검토용이며 배포하지 않는다.
 
-쓰기:  python3 -I -B make_dong_thumbs.py <geometry 폴더> <Resources 폴더>
+쓰기:  python3 -I -B make_dong_thumbs.py <geometry 폴더> <Resources 폴더> [원본 설명]
+원본 설명을 주면 표의 source에 적는다(2026-11-17 중랑구 J2: 굽기 입력 모듈에서 옮긴 경위도로 16동을 그릴 때). 없으면 예전 그대로.
 """
 import gzip
 import hashlib
@@ -141,7 +142,7 @@ def main():
         "schema": "hongdal.dong-thumbs.v1",
         "renderer": VERSION,
         "view": {"yawDegrees": YAW_DEG, "pitchDegrees": PITCH_DEG},
-        "source": "artifacts/local/admin-dong-precision-modules-20261115/geometry/modules (Codex r1, EPSG:4326)",
+        "source": sys.argv[3] if len(sys.argv) > 3 else "artifacts/local/admin-dong-precision-modules-20261115/geometry/modules (Codex r1, EPSG:4326)",
         "note": "내부 검토용 · 배포 아님. 모듈 판본(moduleContentHash)이 다르면 게임은 이 그림을 쓰지 않는다.",
         "thumbs": thumbs,
     }
