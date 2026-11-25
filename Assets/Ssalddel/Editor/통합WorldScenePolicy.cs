@@ -26,6 +26,8 @@ namespace Ssalddel.Unity.Editor
                 "Assets/Ssalddel/Scenes/WorldBootstrapScene.unity",
                 "Assets/Ssalddel/Scenes/UrbanLogisticsCenterPrimitive.unity",
                 "Assets/Ssalddel/Scenes/UrbanMarketManagerPrimitive.unity",
+                "Assets/Ssalddel/Scenes/AreaSetCompositionPatternReview.unity",
+                "Assets/Ssalddel/Scenes/NatureH3GameViewReview.unity",
                 "Assets/Ssalddel/Scenes/턴카드모판.unity",
                 "Assets/Ssalddel/Scenes/통합모판전시관.unity",
                 "Assets/Ssalddel/Scenes/통합Object모판.unity",

@@ -6,10 +6,12 @@ namespace Ssalddel.Unity.Presentation.World
     /// </summary>
     public static class 관찰표현LayerContract
     {
+        public const int 다중센터출고Layer = 27;
         public const int 오프라인생활Layer = 29;
         public const int 사가정운영관찰Layer = 30;
 
         public const int 오프라인생활Mask = 1 << 오프라인생활Layer;
+        public const int 다중센터출고Mask = 1 << 다중센터출고Layer;
         public const int 사가정운영관찰Mask = 1 << 사가정운영관찰Layer;
     }
 }

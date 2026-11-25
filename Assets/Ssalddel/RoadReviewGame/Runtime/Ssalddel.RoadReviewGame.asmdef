@@ -1,0 +1,6 @@
+{
+  "name": "Ssalddel.RoadReviewGame",
+  "rootNamespace": "Ssalddel.RoadReviewGame",
+  "references": ["Unity.UGUI", "Unity.InputSystem", "Unity.Newtonsoft.Json"],
+  "autoReferenced": true
+}

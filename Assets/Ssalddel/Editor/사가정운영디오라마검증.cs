@@ -27,9 +27,18 @@ namespace Ssalddel.Unity.EditorTools
                 throw new InvalidOperationException("DioramaSixSampleObjectsRequired");
             if (world.Objects.Any(x=>x.SourceKindCode!="VerificationSample"))
                 throw new InvalidOperationException("DioramaSampleScopeInvalid");
-            var renderers=view.GetComponentsInChildren<Renderer>();
-            if (renderers.Length<5 || renderers.Any(x=>!x.enabled))
-                throw new InvalidOperationException("DioramaRendererSuppressed");
+            var wasVisible = view.ModuleVisible;
+            try
+            {
+                if (!wasVisible) view.Show(true);
+                var renderers = view.GetComponentsInChildren<Renderer>();
+                if (renderers.Length < 5 || renderers.Any(x => !x.enabled))
+                    throw new InvalidOperationException("DioramaRendererSuppressed");
+            }
+            finally
+            {
+                if (!wasVisible) view.Show(false);
+            }
             Debug.Log($"SAGAJEONG-DIORAMA: map={view.MapStatus}; objects={world.ObjectCount}; unplaced={world.UnplacedCount}; controller={controller.StatusCode}; readOnly=true; animation=false");
         }
     }

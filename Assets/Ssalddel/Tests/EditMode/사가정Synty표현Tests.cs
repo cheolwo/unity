@@ -98,8 +98,14 @@ namespace Ssalddel.Unity.Tests.EditMode
         public void 실제View는_하나의VisualRoot아래에만Synty를만들고Collider를제거한다()
         {
             var root = new GameObject("sagajeong-synty-view-test");
+            root.SetActive(false);
+            var key = 사가정공간표현OverlayPipeline.LocalPrivateReviewPathKey;
+            var oldPath = Environment.GetEnvironmentVariable(key);
             try
             {
+                // 이 시험은 상세 공간이 없는 기존 r3 Synty 경로를 고정한다.
+                Environment.SetEnvironmentVariable(key, System.IO.Path.Combine(
+                    System.IO.Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".missing"));
                 var view = root.AddComponent<사가정운영디오라마View>();
                 typeof(사가정운영디오라마View).GetField("useSyntyPresentation",
                     System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(view, true);
@@ -127,6 +133,7 @@ namespace Ssalddel.Unity.Tests.EditMode
             finally
             {
                 UnityEngine.Object.DestroyImmediate(root);
+                Environment.SetEnvironmentVariable(key, oldPath);
             }
         }
     }

@@ -45,5 +45,24 @@ namespace Ssalddel.Unity.Tests.EditMode
                     "Assets/Ssalddel/Scenes/WorldBootstrapScene.unity"),
                 Is.EqualTo(통합WorldScenePolicy.SceneRole.기존검토참고));
         }
+
+        [TestCase("Assets/Ssalddel/Scenes/AreaSetCompositionPatternReview.unity")]
+        [TestCase("Assets/Ssalddel/Scenes/NatureH3GameViewReview.unity")]
+        public void 기존PresentationOnly검토Scene은_정확경로만참고로분류한다(string path)
+        {
+            Assert.That(통합WorldScenePolicy.Classify(path),
+                Is.EqualTo(통합WorldScenePolicy.SceneRole.기존검토참고));
+        }
+
+        [Test]
+        public void 정식Scene분류와_새미등록Scene거절은_그대로유지한다()
+        {
+            Assert.That(통합WorldScenePolicy.Classify(통합WorldScenePolicy.CanonicalScenePath),
+                Is.EqualTo(통합WorldScenePolicy.SceneRole.공식플레이));
+            Assert.That(통합WorldScenePolicy.Classify("Assets/Ssalddel/Scenes/UnregisteredPersonalGame.unity"),
+                Is.EqualTo(통합WorldScenePolicy.SceneRole.분류되지않음));
+            Assert.That(통합WorldScenePolicy.Classify("Assets/Ssalddel/Scenes/AreaSetCompositionPatternReviewExtra.unity"),
+                Is.EqualTo(통합WorldScenePolicy.SceneRole.분류되지않음));
+        }
     }
 }

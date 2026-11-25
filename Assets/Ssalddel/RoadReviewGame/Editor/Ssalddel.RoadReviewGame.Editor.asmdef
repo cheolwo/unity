@@ -1,0 +1,7 @@
+{
+  "name": "Ssalddel.RoadReviewGame.Editor",
+  "rootNamespace": "Ssalddel.RoadReviewGame.Editor",
+  "references": ["Ssalddel.RoadReviewGame", "Unity.Newtonsoft.Json"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

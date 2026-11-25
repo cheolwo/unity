@@ -31,7 +31,7 @@ namespace Ssalddel.Unity.Presentation.World
         public string RoadNameStatus { get; private set; } = "NotLoaded";
         public string SyntyStatus { get; private set; } = "NotLoaded";
         public string VisualTargetRevision => MapStatus == "NotLoaded" ? "NotLoaded"
-            : useSyntyPresentation ? syntyPlan?.Revision ?? "NotLoaded" : 사가정모형MeshBuilder.Revision;
+            : UsesLegacySynty ? syntyPlan?.Revision ?? "NotLoaded" : 사가정모형MeshBuilder.Revision;
         public int SyntyPlacementCount => syntyPlan?.AcceptedCount ?? 0;
         public int SyntyFallbackCount => syntyPlan?.FallbackCount ?? 0;
         public IReadOnlyList<사가정Synty표현Placement> SyntyPlacements
@@ -47,18 +47,17 @@ namespace Ssalddel.Unity.Presentation.World
         public int StationExitAnchorCount => stationExitAnchorBuild?.AnchorCount ?? 0;
         public IReadOnlyList<역세권방향기준점> StationExitAnchors
             => stationExitAnchorBuild?.Anchors ?? Array.Empty<역세권방향기준점>();
-        public bool SpatialOverlayApplied => !useSyntyPresentation
-            && spatialComposition?.OverlayApplied == true;
-        public string SpatialPresentationRevision => useSyntyPresentation
-            ? 사가정공간표현OverlayComposer.BaseMapRevision
-            : spatialComposition?.Revision ?? "NotLoaded";
-        public string SpatialPresentationContentHash => useSyntyPresentation
-            ? 사가정공간표현OverlayComposer.BaseMapHash
-            : spatialComposition?.ContentHash ?? "NotLoaded";
-        public string SpatialPresentationStatus => useSyntyPresentation
+        public bool SpatialOverlayApplied => spatialComposition?.OverlayApplied == true;
+        private bool UsesLegacySynty => 사가정공간표현ModePolicy.UseLegacySynty(
+            useSyntyPresentation, SpatialOverlayApplied);
+        public string SpatialPresentationRevision => spatialComposition?.Revision ?? "NotLoaded";
+        public string SpatialPresentationContentHash => spatialComposition?.ContentHash ?? "NotLoaded";
+        public string SpatialPresentationStatus => UsesLegacySynty
             ? "SagajeongReferenceR3Base · SpatialOverlayNotRenderedInSyntyMode"
             : spatialComposition == null ? "NotLoaded"
             : $"{spatialComposition.SourceStatus} · {spatialComposition.DiagnosticCode}";
+        public int AppearanceOverlayCount => appearanceRenderer?.Count ?? 0;
+        public string AppearanceOverlayStatus => appearanceRenderer?.StatusCode ?? "NotLoaded";
         public string SpatialPresentationAttribution { get; private set; } = "NotLoaded";
         public string HSelectionStatus { get; private set; } = "NotLoaded";
         public int HSelectionBuildingCount => hSpaceSelection?.BuildingCount ?? 0;
@@ -90,6 +89,7 @@ namespace Ssalddel.Unity.Presentation.World
         private 도로명주소표현조회 roadNames;
         private 사가정Synty표현Plan syntyPlan;
         private 사가정공간표현Composition spatialComposition;
+        private 사가정외관OverlayRenderer appearanceRenderer;
         private 사가정H공간선택Layer hSpaceSelection;
         private 사가정역방향기준점Builder.BuildReport stationExitAnchorBuild;
         private int selectedBuildingRoleIndex;
@@ -140,22 +140,17 @@ namespace Ssalddel.Unity.Presentation.World
                     JsonUtility.FromJson<운영관찰지역배치자료>(placements.text), map, asset.bytes);
                 roadNames = LoadRoadNames(map, asset.bytes);
                 var heights = LoadHeights(map, asset.bytes);
-                spatialComposition = useSyntyPresentation
-                    ? null
-                    : LoadSpatialComposition(map, asset.bytes);
+                spatialComposition = LoadSpatialComposition(map, asset.bytes);
                 LoadHSpaceSelection(map, asset.bytes, heights, spatialComposition);
-                SpatialPresentationAttribution = useSyntyPresentation
-                    ? heights == null
-                        ? "© OpenStreetMap contributors · ODbL 1.0"
-                        : "© OpenStreetMap contributors · ODbL 1.0 / 국토교통부 건축HUB"
-                    : Attribution(spatialComposition, heights != null);
-                syntyPlan = useSyntyPresentation ? LoadSyntyPlan(map, heights) : 사가정Synty표현Plan.Empty();
-                if (!useSyntyPresentation) SyntyStatus = "원문 윤곽 모형 표현";
+                SpatialPresentationAttribution = Attribution(spatialComposition, heights != null);
+                syntyPlan = UsesLegacySynty ? LoadSyntyPlan(map, heights) : 사가정Synty표현Plan.Empty();
+                if (!UsesLegacySynty) SyntyStatus = useSyntyPresentation
+                    ? 사가정공간표현ModePolicy.OverlayPreservedStatus : "원문 윤곽 모형 표현";
                 geography = new GameObject("사가정 지리 배경").transform;
                 geography.SetParent(transform, false);
                 SyntyVisualRoot = new GameObject("Synty VisualRoot · 표현 전용").transform;
                 SyntyVisualRoot.SetParent(geography, false);
-                if (useSyntyPresentation)
+                if (UsesLegacySynty)
                 {
                     사가정지리MeshBuilder.Build(map, AddMesh, heights, syntyPlan);
                     BuildSyntyVisuals();
@@ -166,6 +161,8 @@ namespace Ssalddel.Unity.Presentation.World
                     MiniatureBuildReport = 사가정모형MeshBuilder.BuildBatches(
                         map, heights, spatialComposition, CreateMiniatureMesh, showDecorativeGreenery);
                 }
+                appearanceRenderer = new 사가정외관OverlayRenderer(geography,
+                    new 사가정외관검토Gate(map, spatialComposition, heights), ObservationLayer);
                 LoadStationExitOrientationAnchors(map, asset.bytes);
                 Block(geography, "모형 받침대", new Vector3(map.offsetX, -15f, map.offsetZ),
                     new Vector3(map.halfExtent * 2 + 2, 30, map.halfExtent * 2 + 2), new Color(.41f,.43f,.42f));
@@ -235,6 +232,38 @@ namespace Ssalddel.Unity.Presentation.World
 
         public void SetModuleVisible(bool value) => ApplyVisibility(value && shown);
 
+        /// <summary>개별 비공개 외관 검토만 받으며 지도 사용자 승인이나 공개 상태를 만들지 않는다.</summary>
+        public bool ApplyReviewedAppearance(사가정건물외관Profile profile,
+            법정동경관VisualCatalog catalog, IReadOnlyList<사가정외관ModuleReview> reviewedModules,
+            out string statusCode)
+        {
+            if (appearanceRenderer == null || MapStatus != "Ready")
+            {
+                statusCode = "AppearanceMapNotReady";
+                return false;
+            }
+            // 기존 전체 건물 Synty 표현의 footprint/높이와 추가 외관의 검토 기준은 별개다.
+            if (UsesLegacySynty) { statusCode = "AppearanceRequiresPreservedMass"; return false; }
+            return appearanceRenderer.TryApply(profile, catalog, reviewedModules, out statusCode);
+        }
+
+        public bool RemoveReviewedAppearance(string profileStableId)
+            => appearanceRenderer?.Remove(profileStableId) == true;
+
+        public bool ApplyReviewedAppearance(사가정건물외관Profile profile,
+            사가정외관ModuleCatalog catalog, out string statusCode)
+        {
+            if (appearanceRenderer == null || MapStatus != "Ready")
+            { statusCode = "AppearanceMapNotReady"; return false; }
+            if (UsesLegacySynty) { statusCode = "AppearanceRequiresPreservedMass"; return false; }
+            return appearanceRenderer.TryApply(profile, catalog, out statusCode);
+        }
+
+        public int RemoveReviewedBuildingAppearances(string buildingId)
+            => appearanceRenderer?.RemoveBuilding(buildingId) ?? 0;
+
+        public void ClearReviewedAppearances() => appearanceRenderer?.Clear();
+
         private static StationDioramaModuleLayerRuntimeState ModuleLayer(string layerStableId,
             bool available, string revision, string diagnostic)
             => new(layerStableId,
@@ -281,7 +310,7 @@ namespace Ssalddel.Unity.Presentation.World
         private void LoadHSpaceSelection(공간참고자료 data, byte[] mapBytes,
             건물높이보완조회 heights, 사가정공간표현Composition composition)
         {
-            if (useSyntyPresentation)
+            if (UsesLegacySynty)
             {
                 hSpaceSelection = null;
                 HSelectionStatus = "건물 선택 보류 · r3 모형 표현 전용";
@@ -1152,6 +1181,8 @@ namespace Ssalddel.Unity.Presentation.World
         }
         private void ReleaseGeometry()
         {
+            appearanceRenderer?.Dispose();
+            appearanceRenderer = null;
             if (geography != null) ReleaseObject(geography.gameObject);
             if (ObservationCamera != null) ReleaseObject(ObservationCamera.gameObject);
             geography = null;

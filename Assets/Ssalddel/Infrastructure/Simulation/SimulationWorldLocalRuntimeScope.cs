@@ -24,6 +24,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         NeighborhoodLife = 8,
         OfflineLife = 9,
         SagajeongFoodLife = 10,
+        FulfillmentCenter = 11,
     }
 
     /// <summary>
@@ -61,6 +62,7 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         public string SlotStableId { get; }
         public bool RestoredFromSlot { get; }
         public bool RecoveredFromBackup { get; }
+        public const string FulfillmentSlotStableId = "fulfillment-centers-local-r1";
         public 로컬생활시작묶음? OfflineBundle { get; private set; }
         public static bool OfflineLifeRequested => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SSALDDEL_OFFLINE_LIFE_BUNDLE"));
         public static bool IsInstalled => current != null;
@@ -91,7 +93,9 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         public static bool WaitingFleetRequested => MartCenterRequested || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "2", StringComparison.Ordinal);
         public static bool SyntheticDeliveryRequested => BusinessServerObserverRequested || WaitingFleetRequested || string.Equals(
             Environment.GetEnvironmentVariable("SSALDDEL_SYNTHETIC_DELIVERY"), "1", StringComparison.Ordinal);
-        public static bool RestaurantObserverRequested => SyntheticDeliveryRequested || string.Equals(
+        public static bool FulfillmentObserverRequested => current?.LaunchProfile == Nature생존LaunchProfile.FulfillmentCenter
+            || string.Equals(Environment.GetEnvironmentVariable("SSALDDEL_FULFILLMENT_OBSERVER"), "1", StringComparison.Ordinal);
+        public static bool RestaurantObserverRequested => FulfillmentObserverRequested || SyntheticDeliveryRequested || string.Equals(
             Environment.GetEnvironmentVariable("SSALDDEL_RESTAURANT_OBSERVER"), "1", StringComparison.Ordinal);
 
         public static SimulationWorldLocalRuntimeScope Install()
@@ -142,9 +146,25 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                         var created = runtime.Sessions.CreateAsync(request).AsTask()
                             .GetAwaiter().GetResult();
                         sessionStableId = created.SessionStableId;
+                        if (launchProfile == Nature생존LaunchProfile.FulfillmentCenter)
+                            runtime.ConfirmFulfillmentAsync(sessionStableId, new SimulationFulfillmentCommand
+                            {
+                                CommandId = "command:fulfillment-profile:configure",
+                                ExpectedRevision = created.Revision,
+                                ActionCode = SimulationFulfillmentActionCodes.Configure,
+                                InitialState = 다중센터출고표본.InitialState(),
+                            }).AsTask().GetAwaiter().GetResult();
                         if (launchProfile == Nature생존LaunchProfile.E7Validation)
                             AdvanceToValidationStart(runtime, sessionStableId,
                                 created.Revision);
+                    }
+                    if (launchProfile == Nature생존LaunchProfile.FulfillmentCenter)
+                    {
+                        var snapshot = runtime.Sessions.GetAsync(sessionStableId).AsTask().GetAwaiter().GetResult();
+                        if (snapshot.ScenarioStableId != 다중센터출고표본.ScenarioId
+                            || snapshot.Fulfillment == null
+                            || snapshot.Fulfillment.ScenarioStableId != 다중센터출고표본.ScenarioId)
+                            throw new InvalidOperationException("FulfillmentProfileSaveMismatch");
                     }
                     if(offline != null) runtime.GetLocalLifeReportAsync(sessionStableId,offline).AsTask().GetAwaiter().GetResult();
                     current = new SimulationWorldLocalRuntimeScope(runtime,
@@ -191,7 +211,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         }
 
         public static Nature생존LaunchProfile DetectLaunchProfile()
-            => SagajeongFoodLifeRequested ? Nature생존LaunchProfile.SagajeongFoodLife
+            => FulfillmentObserverRequested ? Nature생존LaunchProfile.FulfillmentCenter
+                : SagajeongFoodLifeRequested ? Nature생존LaunchProfile.SagajeongFoodLife
                 : OfflineLifeRequested ? Nature생존LaunchProfile.OfflineLife
                 : NeighborhoodLifeRequested ? Nature생존LaunchProfile.NeighborhoodLife
                 : OrderFlowRequested ? Nature생존LaunchProfile.OrderFlow
@@ -209,7 +230,9 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
                 : Nature생존LaunchProfile.PlayableDefault;
 
         private static string SlotFor(Nature생존LaunchProfile launchProfile)
-            => launchProfile == Nature생존LaunchProfile.SagajeongFoodLife
+            => launchProfile == Nature생존LaunchProfile.FulfillmentCenter
+                ? FulfillmentSlotStableId
+                : launchProfile == Nature생존LaunchProfile.SagajeongFoodLife
                 ? Ssalddel.Unity.Observation.사가정음식생활관찰Profile.SlotId
                 : launchProfile == Nature생존LaunchProfile.NeighborhoodLife
                 ? Ssalddel.Unity.Warehouse.가상배달관찰표본.NeighborhoodLifeSlotId
@@ -232,6 +255,8 @@ namespace Ssalddel.Unity.Infrastructure.Simulation
         private static 경영SimulationSession생성Request CreateSessionRequest(
             Nature생존LaunchProfile launchProfile)
         {
+            if (launchProfile == Nature생존LaunchProfile.FulfillmentCenter)
+                return 다중센터출고표본.Create(Guid.NewGuid());
             if (launchProfile == Nature생존LaunchProfile.SagajeongFoodLife)
                 return Ssalddel.Unity.Observation.사가정음식생활관찰Profile.생성(Guid.NewGuid());
             if (launchProfile == Nature생존LaunchProfile.NeighborhoodLife)

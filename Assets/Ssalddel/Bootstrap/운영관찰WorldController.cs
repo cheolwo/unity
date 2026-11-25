@@ -52,6 +52,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void InitializeClient()
         {
+            if (사가정개인용조회차단()) return;
             if (worldView == null) worldView = GetComponent<운영관찰WorldView>();
             lifecycleView = GetComponent<다중Os생명주기검증Layer>()
                             ?? gameObject.AddComponent<다중Os생명주기검증Layer>();
@@ -74,6 +75,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void OnEnable()
         {
+            if (사가정개인용조회차단()) return;
             InitializeClient();
             lifetime?.Dispose();
             lifetime = new CancellationTokenSource();
@@ -85,6 +87,7 @@ namespace Ssalddel.Unity.Bootstrap
 
         private void Update()
         {
+            if (사가정개인용조회차단()) return;
             GetComponent<사가정운영디오라마View>()?.SetStatus(statusCode);
             worldView?.Expire(DateTime.UtcNow);
             client?.Expire(DateTime.UtcNow);
@@ -109,6 +112,26 @@ namespace Ssalddel.Unity.Bootstrap
                 cursor,
                 DateTime.UtcNow,
                 lifetime.Token);
+        }
+
+        private bool 사가정개인용조회차단()
+        {
+            if (!SimulationWorldLocalRuntimeScope.SagajeongFoodLifeRequested) return false;
+            // 연결 파일의 존재와 무관하게 개인용 사가정 관찰판은 운영 조회를 만들지 않는다.
+            // 이미 초기화된 뒤 프로필이 바뀌거나 직접 재호출돼도 같은 경계를 유지한다.
+            lifetime?.Cancel();
+            lifetime?.Dispose();
+            lifetime = null;
+            pendingRefresh = null;
+            client?.Clear();
+            transport?.Dispose();
+            transport = null;
+            client = null;
+            planner = null;
+            cursor = 0;
+            statusCode = "LocalOnly";
+            enabled = false;
+            return true;
         }
 
         private void CompleteRefresh(Task<OperationalWorldSceneApplyResult> refresh)

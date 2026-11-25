@@ -222,15 +222,15 @@ namespace Ssalddel.Unity.Presentation.NatureWoodcutting
             target.lightmapScaleOffset = source.lightmapScaleOffset;
             target.realtimeLightmapIndex = source.realtimeLightmapIndex;
             target.realtimeLightmapScaleOffset = source.realtimeLightmapScaleOffset;
-            target.receiveGI = source.receiveGI;
             target.rayTracingMode = source.rayTracingMode;
             target.rayTracingAccelerationStructureBuildFlags = source.rayTracingAccelerationStructureBuildFlags;
             target.rayTracingAccelerationStructureBuildFlagsOverride = source.rayTracingAccelerationStructureBuildFlagsOverride;
             target.forceMeshLod = source.forceMeshLod;
             target.meshLodSelectionBias = source.meshLodSelectionBias;
-            target.globalIlluminationMeshLod = source.globalIlluminationMeshLod;
             target.localBounds = source.localBounds;
 #if UNITY_EDITOR
+            target.receiveGI = source.receiveGI;
+            target.globalIlluminationMeshLod = source.globalIlluminationMeshLod;
             target.scaleInLightmap = source.scaleInLightmap;
             target.stitchLightmapSeams = source.stitchLightmapSeams;
 #endif

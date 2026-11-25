@@ -19,7 +19,8 @@ namespace Ssalddel.Unity.Bootstrap
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         public static async void InstallForCurrentScene()
         {
-            if (SimulationWorldLocalRuntimeScope.SyntheticDeliveryRequested
+            if (SimulationWorldLocalRuntimeScope.FulfillmentObserverRequested
+                || SimulationWorldLocalRuntimeScope.SyntheticDeliveryRequested
                 || !SimulationWorldLocalRuntimeScope.RestaurantObserverRequested
                 || SceneManager.GetActiveScene().name != "SimulationWorldShell"
                 || UnityEngine.Object.FindAnyObjectByType<음식점관찰SceneController>(FindObjectsInactive.Include) != null) return;
