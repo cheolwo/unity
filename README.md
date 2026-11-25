@@ -2,6 +2,8 @@
 
 **실제 서울 · 수도권 지도 위에서 동네 가게와 배달을 운영해 보는 경영 시뮬레이션 게임**입니다. 지금 개발하고 있는 판이라 화면과 기능은 자주 바뀝니다.
 
+> **이 프로젝트는 AI로 만들었습니다.** 코드 · 기획 문서 · 자료 수집과 가공 · 지도와 그림 · 이 README까지 모두 AI(Anthropic Claude, OpenAI Codex)가 만들었고, 사람은 방향을 정하고 결과를 확인합니다.
+
 | 수도권 지도 | 동 디오라마(공개판) | 서울 25구 비교 |
 | --- | --- | --- |
 | [![수도권 전체를 한 화면에 본 지도](Documentation/readme/capital-map.png)](Documentation/readme/capital-map.png) | [![수원 행궁동을 공개 자료로 만든 입체 동네](Documentation/readme/public-dong-diorama.png)](Documentation/readme/public-dong-diorama.png) | [![서울 25개 구를 일반음식점 수로 칠한 지도](Documentation/readme/seoul-gu-compare.png)](Documentation/readme/seoul-gu-compare.png) |
