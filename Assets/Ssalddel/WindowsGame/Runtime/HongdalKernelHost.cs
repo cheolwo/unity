@@ -119,8 +119,8 @@ namespace Ssalddel.WindowsGame
                 territory == null ? null : territory.text).ToString();
             return kernel + "\n" + MapOrderEventChecks() + "\n" + NationFlowChecks() + "\n" + DecisionCycleChecks() + "\n" +
                 DongModuleChecks() + "\n" + DongDemandChecksBlock() + "\n" + RiderMindChecks(sample.text, roads.text) + "\n" +
-                일일결산Checks.Run() + "\n" + OperatingRoundChecks() + "\n" + RouteChecks() + "\n" + MusicAnalysisChecks() + "\n" +
-                AutopilotChecks() + "\n" + NoticeChecks() + "\n" + MingdeLightChecks() + "\n" + PlaceChecks() + "\n" + RoleAppReplayChecks();
+                일일결산Checks.Run() + "\n" + 나눔카드Checks.Run() + "\n" + OperatingRoundChecks() + "\n" + RouteChecks() + "\n" + MusicAnalysisChecks() + "\n" +
+                AutopilotChecks() + "\n" + NoticeChecks() + "\n" + MingdeLightChecks() + "\n" + PlaceChecks() + "\n" + RoleAppReplayChecks() + "\n" + NextTodoChecks() + "\n" + ContinuousMapChecks() + "\n" + PlatformPackageChecks() + "\n" + FiveElementBoardChecks();
         }
 
         // 기사 무념·경 시간·등급(2단계, 2026-11-14). 순수 규칙 검사와, 음식 배달 모듈 옆에 꽂아 보는 검사.
@@ -250,6 +250,66 @@ namespace Ssalddel.WindowsGame
                 if (!string.IsNullOrEmpty(detail)) lines.Append(" — ").Append(detail);
             }
             return "Hongdal role app replay checks: " + (results.Count - failed) + " passed, " + failed + " failed" + lines;
+        }
+
+        // 다음 할 일 · 이번 턴 계획(2026-11-16). 신호에서 고를 일을 모으고 계획을 담고 넘기는 순수 규칙이며 업무 상태를 바꾸지 않는다.
+        private static string NextTodoChecks()
+        {
+            var results = 다음할일Checks.Run();
+            var failed = 0;
+            var lines = new System.Text.StringBuilder();
+            foreach (var (name, ok, detail) in results)
+            {
+                if (!ok) failed++;
+                lines.Append('\n').Append(ok ? "[PASS] " : "[FAIL] ").Append(name);
+                if (!string.IsNullOrEmpty(detail)) lines.Append(" — ").Append(detail);
+            }
+            return "Hongdal next todo checks: " + (results.Count - failed) + " passed, " + failed + " failed" + lines;
+        }
+
+        // 이어지는 지도(2026-11-16). 전국 · 권역 · 구 · 동을 한 배율 축으로 잇는 순수 규칙이며 업무 상태를 바꾸지 않는다.
+        private static string ContinuousMapChecks()
+        {
+            var results = 이어지는지도Checks.Run();
+            var failed = 0;
+            var lines = new System.Text.StringBuilder();
+            foreach (var (name, ok, detail) in results)
+            {
+                if (!ok) failed++;
+                lines.Append('\n').Append(ok ? "[PASS] " : "[FAIL] ").Append(name);
+                if (!string.IsNullOrEmpty(detail)) lines.Append(" — ").Append(detail);
+            }
+            return "Hongdal continuous map checks: " + (results.Count - failed) + " passed, " + failed + " failed" + lines;
+        }
+
+        // 배달 플랫폼 패키지 뼈대(2026-11-16). 패키지 표 · 아래 줄 · 지사 = 동 묶음 · 시간대 필요 기사의 순수 규칙이며 업무 상태를 바꾸지 않는다.
+        private static string PlatformPackageChecks()
+        {
+            var results = 배달플랫폼Checks.Run();
+            var failed = 0;
+            var lines = new System.Text.StringBuilder();
+            foreach (var (name, ok, detail) in results)
+            {
+                if (!ok) failed++;
+                lines.Append('\n').Append(ok ? "[PASS] " : "[FAIL] ").Append(name);
+                if (!string.IsNullOrEmpty(detail)) lines.Append(" — ").Append(detail);
+            }
+            return "Hongdal platform package checks: " + (results.Count - failed) + " passed, " + failed + " failed" + lines;
+        }
+
+        // 00 경영 — 오행 하향식(2026-11-17). 다섯 열 · 경로 · 주문 단계의 순수 규칙이며 업무 상태를 바꾸지 않는다.
+        private static string FiveElementBoardChecks()
+        {
+            var results = 오행경영Checks.Run();
+            var failed = 0;
+            var lines = new System.Text.StringBuilder();
+            foreach (var (name, ok, detail) in results)
+            {
+                if (!ok) failed++;
+                lines.Append('\n').Append(ok ? "[PASS] " : "[FAIL] ").Append(name);
+                if (!string.IsNullOrEmpty(detail)) lines.Append(" — ").Append(detail);
+            }
+            return "Hongdal five-element board checks: " + (results.Count - failed) + " passed, " + failed + " failed" + lines;
         }
 
         // 떴다 사라지는 알림(2026-11-15). 무엇을 얼마 동안 보일지의 순수 규칙이며 업무 상태를 바꾸지 않는다.
