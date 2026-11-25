@@ -66,7 +66,7 @@ namespace Ssalddel.WindowsGame
             DioramaVisible && DongModulesLoaded && dongManifest != null;
         // 오른쪽 칸에 다른 것이 떠 있으면 자리를 내준다.
         private bool MiniMapCrowded => selectedBuilding != null || actorFocus != null || dongPanelOpen || zonePanelOpen ||
-            DailyReportVisible || CycleCardVisible || ExpansionPanelVisible || !cycleCardFolded;
+            DailyReportVisible || CycleCardVisible || ExpansionPanelVisible || !cycleCardFolded || 할일판보임;
         private bool MiniMapShown => MiniMapReady && !MiniMapCrowded && LoadMiniMap();
         private bool MiniMapOpen => MiniMapShown && !miniMapFolded;
         private Rect MiniMapRect => miniMapFolded ? MiniMapLine : MiniMapPanel;
@@ -567,6 +567,7 @@ namespace Ssalddel.WindowsGame
                 MiniSay("이 역 판 밖입니다 · ◀ ▶ 로 역을 바꿉니다");
                 return "board";
             }
+            관찰지도수동이동();
             MoveViewTo(latitude, longitude);
             MiniSay(dong.Entry.name + "으로 옮겼습니다");
             return "moved";

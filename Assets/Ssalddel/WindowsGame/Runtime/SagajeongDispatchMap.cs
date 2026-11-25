@@ -56,7 +56,12 @@ namespace Ssalddel.WindowsGame
 
         private void ResizeMapViewport(float scale)
         {
-            var next = MapViewport(Screen.width, Screen.height, scale);
+            SetMapField(MapViewport(Screen.width, Screen.height, scale));
+        }
+
+        // 지도 자리를 바꾼다(창 크기 · 세로 화면: SagajeongDispatchPortrait.cs)
+        private void SetMapField(Rect next)
+        {
             if (next == Field) return;
 
             mapOffset += (next.size - Field.size) * ((1f - mapZoom) * 0.5f);
@@ -164,13 +169,18 @@ namespace Ssalddel.WindowsGame
             if (!LevelPromptCovers(wheel.mousePosition) && MapOverlayCovers(wheel.mousePosition)) return;
 
             var delta = wheel.delta.y;
-            var wheelAt = wheel.mousePosition - Field.position;
-            var pointer = FlatPoint(wheelAt);
             wheel.Use();
             if (mapPointerDown) return;
+            ApplyMapWheel(delta, wheel.mousePosition, Time.realtimeSinceStartupAsDouble);
+        }
 
+        // 정밀 3(2026-11-16): 휠 한 칸의 처리. 촬영의 휠 왕복(SagajeongDispatchContinuityProof.cs)도 이 길을 그대로 지난다.
+        // mouse는 논리 화면 좌표(Event.mousePosition과 같은 좌표), now는 막힘 시간을 재는 시각.
+        private void ApplyMapWheel(float delta, Vector2 mouse, double now)
+        {
+            var wheelAt = mouse - Field.position;
+            var pointer = FlatPoint(wheelAt);
             var direction = delta > 0 ? 1 : -1;
-            var now = Time.realtimeSinceStartupAsDouble;
             if (direction == lastWheelLevelDirection && now < wheelLevelBlockedUntil)
                 return;
             lastWheelLevelDirection = 0;
@@ -184,6 +194,7 @@ namespace Ssalddel.WindowsGame
                     var nextZoom = Mathf.Clamp(mapZoom * Mathf.Pow(1.08f, -delta), floor, MaxMapZoom);
                     if (nextZoom != mapZoom)
                     {
+                        관찰지도수동이동();
                         // 가까이 보기: 배율에 따라 내려다보는 각이 눕는다. 새 각에서도 가리킨 땅이 그 자리에 남게 한다.
                         var board = (pointer - mapOffset) / mapZoom;
                         var anchor = UseCloseLens(nextZoom) ? FlatPoint(wheelAt) : pointer;
@@ -196,29 +207,32 @@ namespace Ssalddel.WindowsGame
                     return;
                 }
 
-                // 동네 전체가 보이는 한계에 닿았다. 그 화면을 한 번 보여 준 뒤부터 알림을 연다.
+                // 동네 전체가 보이는 한계에 닿았다. 그 화면을 한 번 보여 준 뒤, 알림 창 없이 같은 자리의 구 지도로 이어 간다(이어지는 지도).
                 if (!dongZoomFloorVisible) return;
-                if (!AdvanceLevelPrompt(MapLevel.District, now)) return;
-                ChangeMapLevel(1);
+                DongToGu();
+                lastWheelLevelDirection = direction;
+                wheelLevelBlockedUntil = now + WheelLevelCooldown;
                 return;
             }
 
             if (GuMapVisible)
             {
-                // 구 지도는 그 안에서 확대·축소한다. 끝까지 축소하면 서울 지도 안내로, 면목동에서 끝까지 확대하면 동네 지도로 간다.
-                var step = GuWheel(delta, wheel.mousePosition - Field.position);
+                // 구 지도는 그 안에서 확대·축소한다. 끝까지 축소하면 같은 자리의 전국 지도로(서울 단계 없음, r184), 면목동에서 끝까지 확대하면 동네 지도로 간다.
+                var step = GuWheel(delta, mouse - Field.position);
                 if (step == 0) return;
                 if (step < 0)
                 {
                     ChangeMapLevel(-1);
                     return;
                 }
+                GuToNation(mouse - Field.position);
+                return;
             }
 
             if (NationMapVisible)
             {
-                // 전국 지도도 그 안에서 확대·축소한다. 서울 근처에서 끝까지 확대하면 서울 지도로 내려간다.
-                if (NationWheel(delta, wheel.mousePosition - Field.position) < 0) ChangeMapLevel(-1);
+                // 전국 지도도 그 안에서 확대·축소한다. 구 지도 자료 안에서 끝까지 확대하면 같은 자리의 구 지도로 이어 간다.
+                if (NationWheel(delta, mouse - Field.position) < 0) NationToGu(mouse - Field.position);
                 return;
             }
 
@@ -233,8 +247,33 @@ namespace Ssalddel.WindowsGame
             ChangeMapLevel(-1);
         }
 
+        // 판 가름(판Policy.cs): 기본 판은 구 지도가 바탕이다. 검증 촬영(--sagajeong-… · --hongdal-view…)은 상위 판의 길까지 보므로 열어 둔다.
+        private bool dongMapOpen = 판Policy.동지도 || (Environment.GetCommandLineArgs().Any(item =>
+            item.StartsWith("--sagajeong-", StringComparison.Ordinal) || item.StartsWith("--hongdal-view", StringComparison.Ordinal)) &&
+            !Environment.GetCommandLineArgs().Any(item => item.StartsWith("--hongdal-base", StringComparison.Ordinal)));      // 기본 판 시험은 닫고 본다
+        private bool baseEditionStarted;      // 기본 판: 첫 상태를 받은 뒤 구 지도로 올라갔다
+
+        // Update가 부른다. 기본 판이면 게임이 시작되자마자 구 지도로 올라간다. 그 뒤로 동네 지도 요청은 구 지도에 머문다.
+        private void StartBaseEditionOnGu()
+        {
+            if (dongMapOpen || baseEditionStarted || state == null) return;
+            LoadMapLevel(MapLevel.District);
+            if (mapLevel != MapLevel.District) return;      // 구 지도 자료가 아직이면 다음에 다시
+            baseEditionStarted = true;
+            guManual = false;
+            Debug.Log("Hongdal edition: 기본 판 — 구 지도에서 시작");
+        }
+
         private void LoadMapLevel(MapLevel target, LegalDong dong = null)
         {
+            if (target == MapLevel.Dong && !dongMapOpen && baseEditionStarted)
+            {
+                if (mapLevel == MapLevel.District) return;      // 기본 판: 동네 지도 대신 구 지도에 머문다
+                target = MapLevel.District;
+                dong = null;
+            }
+            if (target != mapLevel) 관찰지도수동이동();
+            if (target != mapLevel && target != MapLevel.Dong) 관찰선택해제();
             if (target == MapLevel.Dong)
             {
                 ReleaseMapTexture();
@@ -404,7 +443,10 @@ namespace Ssalddel.WindowsGame
                 if (mapLevel == MapLevel.Dong)
                     DrawBoard();
                 else
-                    DrawOverviewLabels();
+                {
+                    // 서울 25구 비교가 켜져 있으면 그 판이 서울 지도를 대신한다(SagajeongDispatchSeoulCompare.cs)
+                    if (mapLevel != MapLevel.Seoul || !DrawSeoulCompare()) DrawOverviewLabels();
+                }
             }
             GUI.EndGroup();
             mapGroupShift = Vector2.zero;
@@ -487,6 +529,7 @@ namespace Ssalddel.WindowsGame
             DrawRoleBuildings();
             DrawManagedMarks();          // 회색 동네와 관리 건물: 옥상의 운영 표식
             DrawRoamers();               // 계속 돌아다니는 기사 (SagajeongDispatchRoam.cs)
+            DrawNavRoute();              // 길찾기: 고른 길 · 걷는 구간 · 기사 빛 (SagajeongDispatchNavigation.cs)
             DrawCityBoardLandmark();
             DrawOrderRipples();          // r154: 착지 파동은 경로·표식보다 아래
             foreach (var courier in state.couriers)
@@ -515,7 +558,7 @@ namespace Ssalddel.WindowsGame
             DrawNoticeTags();            //   그 자리의 짧은 글
             DrawGlowName();              // 빛에 올리면 그때만 이름이 뜬다 (SagajeongDispatchRoam.cs)
             // 표식이 먼저다. 표식이 아닌 곳을 눌렀을 때만 건물을 고른다 (2A-2).
-            if (mapClick)
+            if (mapClick && !PickDongFocus())      // 디오라마 시설 모양을 누르면 집중 · 빈 곳이면 풀고 건물 고르기로(SagajeongDispatchDongFocus.cs)
             {
                 PickBuilding(releasePoint);
                 if (mapDoubleClick) OpenDongDeskAtPick();      // 땅이나 건물을 두 번 누르면 그 동의 관리 창 (SagajeongDispatchDongDesk.cs)

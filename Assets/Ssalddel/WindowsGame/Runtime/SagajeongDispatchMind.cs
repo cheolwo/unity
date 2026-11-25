@@ -42,6 +42,7 @@ namespace Ssalddel.WindowsGame
 
         private void CheckRiderMind(string courierId)
         {
+            if (!직접업무가능()) return;
             var result = engine.Business(new GameCommand
             {
                 OsId = 기사무념Module.Id,
@@ -89,12 +90,53 @@ namespace Ssalddel.WindowsGame
                 maintained > 0 && linked > 0 ? $"{linked / (maintained / 60):N0}원" : "산정 대기", note);
         }
 
+        // 경 수치 두 칸(2026-11-23 20:33: 위 띠에서 상태창으로 옮김). courierId가 있으면 그 기사, 없으면 오늘 배차 기사 전체의 합.
+        //  - 경 유지 시간: 오늘 무념을 유지한 시간 · 경 시간당 순소득: 그 구간에 연결된 가상 순소득 ÷ 유지 시간(비용 미반영).
+        private void DrawGyeongFigures(float x, float y, float width, string courierId)
+        {
+            string maintained, perHour, note;
+            if (courierId != null)
+            {
+                var mind = MindOf(courierId);
+                maintained = mind.Maintained > 0 ? MindDuration(mind.Maintained) : "기록 대기";
+                perHour = mind.Maintained > 0 && mind.Linked > 0 ? $"{mind.Linked / (mind.Maintained / 60):N0}원" : "산정 대기";
+                note = mind.Broken ? "무념 깨짐 · 새 배차를 받지 않습니다" : "가상 · 비용 미반영 · 이 기사 오늘";
+            }
+            else
+            {
+                var headline = MindHeadline();
+                maintained = headline.Maintained;
+                perHour = headline.PerHour;
+                note = "가상 · 비용 미반영 · 홍달 기사 전체 오늘" + (headline.Note != null ? " · " + headline.Note : "");
+            }
+            var half = (width - 6f) / 2f;
+            DrawGyeongBox(new Rect(x, y, half, 40f), "오늘 경 유지", maintained);
+            DrawGyeongBox(new Rect(x + half + 6f, y, half, 40f), "경 시간당 순소득", perHour);
+            Text(new Rect(x, y + 41f, width, 14f), note, 9, note.StartsWith("무념 깨짐") ? Red : Soft);
+        }
+
+        private void DrawGyeongBox(Rect box, string label, string value)
+        {
+            Paint(box, Tile, 7);
+            Text(new Rect(box.x + 8f, box.y + 3f, box.width - 12f, 14f), label, 9, Soft);
+            Text(new Rect(box.x + 8f, box.y + 16f, box.width - 12f, 22f), value, 15, Paper, true);
+        }
+
         // r134: 오늘 주문(소비)·매장 준비 여력(생산)·배송 여력(연결)을 비교한다.
         private (int Orders, int Prepare, int Deliver, int Limit, string Focus) MindFlow()
         {
             var mind = MindSnapshot();
             if (state == null || mind == null || !mind.Observed) return (0, 0, 0, 0, "회차를 불러오는 중입니다.");
             return (mind.FlowOrders, mind.FlowPrepare, mind.FlowDeliver, mind.FlowLimit, mind.FlowFocus);
+        }
+
+        // 등급은 처음에 「레벨 n」으로 보인다(20:42 사용자). 자료 창 「게임 요소 · 등급 이름」을 켜면 신사 · 문사 …(20:47 「할 사람은 하고 아니면 안 하는 걸로」).
+        // 커널의 등급 이름 · 승급 기록은 그대로.
+        private string GradeLabel(int grade)
+        {
+            var names = 기사무념Policy.GradeNames;
+            if (gradeNamesOn && grade >= 0 && grade < names.Length) return names[grade];
+            return $"레벨 {grade + 1}";
         }
 
         private void DrawMindCard(float x, float y, string courierId)
@@ -105,7 +147,7 @@ namespace Ssalddel.WindowsGame
             DrawTarot(new Rect(x + 8, y + 8, 44, 74), mind.TarotId, mind.Broken);
             var tx = x + 60;
             Paint(new Rect(tx, y + 11, 11, 11), GradeColors[mind.Grade], 6);
-            Text(new Rect(tx + 16, y + 6, 148, 20), $"{mind.GradeName} · 개인 타로 {mind.TarotName}", 12, Paper, true);
+            Text(new Rect(tx + 16, y + 6, 148, 20), $"{GradeLabel(mind.Grade)} · 개인 타로 {mind.TarotName}", 12, Paper, true);
             Text(new Rect(tx, y + 27, 160, 18), mind.Broken ? "역방향 · 무념 상태가 깨졌습니다" : "정방향 · 무념 유지",
                 11, mind.Broken ? Red : Mint, true);
 
@@ -117,10 +159,10 @@ namespace Ssalddel.WindowsGame
             Text(new Rect(tx, y + 59, 160, 18), $"경 {MindDuration(mind.Remaining)} 남음 / {MindDuration(mind.Capacity)}", 11, Soft);
 
             var next = mind.HasNextGrade
-                ? $"다음 {mind.NextGradeName} · {MindDuration(mind.NextGradeMinutes)} 이상 {mind.Qualifying}/{기사무념Policy.ShiftsForPromotion}"
-                : "최고 등급";
+                ? $"다음 {GradeLabel(mind.Grade + 1)} · {MindDuration(mind.NextGradeMinutes)} 이상 {mind.Qualifying}/{기사무념Policy.ShiftsForPromotion}"
+                : gradeNamesOn ? "최고 등급" : "최고 레벨";
             Text(new Rect(x + 8, y + 86, 210, 16),
-                $"오늘 유지 {MindDuration(mind.Maintained)} · 정산 {mind.Settled}건 · 유효 {mind.ValidDays}일", 10, Soft);
+                $"정산 {mind.Settled}건 · 연결 {mind.Linked:N0}원 · 유효 {mind.ValidDays}일", 10, Soft);
             Text(new Rect(x + 8, y + 102, 140, 16), next, 10, Soft);
 
             var check = new Rect(x + 150, y + 99, 66, 23);

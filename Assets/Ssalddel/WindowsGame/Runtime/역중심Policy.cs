@@ -23,6 +23,10 @@ namespace Ssalddel.WindowsGame
     internal static class 역중심Policy
     {
         public const double Radius = 600;        // 한 판의 반경(m, 표현값)
+        // 역 세 겹(2026-11-19). 서울시 역세권 기준(승강장 경계에서 1차 250 m · 2차 500 m)에서 빌린 표현값이다. 승강장이 아니라 역 자리에서 잰다.
+        public const double Core = 250;          // 역 핵심: 가장 정밀하고 밝다
+        public const double Area = 500;          // 역세권: 그 너머는 낮고 가라앉는다
+        public const double FarHeight = 0.38;    // 역세권 너머 건물의 높이 배율(표현값)
         public const double Fade = 170;          // 그 바깥으로 흐려지며 이어지는 폭(m, 표현값)
 
         public static readonly IReadOnlyList<역자리> Stations = new[]

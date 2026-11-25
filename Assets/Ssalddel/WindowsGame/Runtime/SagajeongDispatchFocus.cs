@@ -12,7 +12,7 @@ namespace Ssalddel.WindowsGame
         private const int AfterDrivingMinutes = 180;
         private (FocusKind Kind, string Id)? actorFocus;
 
-        private enum FocusKind { Courier, Store, Drop, Rider, Cargo, Center }      // Cargo · Center: 홍달 화물 · 홍달 창고 휴대폰 (SagajeongDispatchRolePhones.cs)      // Drop · Rider: 빛을 눌렀을 때의 카드 (SagajeongDispatchRoam.cs)
+        private enum FocusKind { Courier, Store, Drop, Rider, Cargo, Center, Inspection } // 기존 값은 유지하고 검수 관찰을 끝에 붙인다.
 
         private bool IsFocused(FocusKind kind, string id) =>
             actorFocus is { } focus && focus.Kind == kind && focus.Id == id;
@@ -119,13 +119,14 @@ namespace Ssalddel.WindowsGame
             var historyOffset = 154;
             if (courier != null)
             {
-                DrawMindCard(x, y + 150, courier.id);
-                historyOffset += 139;
+                DrawGyeongFigures(x, y + 148, focusPanel.width - 26f, courier.id);      // 오늘 경 유지 · 경 시간당 순소득 (위 띠에서 옮겨 옴)
+                DrawMindCard(x, y + 204, courier.id);
+                historyOffset += 195;
             }
 
             Text(new Rect(x, y + historyOffset, 223, 20), "최근 관련 진행", 12, Soft, true);
             var events = order == null ? Array.Empty<DispatchEvent>() : (state.events ?? Array.Empty<DispatchEvent>())
-                .Where(entry => entry.orderId == order.id).Reverse().Take(3).ToArray();
+                .Where(entry => entry.orderId == order.id).Reverse().Take(courier != null ? (focusPanel.height >= 420 ? 2 : 1) : 3).ToArray();
             if (events.Length == 0)
                 Text(new Rect(x, y + historyOffset + 27, 223, 21), "아직 표시할 진행 기록이 없습니다.", 12, Soft);
             for (var index = 0; index < events.Length; index++)

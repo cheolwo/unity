@@ -85,7 +85,7 @@ namespace Ssalddel.WindowsGame
             {
                 Id = signal.Id, OsId = signal.OsId, PlaceId = signal.PlaceId, Severity = SignalSeverities.Caution,
                 ReasonCode = signal.ReasonCode, Title = signal.Title,
-                Message = anyFree ? "맡김이 켜져 있어요 · 손이 비면 곧 기사를 붙여요." : "빈 기사가 없어 기다려요 · 맡김이 기다리는 일에 남겨요.",
+                Message = anyFree ? "맡김이 기다린 주문에 기사를 붙여요." : "빈 기사가 없어 기다려요 · 맡김이 기다리는 일에 남겨요.",
                 ActionLabel = signal.ActionLabel, SinceMs = signal.SinceMs, EscalatedMs = 0, ResolvedMs = signal.ResolvedMs,
             };
         }
@@ -133,20 +133,20 @@ namespace Ssalddel.WindowsGame
             receipt.dayAdvanced = state.campaign != null && state.campaign.day > firstDay && !DayCardVisible;
             receipt.dayAfterCard = state.campaign?.day ?? 0;
 
-            // 맡김을 켠 채 손이 있는 동안: 배차 대기가 커널에서 위험이 되면 화면에서는 주의
-            autopilotOn = true;
-            autopilotProofIdle = false;
-            lastHandsTime = Time.realtimeSinceStartupAsDouble;
+            // 화에서 대기 위험을 만든 뒤, 같은 시점의 신호를 중에서 어떻게 보여주는지 확인한다.
+            autopilotOn = false;
             Signal kernelDanger = null;
             for (var step = 0; step < 10 && error == null && kernelDanger == null; step++)
             {
                 if (state.campaign != null && state.campaign.phase != "open") break;
-                lastHandsTime = Time.realtimeSinceStartupAsDouble;
                 Send(new DispatchRequest { action = "tick", elapsedMs = state.elapsedMs + 60_000 });
                 yield return Until(() => pending == null, deadline);
                 yield return null;
                 kernelDanger = engine.Kernel.Signals.FirstOrDefault(item => item.ReasonCode == "dispatch-waiting" && item.IsDanger);
             }
+            var 영업중 = running;
+            running = false;
+            autopilotOn = true;
             yield return null;
             yield return null;
             receipt.waitingSignalDangerInKernel = kernelDanger != null;
@@ -156,6 +156,7 @@ namespace Ssalddel.WindowsGame
             receipt.waitingSignalShownText = shown?.Message ?? string.Empty;
             yield return SaveFrame(directory, "84-signal-soft.png");
             autopilotOn = false;
+            running = 영업중;
             holdProofClock = false;
         }
     }

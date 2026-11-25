@@ -366,7 +366,7 @@ namespace Ssalddel.WindowsGame
             Paint(button, Mint, 7);
             Paint(new Rect(button.x + 1, button.y + 1, button.width - 2, button.height - 2), Ink(0x18372F), 6);
             Text(new Rect(button.x + 12, button.y, 100, button.height), "홍달 플레이스", 13, Paper, true);
-            Text(new Rect(button.x + 66, button.y, 76, button.height), "주문자 화면", 9, Mint, align: TextAnchor.MiddleRight);
+            Text(new Rect(button.x + 66, button.y, 76, button.height), "주문자", 9, Mint, align: TextAnchor.MiddleRight);      // 2026-11-24 정리: 「주문자 화면」이 이름과 겹쳐 줄임
             if (Hit(button)) OpenPlace();
         }
 

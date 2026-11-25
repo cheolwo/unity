@@ -22,6 +22,7 @@ namespace Ssalddel.WindowsGame
         {
             mapOnly = false;
             showDesk = !showDesk;
+            if (!showDesk) 관찰업무복귀();
         }
 
         private void ToggleTime()

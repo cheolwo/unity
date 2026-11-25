@@ -20,6 +20,7 @@ namespace Ssalddel.WindowsGame
     public sealed partial class SagajeongDispatchView
     {
         private static readonly int DioramaWindowId = Shader.PropertyToID("_Window");
+        private static readonly int StationTierId = Shader.PropertyToID("_HongdalTier");      // 역 세 겹(전역 값)
         private static readonly Color StationLine = Ink(0x8C9828);       // 역 표식의 색(올리브, 표현값)
         private const int StationRingPoints = 64;
         private const int StationMinBuildings = 20;       // 판 안에 그 동의 건물이 이보다 적으면 이름표를 세우지 않는다
@@ -35,6 +36,11 @@ namespace Ssalddel.WindowsGame
 
         private int stationIndex;                 // 지금 보는 역
         private string stationCardRegion;         // 판 위의 동 사업 칸이 보여 줄 동
+        // 판 위의 동 사업 칸을 펼쳤는가 (2026-11-17 사용자: 처음 화면의 위 카드는 굳이 없어도 된다).
+        // 처음 보기 · 역 넘기기에서는 접어 둔다. 다른 곳에서 그 동을 찾아 넘어올 때만 편다. 고른 동(밝기 · 사업 창)은 그대로다.
+        private bool stationCardShown;
+        // 역 판의 동 이름표로 그 동에 들어왔을 때 돌아갈 역(없으면 -1). 이 동만 보기 아래에 「역 판으로」 단추가 선다.
+        private int stationReturnIndex = -1;
         private readonly Dictionary<string, StationAnchor> stationAnchors = new(StringComparer.Ordinal);     // 지역 ID → 판 안에서 그 동의 이름표 자리
         private int stationLayoutStamp = int.MinValue;
         private double stationCoverage = 1;
@@ -153,6 +159,7 @@ namespace Ssalddel.WindowsGame
             if (other < 0 || other == stationIndex) return false;
             stationIndex = other;
             stationCardRegion = regionId;
+            stationCardShown = true;                  // 그 동을 찾아 넘어왔으니 사업 칸을 편다
             stationLayoutStamp = int.MinValue;
             return FocusStation();
         }
@@ -165,9 +172,10 @@ namespace Ssalddel.WindowsGame
         }
 
         // 판 위의 사업 칸을 그 동으로 바꾼다. 지도는 옮기지 않는다.
-        private void SelectStationDong(string regionId)
+        private void SelectStationDong(string regionId, bool showCard = true)
         {
             stationCardRegion = regionId;
+            if (showCard) stationCardShown = true;
             focusDongRegion = regionId;
             ApplyDongDim();
             Debug.Log("Hongdal station view: dong " + regionId);
@@ -176,8 +184,10 @@ namespace Ssalddel.WindowsGame
         // 역을 넘긴다.
         private void StepStation(int step)
         {
+            관찰지도수동이동();
             stationIndex = 역중심Policy.Step(stationIndex, step, 역중심Policy.Stations.Count);
             stationCardRegion = null;
+            stationCardShown = false;
             stationLayoutStamp = int.MinValue;
             FocusStation();
         }
@@ -219,6 +229,8 @@ namespace Ssalddel.WindowsGame
         private void SyncStationWindow()
         {
             if (dioramaMaterial == null) return;
+            Shader.SetGlobalVector(StationTierId, StationView
+                ? new Vector4((float)역중심Policy.Core, (float)역중심Policy.Area, 1f, (float)역중심Policy.FarHeight) : Vector4.zero);
             var window = Vector4.zero;
             if (StationView)
             {
@@ -273,6 +285,25 @@ namespace Ssalddel.WindowsGame
                     Line(points[i], points[(i + 1) % points.Length], Canvas, 4.5f);
                     Line(points[i], points[(i + 1) % points.Length], Mint, 2.2f);
                 }
+                // 역 세 겹의 둘레: 역 핵심(250 m)과 역세권(500 m)
+                foreach (var (reach, tint, label) in new[] { (역중심Policy.Core, Gold, "역 핵심"), (역중심Policy.Area, Soft, "역세권") })
+                {
+                    var tier = 역중심Policy.Ring(stationEast, stationNorth, reach, StationRingPoints);
+                    var first = Vector2.zero;
+                    var before = Vector2.zero;
+                    for (var i = 0; i <= tier.Count; i++)
+                    {
+                        var spot = tier[i % tier.Count];
+                        var now = ProjectScene(dongManifest.originLatitude + spot.North / dongManifest.metresPerDegreeLatitude,
+                            dongManifest.originLongitude + spot.East / dongManifest.metresPerDegreeLongitude, 0f, Vector2.zero);
+                        if (i == 0) first = now;
+                        else if (i % 2 == 1) { Line(before, now, Fade(Canvas, 0.7f), 4f); Line(before, now, Fade(tint, 0.9f), 2f); }      // 점선
+                        before = now;
+                    }
+                    var plate = new Rect(first.x - 44f, first.y - 9f, 88f, 17f);      // 정북 쪽 둘레 위
+                    Paint(plate, Fade(Canvas, 0.88f), 6);
+                    Text(plate, label + " " + reach.ToString("0") + " m", 10, tint, true, TextAnchor.MiddleCenter);
+                }
                 // 역 자리
                 var middle = ProjectScene(station.Latitude, station.Longitude, 0f, Vector2.zero);
                 Paint(new Rect(middle.x - 8, middle.y - 8, 16, 16), Canvas, 8);
@@ -296,8 +327,8 @@ namespace Ssalddel.WindowsGame
                 if (flagged && repaint) DrawDongFlag(at);
                 if (HitMapMarker(plate))
                 {
-                    SelectStationDong(pair.Key);
-                    if (mapDoubleClick) OpenDongDesk(pair.Key);      // 두 번 누르면 동 관리 창 (SagajeongDispatchDongDesk.cs)
+                    관찰지도수동이동();
+                    EnterDongFromStation(pair.Key);       // 한 번 누르면 그 동 디오라마 + 동 관리 창 (2026-11-17 사용자)
                     return;
                 }
             }
@@ -340,7 +371,50 @@ namespace Ssalddel.WindowsGame
 
             // 고른 동의 사업 칸을 판 위에.
             var chosen = DongModuleById(stationCardRegion);
-            if (chosen != null && DongFlagsActive) DrawDongBusinessCard(chosen, top);
+            if (chosen != null && DongFlagsActive && stationCardShown) DrawDongBusinessCard(chosen, top);
+        }
+
+        // 역 판의 동 이름표를 한 번 누름 (2026-11-17 사용자: 면목5동 · 면목7동을 누르면 그 행정동을 관리하는 디오라마로 옮겨 조작이 간편하게).
+        // 그 동만 보기로 옮기고 왼쪽 동 관리 창을 연다. 떠나온 역을 적어 두어 아래에 「역 판으로」 단추를 세운다. 보기만 바꾼다(시계 · 업무 그대로).
+        private bool EnterDongFromStation(string regionId)
+        {
+            var from = stationIndex;
+            stationCardShown = false;
+            if (!PickDong(regionId)) return false;       // 동 이동 창(M)과 같은 길로 「이 동만」에 들어간다
+            stationReturnIndex = from;
+            OpenDongDesk(regionId);
+            return true;
+        }
+
+        // 떠나온 역 판으로 돌아간다. 들어왔던 동을 고른 동으로 둔 채 판을 다시 맞추고, 동 관리 창은 닫는다.
+        private bool ReturnToStationBoard()
+        {
+            if (stationReturnIndex < 0) return false;
+            var region = soloRegion;
+            stationIndex = Mathf.Clamp(stationReturnIndex, 0, 역중심Policy.Stations.Count - 1);
+            stationReturnIndex = -1;
+            dongDeskOpen = false;
+            focusDongRegion = region;
+            stationCardRegion = region;
+            stationCardShown = false;
+            SetDongView(DongView.Station);
+            return StationView;
+        }
+
+        // 이 동만 보기에서 아래 가운데의 「◀ 역 판으로 · 역 이름」 단추(역 판의 역 이름 칸과 같은 자리 · 모양). 눌렀으면 true.
+        private bool DrawStationReturn()
+        {
+            if (stationReturnIndex < 0 || dongView != DongView.Solo || !DongModulesActive || PlaceVisible || CloseNow > 0.5f) return false;
+            var station = 역중심Policy.Stations[Mathf.Clamp(stationReturnIndex, 0, 역중심Policy.Stations.Count - 1)];
+            var title = "◀  역 판으로 · " + station.Name;
+            var width = title.Length * 11.5f + 28f;
+            var bar = new Rect(Field.width / 2 - width / 2, Field.height - 92, width, 26);
+            Paint(new Rect(bar.x - 1.5f, bar.y - 1.5f, bar.width + 3, bar.height + 3), StationLine, 8);
+            Paint(bar, bar.Contains(Event.current.mousePosition) ? Tile : Canvas, 7);
+            Text(bar, title, 12, Paper, true, TextAnchor.MiddleCenter);
+            if (!HitMapMarker(bar)) return false;
+            관찰지도수동이동();
+            return ReturnToStationBoard();
         }
     }
 }

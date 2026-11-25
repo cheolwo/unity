@@ -39,10 +39,17 @@ namespace Ssalddel.WindowsGame
 
         private bool MapOverlayCovers(Vector2 point)
         {
+            if (PortraitScreen) return PortraitCovers(point);      // 세로 화면은 제 판만 가린다 (SagajeongDispatchPortrait.cs)
             if (SettingsVisible) return true;          // 설정 화면이 떠 있으면 지도는 눌리지 않는다 (SagajeongDispatchSettings.cs)
+            if (패키지고르기표시) return true;         // 패키지 고르기 창 (SagajeongDispatchPlatformPackage.cs)
+            if (StancePickerVisible) return true;      // 입장 고르기 (SagajeongDispatchStance.cs)
+            if (StanceLoadingVisible) return true;     // 입장 자료 불러오기 창 (SagajeongDispatchDongFocus.cs)
+            if (경영판보임) return true;               // 00 경영 판이 떠 있으면 지도는 누르기 · 휠을 받지 않는다 (SagajeongDispatch오행경영.cs)
             if (DongPickerVisible) return true;        // 행정동 이동 창(r236)이 떠 있으면 지도는 누르기 · 휠을 받지 않는다 (SagajeongDispatchDongPicker.cs)
             if (PlaceCovers(point)) return true;       // 홍달 플레이스의 앱 판 · 위 띠 · 번호 핀 (SagajeongDispatchPlace.cs)
-            if (LevelPromptCovers(point) || LevelBannerCovers(point) || BuildingCardCovers(point) || NationCovers(point)) return true;
+            if (DataPanelCovers(point)) return true;   // 자료 창 (SagajeongDispatchDataControl.cs)
+            if (SeoulCompareCovers(point)) return true; // 서울 25구 비교 창 (SagajeongDispatchSeoulCompare.cs)
+            if (LevelPromptCovers(point) || LevelBannerCovers(point) || BuildingCardCovers(point) || NavCovers(point) || NationCovers(point) || ContinuityCovers(point)) return true;
             if (expansionView && !mapOnly)
             {
                 if (ExpansionCovers(point) || AttributionPanel.Contains(point) || DongDeskCovers(point) || StoreDeskCovers(point) || MiniMapCovers(point) || HelpCovers(point) ||

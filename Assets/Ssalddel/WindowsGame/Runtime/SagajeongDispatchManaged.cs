@@ -146,7 +146,7 @@ namespace Ssalddel.WindowsGame
                 if (string.IsNullOrEmpty(record.region)) continue;
                 if (!byRegion.TryGetValue(record.region, out var list))
                     byRegion[record.region] = list = new List<(int Index, string Id, string Kind, double Area, bool Fill)>();
-                list.Add((index, record.id, record.kind, record.area, record.fill));
+                list.Add((index, 관리건물Policy.OrderKey(record.id, record.sourceId), record.kind, record.area, record.fill));
             }
             foreach (var pair in byRegion) managedCandidates[pair.Key] = 관리건물Policy.Candidates(pair.Value);
         }

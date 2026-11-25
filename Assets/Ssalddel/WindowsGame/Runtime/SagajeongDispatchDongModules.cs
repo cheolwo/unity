@@ -71,6 +71,8 @@ namespace Ssalddel.WindowsGame
             public string resource;
             public long bytes;
             public string sha256;
+            public long rawBytes;          // 싼 자원(HDIZ)이면 싸기 전 메시의 길이 · 해시 (S2 첫 조각). 안 싼 자원이면 0 · 빈 값
+            public string rawSha256;
             public string moduleSha256;
             public string moduleContentHash;
             public int buildings;
@@ -202,6 +204,8 @@ namespace Ssalddel.WindowsGame
             var vertices = 0;
 
             using var sha = SHA256.Create();
+            var loadWatch = System.Diagnostics.Stopwatch.StartNew();
+            dongTreeMs = 0;
             foreach (var module in dongModules)
             {
                 if (module.Status != DongModuleWaiting) continue;
@@ -221,6 +225,7 @@ namespace Ssalddel.WindowsGame
                         module.Status = "판본 불일치";
                         continue;
                     }
+                    bytes = 행정동모듈Policy.UnpackModule(bytes, entry.rawBytes, entry.rawSha256);   // 싼 자원이면 풀고 원래 해시를 확인(S2)
                     using var reader = new BinaryReader(new MemoryStream(bytes));
                     var magic = reader.ReadBytes(4);
                     if (magic.Length != 4 || magic[0] != 'H' || magic[1] != 'D' || magic[2] != 'I' || magic[3] != 'O' ||
@@ -246,8 +251,25 @@ namespace Ssalddel.WindowsGame
                     part.transform.SetParent(dioramaRoot.transform, false);
                     module.Part = part;
                     module.Renderers.Add(AddDongPart(part, "Ground, roads and buildings", mesh, dioramaMaterial));
+                    Mesh drifting = null;
+                    var treeWatch = System.Diagnostics.Stopwatch.StartNew();
+                    var trees = EnsureTreeMaterial() != null ? BuildDongTrees(mesh, entry.code, out drifting) : null;      // 나무(표현, SagajeongDispatchTrees.cs)
+                    dongTreeMs += treeWatch.ElapsedMilliseconds;
+                    if (trees != null) module.Renderers.Add(AddDongPart(part, "Trees", trees, treeMaterial));
+                    if (drifting != null && driftMaterial != null)
+                    {
+                        var leafRenderer = AddDongPart(part, "Drifting leaves", drifting, driftMaterial);     // 바람에 날리는 잎 · 꽃잎
+                        leafRenderer.enabled = driftShown;
+                        driftRenderers.Add(leafRenderer);
+                        module.Renderers.Add(leafRenderer);
+                    }
+                    AddRealismParts(module, part, mesh, trees);      // 현실감 시험: 건물 꼬리표 · 해 그림자 · 접지 그늘 · 옥상 소품 (SagajeongDispatchRealism.cs)
                     if (dioramaShadowMaterial != null && shadows.vertexCount > 0)
-                        module.Renderers.Add(AddDongPart(part, "Shadows", shadows, dioramaShadowMaterial));
+                    {
+                        var baked = AddDongPart(part, "Shadows", shadows, dioramaShadowMaterial);
+                        bakedShadowRenderers.Add(baked);         // 현실감을 켜면 해 그림자로 바꾼다
+                        module.Renderers.Add(baked);
+                    }
                     if (module.Latitudes.Length >= 3)
                         module.Renderers.Add(AddDongPart(part, "Edge", BuildDongSkirt(module, manifest), dioramaMaterial));
                     dioramaWest = Math.Min(dioramaWest, west);
@@ -280,8 +302,10 @@ namespace Ssalddel.WindowsGame
             dioramaRoot.SetActive(false);
             QualitySettings.antiAliasing = 4;
             ApplyDongDim();
-            Debug.Log($"Hongdal dong modules: loaded {DongModulesLoadedCount}/{dongModules.Count}, buildings {dioramaBuildings}, " +
-                $"vertices {vertices}, renderers {dioramaRenderers}, materials {(dioramaShadowMaterial != null ? 2 : 1)}");
+            Debug.Log($"Hongdal dong modules: loaded {DongModulesLoadedCount}/{dongModules.Count}, buildings {dioramaBuildings}, trees {dioramaTrees}, drifting leaves {dioramaDriftLeaves}, " +
+                $"vertices {vertices}, renderers {dioramaRenderers}, materials {(dioramaShadowMaterial != null ? 2 : 1)}, " +
+                $"realism buildings {realismTagged}, contact edges {realismContacts}, roof prop vertices {realismProps}, street trees moved {streetTreesMoved} dropped {streetTreesDropped}, " +
+                $"refined (가) {realismRefined}, kerb faces {realismKerbFaces}, survey lamp poles {realismLampPoles}, alley cars {realismCars}, realism {realismMs} ms (kerb {realismKerbMs} ms), trees {dongTreeMs} ms, load {loadWatch.ElapsedMilliseconds} ms");
             return true;
         }
 
@@ -314,7 +338,8 @@ namespace Ssalddel.WindowsGame
                     : 행정동모듈Policy.DimFor(focus, module.Entry.regionId);
                 foreach (var renderer in module.Renderers)
                 {
-                    if (renderer == null || renderer.sharedMaterial != dioramaMaterial) continue;
+                    if (renderer == null || renderer.sharedMaterial != dioramaMaterial && (treeMaterial == null || renderer.sharedMaterial != treeMaterial) &&
+                        (driftMaterial == null || renderer.sharedMaterial != driftMaterial)) continue;
                     renderer.GetPropertyBlock(dongDimBlock);
                     dongDimBlock.SetFloat(DongDimId, dim);
                     renderer.SetPropertyBlock(dongDimBlock);
@@ -412,11 +437,14 @@ namespace Ssalddel.WindowsGame
         private void DrawDongModuleBoundaries()
         {
             if (mapLevel != MapLevel.Dong || !DioramaVisible) return;
+            DrawSubwayOverlay();      // 지하철 노선과 역 (SagajeongDispatchSubway.cs)
+            DrawDongDataLayers();     // 자료 창에서 켠 것: 길 · 버스 · 거리 소품 · 비눈 · 마우스 이름표 (SagajeongDispatchStreetProps.cs)
             if (StationView)
             {
                 DrawStationBoard();     // 역 중심 보기의 선과 이름표
                 return;
             }
+            if (DrawStationReturn()) return;      // 역 판에서 들어온 이 동만 보기: 「역 판으로」 단추 (SagajeongDispatchStationView.cs)
             var far = mapZoom < FarViewZoom;
             var separated = dongView == DongView.Separated;
             var repaint = Event.current.type == EventType.Repaint;
@@ -473,6 +501,7 @@ namespace Ssalddel.WindowsGame
                     Line(points[i], points[(i + 1) % points.Length], Canvas, 5f);
                     Line(points[i], points[(i + 1) % points.Length], Mint, 2.5f);
                 }
+            if (DrawDongCompass(focus, points)) return;     // 이 동만 보기: 팔방 이웃 칸 (SagajeongDispatchDongCompass.cs)
             var top = points.OrderBy(point => point.y).First();
             // 행정동 깃발: 깃발을 세우고, 이름 칸 대신 동 사업 칸을 그린다.
             if (DongFlagsActive)
@@ -636,6 +665,7 @@ namespace Ssalddel.WindowsGame
         private void SetDongView(DongView view)
         {
             if (dongView == view) return;
+            if (view != DongView.Solo) stationReturnIndex = -1;      // 이 동만 보기를 떠나면 「역 판으로」는 거둔다
             var keep = focusDongRegion;
             if (view == DongView.Solo)
                 soloRegion = keep ?? DongModuleAtViewCentre()?.Entry.regionId ??
@@ -715,7 +745,11 @@ namespace Ssalddel.WindowsGame
                 var chosen = dongView == view;
                 Paint(rect, chosen ? Mint : Tile, 5);
                 Text(rect, label, 10, chosen ? Canvas : Paper, true, TextAnchor.MiddleCenter);
-                if (Hit(rect)) SetDongView(view);
+                if (Hit(rect))
+                {
+                    if (dongView != view) 관찰지도수동이동();
+                    SetDongView(view);
+                }
             }
             var shown = 0;
             foreach (var module in dongModules)
@@ -730,7 +764,11 @@ namespace Ssalddel.WindowsGame
                 Text(rect, DongShortName(module.Entry.name), 10, visible ? (focused ? Mint : Paper) : Fade(Soft, 0.5f), focused,
                     TextAnchor.MiddleCenter);
                 if (!visible) Paint(new Rect(rect.x + 8, rect.center.y, rect.width - 16, 1), Fade(Soft, 0.5f));
-                if (Hit(rect)) ToggleDongChip(module);
+                if (Hit(rect))
+                {
+                    관찰지도수동이동();
+                    ToggleDongChip(module);
+                }
             }
         }
 

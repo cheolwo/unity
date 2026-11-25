@@ -86,9 +86,10 @@ namespace Ssalddel.WindowsGame
         };
 
         // 위쪽 띠(인계 사슬 · 신호)의 왼쪽 끝. 왼쪽에 동 관리 창이나 매장 창이 떠 있으면 그 오른쪽에서 시작해 창에 가리지 않는다.
-        private float TopStripLeft => DongDeskVisible || StoreDeskVisible ? 330f : 222f;
-        private Rect ChainStrip => new(TopStripLeft, mapLevel == MapLevel.Dong ? 92 : 136, 976f - TopStripLeft, 78);
-        private bool ChainStripVisible => expansionView && !mapOnly && !showDesk && chain.Started && mapLevel != MapLevel.Nation;
+        private float TopStripLeft => DongDeskVisible || StoreDeskVisible || 역할목록표시 || 관찰띠표시 || 플랫폼장부표시 ? 330f : 222f;
+        private Rect ChainStrip => new(TopStripLeft, (mapLevel == MapLevel.Dong ? 92 : 136) +
+            (관찰띠표시 ? 관찰띠칸.height + 6 : 0), 976f - TopStripLeft, 78);
+        private bool ChainStripVisible => expansionView && !mapOnly && !showDesk && (chain.Started || 플랫폼줄표시) && mapLevel != MapLevel.Nation;
         private bool BusinessCovers(Vector2 point) => !showDesk &&
             (SidePanelsVisible && BusinessLayerPanel.Contains(point) || ChainStripVisible && ChainStrip.Contains(point));
 
@@ -108,6 +109,9 @@ namespace Ssalddel.WindowsGame
 
         private GameResult SendBusiness(string osId, string action, Action<GameCommand> fill)
         {
+            var 읽음표시 = osId == 일일결산Module.Id && action == 일일결산Module.ConfirmAction;
+            if (!읽음표시 && !직접업무가능())
+                return GameResult.Fail("화로 전환한 뒤 업무를 확인해 주세요.", "FocusModeRequested");
             var command = new GameCommand
             {
                 OsId = osId,
@@ -363,6 +367,11 @@ namespace Ssalddel.WindowsGame
         private void DrawChainStrip()
         {
             if (!ChainStripVisible) return;
+            if (플랫폼줄표시)       // 「모든 사업 보기」에서는 지금까지의 인계 사슬 띠
+            {
+                본사띠그리기(ChainStrip);       // 배달 플랫폼 패키지: 같은 자리에 본사 띠 (SagajeongDispatchPlatformPackage.cs)
+                return;
+            }
             var strip = ChainStrip;
             Paint(strip, Rim, 10);
             Paint(new Rect(strip.x + 1, strip.y + 1, strip.width - 2, strip.height - 2), Canvas, 9);
@@ -429,6 +438,7 @@ namespace Ssalddel.WindowsGame
             if (ExpansionButton(new Rect(x, y + 70, width, 30), "이 매장의 주문 보기", known, Mint))
             {
                 showDetails = true;
+                관찰선택해제();
                 actorFocus = (FocusKind.Store, role.storeId);
             }
         }

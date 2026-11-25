@@ -131,6 +131,8 @@ namespace Ssalddel.WindowsGame
             Paint(tag, Lilac, 11);
             Paint(new Rect(tag.x + 1.5f, tag.y + 1.5f, tag.width - 3, tag.height - 3), Fade(Canvas, 0.95f), 10);
             Text(tag, title + " · 고름", 11, Paper, true, TextAnchor.MiddleCenter);
+            storeMarkRect = Rect.MinMaxRect(Mathf.Min(tag.x, top.x - ring) - 10f, tag.y - 8f, Mathf.Max(tag.xMax, top.x + ring) + 10f, top.y + ring + 10f);   // 동 집중 카드가 피한다(SagajeongDispatchDongFocus.cs)
+            storeMarkFrame = Time.frameCount;
         }
 
         // ── 오른쪽 건물 카드의 카페 칸: 매장 창이 있는 화면에서는 명령을 걷고 문 하나만 둔다(계획 D3) ──
@@ -409,8 +411,9 @@ namespace Ssalddel.WindowsGame
                     preview.CanConfirm ? preview.Message + " · 본부에 낼 돈으로 적힘" : preview.Message, 9, preview.CanConfirm ? Gold : SignalRed);
                 var confirm = new Rect(box.x + 10, box.y + 110, box.width - 20, 26);
                 Paint(confirm, preview.CanConfirm ? Mint : Panel, 6);
-                Text(confirm, "본부 발주 확정", 11, preview.CanConfirm ? Canvas : Fade(Soft, 0.7f), true, TextAnchor.MiddleCenter);
-                if (preview.CanConfirm && Hit(confirm)) run = StoreOrder;
+                Text(confirm, 확정말("본부 발주 확정", 다음할일Policy.발주키(storeDeskPlace)), 11, preview.CanConfirm ? Canvas : Fade(Soft, 0.7f), true, TextAnchor.MiddleCenter);
+                if (preview.CanConfirm && Hit(confirm)) run = 턴계획모드 ? (Action)(() => 매장계획담기(계획종류.발주)) : StoreOrder;
+                할일강조그리기(box, 다음할일Policy.발주키(storeDeskPlace));
                 y += box.height + 10;
             }
             else if (chain.ActionKey == "inspect" && receipt != null)
@@ -437,8 +440,9 @@ namespace Ssalddel.WindowsGame
                 Text(new Rect(box.x + 10, box.y + 72, box.width - 18, 16), preview.Message, 9, preview.CanConfirm ? Soft : SignalRed);
                 var confirm = new Rect(box.x + 10, box.y + 94, box.width - 20, 26);
                 Paint(confirm, preview.CanConfirm ? Mint : Panel, 6);
-                Text(confirm, "검수 확정", 11, preview.CanConfirm ? Canvas : Fade(Soft, 0.7f), true, TextAnchor.MiddleCenter);
-                if (preview.CanConfirm && Hit(confirm)) run = StoreInspect;
+                Text(confirm, 확정말("검수 확정", 다음할일Policy.검수키(storeDeskPlace)), 11, preview.CanConfirm ? Canvas : Fade(Soft, 0.7f), true, TextAnchor.MiddleCenter);
+                if (preview.CanConfirm && Hit(confirm)) run = 턴계획모드 ? (Action)(() => 매장계획담기(계획종류.검수)) : StoreInspect;
+                할일강조그리기(box, 다음할일Policy.검수키(storeDeskPlace));
                 y += box.height + 10;
             }
             else if (chain.ActionKey == "produce")
@@ -451,8 +455,9 @@ namespace Ssalddel.WindowsGame
                 Text(new Rect(box.x + 10, box.y + 24, box.width - 18, 28), preview.Message, 9, preview.CanConfirm ? Soft : SignalRed, wrap: true);
                 var confirm = new Rect(box.x + 10, box.y + 52, box.width - 20, 26);
                 Paint(confirm, preview.CanConfirm ? Mint : Panel, 6);
-                Text(confirm, store.Menu + " 1잔 제조", 11, preview.CanConfirm ? Canvas : Fade(Soft, 0.7f), true, TextAnchor.MiddleCenter);
-                if (preview.CanConfirm && Hit(confirm)) run = StoreProduce;
+                Text(confirm, 확정말(store.Menu + " 1잔 제조", 다음할일Policy.제조키(storeDeskPlace)), 11, preview.CanConfirm ? Canvas : Fade(Soft, 0.7f), true, TextAnchor.MiddleCenter);
+                if (preview.CanConfirm && Hit(confirm)) run = 턴계획모드 ? (Action)(() => 매장계획담기(계획종류.제조)) : StoreProduce;
+                할일강조그리기(box, 다음할일Policy.제조키(storeDeskPlace));
                 y += box.height + 10;
             }
 

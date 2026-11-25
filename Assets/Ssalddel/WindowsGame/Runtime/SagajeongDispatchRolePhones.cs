@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Ssalddel.WindowsGame.Kernel;
 using UnityEngine;
@@ -31,6 +33,245 @@ namespace Ssalddel.WindowsGame
 
         // ── 홍달 화물 ──
 
+        private string 관찰출고Id, 관찰운행Id, 관찰검수Id;
+        private readonly List<(string Id, string 이름, string 상태)> 고를물류 = new();
+        private bool 물류관찰중 => 관찰대상?.Kind is FocusKind.Center or FocusKind.Cargo or FocusKind.Inspection;
+        private string 현재물류키 => 관찰대상?.Kind switch
+        {
+            FocusKind.Center => 관찰출고Id, FocusKind.Cargo => 관찰운행Id, FocusKind.Inspection => 관찰검수Id, _ => null,
+        };
+
+        private void 물류관찰키비우기()
+        {
+            관찰출고Id = 관찰운행Id = 관찰검수Id = null;
+            고를물류.Clear();
+        }
+
+        // 같은 참조가 둘 이상이면 어느 한쪽을 임의로 상대 업무로 표시하지 않는다.
+        private static T 단일물류행<T>(IEnumerable<T> 행들, string id, Func<T, string> 참조) where T : class
+        {
+            if (행들 == null || string.IsNullOrEmpty(id)) return null;
+            T 결과 = null;
+            foreach (var 행 in 행들)
+            {
+                if (행 == null || 참조(행) != id) continue;
+                if (결과 != null) return null;
+                결과 = 행;
+            }
+            return 결과;
+        }
+
+        private OutboundState 고른출고읽기() => 단일물류행(ModuleSnapshot<LogisticsCenterSnapshot>(BusinessIds.LogisticsCenter)?.Outbounds, 관찰출고Id, o => o.Id);
+        private CargoTripState 고른운행읽기() => 단일물류행(ModuleSnapshot<CargoTransportSnapshot>(BusinessIds.CargoTransport)?.Trips, 관찰운행Id, t => t.Id);
+        private StoreReceiptState 고른검수읽기() => 단일물류행(ModuleSnapshot<StoreOperationsSnapshot>(BusinessIds.StoreOperations)?.Receipts, 관찰검수Id, r => r.Id);
+
+        private static string 출고표시상태(string 단계) => 단계 switch
+        {
+            OutboundStages.Reserved => "피킹 작업 중", OutboundStages.Picked => "포장 완료 · 상차 대기",
+            OutboundStages.Loaded => "출고 인계 완료", _ => "상태 미확인",
+        };
+
+        private static string 검수표시상태(string 단계) => 단계 switch
+        {
+            ReceiptStages.Waiting => "검수 대기", ReceiptStages.Inspected => "검수 완료", _ => "검수 상태 미확인",
+        };
+
+        private void 물류후보읽기(FocusKind 종류)
+        {
+            고를물류.Clear();
+            if (종류 == FocusKind.Center && ModuleSnapshot<LogisticsCenterSnapshot>(BusinessIds.LogisticsCenter)?.Outbounds is { } 출고들)
+                foreach (var 출고 in 출고들)
+                    if (!string.IsNullOrEmpty(출고?.Id)) 고를물류.Add((출고.Id, 출고.ItemName, 출고표시상태(출고.Stage)));
+            if (종류 == FocusKind.Cargo && ModuleSnapshot<CargoTransportSnapshot>(BusinessIds.CargoTransport) is { } 운송)
+                foreach (var 운행 in 운송.Trips)
+                    if (!string.IsNullOrEmpty(운행?.Id)) 고를물류.Add((운행.Id, 운행.VehicleName, CargoStage(운송, 운행)));
+        }
+
+        private void 물류관찰시작(역할관찰행 행)
+        {
+            if (관찰대상?.Kind == 행.종류 && 현재물류키 != null)
+            {
+                역할목록열림 = 관찰주문목록 = false;
+                return;
+            }
+            관찰시작점기억();
+            관찰지도수동이동();
+            물류관찰키비우기();
+            관찰주문Id = null;
+            직전관점 = null;
+            관찰대상 = (행.종류, 행.대상Id);
+            물류후보읽기(행.종류);
+            if (고를물류.Count == 1) 물류관찰건선택(행.종류, 고를물류[0].Id);
+            관찰주문목록 = 역할목록열림 = 고를물류.Count > 1;
+            역할스크롤 = 0;
+            selectedBuilding = null;
+            phoneKey = null;
+            역할휴대폰초점(행.종류, 행.대상Id);
+        }
+
+        private bool 물류관찰건선택(FocusKind 종류, string 업무Id)
+        {
+            if (관찰대상?.Kind != 종류 || string.IsNullOrEmpty(업무Id)) return false;
+            if (종류 == FocusKind.Center)
+            {
+                if (단일물류행(ModuleSnapshot<LogisticsCenterSnapshot>(BusinessIds.LogisticsCenter)?.Outbounds, 업무Id, o => o.Id) == null) return false;
+                if (관찰출고Id != 업무Id)
+                {
+                    관찰지도수동이동();
+                    관찰출고Id = 업무Id;
+                    관찰운행Id = 관찰검수Id = null;
+                    직전관점 = null;
+                    phoneKey = null;
+                }
+            }
+            else if (종류 == FocusKind.Cargo)
+            {
+                if (단일물류행(ModuleSnapshot<CargoTransportSnapshot>(BusinessIds.CargoTransport)?.Trips, 업무Id, t => t.Id) == null) return false;
+                if (관찰운행Id != 업무Id)
+                {
+                    관찰지도수동이동();
+                    관찰운행Id = 업무Id;
+                    관찰출고Id = 관찰검수Id = null;
+                    직전관점 = null;
+                    phoneKey = null;
+                }
+            }
+            else return false;
+            역할목록열림 = 관찰주문목록 = false;
+            return true;
+        }
+
+        private CargoTripState 출고에연결된운행()
+        {
+            var 출고 = 고른출고읽기();
+            var 운행들 = ModuleSnapshot<CargoTransportSnapshot>(BusinessIds.CargoTransport)?.Trips;
+            var 상대 = 단일물류행(운행들, 출고?.Id, t => t.OutboundId);
+            return 상대 != null && (관찰운행Id == null || 상대.Id == 관찰운행Id)
+                ? 단일물류행(운행들, 상대.Id, t => t.Id) : null;
+        }
+
+        private OutboundState 운행에연결된출고()
+        {
+            var 운행 = 고른운행읽기();
+            if (운행 == null || (관찰출고Id != null && 운행.OutboundId != 관찰출고Id)) return null;
+            return 단일물류행(ModuleSnapshot<LogisticsCenterSnapshot>(BusinessIds.LogisticsCenter)?.Outbounds, 운행.OutboundId, o => o.Id);
+        }
+
+        private StoreReceiptState 운행에연결된검수()
+        {
+            var 운행 = 고른운행읽기();
+            var 검수들 = ModuleSnapshot<StoreOperationsSnapshot>(BusinessIds.StoreOperations)?.Receipts;
+            var 상대 = 단일물류행(검수들, 운행?.Id, r => r.TripId);
+            return 상대 != null && (관찰검수Id == null || 상대.Id == 관찰검수Id)
+                ? 단일물류행(검수들, 상대.Id, r => r.Id) : null;
+        }
+
+        private bool 같은출고화물보기()
+        {
+            if (관찰대상?.Kind != FocusKind.Center || 출고에연결된운행() is not { } 운행 || string.IsNullOrEmpty(운행.Id)) return false;
+            관찰운행Id = 운행.Id;
+            물류상대열기(FocusKind.Cargo, "cargo");
+            return true;
+        }
+
+        private bool 같은화물출고보기()
+        {
+            if (관찰대상?.Kind != FocusKind.Cargo || 운행에연결된출고() is not { } 출고) return false;
+            관찰출고Id = 출고.Id;
+            물류상대열기(FocusKind.Center, "center");
+            return true;
+        }
+
+        private bool 같은화물검수보기()
+        {
+            if (관찰대상?.Kind != FocusKind.Cargo || 운행에연결된검수() is not { } 검수 || string.IsNullOrEmpty(검수.Id)) return false;
+            관찰검수Id = 검수.Id;
+            물류상대열기(FocusKind.Inspection, 검수.Id);
+            return true;
+        }
+
+        private void 물류상대열기(FocusKind 종류, string 대상Id)
+        {
+            관찰지도수동이동();
+            직전관점 = 관찰대상;
+            관찰대상 = (종류, 대상Id);
+            역할목록열림 = 관찰주문목록 = false;
+            역할휴대폰초점(종류, 대상Id);
+        }
+
+        private string 물류관찰안내(FocusKind 종류)
+        {
+            if (현재물류키 == null)
+            {
+                var 있음 = 종류 == FocusKind.Center ? ModuleSnapshot<LogisticsCenterSnapshot>(BusinessIds.LogisticsCenter)?.Outbounds.Count > 0
+                    : ModuleSnapshot<CargoTransportSnapshot>(BusinessIds.CargoTransport)?.Trips.Count > 0;
+                return 있음 ? "읽을 업무를 골라 주세요" : null;
+            }
+            var 유효 = 종류 switch
+            {
+                FocusKind.Center => 고른출고읽기() != null, FocusKind.Cargo => 고른운행읽기() != null,
+                FocusKind.Inspection => 고른검수읽기() != null, _ => false,
+            };
+            return 유효 ? null : "고른 업무의 기록을 확인할 수 없습니다";
+        }
+
+        private void 관찰검수폰그리기()
+        {
+            var 검수 = 고른검수읽기();
+            if (검수 == null || PhoneShell("점포 검수", false, null) is not { } screen) return;
+            var x = screen.x + 11;
+            var y = screen.y + 60;
+            var w = screen.width - 22;
+            var 점포 = ModuleSnapshot<StoreOperationsSnapshot>(BusinessIds.StoreOperations);
+            Text(new Rect(x, y, w, 22), 점포?.StoreName ?? "점포", 14, PhoneText, true);
+            Text(new Rect(x, y + 24, w, 18), 검수표시상태(검수.Stage), 12, PhoneInfo, true);
+            Text(new Rect(x, y + 50, w, 22), 검수.ItemName + " · 하차 " + 검수.Unloaded.ToString("0.##") + 검수.Unit, 11, PhoneText);
+            if (검수.Stage == ReceiptStages.Inspected)
+            {
+                Text(new Rect(x, y + 82, w, 20), "인수 " + 검수.Accepted.ToString("0.##") + 검수.Unit, 11, PhoneText);
+                Text(new Rect(x, y + 104, w, 20), "격리 " + 검수.Quarantined.ToString("0.##") + 검수.Unit, 11, PhoneText);
+                Text(new Rect(x, y + 126, w, 20), "거절 " + 검수.Rejected.ToString("0.##") + 검수.Unit, 11, PhoneText);
+            }
+        }
+
+        private void 물류관찰띠그리기(FocusKind 종류)
+        {
+            var 칸 = 관찰띠칸;
+            var 센터 = 종류 == FocusKind.Center;
+            var 화물 = 종류 == FocusKind.Cargo;
+            var 출고 = 센터 ? 고른출고읽기() : null;
+            var 운행 = 화물 ? 고른운행읽기() : null;
+            var 검수 = 종류 == FocusKind.Inspection ? 고른검수읽기() : null;
+            var 상태 = 물류관찰안내(종류) ?? (센터 ? (출고 == null ? "출고 요청 대기" : 출고표시상태(출고.Stage)) :
+                화물 ? (운행 == null ? "배차 대기" : CargoStage(ModuleSnapshot<CargoTransportSnapshot>(BusinessIds.CargoTransport), 운행)) :
+                검수표시상태(검수?.Stage));
+            Paint(칸, Lilac, 9);
+            Paint(new Rect(칸.x + 1, 칸.y + 1, 칸.width - 2, 칸.height - 2), Canvas, 8);
+            Text(new Rect(칸.x + 12, 칸.y + 4, 275, 22), 센터 ? "물류센터 출고" : 화물 ? "화물 기사" : "점포 검수", 14, Paper, true);
+            Text(new Rect(칸.x + 12, 칸.y + 28, 275, 18), (현재물류키 == null ? "고른 업무 없음" : PhoneOrderNumber(현재물류키)) + " · " + (출고?.ItemName ?? 운행?.ItemName ?? 검수?.ItemName), 12, Mint);
+            Text(new Rect(칸.x + 12, 칸.y + 49, 275, 18), 상태, 11, Soft);
+            if (센터 && ExpansionButton(new Rect(칸.x + 292, 칸.y + 8, 108, 26), "이 화물차 보기", 출고에연결된운행() != null, Tile)) 같은출고화물보기();
+            if (화물 && ExpansionButton(new Rect(칸.x + 292, 칸.y + 8, 108, 26), "해당 출고 보기", 운행에연결된출고() != null, Tile)) 같은화물출고보기();
+            if (화물)
+            {
+                var 연결 = 운행에연결된검수() != null;
+                if (ExpansionButton(new Rect(칸.x + 405, 칸.y + 8, 93, 26), 연결 ? "점포 검수" : "검수 기록 대기", 연결, Tile)) 같은화물검수보기();
+            }
+            if (ExpansionButton(new Rect(칸.x + 503, 칸.y + 8, 62, 26), "이전 관점", 직전관점 is { } 전 && 관찰객체있음(전.Kind, 전.Id), Tile)) 이전관점보기();
+            if (ExpansionButton(new Rect(칸.x + 570, 칸.y + 8, 68, 26), "관찰 끝내기", true, Tile))
+            {
+                역할관찰끝내기();
+                return;
+            }
+            if ((센터 || 화물) && ExpansionButton(new Rect(칸.x + 292, 칸.y + 41, 108, 25), "업무 선택", true, Tile))
+            {
+                역할목록열기();
+                물류후보읽기(종류);
+                관찰주문목록 = true;
+            }
+            관찰이동단추그리기(칸.x + 459, 칸.y + 41);
+        }
+
         // 운행 단계를 화면 단계로 줄인다. 상차 완료 뒤 도착 전은 「운송중」이다. 단계 코드의 글자는 모듈 사본이 알려 준다.
         private static string CargoStage(CargoTransportSnapshot cargo, CargoTripState trip)
         {
@@ -46,8 +287,9 @@ namespace Ssalddel.WindowsGame
             var cargo = ModuleSnapshot<CargoTransportSnapshot>(BusinessIds.CargoTransport);
             var center = ModuleSnapshot<LogisticsCenterSnapshot>(BusinessIds.LogisticsCenter);
             var store = ModuleSnapshot<StoreOperationsSnapshot>(BusinessIds.StoreOperations);
-            var trip = cargo?.Trips.LastOrDefault();
+            var trip = 물류관찰중 ? 단일물류행(cargo?.Trips, 관찰운행Id, t => t.Id) : cargo?.Trips.LastOrDefault();
             var stage = CargoStage(cargo, trip);
+            // 화물 대본의 초 단위 간격은 장면을 읽기 위한 재생 시간이다. 상차 소요시간은 이 사본에서 알 수 없다.
             SyncPhone("cargo", trip?.Id, stage, 역할앱재연Policy.CargoScript);
             var progress = AdvancePhoneScene();
             var rest = 역할앱재연Policy.CargoScreen(stage);
@@ -67,7 +309,8 @@ namespace Ssalddel.WindowsGame
             y += 30;
             var working = view == 화물화면.추천 || view == 화물화면.진행;
             var moving = scene != null && scene.Tap == null && scene.Toast == null && scene.Push == null ? Ease01(progress) : 1f;
-            var along = step <= 1 ? 0f : step <= 3 ? 1f : step == 4 ? 1f + (scene?.Step == 4 ? 0.1f + 0.4f * moving : Mathf.Clamp01(chain.TruckProgress)) : 2f;
+            var 운행진행 = trip == null ? 0 : Mathf.Clamp01((BusinessNow - trip.DepartedAtMs) / (float)Math.Max(1L, trip.ArriveAtMs - trip.DepartedAtMs));
+            var along = step <= 1 ? 0f : step <= 3 ? 1f : step == 4 ? 1f + (scene?.Step == 4 ? 0.1f + 0.4f * moving : 운행진행) : 2f;
             DrawPhoneMap(new Rect(x, y, w, 62), working, along, "상차", PhoneLoad, "하차", PhoneInfo);
             y += 70;
 
@@ -103,7 +346,8 @@ namespace Ssalddel.WindowsGame
                 PhoneCard(new Rect(x, y, w, 36));
                 Text(new Rect(x + 10, y + 3, 80, 12), "하차지", 8, PhoneSub);
                 Text(new Rect(x + 10, y + 16, w - 86, 16), to, 10, PhoneText, true);
-                var left = chain.TruckMoving ? $"{chain.TruckSecondsLeft / 60}:{chain.TruckSecondsLeft % 60:00} 뒤" : "도착 전";
+                var 남은초 = trip == null ? 0 : Math.Max(0L, (trip.ArriveAtMs - BusinessNow + 999) / 1000);
+                var left = trip != null && trip.Stage == cargo.LoadedStage ? $"{남은초 / 60}:{남은초 % 60:00} 뒤" : "도착 전";
                 PhonePill(x + w - 70, y + 17, step >= 5 ? "도착" : step == 4 ? left : "대기", step >= 5 ? PhoneInfo : PhoneSub,
                     step >= 5 ? Ink(0xE4ECFD) : Ink(0xECF0F3));
                 y += 42;
@@ -121,7 +365,7 @@ namespace Ssalddel.WindowsGame
                 if (scene?.Tap != null) tapAt = main.center;
             }
 
-            var tabsY = PhoneFooter(screen, "홈", "진행 중 운송", "보기 전용 · 가상 화물 기사가 한 일을 재연", view != 화물화면.진행);
+            var tabsY = PhoneFooter(screen, "홈", "진행 중 운송", "보기 전용 · 장면 간격은 재연 속도", view != 화물화면.진행);
             if (view == 화물화면.추천)
             {
                 var rows = new[]
@@ -142,7 +386,7 @@ namespace Ssalddel.WindowsGame
         private void DrawCenterPhone()
         {
             var center = ModuleSnapshot<LogisticsCenterSnapshot>(BusinessIds.LogisticsCenter);
-            var outbound = center?.Outbounds.LastOrDefault();
+            var outbound = 물류관찰중 ? 단일물류행(center?.Outbounds, 관찰출고Id, o => o.Id) : center?.Outbounds.LastOrDefault();
             var stage = outbound == null ? "대기" : outbound.Stage;
             SyncPhone("center", outbound?.Id, stage, 역할앱재연Policy.CenterScript);
             var progress = AdvancePhoneScene();
@@ -235,7 +479,7 @@ namespace Ssalddel.WindowsGame
         {
             var shop = state.stores?.FirstOrDefault(item => item.id == storeId);
             if (shop == null) return;
-            var order = PhoneStoreOrder(storeId);
+            var order = 표시할배달주문(FocusKind.Store, storeId);
             SyncPhone("store:" + storeId, order?.id, order?.stage, (from, to) => 역할앱재연Policy.StoreScript(from, to, PhoneOrderNumber(order?.id)));
             var progress = AdvancePhoneScene();
             var rest = 역할앱재연Policy.StoreScreen(order?.stage);
@@ -274,9 +518,9 @@ namespace Ssalddel.WindowsGame
                 var rows = new[]
                 {
                     ("주문번호", PhoneOrderNumber(order.id)),
-                    ("메뉴 · 수량", (order.menu ?? "메뉴") + " · 1"),
+                    ("메뉴", order.menu ?? "자료 미확인"),
                     ("처리상태", status),
-                    ("조리예상", "자료 준비 전"),
+                    ("수량 · 조리예상", "자료 미확인"),
                 };
                 for (var i = 0; i < rows.Length; i++)
                 {

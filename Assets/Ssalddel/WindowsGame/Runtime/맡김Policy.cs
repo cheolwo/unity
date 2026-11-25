@@ -7,18 +7,17 @@ namespace Ssalddel.WindowsGame
     // 켜 두기 성장 — 맡김의 규칙 뼈대 (2026-11-15).
     // 사용자: 「그냥 켜놓기만 하더라도 알아서 성장 … 경영을 하면 더 잘 성장」, 「너무 구체적으로는 정하지 말고 뼈대 정도만 … 구현까지」.
     // 계획: Hongdal docs/AI/Handoffs/2026-11-15-Claude-개발계획-켜두기성장.md (켜1 · 켜2의 뼈대).
-    //  - 손이 빈 동안, 플레이어가 아직 하지 않은 일만, 플레이어가 누를 수 있는 명령으로만 한다. 커널 · Core 계약은 그대로다.
+    //  - 중 모드에서 플레이어가 아직 하지 않은 일만 같은 업무 명령으로 수행한다.
     //  - 맡김은 늘 안전한 쪽(엔진이 권한 기사, 지난 방침)만 고른다. 숨은 감속은 없다. 직접 고르면 더 잘 자란다.
     //  - 아래 수치는 모두 시험값이다(정할 것: 계획 7절). 여기서 바꾸면 화면 쪽은 그대로 따른다.
     internal static class 맡김Policy
     {
-        internal const double HandsIdleSeconds = 120;       // 손이 빈 뒤 맡기기까지(실제 초)
         internal const long OrderWaitMs = 180_000;          // 주문이 이만큼(게임 시간) 기다리면 맡김이 배차한다
         internal const double PolicyWaitSeconds = 60;       // 방침 국면에서 이만큼(실제 초) 고르지 않으면 지난 방침으로
         internal const double ReturnSummarySeconds = 300;   // 이만큼 손이 빈 뒤 돌아오면 「다녀오신 사이」
         internal const string FirstPolicy = "temperance";   // 지난 방침이 없으면 절제
 
-        internal static bool HandsIdle(double idleSeconds) => idleSeconds >= HandsIdleSeconds;
+        internal static bool 자동업무가능(bool 중, bool 운영중, bool 시계진행, bool 방침선택중) => 중 && 운영중 && (시계진행 || 방침선택중);
         internal static bool OrderDue(long waitedMs) => waitedMs >= OrderWaitMs;
         internal static bool PolicyDue(double waitedSeconds, double limit) => waitedSeconds >= limit;
         internal static bool ShowReturn(double idleSeconds, int actions) => idleSeconds >= ReturnSummarySeconds && actions > 0;

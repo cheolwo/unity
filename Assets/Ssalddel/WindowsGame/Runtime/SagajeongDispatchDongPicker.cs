@@ -127,6 +127,7 @@ namespace Ssalddel.WindowsGame
                 dongPickerNote = $"{module.Entry.name}(으)로 옮기지 못했어요. 지도는 그대로예요.";
                 return false;
             }
+            관찰지도수동이동();
             dongPickerOpen = false;
             dongPickerNote = null;
             notice = $"{module.Entry.name}만 보기로 옮겼어요.";

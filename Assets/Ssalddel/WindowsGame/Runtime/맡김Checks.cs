@@ -10,8 +10,11 @@ namespace Ssalddel.WindowsGame
             var results = new List<(string, bool, string)>();
             void Check(string name, bool ok, string detail = null) => results.Add((name, ok, detail));
 
-            Check("손이 정한 시간만큼 비기 전에는 맡기지 않음", !맡김Policy.HandsIdle(맡김Policy.HandsIdleSeconds - 0.1) &&
-                맡김Policy.HandsIdle(맡김Policy.HandsIdleSeconds));
+            Check("중은 운영 중인 시계 또는 방침 선택에서 맡는다", 맡김Policy.자동업무가능(true, true, true, false) &&
+                맡김Policy.자동업무가능(true, true, false, true));
+            Check("화와 정지한 영업은 맡김 명령을 보내지 않는다", !맡김Policy.자동업무가능(false, true, true, false) &&
+                !맡김Policy.자동업무가능(false, true, false, true) && !맡김Policy.자동업무가능(true, true, false, false) &&
+                !맡김Policy.자동업무가능(true, false, true, false));
             Check("주문은 정한 게임 시간만큼 기다린 뒤에만 맡김이 배차함", !맡김Policy.OrderDue(맡김Policy.OrderWaitMs - 1) &&
                 맡김Policy.OrderDue(맡김Policy.OrderWaitMs));
 

@@ -233,7 +233,7 @@ namespace Ssalddel.WindowsGame
             Text(new Rect(LevelBanner.x + 14, LevelBanner.y, 330, LevelBanner.height),
                 $"사가정 배달 운영 중 · 배차 대기 {waiting}건 · 정산 {settled}건", 12, Paper);
             var back = new Rect(LevelBanner.xMax - 122, LevelBanner.y + 4, 114, 26);
-            if (ExpansionButton(back, "동네로 돌아가기", true, Mint)) ReturnToDong();
+            if (dongMapOpen && ExpansionButton(back, "동네로 돌아가기", true, Mint)) ReturnToDong();      // 기본 판에는 이 단추가 없다
         }
 
         // 멀리 볼 때 동네 범위를 점선으로 보인다. 1차는 2.5D 자료 사각형이다 (법정동 경계 아님).
@@ -242,6 +242,7 @@ namespace Ssalddel.WindowsGame
             if (DongModulesLoaded)
             {
                 DrawDongModuleBoundaries();      // 행정동 모듈의 경계와 이름 (SagajeongDispatchDongModules.cs)
+                DrawHexTileInDong();             // 타일에서 내려왔으면 그 칸의 테두리 · 그 자리로 다가가기 (SagajeongDispatchHexTiles.cs)
                 return;
             }
             if (mapLevel != MapLevel.Dong || mapZoom >= FarViewZoom || dioramaRoot == null) return;

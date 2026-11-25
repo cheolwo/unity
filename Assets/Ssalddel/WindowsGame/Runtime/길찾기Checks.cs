@@ -204,6 +204,7 @@ namespace Ssalddel.WindowsGame
             for (var crowdN = 1; crowdN <= 30; crowdN++) crowdFalls &= 기사불빛Policy.Crowd(crowdN) <= 기사불빛Policy.Crowd(crowdN - 1);
             Check("빛이 몰릴수록 연한 부분이 옅어지되 바닥 아래로는 내려가지 않음", Close(기사불빛Policy.Crowd(0), 1f) && crowdFalls &&
                 기사불빛Policy.Crowd(2) < 1f && Close(기사불빛Policy.Crowd(100), 기사불빛Policy.CrowdFloor) && Close(기사불빛Policy.Crowd(-3), 1f));
+            길안내Checks.Add(results);          // 길안내: 주소 찾기 · 거리 · 시간의 글 (길안내Policy.cs)
             return results;
         }
     }

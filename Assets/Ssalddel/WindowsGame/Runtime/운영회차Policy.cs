@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Ssalddel.WindowsGame
 {
@@ -18,6 +19,24 @@ namespace Ssalddel.WindowsGame
 
     // 화면이 기존 업무 상태에서 읽어 주는 대상 작업의 상태.
     internal enum 대상상태 { 없음, 대기, 진행, 전달, 실패 }
+
+    // 전달이 확인된 시점의 표시 자료. 새 영업일이 열려 오늘 주문 목록이 바뀌어도 그때 읽은 값으로 안내한다.
+    internal sealed class 회차전달자료
+    {
+        public readonly int 회차번호, 영업일;
+        public readonly long 판본;
+        public readonly string 주문Id, 매장명, 단계;
+
+        public 회차전달자료(int 회차번호, string 주문Id, string 매장명, string 단계, int 영업일, long 판본)
+        {
+            this.회차번호 = 회차번호;
+            this.주문Id = 주문Id;
+            this.매장명 = 매장명 ?? string.Empty;
+            this.단계 = 단계;
+            this.영업일 = 영업일;
+            this.판본 = 판본;
+        }
+    }
 
     internal sealed class 회차기록
     {
@@ -54,6 +73,16 @@ namespace Ssalddel.WindowsGame
         public string TargetId { get; private set; }
         public long TargetRevision { get; private set; }
         public IReadOnlyList<회차기록> Closed => closed;
+        public 회차전달자료 전달자료 { get; private set; }
+
+        public bool 전달관측(string 주문Id, string 매장명, string 단계, int 영업일, long 판본)
+        {
+            if (전달자료 != null || Phase == 회차국면.준비 || string.IsNullOrEmpty(주문Id) || TargetId != 주문Id ||
+                운영회차Policy.FromOrderStage(단계) != 대상상태.전달 || 판본 < TargetRevision || 영업일 < 0)
+                return false;
+            전달자료 = new 회차전달자료(Number, 주문Id, 매장명, 단계, 영업일, 판본);
+            return true;
+        }
 
         // 앞선 회차에서 이미 끝낸 대상인가.
         public bool WasTarget(string targetId) => closed.Any(record => record.TargetId == targetId);
@@ -97,6 +126,7 @@ namespace Ssalddel.WindowsGame
         {
             if (Phase != 회차국면.결과) return false;
             Number++;
+            전달자료 = null;
             TargetId = null;
             TargetRevision = 0;
             Phase = 회차국면.준비;
@@ -107,6 +137,7 @@ namespace Ssalddel.WindowsGame
         public bool ReturnToSelection(대상상태 status)
         {
             if (Phase != 회차국면.수행 || (status != 대상상태.실패 && status != 대상상태.없음)) return false;
+            전달자료 = null;
             TargetId = null;
             TargetRevision = 0;
             Phase = 회차국면.준비;
@@ -115,10 +146,17 @@ namespace Ssalddel.WindowsGame
 
         // 저장 글자(카1). 첫 줄은 판본, 둘째 줄은 번호 · 국면 · 대상 · 판본, 그 뒤 줄마다 끝낸 회차. 칸은 탭이다.
         public const string TextVersion = "운영회차.v1";
+        private const string 전달자료판본 = "운영회차.v2";
 
         public string ToText()
         {
-            var lines = new List<string> { TextVersion, Number + "\t" + (int)Phase + "\t" + (TargetId ?? string.Empty) + "\t" + TargetRevision };
+            var head = Number + "\t" + (int)Phase + "\t" + (TargetId ?? string.Empty) + "\t" + TargetRevision;
+            if (전달자료 != null)
+            {
+                var 이름 = Convert.ToBase64String(Encoding.UTF8.GetBytes(전달자료.매장명));
+                head += "\t" + 전달자료.단계 + "\t" + 전달자료.영업일 + "\t" + 전달자료.판본 + "\t" + 이름;
+            }
+            var lines = new List<string> { 전달자료 == null ? TextVersion : 전달자료판본, head };
             lines.AddRange(closed.Select(record => record.Number + "\t" + record.TargetId + "\t" + record.TargetRevision));
             return string.Join("\n", lines);
         }
@@ -128,12 +166,21 @@ namespace Ssalddel.WindowsGame
         {
             if (string.IsNullOrEmpty(text)) return null;
             var lines = text.Split('\n');
-            if (lines.Length < 2 || lines[0] != TextVersion) return null;
+            if (lines.Length < 2 || (lines[0] != TextVersion && lines[0] != 전달자료판본)) return null;
             var head = lines[1].Split('\t');
-            if (head.Length != 4 || !int.TryParse(head[0], out var number) || number < 1 || !int.TryParse(head[1], out var phase) ||
+            if (head.Length != (lines[0] == 전달자료판본 ? 8 : 4) || !int.TryParse(head[0], out var number) || number < 1 || !int.TryParse(head[1], out var phase) ||
                 phase < 0 || phase > 2 || !long.TryParse(head[3], out var revision)) return null;
             var round = new 운영회차 { Number = number, Phase = (회차국면)phase, TargetId = head[2].Length == 0 ? null : head[2], TargetRevision = revision };
             if (round.Phase == 회차국면.수행 && round.TargetId == null) return null;
+            if (head.Length == 8 && int.TryParse(head[5], out var 일차) && long.TryParse(head[6], out var 판본))
+            {
+                try
+                {
+                    var 매장명 = Encoding.UTF8.GetString(Convert.FromBase64String(head[7]));
+                    round.전달관측(round.TargetId, 매장명, head[4], 일차, 판본);
+                }
+                catch (FormatException) { /* 표시 자료만 읽지 못해도 기존 회차 진행과 마감 기록은 복원한다. */ }
+            }
             for (var i = 2; i < lines.Length; i++)
             {
                 var cell = lines[i].Split('\t');

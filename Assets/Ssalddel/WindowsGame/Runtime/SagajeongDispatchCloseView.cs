@@ -248,6 +248,34 @@ namespace Ssalddel.WindowsGame
                     yield return null;
                 }
                 yield return SaveFrame(directory, file);
+                if (index == 1)
+                {
+                    // 자료 창(2026-11-23 20:15): 동 디오라마에서 길 · 버스 · 생활 시설을 켜고 자료 창을 연 모습, 닫고 범례 줄 · 이름표만 본 모습.
+                    var keepData = ProofDataPush(DataDefaultBits | 512 | 1024, FacilityAllMask);
+                    dataPanelOpen = true;
+                    for (var frame = 0; frame < 3; frame++) yield return null;
+                    yield return SaveFrame(directory, "62d-close-data-panel.png");
+                    dataPanelOpen = false;
+                    proofHoverAuto = true;
+                    for (var frame = 0; frame < 3; frame++) yield return null;
+                    yield return SaveFrame(directory, "62e-close-data-map.png");
+                    proofHoverAuto = false;
+                    ProofDataPop(keepData);
+                    for (var frame = 0; frame < 2; frame++) yield return null;
+                    // 입장 × 단위(21:30): 「배달 기사」를 고르면 동 단위 묶음(보행등 · 건물 입구 · 쉼터 · 역 출입구 · 길)이 켜진다. 저장하지 않는다.
+                    var keepStance = ProofDataPush(DataBits(), facilityGroupMask);
+                    ApplyStance(Array.Find(Stances, item => item.Key == "rider"), false);
+                    dataPanelOpen = true;
+                    for (var frame = 0; frame < 3; frame++) yield return null;
+                    yield return SaveFrame(directory, "62f-stance-rider-dong-panel.png");
+                    dataPanelOpen = false;
+                    for (var frame = 0; frame < 3; frame++) yield return null;
+                    yield return SaveFrame(directory, "62g-stance-rider-dong.png");
+                    ProofDataPop(keepStance);
+                    for (var frame = 0; frame < 2; frame++) yield return null;
+                    // 단위 × 자료 시각 검증(2026-11-23 21:43): 동 단위 (SagajeongDispatchVisualAudit.cs)
+                    yield return ViewProofVisualAuditDong(directory, latitude, longitude);
+                }
             }
 
             // 가장 가까이에서: 옥상 가운데를 눌렀을 때 그 건물이 골라지는가 (표식 · 누르기가 새 각을 따라오는가)

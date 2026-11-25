@@ -181,6 +181,7 @@ namespace Ssalddel.WindowsGame
                 ? new Rect(space.detail.x, space.detail.y, space.detail.width, space.detail.height)
                 : new Rect(0, 0, space.width, space.height);
             CutDongFills(space, color, area);
+            ReadGuSeasonMasks(color);      // 계절 바탕: 숲 · 공원 · 하천 · 길의 자리 (SagajeongDispatchGuSeason.cs)
             Destroy(color);     // 색 바탕은 동 모양으로 오린 조각만 남긴다
 
             var detailAsset = Resources.Load<TextAsset>(GuDetailGreyResource);
@@ -288,10 +289,12 @@ namespace Ssalddel.WindowsGame
 
         private void ReleaseGu()
         {
+            ReleaseCapital();      // 수도권 바탕 조각(SagajeongDispatchCapital.cs)
             if (guGrey != null) Destroy(guGrey);
             guGrey = null;
             if (guDetail != null) Destroy(guDetail);
             guDetail = null;
+            ReleaseGuSeason();
             if (guSpace?.dongs == null) return;
             foreach (var dong in guSpace.dongs)
             {
@@ -338,7 +341,7 @@ namespace Ssalddel.WindowsGame
         }
 
         // 지도 영역 안에서 패널에 가려지지 않는 부분. 내 영역을 여기에 맞춘다.
-        private Rect GuSafeArea => expansionView && !mapOnly
+        private Rect GuSafeArea => PortraitScreen ? PortraitGuSafeArea : expansionView && !mapOnly
             ? new Rect(222 - Field.x, 180 - Field.y, 754, 468)
             : new Rect(60, 60, Field.width - 120, Field.height - 120);
 
@@ -346,7 +349,7 @@ namespace Ssalddel.WindowsGame
         private void UpdateGuCamera(float delta)
         {
             var space = guSpace;
-            var full = Mathf.Max(Field.width / space.width, Field.height / space.height);
+            var full = GuFullScale;
             float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
             if (territory != null)
             {
@@ -394,8 +397,16 @@ namespace Ssalddel.WindowsGame
 
         private void ClampGu()
         {
-            var full = Mathf.Max(Field.width / guSpace.width, Field.height / guSpace.height);
+            var full = GuFullScale;
             guScale = Mathf.Clamp(guScale, full, Mathf.Max(full, GuMaxScale));
+            if (CapitalReady)      // 수도권 끝까지 끌 수 있다(SagajeongDispatchCapital.cs)
+            {
+                guOrigin.x = Mathf.Clamp(guOrigin.x, Field.width - CapitalX1 * guScale, -CapitalX0 * guScale);
+                var low = Field.height - (guSpace.height - CapitalY0) * guScale;
+                var high = GuTopSlack - (guSpace.height - CapitalY1) * guScale;
+                guOrigin.y = low <= high ? Mathf.Clamp(guOrigin.y, low, high) : (low + high) * 0.5f;
+                return;
+            }
             guOrigin.x = Mathf.Clamp(guOrigin.x, Field.width - guSpace.width * guScale, 0f);
             // 북쪽 끝의 동(묵동·신내동)이 머리줄과 알림 줄에 가리지 않도록, 그 줄들 아래까지는 지도의 북쪽 끝을 내려도 된다.
             guOrigin.y = Mathf.Clamp(guOrigin.y, Field.height - guSpace.height * guScale, GuTopSlack);
@@ -403,17 +414,23 @@ namespace Ssalddel.WindowsGame
 
         // 구 지도 안의 확대·축소. 돌려주는 값: 0 = 지도 안에서 처리했다, 1 = 더 넓은 지도로 넘어갈 차례, -1 = 동네 지도로 내려갈 차례.
         // delta는 휠 값(아래로 굴리면 +, 축소), pointer는 지도 영역 안의 좌표다.
+        private bool wheelToDongOpen = 판Policy.휠로동지도;      // 검증(이어 보기 증명)은 잠깐 열고 본다
+
         private int GuWheel(float delta, Vector2 pointer)
         {
             if (!guCameraSet) return 0;
-            var full = Mathf.Max(Field.width / guSpace.width, Field.height / guSpace.height);
-            var floor = Mathf.Max(full, guFitScale);
+            var full = GuFullScale;
             if (delta < 0)
             {
                 if (guScale >= GuMaxScale - 0.0005f)
                 {
                     var dong = GuDongAt(GuWorld(pointer));
                     var home = dong == null ? null : territory?.Find(dong.code);
+                    if (!wheelToDongOpen)      // 기본 판: 구 지도가 바탕이다. 휠로는 동네 지도에 내려가지 않는다(판Policy.cs)
+                    {
+                        GuSay("여기가 가장 가까운 보기입니다 · 동네 지도는 다음 판에서 열립니다");
+                        return 0;
+                    }
                     if (home != null && home.IsHome) return -1;
                     GuSay("이곳은 아직 동네 지도가 없습니다 · 면목동에서 더 확대하면 동네 지도로 내려갑니다");
                     return 0;
@@ -421,14 +438,10 @@ namespace Ssalddel.WindowsGame
                 ZoomGu(Mathf.Min(GuMaxScale, guScale * Mathf.Pow(1.08f, -delta)), pointer);
                 return 0;
             }
-            if (!guManual || guScale <= floor * 1.002f)
-            {
-                guManual = false;      // 영역 전체가 보이는 자리다. 여기서 더 축소하면 넓은 지도 안내로 간다
-                return 1;
-            }
-            var next = guScale * Mathf.Pow(1.08f, -delta);
-            if (next <= floor) guManual = false;
-            else ZoomGu(next, pointer);
+            // 이어지는 지도(2026-11-16, r184): 첫 맞춤(내 영역)보다 넓게, 구 지도 자료가 화면을 채우는 데까지 축소한다.
+            // 거기서 더 축소하면 같은 자리 · 같은 m/점의 전국 지도로 이어 간다.
+            if (guScale <= full * 1.002f) return PortraitScreen ? 0 : 1;      // 세로 화면은 아직 구 지도까지만
+            ZoomGu(Mathf.Max(full, guScale * Mathf.Pow(1.08f, -delta)), pointer);
             return 0;
         }
 
@@ -447,7 +460,7 @@ namespace Ssalddel.WindowsGame
             guNoticeUntil = Time.unscaledTime + 3.2f;
         }
 
-        private float GuTopSlack => expansionView && !mapOnly ? 176f - Field.y : 0f;
+        private float GuTopSlack => PortraitScreen ? PortraitMapTop : expansionView && !mapOnly ? 176f - Field.y : 0f;
 
         private void ShowTerritoryDong(string code)
         {
@@ -486,35 +499,56 @@ namespace Ssalddel.WindowsGame
                 var delta = guFrameAt <= 0f ? 0f : Mathf.Min(0.1f, now - guFrameAt);
                 guFrameAt = now;
                 UpdateGuCamera(delta);
-                if (guOrigin.y > 0f) Paint(new Rect(0, 0, Field.width, guOrigin.y + 1f), Ink(0x1A1D20));   // 자료 범위의 북쪽 밖
+                if (CapitalReady) DrawCapitalBase();      // 수도권 바탕 조각(SagajeongDispatchCapital.cs) — 세 구 바탕은 그 위에
+                else if (guOrigin.y > 0f) Paint(new Rect(0, 0, Field.width, guOrigin.y + 1f), Ink(0x1A1D20));   // 자료 범위의 북쪽 밖
                 GUI.DrawTexture(new Rect(guOrigin.x, guOrigin.y, guSpace.width * guScale, guSpace.height * guScale), guGrey);
                 if (guDetail != null) GUI.DrawTexture(GuRect(guDetailRect), guDetail);     // 세 구는 촘촘한 바탕을 덧깐다
+                DrawGuSky(now);          // 실제 달력의 낮과 밤: 그날 가로등 점등 시각에 저문다 (SagajeongDispatchDataPacks.cs)
                 var free = !MapOverlayCovers(current.mousePosition + Field.position);
                 guHover = free && !guDragging ? GuDongAt(GuWorld(current.mousePosition))?.code : null;
                 if (territory != null) DrawGuGround(territory, now, delta);
+                else DrawGuSeason();     // 철: 숲 · 공원 · 하천 · 눈 · 젖음 (SagajeongDispatchGuSeason.cs)
+                DrawGuHexTiles(now);     // 구와 동 사이의 타일 지도: 다가가면 떠오른다 (SagajeongDispatchHexTiles.cs)
+                DrawCapitalHex(now);     // 수도권 육각 타일(공개판): 두 번 누르면 동 디오라마 (SagajeongDispatchCapitalHex.cs)
+                DrawGuRoadSpeed();       // 길: 그 시각의 10월 평일 평균 통행속도 (SagajeongDispatchDataPacks.cs)
+                DrawGuBusLines();        // 버스: 중랑을 지나는 47노선의 확인된 선 조각
+                DrawGuStreetLights(now); // 밤 불빛: 그날 점등 시각에 하나씩 켜진다 (SagajeongDispatchDataPacks.cs)
+                DrawGuSubway(now);       // 지하철 노선도와 역 번화가 (SagajeongDispatchSubwayGu.cs)
+                DrawGuFacilities();      // 가까이에서 생활 시설 참고점(중랑 16동, SagajeongDispatchDataPacks.cs)
+                DrawGuFloating(now);     // 유동인구: 행정동 생활인구 원(SagajeongDispatchFloating.cs)
                 PrepareGuNames(territory);
+                DrawCapitalNames();      // 수도권 시군구 · 행정동 이름(세 구 밖)
                 DrawGuNames(now);
-                DrawGuRoads();
-                DrawGuHomeExtent();
-                DrawGuScaleBar();
+                DrawGuRoads();           // 축척 자는 이어 보기 띠로 옮겼다. 동네 범위 점선 상자는 없앴다(사용자 11-16)
             }
-            if (!guCameraSet || territory == null) return;
-
-            DrawGuPins(territory, now, repaint);
-            DrawGuLabels(territory);
+            if (!guCameraSet) return;
+            // 폰 빌드에는 영역 팩(주소 자료 파생)이 없다(2026-11-25) → 표식 · 이름표만 건너뛰고, 누르기(수도권 칸 · 공개판 디오라마)는 받는다.
+            if (territory != null)
+            {
+                DrawGuPins(territory, now, repaint);
+                DrawGuLabels(territory);
+            }
+            if (repaint) DrawGuWeather(now);     // 그날의 비 · 눈과 「오늘」 칩 (SagajeongDispatchDataPacks.cs)
+            if (repaint) DrawGuFloatingCard();   // 유동인구 카드 (SagajeongDispatchFloating.cs)
             if (repaint) guPrimed = true;
+            if (repaint) DrawGuHandoffVeil(now);     // 정밀 1: 전국에서 넘긴 직후 0.3초 동안 구 바탕으로 덮었다 걷는다(SagajeongDispatchMapContinuity.cs)
 
             // 직접 확대하거나 옮겼을 때만 보이는 단추: 내 영역이 다 보이는 자리로 돌아간다.
-            if (guManual && ExpansionButton(new Rect(560 - Field.x, 622 - Field.y, 160, 26), "영역 전체 보기", true, Mint))
+            if (guManual && !PortraitScreen && ExpansionButton(new Rect(560 - Field.x, 622 - Field.y, 160, 26), "영역 전체 보기", true, Mint))
             {
                 guManual = false;
                 guPressed = false;
                 return;
             }
+            if (DrawGuStationCard()) { guPressed = false; return; }       // 역 창 (SagajeongDispatchStationCard.cs)
+            if (DrawStationInside()) { guPressed = false; return; }       // 역 속 창 (SagajeongDispatchStationInside.cs)
+            if (DrawHexTileCard()) { guPressed = false; return; }         // 타일 그릇 창 (SagajeongDispatchHexTiles.cs)
+            if (DrawCapitalHexCard()) { guPressed = false; return; }      // 수도권 칸 창 (SagajeongDispatchCapitalHex.cs)
+            if (DrawGuSubwayOptions()) { guPressed = false; return; }      // 자료 창 · 분야별 켜고 끄기 (SagajeongDispatchDataControl.cs)
             if (repaint && guNotice != null)
             {
                 if (now > guNoticeUntil) guNotice = null;
-                else GuPlate(new Vector2(640 - Field.x, 596 - Field.y), guNotice, 12, Paper, 0.92f);
+                else GuPlate(PortraitScreen ? new Vector2(Field.width * 0.5f, portraitSheetRect.y - 36f) : new Vector2(640 - Field.x, 596 - Field.y), guNotice, 12, Paper, 0.92f);
             }
 
             // 끌면 지도를 옮기고, 표식이나 이름표가 아닌 곳을 그냥 누르면 그 자리의 법정동을 고른다.
@@ -540,7 +574,12 @@ namespace Ssalddel.WindowsGame
             else if (current.type == EventType.MouseUp && guPressed)
             {
                 guPressed = false;
-                if (!guDragging && !covered) guSelected = GuDongAt(GuWorld(current.mousePosition))?.code;
+                if (!guDragging && !covered)
+                {
+                    if (!dongMapOpen) expansionPanelOpen = false;      // 기본 판: 지도에서 고르면 사업 창을 걷고 영역 패널로
+                    if (PickGuStation(current.mousePosition)) hexSelected = -1;
+                    else if (!PickHexTile(current.mousePosition) && !PickCapitalHex(current.mousePosition)) guSelected = GuDongAt(GuWorld(current.mousePosition))?.code;      // 타일 지도에서는 타일을 고른다
+                }
                 guDragging = false;
                 current.Use();
             }
@@ -591,39 +630,6 @@ namespace Ssalddel.WindowsGame
             GUI.matrix = original;
         }
 
-        // 동네 지도(2.5D)가 있는 범위. 가까이 볼 때 점선으로 보여 주어, 어디서 더 확대하면 동네로 내려가는지 알린다.
-        private void DrawGuHomeExtent()
-        {
-            if (guScale < 0.13f || dioramaRoot == null || dioramaEast <= dioramaWest || dioramaNorth <= dioramaSouth) return;
-            var a = GuPoint((float)((dioramaWest - guSpace.west) * 88224.0), (float)((dioramaNorth - guSpace.south) * 111320.0));
-            var b = GuPoint((float)((dioramaEast - guSpace.west) * 88224.0), (float)((dioramaSouth - guSpace.south) * 111320.0));
-            var color = Fade(Mint, 0.7f);
-            Line(new Vector2(a.x, a.y), new Vector2(b.x, a.y), color, 1.5f, true);
-            Line(new Vector2(b.x, a.y), new Vector2(b.x, b.y), color, 1.5f, true);
-            Line(new Vector2(b.x, b.y), new Vector2(a.x, b.y), color, 1.5f, true);
-            Line(new Vector2(a.x, b.y), new Vector2(a.x, a.y), color, 1.5f, true);
-            GuPlate(new Vector2((a.x + b.x) * 0.5f, a.y - 13), "사가정 일대 · 더 확대하면 동네 지도", 10, Mint, 0.85f);
-        }
-
-        // 축척 막대: 화면에서 60~140점이 되는 반듯한 거리를 고른다.
-        private void DrawGuScaleBar()
-        {
-            var metres = 5000f;
-            foreach (var candidate in new[] { 200f, 500f, 1000f, 2000f, 5000f })
-            {
-                if (candidate * guScale < 60f) continue;
-                metres = candidate;
-                break;
-            }
-            var length = metres * guScale;
-            var left = new Vector2(330 - Field.x, 646 - Field.y);
-            var color = Fade(Paper, 0.8f);
-            Paint(new Rect(left.x, left.y, length, 2), color);
-            Paint(new Rect(left.x, left.y - 4, 2, 6), color);
-            Paint(new Rect(left.x + length - 2, left.y - 4, 2, 6), color);
-            Text(new Rect(left.x, left.y - 19, length, 16), metres >= 1000 ? $"{metres / 1000:0} km" : $"{metres:0} m", 10, color, true, TextAnchor.MiddleCenter);
-        }
-
         private static float GuLightOf(TerritoryDongView zone) =>
             zone.Level >= TerritoryLevels.Settled ? 1f : zone.Level == TerritoryLevels.Operating ? 0.86f :
             zone.Level == TerritoryLevels.Entering ? 0.5f : zone.Candidate ? 0.16f : 0f;
@@ -655,6 +661,7 @@ namespace Ssalddel.WindowsGame
                 GUI.DrawTexture(GuRect(dong.fillBounds), dong.fill, ScaleMode.StretchToFill, true, 0,
                     new Color(1f, 1f, 1f, Mathf.Clamp01(light + breathe)), 0, 0);
             }
+            DrawGuSeason();          // 철: 동의 색 바탕 위, 표식 아래 (SagajeongDispatchGuSeason.cs)
 
             // 2) 지사의 배달권과 매장의 불빛
             foreach (var zone in view.Dongs)
@@ -1065,7 +1072,8 @@ namespace Ssalddel.WindowsGame
                 }
                 else if (chosen.IsHome)
                 {
-                    if (ExpansionButton(act, "동네 지도로 내려가기", true, Mint)) ReturnToDong();
+                    if (!dongMapOpen) ExpansionButton(act, "운영하는 곳", false, Tile);      // 기본 판: 내려갈 동네 지도가 없다
+                    else if (ExpansionButton(act, "동네 지도로 내려가기", true, Mint)) ReturnToDong();
                 }
                 else if (chosen.Level <= TerritoryLevels.Unknown)
                 {

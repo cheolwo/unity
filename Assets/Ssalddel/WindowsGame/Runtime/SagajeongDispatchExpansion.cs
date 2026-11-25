@@ -17,23 +17,29 @@ namespace Ssalddel.WindowsGame
         private bool expansionView = true;
         private bool expansionPanelOpen = !TidyScreen;        // 정리한 첫 화면에서는 사업 칸을 접어 둔다(아래 띠를 누르면 열린다)
         private int expansionSelection = BusinessFranchise;   // 처음에는 새로 열린 사업을 보여 준다
+        private readonly (string 상태, Color 색)[] 사업탭 = new (string, Color)[BusinessTitles.Length];
 
         private bool ExpansionPanelVisible => expansionPanelOpen && actorFocus == null && selectedBuilding == null &&
             !dongPanelOpen && !zonePanelOpen && !showDesk && !CycleCardVisible;
 
+        private bool BaseEditionBusinessAsked => !dongMapOpen && expansionPanelOpen;
+
         private bool ExpansionCovers(Vector2 point)
         {
             if (!expansionView || mapOnly) return false;
+            if (역할목록표시 && 역할목록칸.Contains(point)) return true;
+            if (관찰띠표시 && 관찰띠칸.Contains(point)) return true;
+            if (플랫폼장부표시 && 플랫폼장부칸.Contains(point)) return true;
             if (TidyScreen)
             {
                 // 정리한 첫 화면: 옮기거나 접은 것은 지도를 가리지 않는다 (SagajeongDispatchSettings.cs)
                 if (ExpansionHeader.Contains(point) || BusinessCovers(point) || SignalBarCovers(point) || CycleCovers(point) || NoticeCovers(point)) return true;
-                if (!showDesk && (ExpansionRail.Contains(point) || SideCovers(point))) return true;
+                if (!showDesk && (!아래줄걷음 && ExpansionRail.Contains(point) || SideCovers(point))) return true;
                 return (DailyReportVisible || TerritoryPanelVisible || ExpansionPanelVisible) && ExpansionPanel.Contains(point);
             }
             if (ExpansionHeader.Contains(point) || BusinessCovers(point) || SignalBarCovers(point) || CycleCovers(point) ||
                 DongViewPanelCovers(point)) return true;
-            if (!showDesk && (ExpansionRail.Contains(point) || ExpansionOverview.Contains(point) ||
+            if (!showDesk && (!아래줄걷음 && ExpansionRail.Contains(point) || ExpansionOverview.Contains(point) ||
                 ExpansionDongButton.Contains(point) || ExpansionZoneButton.Contains(point) ||
                 ExpansionDioramaButton.Contains(point) || MapEffectsControl.Contains(point) ||
                 DioramaVisible && ExpansionDioramaFacts.Contains(point))) return true;
@@ -42,6 +48,8 @@ namespace Ssalddel.WindowsGame
 
         private void SelectExpansion(int index)
         {
+            플랫폼장부열림 = false;
+            역할목록열림 = false;
             expansionSelection = Mathf.Clamp(index, 0, BusinessTitles.Length - 1);
             expansionPanelOpen = true;
             actorFocus = null;
@@ -51,13 +59,18 @@ namespace Ssalddel.WindowsGame
 
         private void DrawExpansionView()
         {
+            관찰선택동기화();
+            if (!플랫폼장부가능 || 역할목록표시 || sidePanelsOpen || DongDeskVisible || StoreDeskVisible || placeOpen)
+                플랫폼장부열림 = false;
+            if (!역할입구가능 || sidePanelsOpen || DongDeskVisible || StoreDeskVisible || placeOpen)
+                역할목록열림 = false;
             DrawExpansionHeader();
             if (dailyReportOpen && !DailyReportVisible) dailyReportOpen = false;     // 설정 칸과 같다
             if (!showDesk)
             {
                 // 전국 지도(r155)에서는 왼쪽이 자료 층·지표·표시로 바뀐다.
-                if (NationMapVisible) DrawNationSide();
-                else if (SidePanelsVisible)
+                if (NationMapVisible && !플랫폼장부표시) DrawNationSide();
+                else if (SidePanelsVisible && !역할목록표시 && !플랫폼장부표시)
                 {
                     DrawExpansionOverview();
                     DrawBusinessLayers();
@@ -65,19 +78,28 @@ namespace Ssalddel.WindowsGame
                 // 정리한 첫 화면: 도구 줄(지도 효과·동 보기·법정동·배달권·2.5D)은 설정 칸으로 갔다. 왼쪽 아래에는 운영 현황 단추만 남는다.
                 if (TidyScreen)
                 {
-                    DrawSideToggle();
-                    DrawDailyReportButton();        // r174 「오늘 결산」 (SagajeongDispatchDailyReport.cs)
-                    DrawRoundCard();                // r187 운영 회차 안내 (SagajeongDispatchRound.cs)
+                    if (!플랫폼장부표시)
+                    {
+                        DrawSideToggle();
+                        DrawDailyReportButton();
+                        DrawRoundCard();
+                    }
                 }
-                else DrawExpansionTools();
-                DrawExpansionRail();
+                else if (!역할목록표시 && !플랫폼장부표시) DrawExpansionTools();
+                아래줄그림 = !아래줄걷음;
+                if (!아래줄걷음) DrawExpansionRail();   // 한 단추 순환(2026-11-17): 다음 할 일이 켜진 화면에서는 사업 줄을 걷는다 (SagajeongDispatchNextTodo.cs)
                 DrawChainStrip();
                 DrawSignalBar();
+                if (역할목록표시) 역할목록그리기();
+                if (관찰띠표시) 관찰띠그리기();
+                if (플랫폼장부표시) 플랫폼장부그리기();
             }
             // 구 지도에서는 오른쪽 패널이 영역 패널로, 전국 지도에서는 거점·출입구 카드로 바뀐다. 설정은 가운데의 큰 화면이다(OnGUI의 끝).
             if (DailyReportVisible) DrawDailyReportPanel();
             else if (NationPanelVisible) DrawNationPanel();
-            else if (TerritoryPanelVisible) DrawTerritoryPanel();
+            // 기본 판(판Policy.cs)은 구 지도가 바탕이라, 사업 띠를 누르면 영역 패널 자리에 그 사업 창을 보인다. 지도에서 동 · 역을 고르면 영역 패널로 돌아온다.
+            else if (TerritoryPanelVisible && placePanelOn && GuStationNow() != null) DrawStationPlacePanel();      // 자료 창 「게임 요소 · 홍달 플레이스 창」을 켰을 때만      // 역을 고르면 홍달 플레이스 키워드 창 (SagajeongDispatchStationPlace.cs)
+            else if (TerritoryPanelVisible && !(BaseEditionBusinessAsked && ExpansionPanelVisible)) DrawTerritoryPanel();
             else if (ExpansionPanelVisible) DrawExpansionPanel();
         }
 
@@ -91,14 +113,19 @@ namespace Ssalddel.WindowsGame
             Text(new Rect(327, 13, 135, 20), state?.campaign == null ? "첫 배차" :
                 $"운영 {state.campaign.day}일차", 12, Soft);
             Text(new Rect(327, 34, 135, 32), ClockLabel(state?.now ?? "11:30:00"), 23, Paper, true);
-            var headline = MindHeadline();
-            Text(new Rect(484, 13, 145, 20), "경 유지 시간 · 오늘", 12, Soft);
-            Text(new Rect(484, 36, 145, 26), headline.Maintained, 20, Paper, true);
-            if (headline.Note != null)
-                Text(new Rect(484, 62, 145, 16), headline.Note, 10, headline.Note.StartsWith("무념 깨짐") ? Red : Mint);
-            Text(new Rect(651, 13, 161, 20), "경 시간당 순소득", 12, Soft);
-            Text(new Rect(651, 36, 161, 26), headline.PerHour, 20, Paper, true);
-            Text(new Rect(651, 62, 161, 16), "가상 · 비용 미반영", 10, Soft);
+            // 경 유지 시간 · 경 시간당 순소득: 처음엔 위 띠에 없다(20:33 사용자). 기사 빛을 누르면 오른쪽 상태창에 나온다 (SagajeongDispatchMind.cs DrawGyeongFigures).
+            // 자료 창 「게임 요소 · 위 띠 경 수치」를 켜면 예전처럼 위 띠에도 보인다(20:47 「할 사람은 하고 아니면 안 하는 걸로」).
+            if (headerGyeongOn)
+            {
+                var headline = MindHeadline();
+                Text(new Rect(484, 13, 145, 20), "경 유지 시간 · 오늘", 12, Soft);
+                Text(new Rect(484, 36, 145, 26), headline.Maintained, 20, Paper, true);
+                if (headline.Note != null)
+                    Text(new Rect(484, 62, 145, 16), headline.Note, 10, headline.Note.StartsWith("무념 깨짐") ? Red : Mint);
+                Text(new Rect(651, 13, 161, 20), "경 시간당 순소득", 12, Soft);
+                Text(new Rect(651, 36, 161, 26), headline.PerHour, 20, Paper, true);
+                Text(new Rect(651, 62, 161, 16), "가상 · 비용 미반영", 10, Soft);
+            }
 
             var canStart = state != null && pending == null && !running && !CampaignPolicyOpen;
             var restart = state?.settled == true && state.campaign == null;
@@ -149,7 +176,7 @@ namespace Ssalddel.WindowsGame
         private bool ExpansionButton(Rect rect, string label, bool enabled, Color background)
         {
             Paint(rect, enabled ? background : Panel, 6);
-            Text(rect, label, 11, enabled && background == Mint ? Canvas : Paper, true,
+            Text(rect, label, 11, enabled && (background == Mint || background == Gold) ? Canvas : Paper, true,
                 TextAnchor.MiddleCenter);
             return enabled && Hit(rect);
         }
@@ -197,16 +224,33 @@ namespace Ssalddel.WindowsGame
 
         private void DrawExpansionRail()
         {
+            if (플랫폼줄표시)
+            {
+                플랫폼줄그리기();             // 배달 플랫폼 패키지의 아래 줄 (SagajeongDispatchPlatformPackage.cs)
+                return;
+            }
             Paint(ExpansionRail, Canvas, 10);
-            var slot = 0;
+            var visibleTabs = 0;
             for (var index = 0; index < BusinessTitles.Length; index++)
             {
                 var label = BusinessState(index, out var accent);
+                사업탭[index] = (label, accent);
+                if (!TidyScreen || accent != Soft || expansionPanelOpen && expansionSelection == index) visibleTabs++;
+            }
+            var firstTabX = ExpansionRail.x + 8 + 플랫폼돌아가기폭;      // 배달 플랫폼 패키지의 「모든 사업 보기」: 맨 왼쪽에 돌아가기
+            플랫폼돌아가기그리기();
+            var nextButtonX = PlaceAvailable ? PlaceButton.x : 역할입구가능 ? 역할입구칸.x :
+                플랫폼장부가능 ? 플랫폼장부단추.x : ExpansionRail.xMax - 226;
+            var stride = Mathf.Min(166f, (nextButtonX - firstTabX) / Mathf.Max(1, visibleTabs));
+            var slot = 0;
+            for (var index = 0; index < BusinessTitles.Length; index++)
+            {
+                var (label, accent) = 사업탭[index];
                 var open = accent != Soft;
                 var selected = expansionPanelOpen && expansionSelection == index;
                 // 정리한 첫 화면: 아직 열리지 않은 사업은 띠에 두지 않는다. 열리면 그때 자리가 생긴다.
                 if (TidyScreen && !open && !selected) continue;
-                var tab = new Rect(ExpansionRail.x + 8 + (TidyScreen ? slot : index) * 166, ExpansionRail.y + 6, 160, 32);
+                var tab = new Rect(firstTabX + slot * stride, ExpansionRail.y + 6, stride - 6, 32);
                 slot++;
                 if (open || selected)
                 {
@@ -214,20 +258,31 @@ namespace Ssalddel.WindowsGame
                     Paint(new Rect(tab.x + 1, tab.y + 1, tab.width - 2, tab.height - 2),
                         accent == Mint ? Ink(0x18372F) : accent == Gold ? Ink(0x302F27) : Panel, 6);
                 }
-                Text(new Rect(tab.x + 12, tab.y, 86, tab.height), BusinessTitles[index], 13, open ? Paper : Soft, true);
-                Text(new Rect(tab.x + 66, tab.y, 84, tab.height), label, 10, accent, align: TextAnchor.MiddleRight);
+                if (tab.width >= 150)
+                {
+                    Text(new Rect(tab.x + 12, tab.y, 86, tab.height), BusinessTitles[index], 13, open ? Paper : Soft, true);
+                    Text(new Rect(tab.x + 66, tab.y, tab.width - 76, tab.height), label, 10, accent, align: TextAnchor.MiddleRight);
+                }
+                else
+                {
+                    Text(new Rect(tab.x + 8, tab.y + 1, tab.width - 16, 17), BusinessTitles[index], 12, open ? Paper : Soft, true);
+                    Text(new Rect(tab.x + 8, tab.y + 17, tab.width - 16, 13), label, 9, accent);
+                }
                 if (Hit(tab))
                 {
                     SelectExpansion(index);
                     DongDeskShortcut(index);      // 기사 운영 · 음식점은 동 관리 창의 그 묶음도 편다 (SagajeongDispatchDongDesk.cs)
                 }
             }
-            Text(new Rect(ExpansionRail.xMax - 226, ExpansionRail.y, 214, ExpansionRail.height),
+            if (!플랫폼장부가능) Text(new Rect(ExpansionRail.xMax - 226, ExpansionRail.y, 214, ExpansionRail.height),
                 mapLevel == MapLevel.Dong ? "더 축소하면 구 지도 · 영역" : GuMapVisible ? "휠 확대·축소 · 끌어서 이동" :
                 NationMapVisible ? "거점·출입구를 눌러 자료 보기" :
                 mapLevel == MapLevel.Seoul ? "휠을 올리면 구 지도 · 내리면 전국" : "휠을 올리면 한 단계 가까이",
                 11, Soft, align: TextAnchor.MiddleRight);
             DrawPlaceButton();                  // 홍달 플레이스 주문자 뷰 열기 (SagajeongDispatchPlace.cs)
+            if (placeOpen) 역할목록열림 = false;
+            if (역할입구가능) 역할입구그리기();
+            플랫폼장부단추그리기();
         }
 
         private void DrawExpansionPanel()
@@ -311,6 +366,7 @@ namespace Ssalddel.WindowsGame
                 else if (business == BusinessRestaurant)
                 {
                     showDetails = true;
+                    관찰선택해제();
                     actorFocus = (FocusKind.Store, state.stores[0].id);
                 }
                 else if (business == BusinessFranchise) GoToPlace(engine.Pack.network.store.placeId);

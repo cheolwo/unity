@@ -77,6 +77,7 @@ namespace Ssalddel.WindowsGame
         // 동 사업 칸의 화살표: 읽은 동을 차례로 넘겨 본다.
         private void StepDongSolo(int step)
         {
+            관찰지도수동이동();
             var regions = dongModules.Where(module => module.Loaded).Select(module => module.Entry.regionId).ToList();
             if (regions.Count < 2) return;
             var at = regions.IndexOf(soloRegion ?? focusDongRegion);

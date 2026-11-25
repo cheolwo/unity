@@ -56,6 +56,7 @@ namespace Ssalddel.WindowsGame
             SyncMusic();                 // 고른 곡: 불러오기 · 분석 · 지금의 박 (SagajeongDispatchMusic.cs)
             if (!dioramaTried && state != null && roadTexture != null) LoadDiorama();
             if (dioramaCamera == null) dioramaCamera = Camera.main;
+            if (SyncPublicDong(dioramaCamera)) return;      // 공개판 동 디오라마가 열려 있으면 카메라를 맡긴다 (SagajeongDispatchPublicDong.cs)
             var camera = dioramaCamera;
             var scale = Mathf.Min(Screen.width / (float)Width, Screen.height / (float)Height);
             var show = dioramaOn && dioramaRoot != null && camera != null && scale > 0 && mapLevel == MapLevel.Dong &&
@@ -64,7 +65,12 @@ namespace Ssalddel.WindowsGame
             if (camera != null && show != dioramaShown)
                 camera.backgroundColor = show ? (DongModulesLoaded ? DongBackdrop : DioramaGround) : FlatGround;
             dioramaShown = show;
-            if (!show) return;
+            if (!show)
+            {
+                StopWeatherParticles();      // 비 · 눈 알갱이는 동 디오라마에서만 (SagajeongDispatchWeatherParticles.cs)
+                StopRealismLens();           // 렌즈는 동 디오라마에서만 (SagajeongDispatchRealism.cs)
+                return;
+            }
 
             // 가까이 보기: 지금 배율에 맞는 각으로 (SagajeongDispatchCloseView.cs). 멀리서는 바탕 시점 그대로다.
             if (SyncCloseLens()) mapOffset = ClampDioramaOffset(ClampMapOffset(mapOffset, mapZoom), mapZoom);
@@ -103,6 +109,10 @@ namespace Ssalddel.WindowsGame
             SyncManagedBuildings();      // 회색 동네와 관리 건물 (SagajeongDispatchManaged.cs)
             SyncStationWindow();         // 역 중심 보기의 둥근 창 (SagajeongDispatchStationView.cs)
             SyncRoamers();               // 계속 돌아다니는 기사 (SagajeongDispatchRoam.cs)
+            SyncEnvironment();           // 계절 · 날씨 · 해 (SagajeongDispatchEnvironment.cs)
+            SyncRealism(camera, halfHeight);     // 현실감 시험: 해 방향 · 그림자 · 렌즈 (SagajeongDispatchRealism.cs)
+            SyncDriftSize(halfHeight);   // 날리는 잎 크기 (SagajeongDispatchTrees.cs)
+            SyncWeatherParticles(focus, halfHeight, (float)dioramaLens.PitchDegrees);     // 땅 위의 비 · 눈 (SagajeongDispatchWeatherParticles.cs)
             SyncCloseShader(camera, focus, halfHeight);      // 가까이 보기: 창 · 안개 · 고른 곳 (SagajeongDispatchCloseView.cs)
         }
 
@@ -364,11 +374,20 @@ namespace Ssalddel.WindowsGame
         private void ReleaseDiorama()
         {
             ReleaseManaged();
+            ReleaseRealism();
             if (dioramaRoot != null) Destroy(dioramaRoot);
             foreach (var mesh in dioramaMeshes)
                 if (mesh != null) Destroy(mesh);
             if (dioramaMaterial != null) Destroy(dioramaMaterial);
             if (dioramaShadowMaterial != null) Destroy(dioramaShadowMaterial);
+            if (treeMaterial != null) Destroy(treeMaterial);
+            if (driftMaterial != null) Destroy(driftMaterial);
+            treeMaterial = null;
+            driftMaterial = null;
+            driftRenderers.Clear();
+            driftShown = false;
+            dioramaTrees = 0;
+            dioramaDriftLeaves = 0;
             dioramaMeshes.Clear();
             dioramaFillParts.Clear();
             dioramaRoot = null;

@@ -75,6 +75,7 @@ namespace Ssalddel.WindowsGame
                 .OrderBy(key => key, StringComparer.Ordinal).ToList();
             if (regions.Count < 2) return;
             var at = Mathf.Max(0, regions.IndexOf(stationCardRegion));
+            관찰지도수동이동();
             SelectStationDong(regions[(at + step + regions.Count) % regions.Count]);
         }
 
@@ -307,17 +308,21 @@ namespace Ssalddel.WindowsGame
                 if (DeskSection(ref y, "고용", dongDeskHire, "사람을 들인다")) run = () => dongDeskHire = !dongDeskHire;
                 if (dongDeskHire && trade != null && dongDemand != null)
                 {
+                    var 모집줄 = y;
                     if (DeskRow(ref y, FireflyHalo, "기사", "지금 " + trade.Riders + "명 · 받아낼 수 있는 주문이 늘어난다",
-                            dongDemand.RecruitCost.ToString("N0"), "고용", trade.CanRecruit, trade.RecruitBlock))
-                        run = () => DeskRecruit(region);
+                            dongDemand.RecruitCost.ToString("N0"), 동확정말("고용", 다음할일Policy.모집키(land.Code)), trade.CanRecruit, trade.RecruitBlock))
+                        run = 턴계획모드 ? (Action)(() => 동계획담기(region, false)) : () => DeskRecruit(region);
+                    할일강조그리기(new Rect(11, 모집줄 - 3, DeskListWidth - 22, y - 모집줄), 다음할일Policy.모집키(land.Code));
                 }
 
                 if (DeskSection(ref y, "건설", dongDeskBuild, "거점을 늘린다")) run = () => dongDeskBuild = !dongDeskBuild;
                 if (dongDeskBuild && trade != null && dongDemand != null)
                 {
+                    var 제휴줄 = y;
                     if (DeskRow(ref y, StoreHalo, "제휴 음식점", trade.Partners + "/" + trade.PartnerLimit + "곳 · 가상 자리로 밝혀진다",
-                            dongDemand.ContractCost.ToString("N0"), "건설", trade.CanContract, trade.ContractBlock))
-                        run = () => DeskContract(region);
+                            dongDemand.ContractCost.ToString("N0"), 동확정말("건설", 다음할일Policy.제휴키(land.Code)), trade.CanContract, trade.ContractBlock))
+                        run = 턴계획모드 ? (Action)(() => 동계획담기(region, true)) : () => DeskContract(region);
+                    할일강조그리기(new Rect(11, 제휴줄 - 3, DeskListWidth - 22, y - 제휴줄), 다음할일Policy.제휴키(land.Code));
                     // 자리 고르기는 다음 걸음이다. 지금은 줄만 세워 둔다.
                     DeskRow(ref y, Fade(StoreHalo, 0.45f), "음식점 차리기", "지도에서 자리 고르기 · 아직 준비 중입니다", null, "준비 중", false, null);
                 }

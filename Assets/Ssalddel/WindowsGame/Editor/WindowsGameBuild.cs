@@ -90,7 +90,7 @@ namespace Ssalddel.WindowsGame.Editor
             return summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded;
         }
 
-        private static string CreateScene()
+        internal static string CreateScene()      // AndroidGameBuild도 같은 장면을 쓴다
         {
             var asmdef = AssetDatabase.FindAssets("Ssalddel.WindowsGame t:AssemblyDefinitionAsset")
                 .Select(AssetDatabase.GUIDToAssetPath)

@@ -56,7 +56,7 @@ namespace Ssalddel.WindowsGame
         private int phoneLastFrame = -10;              // 마지막으로 그린 프레임: 닫았다 다시 열면 재연하지 않는다
         private readonly Dictionary<string, string> phoneRecommended = new();     // 주문 → 기다리는 동안 배차 엔진이 추천한 기사
 
-        private static bool PhoneKind(FocusKind kind) => kind is FocusKind.Courier or FocusKind.Store or FocusKind.Cargo or FocusKind.Center;
+        private static bool PhoneKind(FocusKind kind) => kind is FocusKind.Courier or FocusKind.Store or FocusKind.Cargo or FocusKind.Center or FocusKind.Inspection;
         private static bool PhoneHasCard(FocusKind kind) => kind is FocusKind.Courier or FocusKind.Store;
 
         // 휴대폰이 서는 화면: 확장 화면의 오른쪽 칸. 기사 · 가게는 동 지도에서, 화물 · 창고(인계 사슬에서 엶)는 전국 지도가 아니면.
@@ -70,6 +70,12 @@ namespace Ssalddel.WindowsGame
 
         private void OpenRolePhone(FocusKind kind, string id)
         {
+            관찰선택해제();
+            역할휴대폰초점(kind, id);
+        }
+
+        private void 역할휴대폰초점(FocusKind kind, string id)
+        {
             dongPanelOpen = false;
             zonePanelOpen = false;
             showDetails = true;
@@ -79,10 +85,12 @@ namespace Ssalddel.WindowsGame
 
         private void DrawRolePhone(FocusKind kind, string id)
         {
+            if (관찰휴대폰안내그리기(kind, id)) return;
             if (kind == FocusKind.Courier) DrawRiderPhone(id);
             else if (kind == FocusKind.Store) DrawStorePhone(id);
             else if (kind == FocusKind.Cargo) DrawCargoPhone();
             else if (kind == FocusKind.Center) DrawCenterPhone();
+            else if (kind == FocusKind.Inspection) 관찰검수폰그리기();
         }
 
         // ── 배차 엔진의 추천을 기억한다(보기만) ──
@@ -209,7 +217,7 @@ namespace Ssalddel.WindowsGame
             Text(new Rect(x, head, 18, 18), "홍", 10, Color.white, true, TextAnchor.MiddleCenter);
             Text(new Rect(x + 24, head - 1, 120, 20), app, 13, PhoneText, true);
             var close = new Rect(screen.xMax - 40, head, 30, 18);
-            if (card)
+            if (card && 관찰대상 == null)
             {
                 var cardButton = new Rect(screen.xMax - 78, head, 34, 18);
                 Paint(cardButton, PhoneSurface, 9);
@@ -224,7 +232,8 @@ namespace Ssalddel.WindowsGame
             Text(close, "닫기", 9, PhoneSub, align: TextAnchor.MiddleCenter);
             if (Hit(close))
             {
-                actorFocus = null;
+                if (관찰대상.HasValue) 역할관찰끝내기();
+                else actorFocus = null;
                 return null;
             }
             return screen;
@@ -440,7 +449,7 @@ namespace Ssalddel.WindowsGame
         {
             var courier = state.couriers?.FirstOrDefault(item => item.id == courierId);
             if (courier == null) return;
-            var order = PhoneOrderOf(courierId);
+            var order = 표시할배달주문(FocusKind.Courier, courierId);
             SyncPhone("rider:" + courierId, order?.id, order?.stage, (from, to) =>
             {
                 if (to == "Settled") phonePayText = null;
@@ -492,8 +501,13 @@ namespace Ssalddel.WindowsGame
                 PhoneCard(new Rect(x, y, w, 46));
                 Text(new Rect(x + 10, y + 4, 80, 12), "픽업지", 8, PhoneSub);
                 Text(new Rect(x + 10, y + 16, w - 20, 16), pickupName, 11, PhoneText, true);
-                var ready = step >= 3 ? ("픽업 완료", PhoneSub, Ink(0xECF0F3)) : step == 2 ? ("픽업 준비 확인", PhoneSuccess, Ink(0xE3F4E9)) : ("음식 준비 중", PhoneWarn, Ink(0xFDF1E2));
-                PhonePill(x + 10, y + 32, ready.Item1, ready.Item2, ready.Item3);
+                // 재연을 다시 보더라도 픽업지의 현재 상태는 이 주문의 기사 단계에서 읽는다.
+                if (rest.Step >= 3)
+                    PhonePill(x + 10, y + 32, "픽업 완료", PhoneSub, Ink(0xECF0F3));
+                else if (rest.Screen != 기사화면.대기 || order?.stage == "Waiting")
+                    PhonePill(x + 10, y + 32, "픽업 전", PhoneWarn, Ink(0xFDF1E2));
+                else
+                    PhonePill(x + 10, y + 32, "자료 미확인", PhoneSub, Ink(0xECF0F3));
                 y += 52;
                 PhoneCard(new Rect(x, y, w, 36));
                 Text(new Rect(x + 10, y + 3, 80, 12), "전달지", 8, PhoneSub);

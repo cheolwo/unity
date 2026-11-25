@@ -35,6 +35,11 @@ namespace Ssalddel.WindowsGame
             return hash;
         }
 
+        // 고르는 순서의 열쇠 (2026-11-17 중랑구 J1). 건물통합식별번호가 있으면 옛 판(2026-08-09) id 꼴로 만든다.
+        // 건물 판을 바꿔도 같은 건물이 같은 순서에 서서, 밝힌 제휴 자리가 다른 건물로 옮겨 가지 않는다.
+        public static string OrderKey(string id, string sourceId) =>
+            string.IsNullOrEmpty(sourceId) ? id : "vworld:al-d010:" + sourceId;
+
         // 한 동의 후보 건물을 고르는 순서대로. 넣는 순서가 달라도 결과는 같다.
         public static List<int> Candidates(IEnumerable<(int Index, string Id, string Kind, double Area, bool Fill)> buildings) =>
             buildings.Where(item => Eligible(item.Kind, item.Area, item.Fill))

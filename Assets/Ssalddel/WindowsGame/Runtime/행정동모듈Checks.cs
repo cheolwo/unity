@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Ssalddel.WindowsGame
 {
@@ -11,6 +14,41 @@ namespace Ssalddel.WindowsGame
         private static readonly double YawCos = Math.Cos(30 * Math.PI / 180);
         private static readonly double YawSin = Math.Sin(30 * Math.PI / 180);
         private static readonly double PitchSin = Math.Sin(55 * Math.PI / 180);
+
+        // ── 동 메시 풀기 (지도 자료 적용 S2 첫 조각, 2026-11-16) ──
+        // 굽은 메시를 손실 없이 싸고(HDIZ) 게임이 풀 때, 같은 바이트로 돌아오고 바뀐 것은 거절하는지 본다.
+        private static void 동메시풀기Checks(List<(string, bool, string)> results)
+        {
+            void Check(string name, bool ok, string detail = null) => results.Add((name, ok, detail));
+            static bool Throws(Func<byte[]> act)
+            {
+                try { act(); return false; }
+                catch (InvalidDataException) { return true; }
+            }
+            var raw = new byte[600];
+            raw[0] = (byte)'H'; raw[1] = (byte)'D'; raw[2] = (byte)'I'; raw[3] = (byte)'O';
+            for (var i = 4; i < raw.Length; i++) raw[i] = (byte)(i * 7 % 13);
+            byte[] hash;
+            using (var sha = SHA256.Create()) hash = sha.ComputeHash(raw);
+            byte[] body;
+            using (var output = new MemoryStream())
+            {
+                using (var deflate = new DeflateStream(output, CompressionMode.Compress, true)) deflate.Write(raw, 0, raw.Length);
+                body = output.ToArray();
+            }
+            var packed = new byte[행정동모듈Policy.PackHeaderBytes + body.Length];
+            packed[0] = (byte)'H'; packed[1] = (byte)'D'; packed[2] = (byte)'I'; packed[3] = (byte)'Z';
+            packed[4] = 1; packed[8] = (byte)(raw.Length & 0xFF); packed[9] = (byte)(raw.Length >> 8);
+            Array.Copy(hash, 0, packed, 12, 32);
+            Array.Copy(body, 0, packed, 행정동모듈Policy.PackHeaderBytes, body.Length);
+            var hex = BitConverter.ToString(hash).Replace("-", string.Empty);
+            Check("동 메시 풀기: 싼 것을 풀면 원래와 같음", 행정동모듈Policy.UnpackModule(packed, raw.Length, hex).SequenceEqual(raw), $"{packed.Length} → {raw.Length}");
+            Check("동 메시 풀기: 안 싼 메시(HDIO)는 그대로", ReferenceEquals(행정동모듈Policy.UnpackModule(raw, 0, null), raw));
+            var tampered = (byte[])packed.Clone(); tampered[20] ^= 0xFF;
+            Check("동 메시 풀기: 머리의 해시와 다르면 거절", Throws(() => 행정동모듈Policy.UnpackModule(tampered, raw.Length, null)));
+            Check("동 메시 풀기: 목록의 원래 길이 · 해시와 다르면 거절",
+                Throws(() => 행정동모듈Policy.UnpackModule(packed, raw.Length + 1, null)) && Throws(() => 행정동모듈Policy.UnpackModule(packed, raw.Length, new string('0', 64))));
+        }
 
         // ── 회색 동네와 관리 건물 (r143 첫 걸음, 2026-11-14) ──
         // 제휴 음식점의 가상 자리를 고르는 규칙과, 밝힌 건물의 모양(외곽 넓히기·지붕 나누기)을 본다.
@@ -317,6 +355,14 @@ namespace Ssalddel.WindowsGame
             Check("대응이 없으면 역할을 얹지 않음",
                 행정동모듈Policy.MapRoleBuilding(map, "example:2") == null && 행정동모듈Policy.MapRoleBuilding(map, "osm:way/3") == null);
 
+            // ── 제휴 자리 순서 열쇠(판 바꾸기) ──
+            Check("새 판 건물은 건물통합식별번호로 옛 판과 같은 열쇠",
+                관리건물Policy.OrderKey("al-d010:20261109:11:170501", "2016208187304535077200000000") == "vworld:al-d010:2016208187304535077200000000" &&
+                관리건물Policy.Order(관리건물Policy.OrderKey("al-d010:20261109:11:170501", "2016208187304535077200000000")) ==
+                관리건물Policy.Order("vworld:al-d010:2016208187304535077200000000"));
+            Check("번호가 없으면 id 그대로", 관리건물Policy.OrderKey("vworld:al-d010:9", null) == "vworld:al-d010:9" &&
+                관리건물Policy.OrderKey("b:shop-1", "") == "b:shop-1");
+
             // ── 건물 카드 글자 ──
             Check("주용도 코드를 이름으로", 행정동모듈Policy.UseLabel("al-d010:01000") == "단독주택" &&
                 행정동모듈Policy.UseLabel("al-d010:04000") == "제2종 근린생활" && 행정동모듈Policy.UseLabel("al-d010:unknown") == "용도 미상");
@@ -359,8 +405,10 @@ namespace Ssalddel.WindowsGame
                 행정동모듈Policy.Visible(true, "region:kr:hjd:1126052000", hidden, "region:kr:hjd:1126052000") &&
                 !행정동모듈Policy.Visible(true, "region:kr:hjd:1126052000", null, "region:kr:hjd:1126056500"));
             Check("마지막 한 동은 숨기지 않음", 행정동모듈Policy.CanHide(6, 4) && !행정동모듈Policy.CanHide(6, 5) && !행정동모듈Policy.CanHide(1, 0));
+            동메시풀기Checks(results);
             관리건물Checks(results);
             역중심Checks(results);
+            팔방이웃Checks.Add(results);
             return results;
         }
     }

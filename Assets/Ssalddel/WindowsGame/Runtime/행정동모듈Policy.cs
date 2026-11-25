@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Security.Cryptography;
 
 namespace Ssalddel.WindowsGame
 {
@@ -93,6 +96,42 @@ namespace Ssalddel.WindowsGame
             if (!IsSha256(sha256)) return "해시 모양이 아님";
             if (!(west < east) || !(south < north)) return "범위가 비었음";
             return null;
+        }
+
+        // 동 메시 자원 풀기(지도 자료 적용 S2 첫 조각, 2026-11-16). 굽은 메시(HDIO)를 굽기 뒤 손실 없이 싼 것(HDIZ)이면 풀어서 돌려준다.
+        // 싼 꼴(작은 끝): 'HDIZ' · int32 판(1) · int32 원래 길이 · 원래 SHA-256 32바이트 · raw deflate 본문(Tools~/pack_dong_resources.py).
+        // 안 싼 HDIO는 그대로 돌려준다. 원래 길이 · 해시가 머리나 목록(rawBytes · rawSha256, 있으면)과 다르면 InvalidDataException.
+        public const int PackHeaderBytes = 44;
+        public static byte[] UnpackModule(byte[] stored, long expectedRawBytes, string expectedRawSha256)
+        {
+            if (stored == null || stored.Length < 4) throw new InvalidDataException("empty module");
+            if (!(stored[0] == 'H' && stored[1] == 'D' && stored[2] == 'I' && stored[3] == 'Z')) return stored;
+            if (stored.Length < PackHeaderBytes) throw new InvalidDataException("short pack header");
+            static int Int32At(byte[] b, int at) => b[at] | b[at + 1] << 8 | b[at + 2] << 16 | b[at + 3] << 24;
+            if (Int32At(stored, 4) != 1) throw new InvalidDataException("unknown pack version");
+            var rawLength = Int32At(stored, 8);
+            if (rawLength <= 0 || expectedRawBytes > 0 && rawLength != expectedRawBytes) throw new InvalidDataException("pack length");
+            var raw = new byte[rawLength];
+            using (var input = new MemoryStream(stored, PackHeaderBytes, stored.Length - PackHeaderBytes, false))
+            using (var deflate = new DeflateStream(input, CompressionMode.Decompress))
+            {
+                var read = 0;
+                while (read < rawLength)
+                {
+                    var n = deflate.Read(raw, read, rawLength - read);
+                    if (n <= 0) break;
+                    read += n;
+                }
+                if (read != rawLength || deflate.ReadByte() != -1) throw new InvalidDataException("pack body");
+            }
+            byte[] hash;
+            using (var sha = SHA256.Create()) hash = sha.ComputeHash(raw);
+            for (var i = 0; i < 32; i++)
+                if (hash[i] != stored[12 + i]) throw new InvalidDataException("pack hash");
+            if (!string.IsNullOrEmpty(expectedRawSha256) &&
+                !string.Equals(BitConverter.ToString(hash).Replace("-", string.Empty), expectedRawSha256, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("pack hash (manifest)");
+            return raw;
         }
 
         public static bool IsSha256(string text)

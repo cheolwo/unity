@@ -8,20 +8,21 @@ using UnityEngine;
 namespace Ssalddel.WindowsGame
 {
     // 켜 두기 성장 — 맡김의 화면 쪽 뼈대 (2026-11-15). 규칙과 시험값은 맡김Policy.cs.
-    //  - 손(누르기 · 키 · 휠 · 끌기 · 마우스 움직임)이 빈 시간을 잰다. 운영 중(정지 아님)이고 손이 빈 동안에만 움직인다.
+    //  - 중(관찰)에서는 정상 업무를 맡는다. 화(집중)에서는 사람이 직접 처리한다. 자리 비움 시간은 복귀 카드에 쓴다.
     //  - 하는 일(한 번에 하나): ① 오늘 점검하지 않은 기사의 출발 전 점검 ② 기다린 주문을 엔진이 권한 기사에게 배차
     //    ③ 방침 국면에서 정한 시간 뒤 지난 방침으로 이어 가기. 모두 플레이어가 누르는 것과 같은 명령(check · assign · campaign-policy)이다.
     //  - 못 한 일(빈 기사가 없음)은 기다리는 일에 남긴다. 시한 · 벌점이 없다. 정산 승인 · 예외 · 새 사업 · 확장은 하지 않는다.
     //  - 손이 오래 빈 뒤 돌아오면 「다녀오신 사이」를 한 번 띄운다.
-    //  - 설정 「회차」 탭에서 끈다. 끄면 아무 명령도 보내지 않는다. 켜고 끈 것은 PlayerPrefs(업무 저장과 따로)에 둔다.
+    //  - 오른쪽 위 중화 단추와 설정 「회차」가 같은 선호 값을 읽는다. 이전의 맡김 켜기/끄기도 그대로 읽는다.
     //    검증 촬영(--sagajeong-* · 방향 촬영)에서는 늘 꺼 두고, 방향 촬영의 맡김 장면에서만 켠다.
     public sealed partial class SagajeongDispatchView
     {
         private const string AutopilotPreference = "hongdal.autopilot.v1";
         private static readonly Rect AutopilotChip = new(1052, 10, 118, 28);
         private bool autopilotOn;
+        private bool 집중전환대기;
         private bool autopilotPersistent;
-        private bool autopilotProofIdle;                // 방향 촬영에서만: 손이 오래 빈 것으로 본다
+        private bool autopilotProofIdle;                // 방향 촬영의 자리 비움 장면에서는 실제 포인터를 무시한다
         private double autopilotPolicyWait = 맡김Policy.PolicyWaitSeconds;
         private double lastHandsTime;
         private Vector2 lastMouse = new(-1f, -1f);
@@ -39,15 +40,15 @@ namespace Ssalddel.WindowsGame
         private string returnSummary;
         private string returnDetail;
 
-        private double HandsIdleFor => autopilotProofIdle ? 1e9 : Time.realtimeSinceStartupAsDouble - lastHandsTime;
-        private bool AutopilotActing => autopilotOn && running && state != null && error == null &&
-            (campaignSpeed != 0 || CampaignPolicyOpen) && 맡김Policy.HandsIdle(HandsIdleFor);
+        private bool AutopilotActing => state != null && error == null &&
+            맡김Policy.자동업무가능(autopilotOn, running, campaignSpeed != 0, CampaignPolicyOpen);
 
         private void LoadAutopilot()
         {
             autopilotPersistent = Array.TrueForAll(Environment.GetCommandLineArgs(), value =>
                 !value.StartsWith("--sagajeong-", StringComparison.Ordinal) && !value.StartsWith(ViewProofFlag, StringComparison.Ordinal));
             autopilotOn = autopilotPersistent && PlayerPrefs.GetInt(AutopilotPreference, 1) == 1;
+            if (autopilotPersistent) noticeLevel = autopilotOn ? 알림정도.조용히 : 알림정도.보통;
             lastHandsTime = Time.realtimeSinceStartupAsDouble;
         }
 
@@ -55,7 +56,13 @@ namespace Ssalddel.WindowsGame
         {
             if (autopilotOn == on) return;
             autopilotOn = on;
+            집중전환대기 = false;
             policySeenAt = -1;
+            idleMark = -1;
+            lastHandsTime = Time.realtimeSinceStartupAsDouble;
+            if (on && expansionView) showDesk = false;
+            if (on) 관찰업무복귀();
+            if (autopilotPersistent) noticeLevel = on ? 알림정도.조용히 : 알림정도.보통;
             if (!autopilotPersistent) return;
             PlayerPrefs.SetInt(AutopilotPreference, on ? 1 : 0);
             PlayerPrefs.Save();
@@ -73,13 +80,14 @@ namespace Ssalddel.WindowsGame
             policySeenAt = -1;
             idleMark = -1;
             returnCardOpen = false;
+            집중전환대기 = false;
         }
 
         // OnGUI의 맨 앞에서 부른다. 손이 닿으면 빈 시간을 처음으로 돌리고, 오래 비었으면 「다녀오신 사이」를 연다.
         private void NoteHands()
         {
             var current = Event.current;
-            if (current == null) return;
+            if (current == null || autopilotProofIdle) return;
             var moved = false;
             if (current.type == EventType.Repaint)
             {
@@ -96,7 +104,6 @@ namespace Ssalddel.WindowsGame
             var now = Time.realtimeSinceStartupAsDouble;
             var idle = now - lastHandsTime;
             lastHandsTime = now;
-            policySeenAt = -1;
             if (idleMark < 0) return;
             if (맡김Policy.ShowReturn(idle, autopilotLog.Count - idleMark)) OpenReturnCard(idle);
             idleMark = -1;
@@ -221,33 +228,63 @@ namespace Ssalddel.WindowsGame
             returnCardOpen = true;
         }
 
-        // 머리줄의 작은 표시. 맡김이 꺼져 있으면 그리지 않는다.
+        // 맡김을 바꾸는 단추는 이전 상태와 관계없이 같은 자리에 둔다.
         private void DrawAutopilotChip()
         {
-            if (!autopilotOn || state == null) return;
-            string label;
-            Color colour;
-            if (AutopilotActing && CampaignPolicyOpen && policySeenAt >= 0)
-            {
-                var left = Math.Max(0, autopilotPolicyWait - (Time.realtimeSinceStartupAsDouble - policySeenAt));
-                label = $"방침 {Math.Ceiling(left)}초 뒤";
-                colour = Lilac;
-            }
-            else if (AutopilotActing)
-            {
-                label = "맡기는 중";
-                colour = Mint;
-            }
-            else
-            {
-                label = "맡김 켜짐";
-                colour = Soft;
-            }
-            Paint(AutopilotChip, colour, 14);
+            var 색 = autopilotOn ? Mint : Gold;
+            Paint(AutopilotChip, 색, 14);
             Paint(new Rect(AutopilotChip.x + 1, AutopilotChip.y + 1, AutopilotChip.width - 2, AutopilotChip.height - 2), Canvas, 13);
-            Paint(new Rect(AutopilotChip.x + 10, AutopilotChip.y + 11, 6, 6), colour, 3);
-            Text(new Rect(AutopilotChip.x + 20, AutopilotChip.y, AutopilotChip.width - 24, AutopilotChip.height), label, 11, colour, true,
-                TextAnchor.MiddleLeft);
+            Paint(new Rect(AutopilotChip.x + 10, AutopilotChip.y + 10, 8, 8), 색, 4);
+            Text(new Rect(AutopilotChip.x + 24, AutopilotChip.y, AutopilotChip.width - 26, AutopilotChip.height),
+                autopilotOn ? "중 · 관찰" : "화 · 집중", 12, 색, true);
+            if (Hit(AutopilotChip))
+            {
+                SetAutopilot(!autopilotOn);
+                if (!autopilotOn) showDesk = true;
+            }
+        }
+
+        // 업무 명령을 보관하지 않는다. 확인은 모드만 고르고, 원래 화면에서 최신 상태와 수량을 확인해 실행한다.
+        private bool 직접업무가능()
+        {
+            if (!autopilotOn) return true;
+            집중전환대기 = true;
+            return false;
+        }
+
+        private void 집중전환응답(bool 전환)
+        {
+            if (!집중전환대기) return;
+            집중전환대기 = false;
+            if (전환) SetAutopilot(false);
+        }
+
+        private void 집중전환창그리기()
+        {
+            var box = new Rect(440, 234, 400, 186);
+            Paint(new Rect(0, 0, Width, Height), Fade(Canvas, 0.58f));
+            Paint(box, Gold, 10);
+            Paint(new Rect(box.x + 1, box.y + 1, box.width - 2, box.height - 2), Canvas, 9);
+            Text(new Rect(box.x + 20, box.y + 14, 350, 28), "화 · 집중으로 바꿀까요?", 18, Paper, true);
+            Text(new Rect(box.x + 20, box.y + 51, 356, 54),
+                "전환하면 배차와 출발 점검을 직접 맡습니다. 선택한 업무는 전환 뒤 원래 화면에서 다시 확인해 실행하세요.", 13, Soft, wrap: true);
+            if (ExpansionButton(new Rect(box.x + 20, box.yMax - 50, 167, 32), "중 · 관찰 유지", true, Tile))
+                집중전환응답(false);
+            if (ExpansionButton(new Rect(box.x + 199, box.yMax - 50, 181, 32), "화 · 집중으로 전환", true, Gold))
+                집중전환응답(true);
+        }
+
+        // 확인을 읽는 동안 시계는 돌아간다. 입력은 이 창만 받고 지도와 뒤쪽 업무 단추는 받지 않는다.
+        private bool 집중전환입력처리()
+        {
+            var 입력 = Event.current;
+            if (!집중전환대기 || 입력.type is EventType.Repaint or EventType.Layout) return false;
+            if (입력.type == EventType.KeyDown && 입력.keyCode == KeyCode.Escape)
+                집중전환응답(false);
+            else
+                집중전환창그리기();
+            if (입력.type != EventType.Used) 입력.Use();
+            return true;
         }
 
         // 「다녀오신 사이」. 닫기 한 번으로 끝난다. 읽지 않아도 된다.

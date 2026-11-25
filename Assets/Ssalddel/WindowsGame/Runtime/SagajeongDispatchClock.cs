@@ -76,6 +76,7 @@ namespace Ssalddel.WindowsGame
         private void ApplyCampaignPolicy(string policy)
         {
             if (!CampaignPolicyOpen || pending != null || string.IsNullOrEmpty(policy)) return;
+            if (autopilotSentAction != "campaign-policy" && !직접업무가능()) return;
             Send(new DispatchRequest { action = "campaign-policy", elapsedMs = state.elapsedMs, policy = policy });
         }
 

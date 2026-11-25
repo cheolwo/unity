@@ -229,6 +229,7 @@ namespace Ssalddel.WindowsGame
             roamLightDue += seconds;
             roamClock += seconds;
             var scaled = seconds * 기사순찰Policy.Pace;
+            StepNavRider(scaled);            // 길찾기로 보낸 기사도 같은 시간으로 (SagajeongDispatchNavigation.cs)
             foreach (var roamer in roamers)
             {
                 var left = scaled;
@@ -291,7 +292,7 @@ namespace Ssalddel.WindowsGame
             var seconds = roamLightDue;
             roamLightDue = 0f;
             roamLight.Fade(seconds);
-            foreach (var roamer in roamers)
+            foreach (var roamer in navRider == null ? (IEnumerable<Roamer>)roamers : roamers.Append(navRider))      // 길찾기 기사도 같은 자취를 남긴다
             {
                 var dx = roamer.X - roamer.LitX;
                 var dz = roamer.Z - roamer.LitZ;
@@ -354,6 +355,7 @@ namespace Ssalddel.WindowsGame
                     roamLight.Light(기사불빛Policy.Drop, (float)east, (float)north, 기사불빛Policy.DropRadius, DropRestLight);
                 }
             }
+            LightSubwayStations();      // 역 둘레도 제 빛으로 밝다 (SagajeongDispatchSubway.cs)
         }
 
         // 빛의 양을 그림으로 올리고 셰이더에 알린다.
@@ -673,7 +675,7 @@ namespace Ssalddel.WindowsGame
         // 고른 대상의 카드가 서는 자리. 빛으로 보는 동안에는 사업 창 · 건물 카드와 같은 오른쪽 칸이다.
         private Rect FocusPanelNow(FocusKind kind) => LightCards(kind)
             ? new Rect(ExpansionPanel.x, ExpansionPanel.y, ExpansionPanel.width,
-                kind == FocusKind.Courier ? 392 : kind == FocusKind.Store ? 266 : 196)
+                kind == FocusKind.Courier ? 430 : kind == FocusKind.Store ? 266 : kind == FocusKind.Rider ? 262 : 196)
             : FocusPanelFor(kind);
 
         private Vector2 LightPointer() => mapMenuClick ? menuPoint : tileIndex == null ? Event.current.mousePosition : releasePoint;
@@ -695,6 +697,7 @@ namespace Ssalddel.WindowsGame
         // 한 번 누르기: 오른쪽 칸에 그 대상의 카드를 연다. 업무를 바꾸지 않는다.
         private void FocusLight(FocusKind kind, string id)
         {
+            관찰선택해제();
             dongPanelOpen = false;
             zonePanelOpen = false;
             showDetails = true;
@@ -721,7 +724,7 @@ namespace Ssalddel.WindowsGame
         // 그 대상이 있는 동을 고르고 그 사업의 창을 연다 (r198: 동은 어디를, 사업 버튼은 무슨 일을).
         private void OpenBusinessWindowIn(int business, string region)
         {
-            if (!string.IsNullOrEmpty(region) && dongView == DongView.Station && stationAnchors.ContainsKey(region)) SelectStationDong(region);
+            if (!string.IsNullOrEmpty(region) && dongView == DongView.Station && stationAnchors.ContainsKey(region)) SelectStationDong(region, false);   // 사업 창이 말하니 판 위 칸은 펴지 않는다
             selectedBuilding = null;
             SelectExpansion(business);
         }
@@ -806,7 +809,11 @@ namespace Ssalddel.WindowsGame
         private void TouchCourierLight(DispatchCourier courier, Vector2 position)
         {
             var touch = TouchLight(position, 23f);
-            if (touch == LightTouch.Click) SelectCourier(courier.id);
+            if (touch == LightTouch.Click)
+            {
+                SelectCourier(courier.id);
+                phoneCardView = true;           // 빛을 누르면 오른쪽 상태창(경 수치 포함)이 먼저. 휴대폰은 창의 「휴대폰」 단추로 (2026-11-23 20:33)
+            }
             else if (touch == LightTouch.Open) OpenBusinessAt(BusinessFood, courier.latitude, courier.longitude);
             else if (touch == LightTouch.Menu)
             {
@@ -815,7 +822,7 @@ namespace Ssalddel.WindowsGame
                 var longitude = courier.longitude;
                 OpenLightMenu(position, "기사 " + Letter(id), new List<(string Label, Action Run)>
                 {
-                    ("정보 보기", () => FocusLight(FocusKind.Courier, id)),
+                    ("정보 보기", () => { FocusLight(FocusKind.Courier, id); phoneCardView = true; }),
                     ("이 기사 고르기", () => SelectCourier(id)),
                     (BusinessDoorLabel(BusinessFood), () => OpenBusinessAt(BusinessFood, latitude, longitude)),
                 });
@@ -907,6 +914,14 @@ namespace Ssalddel.WindowsGame
             }
             Text(new Rect(x, y + 72, panel.width - 26, 23), status, 14, Gold, true);
             Text(new Rect(x, y + 98, panel.width - 26, 23), detail, 13, Paper);
+            if (kind == FocusKind.Rider)
+            {
+                // 이 빛 한 사람의 경 기록은 아직 잇지 않았다. 위 띠에서 옮겨 온 「홍달 기사 전체 · 오늘」 값을 보인다.
+                DrawGyeongFigures(x, y + 124, panel.width - 26f, null);
+                Text(new Rect(x, y + 180, panel.width - 26, 74),
+                    note + " 경 수치는 배차 기사 전체의 오늘 합입니다. 이 빛 한 사람의 경 기록은 아직 잇지 않았습니다.", 11, Soft, wrap: true);
+                return;
+            }
             Text(new Rect(x, y + 126, panel.width - 26, 58), note, 11, Soft, wrap: true);
         }
 
@@ -1041,6 +1056,25 @@ namespace Ssalddel.WindowsGame
                 receipt.lightCard = actorFocus != null && Mathf.Approximately(FocusPanelNow(FocusKind.Rider).x, ExpansionPanel.x);
                 yield return SaveFrame(directory, "37-light-card.png");
                 actorFocus = null;
+            }
+            // 배차 기사 빛을 누른 모습(2026-11-23 20:33): 오른쪽 상태창에 그 기사의 경 유지 · 경 시간당 순소득.
+            var firstCourier = state?.couriers?.FirstOrDefault();
+            if (firstCourier != null)
+            {
+                var keepCard = phoneCardView;
+                FocusLight(FocusKind.Courier, firstCourier.id);
+                phoneCardView = true;
+                yield return null;
+                yield return null;
+                yield return SaveFrame(directory, "37b-courier-card.png");
+                // 게임 요소를 켠 사람의 화면: 등급 이름(신사 …) · 위 띠 경 수치 (2026-11-23 20:47)
+                var keepData = ProofDataPush(DataBits() | 4096 | 8192, facilityGroupMask);
+                yield return null;
+                yield return null;
+                yield return SaveFrame(directory, "37c-courier-card-game.png");
+                ProofDataPop(keepData);
+                actorFocus = null;
+                phoneCardView = keepCard;
             }
             if (firstStore != null)
             {

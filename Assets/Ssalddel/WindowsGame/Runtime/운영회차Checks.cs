@@ -78,6 +78,36 @@ namespace Ssalddel.WindowsGame
                 운영회차.FromText(null) == null && 운영회차.FromText("운영회차.v0\n1\t0\t\t0") == null && 운영회차.FromText("운영회차.v1\n1\t9\t\t0") == null &&
                 운영회차.FromText("운영회차.v1\n2\t1\t\t0") == null && 운영회차.FromText("운영회차.v1\n1\t0\t\t0\nx") == null);
             Check("되읽은 회차도 이미 끝낸 대상을 다시 묶지 않음", saved != null && !saved.Bind("order-a", 1) || saved != null && saved.Phase != 회차국면.준비);
+            var 관찰 = new 운영회차();
+            관찰.Bind("original-order", 3);
+            Check("다른 주문, 진행·미확인 상태, 오래된 판본은 전달로 저장하지 않음",
+                !관찰.전달관측("other-order", "다른 가게", "Delivered", 1, 6) &&
+                !관찰.전달관측("original-order", "가게", "ToDropoff", 1, 6) &&
+                !관찰.전달관측("original-order", "가게", "Unknown", 1, 6) &&
+                !관찰.전달관측("original-order", "가게", "Delivered", 1, 2) && 관찰.전달자료 == null);
+            const string 매장명 = "가게\t별관\n1층";
+            Check("확인한 전달을 기록해도 회차는 수행이고 수동 마감은 그대로 남음",
+                관찰.전달관측("original-order", 매장명, "Delivered", 1, 6) &&
+                관찰.Phase == 회차국면.수행 && 관찰.Closed.Count == 0 &&
+                !관찰.전달관측("original-order", "나중 이름", "Settled", 4, 7));
+            var 보관문 = 관찰.ToText();
+            var 복원 = 운영회차.FromText(보관문);
+            var 전달 = 복원?.전달자료;
+            Check("다음 날들에 원래 주문이 없어도 저장한 가게·원 주문·회차·판본·영업일을 복원",
+                전달 != null && 전달.회차번호 == 1 && 전달.주문Id == "original-order" && 전달.단계 == "Delivered" &&
+                전달.매장명 == 매장명 && 전달.판본 == 6 && 전달.영업일 == 1 && 복원.Closed.Count == 0 && 복원.ToText() == 보관문);
+            Check("늦게 직접 마감하면 관측 판본으로 한 번 기록되고 다음 준비는 이전 회차 자료를 비움",
+                전달 != null && 복원.Close(운영회차Policy.FromOrderStage(전달.단계), false, 전달.판본) &&
+                복원.Closed.Count == 1 && 복원.Closed[0].TargetRevision == 6 &&
+                운영회차.FromText(복원.ToText())?.전달자료?.주문Id == "original-order" && 복원.Next() && 복원.전달자료 == null);
+            var 옛수행 = 운영회차.FromText("운영회차.v1\n1\t1\toriginal-order\t3");
+            var 옛마감 = 운영회차.FromText("운영회차.v1\n1\t2\toriginal-order\t3\n1\toriginal-order\t6");
+            Check("관측하지 않은 옛 수행·마감 파일은 회차를 살리고 과거 주문 상세를 만들어 내지 않음",
+                옛수행 != null && 옛수행.Phase == 회차국면.수행 && 옛수행.전달자료 == null &&
+                옛마감 != null && 옛마감.Closed.Count == 1 && 옛마감.전달자료 == null);
+            var 손상 = 운영회차.FromText("운영회차.v2\n1\t1\toriginal-order\t3\tDelivered\t1\t6\t!bad");
+            Check("읽기 자료가 손상돼도 회차를 살리고 전달을 단정하지 않음",
+                손상 != null && 손상.TargetId == "original-order" && 손상.전달자료 == null);
             return results;
         }
     }

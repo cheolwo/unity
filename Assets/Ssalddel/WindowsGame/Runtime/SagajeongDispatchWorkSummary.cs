@@ -77,7 +77,7 @@ namespace Ssalddel.WindowsGame
                 Icon(new Rect(row.x + 5, row.y + 4, 16, 16), chain.ActionKey == "inspect" ? "eye" : chain.ActionKey == "produce" ? "machine" : "receipt", Gold);
                 Text(new Rect(row.x + 25, row.y, row.width - 68, row.height), job + " · " + (store?.StoreName ?? "내 매장"), 10, Paper);
                 var go = new Rect(row.xMax - 40, row.y + 3, 36, 18);
-                if (ExpansionButton(go, "열기", true, Mint)) PressShortcut(KeyCode.F4);      // 재료 탭에서 한다(여는 것만)
+                if (ExpansionButton(go, "열기", true, Mint)) 할일매장열기();      // 사슬의 그 매장 재료 탭(여는 것만). F4의 최근 매장 대신 (SagajeongDispatchNextTodo.cs)
                 y += 27;
             }
             y += 3;

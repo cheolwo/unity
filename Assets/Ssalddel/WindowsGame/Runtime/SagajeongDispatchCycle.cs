@@ -23,7 +23,7 @@ namespace Ssalddel.WindowsGame
 
         private bool CycleVisible => expansionView && !mapOnly && !showDesk;
 
-        private bool CycleCardVisible => CycleVisible && !cycleCardFolded && Cycle.Phase != 순회단계.영업 &&
+        private bool CycleCardVisible => !다음할일사용 && CycleVisible && !cycleCardFolded && Cycle.Phase != 순회단계.영업 &&
             actorFocus == null && selectedBuilding == null && !dongPanelOpen && !zonePanelOpen && !SettingsVisible && !DailyReportVisible;
 
         // 오른쪽에 아래로 긴 패널(전국 패널·건물 카드·기사·동·구성 패널)이 보일 때는 버튼을 한 줄로 줄여 그 아래에 둔다.
@@ -32,11 +32,17 @@ namespace Ssalddel.WindowsGame
         // 정리한 첫 화면에서는 접어 둔 동안에도 한 줄이다. 버튼을 누르거나 「펼치기」를 누르면 칩과 카드가 나온다.
         private Rect CycleDockRect => CycleDockCrowded || TidyScreen && cycleCardFolded ? CycleDockCompact : CycleDockFull;
 
-        private bool CycleCovers(Vector2 point) =>
+        private bool CycleCovers(Vector2 point) => 다음할일사용 ? 다음할일Covers(point) :
             CycleVisible && (CycleDockRect.Contains(point) || CycleCardVisible && CycleCard.Contains(point));
 
         private void DrawCycle()
         {
+            턴시계맞추기();                        // 다음 할 일: 화에서 계획하는 동안의 시계 (SagajeongDispatchNextTodo.cs)
+            if (다음할일사용)
+            {
+                DrawNextTodo();                    // 일반 실행에서는 다음 할 일이 이 자리와 Enter를 이어받는다(가상 안건은 끈다)
+                return;
+            }
             if (!CycleVisible) return;
             HandleCycleKey();
             if (CycleCardVisible) DrawCycleCard();
@@ -103,7 +109,8 @@ namespace Ssalddel.WindowsGame
                     if (mapLevel != MapLevel.District) LoadMapLevel(MapLevel.District);
                     break;
                 case 순회높이.서울:
-                    if (mapLevel != MapLevel.Seoul) LoadMapLevel(MapLevel.Seoul);
+                    // r184 · 이어지는 지도: 서울 단계는 없다. 서울 정거장의 안건은 구 지도에서 본다.
+                    if (mapLevel != MapLevel.District) LoadMapLevel(MapLevel.District);
                     break;
                 default:
                     if (mapLevel != MapLevel.Nation) LoadMapLevel(MapLevel.Nation);

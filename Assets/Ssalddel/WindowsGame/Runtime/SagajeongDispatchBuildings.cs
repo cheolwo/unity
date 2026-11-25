@@ -61,6 +61,8 @@ namespace Ssalddel.WindowsGame
             public string region;        // 행정동 모듈 건물만: region:kr:hjd:…
             public int floors;           // 지상 층수 (0 = 자료 없음)
             public float area;           // 건축면적 ㎡
+            public string sourceId;      // 건물통합식별번호(2026-11-09 판 색인만). 판이 바뀌어도 같은 건물을 잇는 열쇠
+            public string door;          // "juso"면 문이 공식 건물 출입구(도로명주소 2026-10). 비어 있으면 가상 출입구 (길 그래프의 문과 같은 건물 순서)
         }
 
         // 색인 한 건을 고르기 좋게 바꾼 것. 외곽은 자료 원점 기준 미터(x 동쪽, z 북쪽), 위경도도 미리 둔다.
@@ -316,7 +318,10 @@ namespace Ssalddel.WindowsGame
                 var size = record.floors > 0 ? $"지상 {record.floors}층" : "층수 자료 없음";
                 if (record.area > 0) size += $" · {record.area:N0}㎡";
                 Text(new Rect(x, y + 38, card.width - 34, 30), size, 20, Paper, true);
-                Text(new Rect(x, y + 70, card.width - 34, 22), "도로명주소 없음 (모듈에 주소 없음)", 13, Soft, true);
+                var moduleAddress = !string.IsNullOrEmpty(record.road) && !string.IsNullOrEmpty(record.number);      // 공식 판(도로명주소 2026-10)부터 주소가 붙는다
+                Text(new Rect(x, y + 70, card.width - 34, 22), moduleAddress
+                    ? record.road + " " + record.number + (string.IsNullOrEmpty(record.name) ? string.Empty : " · " + record.name)
+                    : "도로명주소 자료 없음", 13, moduleAddress ? Mint : Soft, true);
                 var area = string.Join(" ", new[] { record.city, record.district, record.dong }.Where(part => !string.IsNullOrEmpty(part)));
                 Text(new Rect(x, y + 96, card.width - 34, 20), string.IsNullOrEmpty(area) ? "행정동 자료 없음" : area + " (행정동)", 12, Soft);
                 Text(new Rect(x, y + 117, card.width - 34, 20), 행정동모듈Policy.HeightNote(record.heightSource), 12, Soft);
@@ -326,7 +331,8 @@ namespace Ssalddel.WindowsGame
                     var partnerSite = IsPartnerSite(selectedBuilding.Value);
                     Text(new Rect(x + 9, y + 149, card.width - 52, 38), partnerSite
                         ? "제휴 음식점의 가상 자리로 밝혀 둔 건물입니다. 실제 점포와 무관합니다. 내부 검토용."
-                        : "2023 역사 경계 후보 모듈입니다. 실제 쓰임·점포와 무관하며 배포·통행 자료가 아닙니다.", 11, partnerSite ? Mint : Soft, wrap: true);
+                        : (record.door == "juso" ? "문: 공식 건물 출입구(도로명주소). 점포의 픽업문이 아닙니다. " : "문: 가상 출입구(가까운 길에 붙인 자리). ") +
+                            "실제 쓰임 · 점포와 무관한 내부 검토용 자료입니다.", 11, partnerSite ? Mint : Soft, wrap: true);
                 }
             }
             else if (record.fill)

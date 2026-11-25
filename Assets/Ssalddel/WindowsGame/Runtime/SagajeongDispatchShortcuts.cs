@@ -52,6 +52,7 @@ namespace Ssalddel.WindowsGame
                 return;
             }
             if (current.type != EventType.KeyDown) return;
+            if (경영판보임 && key != KeyCode.M) return;    // 00 경영 판이 떠 있으면 F키로 뒤의 창을 바꾸지 않는다 (M은 행정동 이동 창으로)
             if (current.control || current.alt || current.shift || current.command) return;
             if (GUIUtility.keyboardControl != 0) return;
             current.Use();

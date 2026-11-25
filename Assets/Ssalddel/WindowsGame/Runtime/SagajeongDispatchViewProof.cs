@@ -20,7 +20,7 @@ namespace Ssalddel.WindowsGame
     public sealed partial class SagajeongDispatchView
     {
         internal const string ViewProofFlag = "--hongdal-view-proof=";
-        private const float ViewProofTimeoutSeconds = 170f;
+        private const float ViewProofTimeoutSeconds = 240f;     // 2026-11-24: 현실감 시험(가 등급 보도 · 연석)으로 읽기가 길어져 170 → 240
 
         private static readonly (double Yaw, double Pitch, string File)[] ViewProofShots =
         {
@@ -40,6 +40,9 @@ namespace Ssalddel.WindowsGame
             public int screenWidth;
             public int screenHeight;
             public List<ViewProofShot> shots = new List<ViewProofShot>();
+            public int hexTiles;            // 타일 지도(2026-11-22): 읽은 타일 수
+            public bool hexDongOpened;      // 타일을 두 번 눌러 집 동의 디오라마로 내려갔는가
+            public bool hexReturned;        // 동에서 올라와 같은 타일로 돌아왔는가
             public int dailyReportEntries;        // 오늘 날짜로 묶인 원장 줄 수 (확인 전)
             public bool dailyReportConfirmed;     // 확인한 뒤 읽음으로 보이는가
             public bool dailyReportUnchanged;     // 확인 전후로 시계와 원장이 그대로인가
@@ -63,6 +66,12 @@ namespace Ssalddel.WindowsGame
             public float stationCoverage;         // 첫 역의 판에서 자료가 덮는 넓이의 비율
             public float stationNextCoverage;     // 다음 역의 판에서의 비율
             public bool stationUnchanged;         // 역 중심 보기를 켜고 끈 전후로 시계·원장·커널 저장이 그대로인가
+            public bool stationEnterSolo;         // 2026-11-17: 역 판의 이름표로 그 동만 보기에 들어갔는가
+            public bool stationEnterDesk;         //   그때 동 관리 창이 그 동으로 열렸는가 (창을 쓰는 화면일 때)
+            public bool stationReturned;          //   「역 판으로」로 떠나온 역 판에 돌아왔는가
+            public int compassSlots;              // 2026-11-17 팔방: 들어간 동의 여덟 방향 칸 가운데 이웃이 선 칸 수
+            public bool compassMoved;             //   한 칸을 눌러 그 이웃 동만 보기로 옮겼는가
+            public bool compassDeskKept;          //   그때 동 관리 창이 새 동으로 따라갔는가 (창을 쓰는 화면일 때)
             public int pastReportsBefore;         // r174: 지난 날짜에 확인하지 않은 보고의 수 (어제 기록을 만들기 전)
             public int pastReportsPending;        // 어제 날짜로 기록 한 줄을 만든 뒤
             public int pastReportsAfterConfirm;   // 어제 보고를 확인한 뒤
@@ -72,6 +81,25 @@ namespace Ssalddel.WindowsGame
             public float roamMetres;              // 표현의 시간 90초 동안 달린 거리 (m)
             public int roamJobs;                  // 그동안 마친 가상의 차례
             public int roamInsideBuildings;       // 그동안 기사 자리가 건물 안이었던 횟수 (0이어야 한다)
+            public bool navReady;                 // 길찾기(r287): 길 그래프와 건물 색인이 맞아 쓸 수 있나 (SagajeongDispatchNavigation.cs)
+            public int navOfficialDoors;          //   문이 공식 건물 출입구인 건물 수
+            public int navAddresses;              //   도로명주소가 붙은 건물 수
+            public bool navPublicPlaces;          //   공공시설 이름이 붙은 건물 둘을 골랐나(아니면 공식 출입구 건물)
+            public int navSearchHits;             //   이름(또는 주소)으로 찾은 후보 수
+            public bool navSearchExact;           //   첫 후보가 그 건물(같은 이름 · 같은 주소)인가
+            public bool navFound;
+            public float navStraightMetres;       //   두 문 사이 직선 거리
+            public float navDriveMetres;          //   길을 따라간 거리
+            public float navWalkMetres;           //   문에서 길까지 걷는 거리(양쪽 합)
+            public float navSeconds;              //   예상시간(시뮬레이션 추정)
+            public int navPathPoints;
+            public int navDrawPoints;             //   줄여서 그린 점 수
+            public int navDoorsOfficial;          //   두 문 가운데 공식 건물 출입구 수
+            public int navInsideBuildings;        //   길의 점이 건물 안인 수 (0이어야 한다)
+            public bool navStripDrawn;
+            public bool navRiderArrived;          //   기사 빛이 그 길로 끝까지 갔나
+            public float navRiderMetres;
+            public bool navUnchanged;             //   시계 · 원장 그대로
             public bool roamUnchanged;            // 기사가 돌아다녀도 시계와 원장이 그대로인가
             public int roamLitCells;              // 빛: 90초 뒤 기사의 자취나 온기로 밝은 칸의 수
             public int roamLightKinds;            // 빛이 적힌 겹의 수 (기사 · 음식점 · 전달지 · 온기)
@@ -319,6 +347,45 @@ namespace Ssalddel.WindowsGame
             public int soakAutopilotAssigns;      //   맡김의 배차
             public int soakMindBrokenMost;        //   무념이 깨진 기사(가장 많을 때)
             public int soakWaitingNow;            //   끝에서 기다리는 주문
+            public bool todoOffInChecks;          // 다음 할 일(r247): 검증 촬영에서는 꺼져 있다 (SagajeongDispatchNextTodoProof.cs)
+            public bool todoDockDrawn;            //   오른쪽 아래 단추
+            public int todoCount;                 //   단추의 수(위험 + 고를 일)
+            public int todoDanger;
+            public int todoChoice;
+            public int todoWatch;                 //   지켜볼 것(세지 않음)
+            public bool todoPanelDrawn;           //   안내판
+            public bool todoGuideUnchanged;       //   안내판을 열어도 업무 지문 그대로
+            public bool todoClockApplies;         //   캠페인 시계가 도는 회차인가
+            public bool todoClockHeld;            //   화에서 안내판이 열린 동안 시계 멈춤
+            public bool todoWindowOpened;         //   「고르러 가기」가 그 창을 열었나
+            public string todoWindow;
+            public bool todoWindowUnchanged;
+            public string todoPicked;             //   담은 일의 명령 키
+            public bool todoPlanAdded;
+            public bool todoPlanUnchanged;        //   담아도 업무 지문 그대로
+            public bool todoPlanReplaced;         //   다시 담으면 바뀌고 쌓이지 않음
+            public int todoPlanned;
+            public bool todoDeferAsked;           //   고르지 않은 일이 있어 미루기 확인이 떴나
+            public int todoDeferredExpected;
+            public int todoDeferred;
+            public int todoSent;                  //   넘길 때 받아들여진 명령
+            public string todoFailure;
+            public bool todoBackToCenter;         //   중으로 돌아왔나
+            public bool todoPlanCleared;
+            public string todoResult;
+            public bool todoResultReadsId;        //   결과 칸이 같은 원 ID를 읽는가
+            public bool todoResultDrawn;
+            public bool todoClockResumed;
+            public bool todoRailHidden;           //   한 단추 순환(11-17): 맨 아래 사업 줄을 걷었나
+            public string todoButtonFirst;        //   단추 상태: 다음일 · 턴넘기기 · 다음턴준비
+            public string todoButtonTarget;       //   단추가 열 다음 일의 명령 키
+            public bool todoButtonOpened;         //   단추 한 번이 그 일의 창을 열었나(업무 지문 그대로)
+            public int todoShortcutChips;         //   안내판 아래 바로 가기 칸
+            public string todoButtonAfterPlan;
+            public bool todoButtonPassed;         //   다 고른 뒤 같은 단추가 턴을 넘겼나
+            public string todoButtonAfterTurn;    //   중으로 온 뒤 단추 상태
+            public bool todoButtonReady;          //   중에서 단추 한 번이 화로 바꿨나
+            public string todoButtonReadyState;
             public bool nationShown;              // 전국 지도 촬영(관찰용, 실패 판정 밖): 시설 빛 시안의 바탕 (SagajeongDispatchNationProof.cs)
             public float nationFieldX;
             public float nationFieldY;
@@ -329,6 +396,58 @@ namespace Ssalddel.WindowsGame
             public float nationZoomOriginY;
             public float nationZoomScale;
             public bool nationBack;               //   동네 지도로 돌아왔나
+            public bool guShown;                  // 구 지도 · 서울 지도 촬영(연속 지도 시안의 바탕, SagajeongDispatchNationProof.cs)
+            public float guFieldX;
+            public float guFieldY;
+            public float guScale;
+            public float guOriginX;
+            public float guOriginY;
+            public float guCloseScale;
+            public float guCloseOriginX;
+            public float guCloseOriginY;
+            public bool seoulShown;
+            public bool contShown;                // 이어지는 지도 촬영(SagajeongDispatchContinuityProof.cs)
+            public float contHandoffScale;
+            public float[] contMetres;
+            public float[] contHomeX;
+            public float[] contHomeY;
+            public bool contGuShown;
+            public float contHandoffDx;
+            public float contHandoffDy;
+            public bool contBackNation;
+            public float contReturnDx;
+            public float contReturnDy;
+            public bool contDongToGu;
+            public float contDongToGuMetres;
+            public bool contBack;
+            public bool contStateSame;
+            public int wheelOutNotches;          // 정밀 3 · 휠 왕복(SagajeongDispatchContinuityProof.cs)
+            public string wheelOutLevels;
+            public bool wheelOutReachedNation;
+            public int wheelInertiaExtra;
+            public int wheelInNotches;
+            public string wheelInLevels;
+            public float wheelDriftNation;
+            public float wheelDriftGu;
+            public bool wheelBackDong;
+            public int wheelTransitions;
+            public bool wheelPromptSeen;
+            public bool wheelStateSame;
+            public bool pkgPickerShown;          // 배달 플랫폼 패키지 뼈대 (SagajeongDispatchPlatformPackageProof.cs)
+            public bool pkgRail;
+            public bool pkgStrip;
+            public bool pkgBranchShown;
+            public int pkgBranchDongs;
+            public int pkgBranchRiders;
+            public int pkgBranchPartners;
+            public float pkgBranchOrders;
+            public string pkgServed;
+            public int pkgOutsideDongs;
+            public float pkgOutsideOrders;
+            public string pkgNeed;
+            public string pkgTodo;
+            public bool pkgAllRail;
+            public bool pkgStateSame;
             public bool workSummaryDrawn;         //   업무 요약을 그렸나
             public int iconCount;                 // 그1: 읽어 들인 아이콘 수(29)
             public int iconAtlasWidth;            // 아이콘 그림의 크기(512 × 256)
@@ -358,7 +477,8 @@ namespace Ssalddel.WindowsGame
             public string miniPick;               // 요약 지도에서 준비된 동의 한 곳(매장 A 자리)을 누른 결과 (moved여야 한다)
             public float miniPickOffMetres;       // 옮긴 뒤 그곳과 보는 곳의 차(m)
             public bool miniPickKeptZoom;         // 그때 배율은 그대로인가
-            public string miniPickUnready;        // 준비 전인 곳을 누른 결과 (unready여야 한다)
+            public string miniPickUnready;        // 준비 전인 곳을 누른 결과 (unready 또는 board여야 한다)
+                                                  // 2026-11-17 중랑구 J2: 16동이 모두 읽히면 구 안에 준비 전인 곳이 없어 역 판 밖(board)이 된다. 어느 쪽이든 큰 지도는 그대로
             public bool miniPickUnreadyStayed;    // 그때 큰 지도는 그대로인가
             public bool musicUnchanged;           // 촬영 전후로 시계 · 원장 · 기억한 곡이 그대로인가
             public bool startedInStationView;     // 처음 보기가 역 중심인가
@@ -382,7 +502,8 @@ namespace Ssalddel.WindowsGame
             var option = args.FirstOrDefault(item => item.StartsWith(ViewProofFlag, StringComparison.Ordinal));
             if (option == null) return false;
             StartCoroutine(ViewProofWatchdog());
-            StartCoroutine(CaptureViewProof(option.Substring(ViewProofFlag.Length)));
+            if (BaseProofRequested) StartCoroutine(CaptureBaseProof(option.Substring(ViewProofFlag.Length)));      // 기본 판 시험 (SagajeongDispatchBaseProof.cs)
+            else StartCoroutine(CaptureViewProof(option.Substring(ViewProofFlag.Length)));
             return true;
         }
 
@@ -465,6 +586,7 @@ namespace Ssalddel.WindowsGame
             yield return ViewProofStation(directory, receipt);
             yield return ViewProofPastReports(directory, receipt);
             yield return ViewProofRoam(directory, receipt);
+            yield return ViewProofNav(directory, receipt);           // 길찾기: 이름으로 찾기 → 길 → 기사 빛 (SagajeongDispatchNavigation.cs)
             yield return ViewProofDongDesk(directory, receipt);
             yield return ViewProofCrowd(directory, receipt);
             yield return ViewProofMusic(directory, receipt);
@@ -481,7 +603,27 @@ namespace Ssalddel.WindowsGame
             yield return ViewProofPlace(directory, receipt);         // 홍달 플레이스 주문자 뷰 (SagajeongDispatchPlace.cs)
             yield return ViewProofRiderPhone(directory, receipt);    // 홍달 기사 휴대폰 재연 (SagajeongDispatchRiderPhone.cs)
             yield return ViewProofSoak(directory, receipt);          // 생명주기 확인: 맡김으로 사흘 (SagajeongDispatchSoakProof.cs, 관찰용)
+            yield return ViewProofNextTodo(directory, receipt);      // 다음 할 일 · 이번 턴 계획 · 턴 넘기기 (SagajeongDispatchNextTodoProof.cs)
             yield return ViewProofNationLights(directory, receipt);  // 전국 지도 촬영: 시설 빛 시안의 바탕 (SagajeongDispatchNationProof.cs, 관찰용)
+            yield return ViewProofWheel(directory, receipt);         // 정밀 3: 실제 휠과 같은 길로 동 → 구 → 전국 → 구 → 동 (SagajeongDispatchContinuityProof.cs)
+            yield return ViewProofPackage(directory, receipt);       // 배달 플랫폼 패키지 뼈대: 고르기 · 아래 줄 · 본사 띠 · 지사 쪽 (SagajeongDispatchPlatformPackageProof.cs, 관찰용)
+            yield return ViewProofContinuity(directory, receipt);    // 이어지는 지도: 전국 → 권역 → 구 넘김 · 되돌아옴 · 동 → 구 (SagajeongDispatchContinuityProof.cs, 관찰용)
+            yield return ViewProofHexTiles(directory, receipt);      // 구와 동 사이의 타일 지도: 두 번 눌러 동으로 · 올라와 같은 타일로 (SagajeongDispatchHexTiles.cs, 관찰용)
+            // 판 가름(2026-11-19): 기본 판처럼 닫아 놓고 시작 화면과 닫힌 길을 찍는다. 이 뒤의 장면이 있으면 다시 연다.
+            ReturnToDong();
+            for (var frame = 0; frame < 4; frame++) yield return null;
+            dongMapOpen = false;
+            baseEditionStarted = false;
+            for (var frame = 0; frame < 12; frame++) yield return null;
+            yield return SaveFrame(directory, "140-base-edition-start.png");
+            ReturnToDong();
+            for (var frame = 0; frame < 6; frame++) yield return null;
+            Debug.Log("Hongdal edition proof: after ReturnToDong level " + mapLevel);
+            yield return SaveFrame(directory, "141-base-edition-stays-gu.png");
+            dongMapOpen = true;
+            baseEditionStarted = false;
+            ReturnToDong();
+            for (var frame = 0; frame < 4; frame++) yield return null;
 
             // 기본 방향에서의 비율을 기준으로, 다른 방향에서도 옥상 가운데가 같은 건물로 골라지는지 본다.
             var first = receipt.shots[0];
@@ -513,7 +655,9 @@ namespace Ssalddel.WindowsGame
                 receipt.failure = "원근 보기에서 건물 고르기가 맞지 않거나, 켜고 끈 뒤 업무 상태가 달라졌습니다.";
             }
             else if (!(receipt.startedInStationView && receipt.stationUnchanged && receipt.stationDongs >= 2 && receipt.stationRoofsSampled >= 20 &&
-                receipt.stationRoofsPicked / (float)receipt.stationRoofsSampled >= baseline - 0.2f))
+                receipt.stationRoofsPicked / (float)receipt.stationRoofsSampled >= baseline - 0.2f &&
+                receipt.stationEnterSolo && receipt.stationEnterDesk && receipt.stationReturned &&
+                receipt.compassSlots >= 2 && receipt.compassMoved && receipt.compassDeskKept))
             {
                 receipt.passed = false;
                 receipt.failure = "처음 보기가 역 중심이 아니거나, 역 중심 보기에서 건물 고르기가 맞지 않거나, 보기를 바꾼 뒤 업무 상태가 달라졌습니다.";
@@ -583,7 +727,8 @@ namespace Ssalddel.WindowsGame
                 receipt.miniCoversMap && receipt.miniSpotInside && receipt.miniCentreOffMetres < 3f && receipt.miniViewBoxCells >= MiniViewBoxFloor &&
                 receipt.miniHomeMoved && receipt.miniHomeOffMetres < 3f && receipt.miniHomeKeptZoom && receipt.miniFoldedLine &&
                 receipt.miniGivesWay && receipt.miniUnchanged && receipt.miniDongLevelShown && receipt.miniPick == "moved" &&
-                receipt.miniPickOffMetres < 3f && receipt.miniPickKeptZoom && receipt.miniPickUnready == "unready" && receipt.miniPickUnreadyStayed))
+                receipt.miniPickOffMetres < 3f && receipt.miniPickKeptZoom && (receipt.miniPickUnready == "unready" || receipt.miniPickUnready == "board") &&
+                receipt.miniPickUnreadyStayed))
             {
                 receipt.passed = false;
                 receipt.failure = "요약 지도가 뜨지 않았거나, 보는 곳의 동 · 자리가 맞지 않았거나, 요약 지도 위에서 지도가 눌렸거나, 내 매장으로 · 접기 · 자리 내주기 · 동 단계 · 눌러서 옮기기가 되지 않았거나, 그것만으로 업무가 바뀌었습니다.";
@@ -629,7 +774,8 @@ namespace Ssalddel.WindowsGame
                 receipt.passed = false;
                 receipt.failure = "명1 명덕 → 빛: 게임에서 명덕 자료 없이 빛이 바뀌었거나, 시험값에서 크기와 세기가 함께 커지지 않았거나, 시험값이 남았습니다.";
             }
-            else if (!(receipt.pickerOpened && receipt.pickerCards == receipt.pickerModules && receipt.pickerCards > 0 &&
+            // 2026-11-17 중랑구 J2: 모듈이 한 쪽(3 × 2)보다 많으면 첫 쪽만 그린다. 그린 카드 수 = min(모듈 수, 한 쪽 칸 수)
+            else if (!(receipt.pickerOpened && receipt.pickerCards == Math.Min(receipt.pickerModules, DongPickerColumns * DongPickerRows) && receipt.pickerCards > 0 &&
                 receipt.pickerThumbs == receipt.pickerCards && receipt.pickerMoved && receipt.pickerTargetOnScreen && receipt.pickerSameAgain &&
                 receipt.pickerEscClosed && receipt.pickerUnchanged))
             {
@@ -656,6 +802,31 @@ namespace Ssalddel.WindowsGame
                 receipt.passed = false;
                 receipt.failure = "역할 휴대폰: 배차 기사를 눌러도 뜨지 않았거나, 열 때 재연했거나, 배정 → 수락 재연에서 「수락」을 누르지 않았거나, " +
                     "재연이 끝나지 않았거나, 「카드」로 바꾸지 못했거나, 홍달 화물 · 홍달 창고 · 홍달 가게가 뜨지 않았거나 기대한 단추 · 알림이 아니었거나, 업무 상태가 바뀌었습니다.";
+            }
+            else if (!(receipt.navReady && receipt.navOfficialDoors > 0 && receipt.navAddresses > 0 && receipt.navSearchHits > 0 &&
+                receipt.navSearchExact && receipt.navFound && receipt.navDriveMetres >= receipt.navStraightMetres - 60f && receipt.navDriveMetres > 30f &&
+                receipt.navSeconds > 0f && receipt.navInsideBuildings == 0 && receipt.navStripDrawn && receipt.navRiderArrived &&
+                receipt.navRiderMetres > receipt.navDriveMetres * 0.75f && receipt.navUnchanged))
+            {
+                receipt.passed = false;
+                receipt.failure = "길찾기: 길 그래프나 공식 출입구 · 도로명주소가 없거나, 이름으로 찾은 첫 후보가 그 건물이 아니거나, 길을 찾지 못했거나, " +
+                    "길이 건물 안을 지나거나, 띠가 뜨지 않았거나, 기사 빛이 끝까지 가지 않았거나, 시계 · 원장이 바뀌었습니다.";
+            }
+            else if (!(receipt.todoOffInChecks && receipt.todoDockDrawn && receipt.todoCount >= 1 && receipt.todoPanelDrawn &&
+                receipt.todoGuideUnchanged && receipt.todoWindowOpened && receipt.todoWindowUnchanged && receipt.todoPlanAdded &&
+                receipt.todoPlanUnchanged && receipt.todoPlanReplaced && receipt.todoPlanned == 1 && receipt.todoSent == 1 &&
+                receipt.todoDeferred == receipt.todoDeferredExpected && receipt.todoBackToCenter && receipt.todoPlanCleared &&
+                receipt.todoResultReadsId && receipt.todoResultDrawn &&
+                (!receipt.todoClockApplies || receipt.todoClockHeld && receipt.todoClockResumed) &&
+                receipt.todoRailHidden && receipt.todoButtonFirst == "다음일" && receipt.todoButtonOpened && receipt.todoShortcutChips == 5 &&
+                (receipt.todoButtonAfterPlan == "턴넘기기") == receipt.todoButtonPassed && receipt.todoButtonAfterTurn == "다음턴준비" &&
+                receipt.todoButtonReady))
+            {
+                receipt.passed = false;
+                receipt.failure = "다음 할 일: 검증 촬영에서 켜져 있었거나, 단추 · 안내판이 뜨지 않았거나, 고를 일이 없었거나, 「고르러 가기」가 그 창을 열지 않았거나, " +
+                    "열기 · 담기만으로 업무가 바뀌었거나, 다시 담을 때 쌓였거나, 턴을 넘길 때 계획한 한 건만 보내지 않았거나, 미룬 수가 다르거나, " +
+                    "중으로 돌아오지 않았거나, 결과가 같은 원 ID를 읽지 않았거나, 계획하는 동안 시계가 멈췄다 이어지지 않았거나, " +
+                    "한 단추 순환(사업 줄 걷기 · 단추로 다음 일 · 바로 가기 5칸 · 다 고르면 턴 넘기기 · 중에서 화로)이 맞지 않았습니다. " + receipt.todoFailure;
             }
             FinishViewProof(directory, receipt);
         }
@@ -864,6 +1035,30 @@ namespace Ssalddel.WindowsGame
                 yield return null;
                 yield return null;
                 yield return SaveFrame(directory, "24-station-other-dong.png");
+
+                // 이름표 한 번 → 그 동 디오라마 + 동 관리 창, 「역 판으로」로 돌아오기 (2026-11-17)
+                var boardBefore = stationIndex;
+                receipt.stationEnterSolo = EnterDongFromStation(other) && DongSoloView && soloRegion == other;
+                yield return null;
+                yield return null;
+                yield return null;
+                receipt.stationEnterDesk = !DongDeskReady || (DongDeskVisible && BusinessDong()?.Entry.regionId == other);
+                yield return SaveFrame(directory, "24b-station-enter-dong.png");
+                var compass = DongCompassSlots(DongModuleById(other));
+                receipt.compassSlots = compass.Count(slot => slot != null);
+                var neighbour = compass.FirstOrDefault(slot => slot != null);
+                if (neighbour != null)
+                {
+                    receipt.compassMoved = MoveDongAround(neighbour) && DongSoloView && soloRegion == neighbour;
+                    yield return null;
+                    yield return null;
+                    yield return null;
+                    receipt.compassDeskKept = !DongDeskReady || (DongDeskVisible && BusinessDong()?.Entry.regionId == neighbour);
+                    yield return SaveFrame(directory, "24c-dong-compass.png");
+                }
+                receipt.stationReturned = ReturnToStationBoard() && StationView && stationIndex == boardBefore && stationReturnIndex < 0;
+                yield return null;
+                yield return null;
             }
 
             SetDioramaPerspective(true);

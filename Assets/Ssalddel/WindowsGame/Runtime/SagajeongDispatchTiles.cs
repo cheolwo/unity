@@ -73,6 +73,7 @@ namespace Ssalddel.WindowsGame
                 var delta = point - pressPoint;
                 if (mapDragging || delta.sqrMagnitude >= DragThreshold * DragThreshold)
                 {
+                    관찰지도수동이동();
                     mapDragging = true;
                     viewedDong = null;
                     // 2.5D에서는 화면에서 끈 방향을 평면 지도 이동량으로 되돌린다.

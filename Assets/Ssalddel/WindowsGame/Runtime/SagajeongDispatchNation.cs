@@ -20,10 +20,10 @@ namespace Ssalddel.WindowsGame
         private const string NationBaseResource = "hongdal-nation-base";
         private const float NationMaxScale = 3f;
         private const float NationSeoulReach = 60f;      // 끝까지 확대했을 때 이 거리(세계 점) 안이면 서울 지도로 내려간다
-        private static readonly Rect NationSide = new(22, 156, 188, 432);
+        private static readonly Rect NationSide = new(22, 156, 188, 454);      // 2026-11-24 정리: 절기 장터 상자 142(아이콘 누르기 안내)
         private static readonly Rect NationPanel = new(986, 106, 272, 500);
         private static readonly Rect NationClock = new(330, 604, 590, 50);
-        private static readonly Rect NationBanner = new(360, 94, 560, 46);
+        private static readonly Rect NationBanner = new(392, 94, 528, 46);      // 2026-11-24 정리: 360이면 이어 보기 띠의 축척 자가 「전국」 글자를 덮었다
         private static readonly Color NationSea = Ink(0x7CC6F0);
         private static readonly Color NationWater = Ink(0x0C1F2E);     // 선 색을 미리 섞는 바다 색(겹친 마디가 진해지지 않게)
         private static readonly Color NationLand = Ink(0x2A3A46);      // 육로(가상 회차) 선을 섞는 땅 색
@@ -298,11 +298,12 @@ namespace Ssalddel.WindowsGame
 
         private float NationFloor => Mathf.Max(Field.width / nationSpace.worldWidth, Field.height / nationSpace.worldHeight);
 
-        private Vector2 NationPoint(Vector2 world) => nationOrigin + world * nationScale;
+        // 정밀 1(2026-11-16): 동서는 NationScaleX(깊이 들어갈수록 전국 투영의 동서 늘어남을 걷어 냄 · SagajeongDispatchMapContinuity.cs)
+        private Vector2 NationPoint(Vector2 world) => nationOrigin + Vector2.Scale(world, NationScaleXY);
 
-        private Vector2 NationPoint(float x, float y) => nationOrigin + new Vector2(x, y) * nationScale;
+        private Vector2 NationPoint(float x, float y) => nationOrigin + new Vector2(x * NationScaleX, y * nationScale);
 
-        private Vector2 NationWorld(Vector2 local) => (local - nationOrigin) / nationScale;
+        private Vector2 NationWorld(Vector2 local) => new((local.x - nationOrigin.x) / NationScaleX, (local.y - nationOrigin.y) / nationScale);
 
         private Rect NationLocal(Rect logical) => new(logical.x - Field.x, logical.y - Field.y, logical.width, logical.height);
 
@@ -320,34 +321,42 @@ namespace Ssalddel.WindowsGame
         {
             var space = nationSpace;
             var floor = NationFloor;
-            nationScale = Mathf.Clamp(nationScale, floor, Mathf.Max(floor, NationMaxScale));
-            nationOrigin.x = Mathf.Clamp(nationOrigin.x, Field.width - (space.worldX + space.worldWidth) * nationScale, -space.worldX * nationScale);
+            nationScale = Mathf.Clamp(nationScale, floor, Mathf.Max(floor, NationScaleCap));    // 수도권 자료가 있으면 더 깊이 (SagajeongDispatchMapContinuity.cs)
+            nationOrigin.x = Mathf.Clamp(nationOrigin.x, Field.width - (space.worldX + space.worldWidth) * NationScaleX, -space.worldX * NationScaleX);
             nationOrigin.y = Mathf.Clamp(nationOrigin.y, Field.height - (space.worldY + space.worldHeight) * nationScale, -space.worldY * nationScale);
+            FunnelNationToGu();      // 21배보다 깊으면 구 지도 자료 쪽으로 모은다
         }
 
         private void ZoomNation(float scale, Vector2 pointer)
         {
             var world = NationWorld(pointer);
-            nationScale = Mathf.Clamp(scale, NationFloor, Mathf.Max(NationFloor, NationMaxScale));
-            nationOrigin = pointer - world * nationScale;
+            nationScale = Mathf.Clamp(scale, NationFloor, Mathf.Max(NationFloor, NationScaleCap));
+            nationOrigin = pointer - Vector2.Scale(world, NationScaleXY);
             nationManual = true;
             ClampNation();
         }
 
-        // 전국 지도 안의 확대·축소. 돌려주는 값: 0 = 지도 안에서 처리했다, -1 = 서울 지도로 내려갈 차례.
+        // 전국 지도 안의 확대·축소. 돌려주는 값: 0 = 지도 안에서 처리했다, -1 = 같은 자리의 구 지도로 이어 갈 차례.
+        // 이어지는 지도(2026-11-16): 3배까지는 어디서나, 수도권 길 바탕이 있는 곳은 21배까지, 구 지도 자료 안은 넘김 배율까지 확대한다.
         private int NationWheel(float delta, Vector2 pointer)
         {
             if (!nationCameraSet) return 0;
             if (delta < 0)
             {
-                if (nationScale >= NationMaxScale - 0.001f)
+                var world = NationWorld(pointer);
+                LoadRegion();
+                var cap = NationZoomCapAt(world);
+                if (nationScale >= cap - 0.001f)
                 {
-                    if (Vector2.Distance(NationWorld(pointer), new Vector2(nationSpace.seoulX, nationSpace.seoulY)) <= NationSeoulReach)
+                    if (NationDeepReady ? InGuSpace(world) && nationScale >= NationHandoffScale - 0.01f
+                                        : Vector2.Distance(world, new Vector2(nationSpace.seoulX, nationSpace.seoulY)) <= NationSeoulReach)
                         return -1;
-                    NationSay("서울 근처에서 끝까지 확대하면 서울 지도로 내려갑니다");
+                    NationSay(!NationDeepReady || cap <= NationMaxScale + 0.01f
+                        ? "이 지역은 더 자세한 바탕이 아직 없습니다 · 수도권에서 더 확대됩니다"
+                        : "이보다 자세한 지도는 사가정 일대(구 지도 자료)에만 있습니다");
                     return 0;
                 }
-                ZoomNation(nationScale * Mathf.Pow(1.08f, -delta), pointer);
+                ZoomNation(Mathf.Min(cap, nationScale * Mathf.Pow(1.08f, -delta)), pointer);
                 return 0;
             }
             if (nationScale <= NationFloor * 1.002f)
@@ -379,7 +388,8 @@ namespace Ssalddel.WindowsGame
                 else ClampNation();
                 var space = nationSpace;
                 GUI.DrawTexture(new Rect(NationPoint(space.worldX, space.worldY),
-                    new Vector2(space.worldWidth, space.worldHeight) * nationScale), nationBase);
+                    Vector2.Scale(new Vector2(space.worldWidth, space.worldHeight), NationScaleXY)), nationBase);
+                DrawNationDeep();        // 3배보다 깊으면 무채색 바탕 · 수도권 길 · 구 지도 바탕 (SagajeongDispatchMapContinuity.cs)
                 DrawNationNames();
                 PrepareNationFlows();
                 DrawNationFlows(now);
@@ -390,6 +400,7 @@ namespace Ssalddel.WindowsGame
                 DrawNationHubs();
                 DrawNationGates();
                 DrawNationHubLabels();
+                if (nationSeasonOn) DrawJangteoMap(now);      // 절기 장터 (SagajeongDispatchSeasonMarket.cs)
                 DrawNationPick(now);
             }
 
@@ -769,6 +780,7 @@ namespace Ssalddel.WindowsGame
 
         private void PickNation(Vector2 local)
         {
+            if (nationSeasonOn && PickJangteo(local)) return;
             var hub = NationHubAt(local);
             if (hub != null)
             {
@@ -831,6 +843,11 @@ namespace Ssalddel.WindowsGame
 
         private void DrawNationClockPanel()
         {
+            if (nationSeasonOn && LoadJangteo())
+            {
+                DrawJangteoStrip();      // 절기 장터를 켜면 자료 시계 자리에 24절기 띠
+                return;
+            }
             var panel = NationLocal(NationClock);
             Paint(panel, Fade(Canvas, 0.94f), 9);
             Text(new Rect(panel.x + 14, panel.y + 6, 112, 18), "자료 시계", 11, Gold, true);
@@ -873,8 +890,8 @@ namespace Ssalddel.WindowsGame
             Text(new Rect(banner.x + 14, banner.y + 4, 340, 21), "전국 · 해상·항공 자료 관찰 · " + NationClockNote.Replace("자료 보기 중 · ", string.Empty),
                 13, Paper, true);
             Text(new Rect(banner.x + 14, banner.y + 25, 340, 16), "통계 관계를 그린 것 · 실제 항로·선박·항공기 위치 아님", 10, Soft);
-            if (ExpansionButton(new Rect(banner.xMax - 198, banner.y + 9, 88, 28), "서울 지도로", true, Tile))
-                ChangeMapLevel(-1);
+            if (ExpansionButton(new Rect(banner.xMax - 198, banner.y + 9, 88, 28), "구 지도로", true, Tile))
+                LoadMapLevel(MapLevel.District);         // r184 · 이어지는 지도: 서울 단계 없이 구 지도로
             else if (ExpansionButton(new Rect(banner.xMax - 104, banner.y + 9, 94, 28), "동네로 돌아가기", true, Mint))
                 ReturnToDong();
         }
@@ -895,7 +912,7 @@ namespace Ssalddel.WindowsGame
             var off = false;
             NationLayerRow(3, "바다 상태", "해류·수온·조석 수집 후", Soft, false, ref off);
             NationLayerRow(4, "입출항 사건", "선박운항정보 수집 후", Soft, false, ref off);
-            NationLayerRow(5, "산지·위판장", "위탁판매·어장 수집 후", Soft, false, ref off);
+            NationLayerRow(5, "절기 장터", "공식 제철 · 산지 · 위판 · 값", Gold, LoadJangteo(), ref nationSeasonOn);      // 2026-11-24
 
             var choose = new Rect(x, y + 234, NationSide.width, 70);
             Paint(choose, Panel, 10);
@@ -907,6 +924,11 @@ namespace Ssalddel.WindowsGame
             NationSegment(new Rect(x + 128, y + 262, 50, 24), "중량", false, false);
             Text(new Rect(x + 13, y + 287, 170, 15), "중량은 원본 단위 확인 중 · 항공은 늘 BL", 9, Fade(Soft, 0.8f));
 
+            if (nationSeasonOn && jangteo != null)
+            {
+                DrawJangteoLegend(new Rect(x, y + 312, NationSide.width, 142));
+                return;
+            }
             var legend = new Rect(x, y + 312, NationSide.width, 120);
             Paint(legend, Panel, 10);
             Text(new Rect(x + 13, y + 318, 160, 18), "표시", 11, Soft, true);
@@ -968,6 +990,11 @@ namespace Ssalddel.WindowsGame
 
         private void DrawNationPanel()
         {
+            if (nationSeasonOn && LoadJangteo())
+            {
+                DrawJangteoPanel();      // 제철 목록 · 품목 카드
+                return;
+            }
             var panel = NationPanel;
             Paint(panel, Rim, 11);
             Paint(new Rect(panel.x + 1, panel.y + 1, panel.width - 2, panel.height - 2), Canvas, 10);

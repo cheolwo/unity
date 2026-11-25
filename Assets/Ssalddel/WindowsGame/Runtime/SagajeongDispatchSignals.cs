@@ -33,7 +33,8 @@ namespace Ssalddel.WindowsGame
         {
             get
             {
-                var top = ChainStripVisible ? ChainStrip.yMax + 6 : mapLevel == MapLevel.Dong ? 92 : 136;
+                var top = ChainStripVisible ? ChainStrip.yMax + 6 : 관찰띠표시 ? 관찰띠칸.yMax + 6 :
+                    mapLevel == MapLevel.Dong ? 92 : 136;
                 return new Rect(TopStripLeft, top, 976f - TopStripLeft, Mathf.Min(BarSignals.Count, SignalRows) * SignalRowHeight + 6);
             }
         }
@@ -233,6 +234,7 @@ namespace Ssalddel.WindowsGame
             if (signal.ReasonCode == "dispatch-waiting" && place.StartsWith("store:", StringComparison.Ordinal))
             {
                 // 기사를 지정해야 하는 일이다. 매장을 고른 상태로 둔다.
+                관찰선택해제();
                 actorFocus = (FocusKind.Store, place.Substring(6));
                 showDetails = true;
                 dongPanelOpen = false;

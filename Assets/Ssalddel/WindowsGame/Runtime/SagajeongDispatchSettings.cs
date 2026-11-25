@@ -58,9 +58,9 @@ namespace Ssalddel.WindowsGame
             (error != null || !string.IsNullOrEmpty(notice) && Time.unscaledTime - sideNoteAt < SideNoteSeconds);
 
         private bool SideCovers(Vector2 point) =>
-            (SidePanelsVisible || NationMapVisible) && ExpansionOverview.Contains(point) ||
+            !플랫폼장부표시 && ((SidePanelsVisible || NationMapVisible) && ExpansionOverview.Contains(point) ||
             !NationMapVisible && (SideToggleButton.Contains(point) || DailyReportButton.Contains(point) ||
-                RoundCardVisible && RoundCard.Contains(point) || SideNoteVisible && SideNoteLine.Contains(point));
+                RoundCardVisible && RoundCard.Contains(point) || SideNoteVisible && SideNoteLine.Contains(point)));
 
         private void ToggleSettings()
         {
@@ -72,7 +72,7 @@ namespace Ssalddel.WindowsGame
         // 이미 멈춰 있었으면(정지를 눌렀거나 전국 지도가 멈춰 둠) 손대지 않는다. 운영이 돌고 있을 때만이다. (OnGUI의 처음, ESC 다음)
         private void SyncSettingsClock()
         {
-            if (SettingsVisible)
+            if (SettingsVisible || 패키지고르기표시)      // 패키지 고르기 창도 시계를 잡는다 (SagajeongDispatchPlatformPackage.cs)
             {
                 if (settingsHeldSpeed != 0 || !campaignMode || !running || error != null || CampaignPolicyOpen || campaignJumpPending ||
                     campaignSpeed == 0) return;
@@ -103,7 +103,7 @@ namespace Ssalddel.WindowsGame
             }
             if (current.type != EventType.KeyDown) return;
             current.Use();
-            if (CloseDongPickerByEscape() || ClosePlaceByEscape())       // 행정동 이동 창(r236) · 홍달 플레이스가 열려 있으면 닫기가 먼저다. 설정은 열지 않는다
+            if (경영판Esc닫기() || CloseDongPickerByEscape() || ClosePlaceByEscape() || 할일Esc닫기() || HexEscape())      // HexEscape: 타일에서 내려온 동 → 같은 타일 · 타일 창 닫기 (SagajeongDispatchHexTiles.cs)       // 행정동 이동 창(r236) · 홍달 플레이스가 열려 있으면 닫기가 먼저다. 설정은 열지 않는다
             {
                 settingsKeyHeld = true;
                 settingsKeyAt = Time.unscaledTime;
@@ -311,6 +311,8 @@ namespace Ssalddel.WindowsGame
             if (EffectsSegment(ScreenCell(x, y, 0, 2), "간단히", !mapEffects)) SetMapEffects(false);
             if (EffectsSegment(ScreenCell(x, y, 1, 2), "효과 사용", mapEffects)) SetMapEffects(true);
             y += ScreenRow;
+            DrawSettingsStanceRow(x, y);      // 입장 자료: 입장 카드 · 부가까지 모두 · 필수만(2026-11-24 16:28 · SagajeongDispatchStanceInfo.cs)
+            y += ScreenRow;
 
             // 전국 지도에는 동네 도구가 없다.
             if (mapLevel != MapLevel.Nation)
@@ -352,7 +354,8 @@ namespace Ssalddel.WindowsGame
                 y += ScreenRow;
 
                 // 품6: 길가 불빛. 자리 자료가 없는 표현이다(SagajeongDispatchStreetLamps.cs). 가까이 볼 때만 보인다.
-                ScreenLabel(x, y, "길가 불빛(표현)");
+                //  2026-11-24: 사가정역 둘레 보안등 33곳은 조사된 자리(서울 OA-21696, 2022-08)다. 빛의 모양은 그래도 표현값.
+                ScreenLabel(x, y, lampSurveyCount > 0 ? $"길가 불빛(표현 · 보안등 {lampSurveyCount}곳 조사)" : "길가 불빛(표현)");
                 if (DioramaVisible)
                 {
                     if (EffectsSegment(ScreenCell(x, y, 0, 2), "켜기 · 가까이에서만 보임", LampsOn)) SetLamps(true);
@@ -438,18 +441,18 @@ namespace Ssalddel.WindowsGame
 
             // 켜 두기 성장 · 맡김(뼈대). 끄면 맡김은 아무 명령도 보내지 않는다.
             y += 46;
-            ScreenLabel(x, y, "맡겨두기");
+            ScreenLabel(x, y, "중화 모드");
             var autoOn = ScreenCell(x, y, 0, 2);
             var autoOff = ScreenCell(x, y, 1, 2);
             Paint(autoOn, autopilotOn ? Mint : Tile, 6);
-            Text(autoOn, "켜기 · 손이 비면", 12, autopilotOn ? Canvas : Paper, true, TextAnchor.MiddleCenter);
+            Text(autoOn, "중 · 관찰", 12, autopilotOn ? Canvas : Paper, true, TextAnchor.MiddleCenter);
             if (Hit(autoOn)) SetAutopilot(true);
             Paint(autoOff, autopilotOn ? Tile : Mint, 6);
-            Text(autoOff, "끄기 · 모두 직접", 12, autopilotOn ? Paper : Canvas, true, TextAnchor.MiddleCenter);
+            Text(autoOff, "화 · 집중", 12, autopilotOn ? Paper : Canvas, true, TextAnchor.MiddleCenter);
             if (Hit(autoOff)) SetAutopilot(false);
             y += 34;
             Text(new Rect(x + ScreenLabelWidth, y, ScreenRowWidth - ScreenLabelWidth, 40),
-                "손이 2분 비면 출발 전 점검 · 기다린 주문 배차 · 지난 방침 이어 가기를 맡김이 합니다(시험값). 정산 · 예외 · 확장은 하지 않습니다.",
+                "중에서는 지도를 둘러보는 동안에도 출발 점검·배차·지난 방침 이어가기를 맡깁니다. 화에서는 직접 처리합니다. 발주·정산·새 사업은 운영자가 정합니다.",
                 11, Fade(Soft, 0.8f), wrap: true);
 
             // 개발 정보. 첫 화면에는 두지 않는다.
