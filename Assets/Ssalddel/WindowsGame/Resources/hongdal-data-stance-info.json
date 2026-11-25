@@ -1,0 +1,1396 @@
+{
+ "schema": "hongdal-data.v1",
+ "topic": "stance-info",
+ "title": "입장 × 정보 · 필수(하루 한 번 이상) · 부가(주 1~2번 · 달 2~3번)",
+ "release": "review",
+ "asOf": "2026-11-24",
+ "note": "필수 = 그 사람이 되어 하루 한 번 이상 마주치는 것(입장을 고르면 켠다). 부가 = 주 1~2번 · 달 2~3번(꺼 두고 「부가도 켜기」로). 목록에 없는 것은 그 입장에서 거의 마주치지 않는 것.",
+ "sources": [
+  {
+   "what": "필수 · 부가 기준",
+   "source": "사용자 2026-11-24 15:02 「하루 한 번 이상 마주하면 필수 · 주 1~2번 · 달 2~3번이면 부가」",
+   "url": "docs/AI/Handoffs/2026-11-24-Claude-기획-입장별-필수부가.md"
+  }
+ ],
+ "items": [
+  {
+   "id": "subway",
+   "name": "지하철 노선",
+   "brief": "지하철 노선",
+   "kind": "bit",
+   "value": 32,
+   "where": "자료 창 · 교통"
+  },
+  {
+   "id": "station-pulse",
+   "name": "역 불빛",
+   "brief": "역 불빛",
+   "kind": "bit",
+   "value": 1,
+   "where": "자료 창 · 교통"
+  },
+  {
+   "id": "bus",
+   "name": "버스 노선",
+   "brief": "버스",
+   "kind": "bit",
+   "value": 1024,
+   "where": "자료 창 · 교통"
+  },
+  {
+   "id": "road",
+   "name": "길 속도",
+   "brief": "길 속도",
+   "kind": "bit",
+   "value": 512,
+   "where": "자료 창 · 교통"
+  },
+  {
+   "id": "day-night",
+   "name": "낮과 밤",
+   "brief": "낮밤",
+   "kind": "bit",
+   "value": 2,
+   "where": "자료 창 · 시간 · 날씨"
+  },
+  {
+   "id": "weather",
+   "name": "비 · 눈",
+   "brief": "비 · 눈",
+   "kind": "bit",
+   "value": 4,
+   "where": "자료 창 · 시간 · 날씨"
+  },
+  {
+   "id": "today",
+   "name": "오늘 칩",
+   "brief": "오늘 칩",
+   "kind": "bit",
+   "value": 8,
+   "where": "자료 창 · 시간 · 날씨"
+  },
+  {
+   "id": "floating",
+   "name": "유동인구",
+   "brief": "유동인구",
+   "kind": "bit",
+   "value": 16384,
+   "where": "자료 창 · 사람 · 동네의 하루"
+  },
+  {
+   "id": "downtown",
+   "name": "번화가",
+   "brief": "번화가",
+   "kind": "bit",
+   "value": 64,
+   "where": "자료 창 · 게임 요소"
+  },
+  {
+   "id": "lore",
+   "name": "내력 문양",
+   "brief": "내력",
+   "kind": "bit",
+   "value": 128,
+   "where": "자료 창 · 게임 요소"
+  },
+  {
+   "id": "spread",
+   "name": "빛의 번짐",
+   "brief": "번짐",
+   "kind": "bit",
+   "value": 256,
+   "where": "자료 창 · 게임 요소"
+  },
+  {
+   "id": "tiles",
+   "name": "타일 지도",
+   "brief": "타일 지도",
+   "kind": "global",
+   "value": 16,
+   "where": "자료 창 · 지도"
+  },
+  {
+   "id": "place",
+   "name": "홍달 플레이스 창",
+   "brief": "플레이스 창",
+   "kind": "global",
+   "value": 2048,
+   "where": "자료 창 · 게임 요소"
+  },
+  {
+   "id": "grade",
+   "name": "등급 이름",
+   "brief": "등급",
+   "kind": "global",
+   "value": 4096,
+   "where": "자료 창 · 게임 요소"
+  },
+  {
+   "id": "gyeong",
+   "name": "위 띠 경 수치",
+   "brief": "경 수치",
+   "kind": "global",
+   "value": 8192,
+   "where": "자료 창 · 게임 요소"
+  },
+  {
+   "id": "fac:0",
+   "name": "보행등 · 횡단보도",
+   "brief": "보행등",
+   "kind": "facility",
+   "value": 0,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "fac:1",
+   "name": "정류장",
+   "brief": "정류장",
+   "kind": "facility",
+   "value": 1,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "fac:2",
+   "name": "보행 출입구",
+   "brief": "건물 입구",
+   "kind": "facility",
+   "value": 2,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "fac:3",
+   "name": "그늘 · 쉼 · 물",
+   "brief": "쉼터",
+   "kind": "facility",
+   "value": 3,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "fac:4",
+   "name": "자전거 · 따릉이",
+   "brief": "따릉이",
+   "kind": "facility",
+   "value": 4,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "fac:5",
+   "name": "공원 · 나무",
+   "brief": "공원",
+   "kind": "facility",
+   "value": 5,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "fac:6",
+   "name": "시장 · 관광",
+   "brief": "시장",
+   "kind": "facility",
+   "value": 6,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "fac:7",
+   "name": "역 출입구",
+   "brief": "역 출입구",
+   "kind": "facility",
+   "value": 7,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "fac:8",
+   "name": "그 밖(주차 · 택배함 등)",
+   "brief": "주차 · 택배함",
+   "kind": "facility",
+   "value": 8,
+   "where": "자료 창 · 생활 시설"
+  },
+  {
+   "id": "season-list",
+   "name": "절기 장터 제철 목록",
+   "brief": "제철 목록",
+   "kind": "nation",
+   "value": 0,
+   "where": "전국 지도 · 절기 장터"
+  },
+  {
+   "id": "fact:local",
+   "name": "동네 값 · 서울 동부",
+   "brief": "동네 값",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:consumer",
+   "name": "소비자 값 · 전국",
+   "brief": "소비자 값",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:kimjang",
+   "name": "김장 4인 가구 셈",
+   "brief": "김장 셈",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:supply_home",
+   "name": "올해 배추가 많다",
+   "brief": "배추 많다",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:cost",
+   "name": "유통이 가져가는 몫",
+   "brief": "유통 몫",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:auction",
+   "name": "경락 · 가락 경매 낙찰",
+   "brief": "경락",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:auction_time",
+   "name": "가락 채소 경매 시각",
+   "brief": "경매 시각",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:wholesale",
+   "name": "도매값 · 중도매인 → 소매",
+   "brief": "도매값",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:margin",
+   "name": "경락과 도매값 사이",
+   "brief": "내 몫",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:supply",
+   "name": "생산 전망 · 가을배추",
+   "brief": "생산 전망",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:farmgate",
+   "name": "농가가 받는 값",
+   "brief": "받는 값",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:area",
+   "name": "심은 넓이 · 가을배추",
+   "brief": "심은 넓이",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:halt",
+   "name": "출하정지 · 해남 등",
+   "brief": "출하정지",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:stock",
+   "name": "수매비축",
+   "brief": "수매비축",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:insure",
+   "name": "수입안정보험",
+   "brief": "수입보험",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:route",
+   "name": "해남 → 가락 노선",
+   "brief": "산지 노선",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:garak",
+   "name": "가락시장의 몫",
+   "brief": "가락 몫",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "fact:shop_choice",
+   "name": "한 포기, 어디서 사나",
+   "brief": "어디서 사나",
+   "kind": "fact",
+   "value": 0,
+   "where": "전국 지도 · 장터 자료 줄"
+  }
+ ],
+ "stances": [
+  {
+   "key": "rider",
+   "name": "배달 기사",
+   "entries": [
+    {
+     "id": "road",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "하루 수십 번",
+     "why": "배달마다 길을 고른다"
+    },
+    {
+     "id": "weather",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "하루 여러 번",
+     "why": "비 · 눈이면 속도와 안전이 바뀐다"
+    },
+    {
+     "id": "day-night",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "해가 지면 길과 보행등이 달라진다"
+    },
+    {
+     "id": "today",
+     "tier": 1,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "매일",
+     "why": "날짜 · 날씨를 한눈에"
+    },
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "역이 길 찾기의 기준"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "구와 동 사이 바탕"
+    },
+    {
+     "id": "gyeong",
+     "tier": 1,
+     "units": [],
+     "freq": "하루 수십 번",
+     "why": "오늘 번 것(게임)"
+    },
+    {
+     "id": "fac:2",
+     "tier": 1,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "하루 수십 번",
+     "why": "집집마다 들어가는 입구"
+    },
+    {
+     "id": "fac:0",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "매일 밤",
+     "why": "밤 배달 길"
+    },
+    {
+     "id": "fac:7",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "하루 여러 번",
+     "why": "역 앞 배달 · 만남"
+    },
+    {
+     "id": "fac:3",
+     "tier": 1,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "쉬는 곳 · 물"
+    },
+    {
+     "id": "station-pulse",
+     "tier": 2,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "주 1~2번",
+     "why": "붐비는 시각을 미리 볼 때"
+    },
+    {
+     "id": "bus",
+     "tier": 2,
+     "units": [
+      0,
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "버스 차로 · 정류장 피하기"
+    },
+    {
+     "id": "floating",
+     "tier": 2,
+     "units": [
+      0
+     ],
+     "freq": "주 1~2번",
+     "why": "주문이 몰릴 동네 짐작"
+    },
+    {
+     "id": "fac:1",
+     "tier": 2,
+     "units": [
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "정류장 앞에 세우지 않기"
+    },
+    {
+     "id": "season-list",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "장터 제철"
+    }
+   ]
+  },
+  {
+   "key": "store",
+   "name": "음식점 사장",
+   "entries": [
+    {
+     "id": "floating",
+     "tier": 1,
+     "units": [
+      0
+     ],
+     "freq": "하루 두 번(점심 · 저녁 준비)",
+     "why": "손님이 언제 · 얼마나 오나"
+    },
+    {
+     "id": "station-pulse",
+     "tier": 1,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "매일",
+     "why": "역을 드나드는 시각이 곧 손님 시각"
+    },
+    {
+     "id": "day-night",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "영업 시간"
+    },
+    {
+     "id": "weather",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "비 오면 배달 주문이 는다"
+    },
+    {
+     "id": "today",
+     "tier": 1,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "매일",
+     "why": "날짜 · 날씨를 한눈에"
+    },
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "역 둘레 가게"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "구와 동 사이 바탕"
+    },
+    {
+     "id": "place",
+     "tier": 1,
+     "units": [],
+     "freq": "하루 수십 번",
+     "why": "키워드 · 손님 화면(게임)"
+    },
+    {
+     "id": "fac:7",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "매일",
+     "why": "가게 앞 사람 줄기"
+    },
+    {
+     "id": "fac:6",
+     "tier": 1,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "매일 아침",
+     "why": "장보기"
+    },
+    {
+     "id": "fact:shop_choice",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "어디서 사면 싼가"
+    },
+    {
+     "id": "fact:wholesale",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "식재료 도매값"
+    },
+    {
+     "id": "bus",
+     "tier": 2,
+     "units": [
+      0,
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "손님이 타고 오는 길"
+    },
+    {
+     "id": "downtown",
+     "tier": 2,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "주 1~2번",
+     "why": "상권 넓이(게임)"
+    },
+    {
+     "id": "fac:1",
+     "tier": 2,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "정류장 손님"
+    },
+    {
+     "id": "fact:local",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "동네 소매값과 견주기"
+    },
+    {
+     "id": "fact:consumer",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "전국 소비자 값"
+    },
+    {
+     "id": "fact:auction",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "새벽 경락"
+    },
+    {
+     "id": "fact:cost",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "유통이 가져가는 몫"
+    },
+    {
+     "id": "fact:auction_time",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "직접 새벽 장에 갈 때"
+    },
+    {
+     "id": "fact:garak",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "가락의 몫"
+    }
+   ]
+  },
+  {
+   "key": "resident",
+   "name": "동네 주민",
+   "entries": [
+    {
+     "id": "day-night",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "해 지는 시각 · 밤길"
+    },
+    {
+     "id": "weather",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "우산 · 빨래 · 장보기"
+    },
+    {
+     "id": "today",
+     "tier": 1,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "매일",
+     "why": "날짜 · 날씨를 한눈에"
+    },
+    {
+     "id": "bus",
+     "tier": 1,
+     "units": [
+      0,
+      2
+     ],
+     "freq": "매일",
+     "why": "출퇴근 · 장 보러"
+    },
+    {
+     "id": "fac:1",
+     "tier": 1,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "타고 내리는 곳"
+    },
+    {
+     "id": "fac:0",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "매일 밤",
+     "why": "밤길 건널목"
+    },
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "동네의 기준"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "구와 동 사이 바탕"
+    },
+    {
+     "id": "fact:local",
+     "tier": 1,
+     "units": [],
+     "freq": "매일(장 볼 때)",
+     "why": "오늘 동네 값"
+    },
+    {
+     "id": "fac:3",
+     "tier": 2,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "산책 · 쉼"
+    },
+    {
+     "id": "fac:5",
+     "tier": 2,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "산책"
+    },
+    {
+     "id": "fac:6",
+     "tier": 2,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "장날"
+    },
+    {
+     "id": "fac:4",
+     "tier": 2,
+     "units": [
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "따릉이"
+    },
+    {
+     "id": "fact:consumer",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "전국 소비자 값"
+    },
+    {
+     "id": "fact:supply_home",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "올해 배추가 많다"
+    },
+    {
+     "id": "fact:kimjang",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번(김장철)",
+     "why": "한 해 한 번 큰 장"
+    },
+    {
+     "id": "fact:cost",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "유통이 가져가는 몫"
+    }
+   ]
+  },
+  {
+   "key": "cargo",
+   "name": "화물 · 창고",
+   "entries": [
+    {
+     "id": "road",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "하루 수십 번",
+     "why": "큰길이 언제 느린가"
+    },
+    {
+     "id": "weather",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "비 · 눈 운행"
+    },
+    {
+     "id": "day-night",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "밤 운행"
+    },
+    {
+     "id": "today",
+     "tier": 1,
+     "units": [
+      0
+     ],
+     "freq": "매일",
+     "why": "날짜 · 날씨를 한눈에"
+    },
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "구 지도 기준"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "구와 동 사이 바탕"
+    },
+    {
+     "id": "fac:8",
+     "tier": 1,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "하루 수십 번",
+     "why": "세울 곳 · 택배함"
+    },
+    {
+     "id": "fact:route",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "산지 → 가락 노선"
+    },
+    {
+     "id": "fact:auction_time",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "경매 전에 닿기"
+    },
+    {
+     "id": "bus",
+     "tier": 2,
+     "units": [
+      0
+     ],
+     "freq": "주 1~2번",
+     "why": "버스 차로 피하기"
+    },
+    {
+     "id": "fact:halt",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "일감이 줄어드는 소식"
+    },
+    {
+     "id": "fact:supply",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "실어 나를 물량"
+    },
+    {
+     "id": "fact:stock",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "비축 물량"
+    },
+    {
+     "id": "fact:garak",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "가락의 몫"
+    }
+   ]
+  },
+  {
+   "key": "wholesale",
+   "name": "도매상",
+   "entries": [
+    {
+     "id": "road",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일 새벽",
+     "why": "시장 가는 큰길"
+    },
+    {
+     "id": "weather",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "새벽 시장 날씨"
+    },
+    {
+     "id": "day-night",
+     "tier": 1,
+     "units": [
+      0,
+      2
+     ],
+     "freq": "매일",
+     "why": "밤 · 새벽 장"
+    },
+    {
+     "id": "today",
+     "tier": 1,
+     "units": [
+      0
+     ],
+     "freq": "매일",
+     "why": "날짜 · 날씨를 한눈에"
+    },
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "구 지도 기준"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "구와 동 사이 바탕"
+    },
+    {
+     "id": "fac:6",
+     "tier": 1,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "매일",
+     "why": "내 일터"
+    },
+    {
+     "id": "fact:auction",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "오늘 밤 경락"
+    },
+    {
+     "id": "fact:auction_time",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "경매 시각"
+    },
+    {
+     "id": "fact:wholesale",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "내가 파는 값"
+    },
+    {
+     "id": "fact:margin",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "내 몫"
+    },
+    {
+     "id": "fac:8",
+     "tier": 2,
+     "units": [
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "싣고 내릴 곳"
+    },
+    {
+     "id": "fact:supply",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "생산 전망"
+    },
+    {
+     "id": "fact:halt",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "출하정지 소식"
+    },
+    {
+     "id": "fact:consumer",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "소비자 값"
+    },
+    {
+     "id": "fact:garak",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "가락의 몫"
+    },
+    {
+     "id": "fact:area",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "심은 넓이"
+    }
+   ]
+  },
+  {
+   "key": "farm",
+   "name": "농가",
+   "entries": [
+    {
+     "id": "weather",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "하루 여러 번",
+     "why": "밭일"
+    },
+    {
+     "id": "day-night",
+     "tier": 1,
+     "units": [
+      0,
+      2
+     ],
+     "freq": "매일",
+     "why": "해 뜨고 지는 시각"
+    },
+    {
+     "id": "today",
+     "tier": 1,
+     "units": [
+      0
+     ],
+     "freq": "매일",
+     "why": "날짜 · 날씨를 한눈에"
+    },
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "구 지도 기준"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "구와 동 사이 바탕"
+    },
+    {
+     "id": "fact:farmgate",
+     "tier": 1,
+     "units": [],
+     "freq": "매일(출하철)",
+     "why": "내가 받는 값"
+    },
+    {
+     "id": "fact:auction",
+     "tier": 1,
+     "units": [],
+     "freq": "매일(출하철)",
+     "why": "경락이 받는 값의 바탕"
+    },
+    {
+     "id": "fact:halt",
+     "tier": 1,
+     "units": [],
+     "freq": "매일(출하철)",
+     "why": "우리 지역 출하정지"
+    },
+    {
+     "id": "fac:6",
+     "tier": 2,
+     "units": [
+      1,
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "직판 · 시장"
+    },
+    {
+     "id": "fact:supply",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "남을까 모자랄까"
+    },
+    {
+     "id": "fact:wholesale",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "도매값"
+    },
+    {
+     "id": "fact:consumer",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "소비자 값"
+    },
+    {
+     "id": "fact:stock",
+     "tier": 2,
+     "units": [],
+     "freq": "주 1~2번",
+     "why": "나라가 사 주는 양"
+    },
+    {
+     "id": "fact:cost",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "유통이 가져가는 몫"
+    },
+    {
+     "id": "fact:area",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "올해 심은 넓이"
+    },
+    {
+     "id": "fact:insure",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "수입안정보험"
+    }
+   ]
+  },
+  {
+   "key": "owner",
+   "name": "홍달 경영자",
+   "entries": [
+    {
+     "id": "gyeong",
+     "tier": 1,
+     "units": [],
+     "freq": "하루 수십 번",
+     "why": "경 수치"
+    },
+    {
+     "id": "place",
+     "tier": 1,
+     "units": [],
+     "freq": "하루 수십 번",
+     "why": "플레이스 창"
+    },
+    {
+     "id": "grade",
+     "tier": 1,
+     "units": [],
+     "freq": "매일",
+     "why": "등급 이름"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "바탕"
+    },
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "바탕"
+    },
+    {
+     "id": "station-pulse",
+     "tier": 1,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "매일",
+     "why": "역 불빛"
+    },
+    {
+     "id": "downtown",
+     "tier": 1,
+     "units": [
+      0,
+      1
+     ],
+     "freq": "매일",
+     "why": "번화가"
+    },
+    {
+     "id": "floating",
+     "tier": 1,
+     "units": [
+      0
+     ],
+     "freq": "매일",
+     "why": "유동인구"
+    },
+    {
+     "id": "lore",
+     "tier": 2,
+     "units": [
+      0
+     ],
+     "freq": "주 1~2번",
+     "why": "역 이름 유래"
+    },
+    {
+     "id": "spread",
+     "tier": 2,
+     "units": [
+      0
+     ],
+     "freq": "주 1~2번",
+     "why": "먹은 키워드만큼 번짐"
+    },
+    {
+     "id": "season-list",
+     "tier": 2,
+     "units": [],
+     "freq": "달 2~3번",
+     "why": "장터 제철"
+    }
+   ]
+  },
+  {
+   "key": "custom",
+   "name": "직접 고르기",
+   "entries": [
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "바탕만 켜고 나머지는 직접"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "바탕"
+    }
+   ]
+  }
+ ]
+}

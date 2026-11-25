@@ -35,7 +35,57 @@ namespace Ssalddel.WindowsGame
         private bool lampsRead;
         private bool lampMapTried;
         private Texture2D lampMap;
-        private int lampCount, lampRoadCount;
+        private int lampCount, lampRoadCount, lampSurveyCount;
+        private List<SurveyLamp> surveyLamps;
+        private bool lampMapShops;                      // 지금 불빛 그림에 가게 불빛이 들어 있는가
+
+        private const float LampSurveyReach = 5.2f;     // 조사된 보안등 불빛이 번지는 정도 (m, 표현값. 등의 밝기 · 배광은 자료에 없다)
+
+        // 조사된 보안등 한 곳: 공통 원점 기준 m(x 동쪽, y 북쪽), 장부 대수
+        private readonly struct SurveyLamp
+        {
+            public readonly Vector2 At;
+            public readonly int Count;
+            public SurveyLamp(Vector2 at, int count) { At = at; Count = count; }
+        }
+
+        [System.Serializable]
+        private sealed class SurveyLampPoint
+        {
+            public string id;
+            public double latitude;
+            public double longitude;
+            public int count;
+            public string surveyed;
+        }
+
+        [System.Serializable]
+        private sealed class SurveyLampPack
+        {
+            public string source;
+            public string surveyed;
+            public SurveyLampPoint[] points;
+        }
+
+        // 2026-11-24 G4: 사가정역 600 m 안 안심귀갓길 보안등 33곳(서울 OA-21696, 2022-08 조사, hongdal-security-lamps.json).
+        //  자리와 대수만 자료다. 지금 있는지 · 등의 종류 · 밝기 · 색온도는 모른다(빛의 모양은 표현값). 표본 구간만이라 모든 보안등이 아니다.
+        private List<SurveyLamp> SurveyLamps()
+        {
+            if (surveyLamps != null) return surveyLamps;
+            surveyLamps = new List<SurveyLamp>();
+            if (dongManifest == null) return surveyLamps;
+            var asset = Resources.Load<TextAsset>("hongdal-security-lamps");
+            if (asset == null) return surveyLamps;
+            var pack = JsonUtility.FromJson<SurveyLampPack>(asset.text);
+            Resources.UnloadAsset(asset);
+            if (pack?.points == null) return surveyLamps;
+            foreach (var point in pack.points)
+            {
+                var (east, north) = DongLocal(point.latitude, point.longitude);
+                surveyLamps.Add(new SurveyLamp(new Vector2((float)east, (float)north), Mathf.Max(1, point.count)));
+            }
+            return surveyLamps;
+        }
         private float lampCell;
 
         // 취향. 검증 촬영(--sagajeong-*)에서는 쓰지 않는다(지도 효과와 같다).
@@ -63,15 +113,28 @@ namespace Ssalddel.WindowsGame
         }
 
         // 프레임마다(SyncCloseShader). close = 가까이 보기의 정도(0~1).
+        // 2026-11-23: 자료 창 「낮과 밤」을 켜면 그날의 점등 시각에 맞춰 켜진다(낮에는 꺼짐, 밤에는 멀리서도). 끄면 전처럼 가까이에서만.
         private void SyncLamps(float close)
         {
             var strength = 0f;
-            if (close > 0.02f && LampsOn)
+            var timed = skyOn && mapLevel == MapLevel.Dong;
+            var night = timed ? NightFactor() : 0f;
+            if ((close > 0.02f || night > 0.02f) && LampsOn)
             {
+                // 가게 불빛은 현실감 시험을 켰을 때만(끄면 전과 같다). 켜고 끌 때 불빛 그림을 다시 만든다
+                var wantShops = realismOn && shopLights.Count > 0;
+                if (lampMapTried && lampMapShops != wantShops && lampMap != null)
+                {
+                    Destroy(lampMap);
+                    lampMap = null;
+                    lampMapTried = false;
+                }
                 EnsureLampMap();
-                if (lampMap != null) strength = close * close;
+                if (lampMap != null) strength = timed ? night * Mathf.Max(0.6f, close * close) * 1.35f : close * close;
             }
             Shader.SetGlobalFloat(LampId, strength);
+            Shader.SetGlobalFloat(DioramaNightId, night);
+            SyncDongDataMap();          // 길 속도 · 버스 바닥 그림 (SagajeongDispatchStreetProps.cs)
         }
 
         private void EnsureLampMap()
@@ -114,6 +177,33 @@ namespace Ssalddel.WindowsGame
             var next = new List<int>();
             lampCount = 0;
             lampRoadCount = 0;
+            lampSurveyCount = 0;
+            // 조사된 보안등을 먼저 놓는다. 그 둘레(골목 간격 안)에는 표현 불빛을 더 놓지 않는다.
+            foreach (var survey in SurveyLamps())
+            {
+                var x = survey.At.x;
+                var z = survey.At.y;
+                if (x < x0 || z < z0 || x > x0 + spanX || z > z0 + spanZ) continue;
+                var gridX = Mathf.Clamp((int)((x - x0) / bucket), 0, gridWidth - 1);
+                var gridZ = Mathf.Clamp((int)((z - z0) / bucket), 0, gridHeight - 1);
+                placedX.Add(x);
+                placedZ.Add(z);
+                next.Add(head[gridZ * gridWidth + gridX]);
+                head[gridZ * gridWidth + gridX] = placedX.Count - 1;
+                lampSurveyCount++;
+                StampLamp(cells, width, height, (x - x0) / lampCell, (z - z0) / lampCell, LampSurveyReach / lampCell,
+                    Mathf.Min(1f, 0.85f + 0.15f * survey.Count));
+            }
+            // 밤 가게 불빛(표현, 현실감 시험이 읽을 때 모은 자리): 근린생활 · 상업 건물 벽 앞 보도. 표현 불빛 자리는 막지 않는다
+            var shops = 0;
+            lampMapShops = realismOn && shopLights.Count > 0;
+            if (lampMapShops)
+            foreach (var shop in shopLights)
+            {
+                if (shop.x < x0 || shop.y < z0 || shop.x > x0 + spanX || shop.y > z0 + spanZ) continue;
+                StampLamp(cells, width, height, (shop.x - x0) / lampCell, (shop.y - z0) / lampCell, 3.4f / lampCell, 0.62f);
+                shops++;
+            }
             for (var pass = 0; pass < 2; pass++)
             {
                 var kind = pass == 0 ? 길그래프.Road : 길그래프.Alley;
@@ -171,7 +261,7 @@ namespace Ssalddel.WindowsGame
                     }
                 }
             }
-            if (lampCount == 0) return;
+            if (lampCount + lampSurveyCount == 0) return;
 
             var single = SystemInfo.SupportsTextureFormat(TextureFormat.R8);
             lampMap = new Texture2D(width, height, single ? TextureFormat.R8 : TextureFormat.RGBA32, false, true)
@@ -193,7 +283,8 @@ namespace Ssalddel.WindowsGame
             lampMap.Apply(false, true);
             Shader.SetGlobalTexture(LampMapId, lampMap);
             Shader.SetGlobalVector(LampRectId, new Vector4(x0, z0, 1f / (width * lampCell), 1f / (height * lampCell)));
-            Debug.Log($"Hongdal street lamps: {lampCount} (큰길 {lampRoadCount}), {width} x {height} cells, {lampCell:0.0} m each · 표현");
+            Debug.Log($"Hongdal street lamps: {lampCount} (큰길 {lampRoadCount}), {width} x {height} cells, {lampCell:0.0} m each · 표현, " +
+                $"조사된 보안등 {lampSurveyCount}곳(OA-21696 2022-08), 가게 불빛 {shops}곳(표현)");
         }
 
         // 한 불빛: 가운데가 가장 밝고 둥글게 옅어진다. 겹치는 곳은 더하지 않고 밝은 쪽을 쓴다.
