@@ -9,6 +9,16 @@
 | [![수도권 전체를 한 화면에 본 지도](Documentation/readme/capital-map.png)](Documentation/readme/capital-map.png) | [![수원 행궁동을 공개 자료로 만든 입체 동네](Documentation/readme/public-dong-diorama.png)](Documentation/readme/public-dong-diorama.png) | [![서울 25개 구를 일반음식점 수로 칠한 지도](Documentation/readme/seoul-gu-compare.png)](Documentation/readme/seoul-gu-compare.png) |
 | 수도권을 한 장으로 보고, 휠로 구 · 동까지 다가갑니다 | 칸을 두 번 누르면 그 동이 입체 모형(디오라마)으로 열립니다 | 공표 통계로 구를 칠하고, 구를 누르면 숫자 카드가 나옵니다 |
 
+## 휴대폰에서 바로 해 보기 (안드로이드)
+
+[**안드로이드 시험판 0.2.0 내려받기 (APK, 약 112 MB)**](https://github.com/cheolwo/unity/releases/download/hongdal-android-v0.2.0/hongdal-0.2.0.apk) · [릴리스 안내 페이지](https://github.com/cheolwo/unity/releases/tag/hongdal-android-v0.2.0)
+
+1. 휴대폰에서 위 링크를 눌러 APK를 받습니다.
+2. 받은 파일을 열고 「출처를 알 수 없는 앱」 설치를 허용한 뒤 설치합니다. Play 프로텍트 경고가 뜨면 「그래도 설치」를 누릅니다(스토어를 거치지 않은 앱이라 뜨는 경고입니다).
+3. 해 보시고 이상한 곳이나 바라는 점은 [Issues](https://github.com/cheolwo/unity/issues)에 남겨 주세요.
+
+안드로이드 64비트 휴대폰 · 세로 화면용 시험판입니다. 지도와 생활 자료의 출처 · 라이선스는 게임 안 지도 아래 「출처 전체」에서 볼 수 있습니다.
+
 ## 어떤 게임인가요?
 
 - 플레이어는 **카페 · 음식점 같은 가게와 배달 기사, 물류**를 맡아 하루하루 운영합니다. 주문이 들어오면 기사를 보내고, 재료가 떨어지면 보충합니다.
