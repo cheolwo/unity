@@ -1,5 +1,9 @@
 # Ssalddel Unity 작업 지침
 
+## 작업별 스킬
+
+항상 지킬 경계는 이 지침에 두고, 지도 자료 연결은 `.agents/skills/hongdal-unity-map-data-binding/SKILL.md`, 2D 객체 배치·선택·카메라 입력은 `.agents/skills/hongdal-unity-2d-interaction/SKILL.md`, 구매한 Synty 자산 검색·측정·외형 적용은 `.agents/skills/hongdal-synty-asset-workflow/SKILL.md`의 연결을 통해 필요할 때만 읽는다. Claude용 진입은 `.claude/skills`에 있다. 공통 정본은 Hongdal 저장소에 있으므로 다른 PC·클라우드에서는 연결과 코드 판본을 확인한다. 스킬 호출은 새 Scene·게임 규칙·운영 쓰기나 Editor 점유를 승인하지 않는다.
+
 ## Unity 자동화 우선순위
 
 - 이 프로젝트에는 Unity CLI와 `com.unity.pipeline` 패키지가 설치되어 있다. Unity 관련 작업은 두 도구를 함께 활용한다.

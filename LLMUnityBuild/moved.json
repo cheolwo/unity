@@ -1,0 +1,16 @@
+{
+    "pairs": [
+        {
+            "source": "C:/Users/user/ssalddel/Assets/StreamingAssets/LlamaLib-v2.0.5\\setup",
+            "target": "C:\\Users\\user\\ssalddel\\LLMUnityBuild\\setup"
+        },
+        {
+            "source": "",
+            "target": "C:/Users/user/ssalddel/Assets/StreamingAssets/LLMManager.json"
+        },
+        {
+            "source": "",
+            "target": "C:/Users/user/ssalddel/Assets/StreamingAssets/LLMManager.json.meta"
+        }
+    ]
+}
