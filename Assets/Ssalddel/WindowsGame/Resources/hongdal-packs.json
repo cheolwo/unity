@@ -1,0 +1,256 @@
+{
+ "schema": "hongdal-pack-manifest.v1",
+ "note": "게임은 원본 자료를 직접 읽지 않고 팩만 읽는다. 회차는 시작할 때의 팩 판본에 고정한다. 상위 등록부는 neighborhood-package-registry.v2와 지역 Experience Package이며, 이 목록은 Windows 게임 모듈이 싣고 다니는 사본이다.",
+ "packs": [
+  {
+   "id": "space.seoul.jungnang.myeonmok.sagajeong",
+   "kind": "space",
+   "version": "2026.11.12-1",
+   "unit": "면목동 사가정 일대 (2.5D 자료 범위 1,089m × 1,888m)",
+   "files": [
+    {
+     "path": "hongdal-diorama.bytes",
+     "role": "diorama-mesh",
+     "bytes": 10163852,
+     "sha256": "c97df13e3dd321ac50be4afa56c7581a2970d7e9dd4f541bef4d52ed746592ce"
+    },
+    {
+     "path": "hongdal-buildings.json",
+     "role": "building-index",
+     "bytes": 1158486,
+     "sha256": "f725b8fd149b1c9f6c233bef99249232ecd6ef07abf388ec124e58756957e99b"
+    },
+    {
+     "path": "hongdal-building-roles.json",
+     "role": "building-roles",
+     "bytes": 2503,
+     "sha256": "7f75930ce5ff2300c5a8a2c6a9dcda402ea0c27baba9d029a4fc8bb9eec37187"
+    },
+    {
+     "path": "HongdalWindows/road-graph.json",
+     "role": "road-graph",
+     "bytes": 81226,
+     "sha256": "cd4e8bf622edd75a5d249049c9f04cafd5e33f63c340a2d387aaffc5088d2b67"
+    }
+   ],
+   "sources": [
+    {
+     "name": "OpenStreetMap",
+     "date": "2026-11-10",
+     "terms": "ODbL 1.0 · 출처 표시"
+    }
+   ],
+   "distribution": "배포 가능 (출처 표시)",
+   "privacy": "개인정보 없음",
+   "conversion": "diorama-bake/bake_diorama.py가 메시와 건물 색인을 함께 굽는다. 건물 역할표는 make_roles.py가 만든다.",
+   "gaps": [
+    "법정동 경계",
+    "횡단보도·차선",
+    "공공 건물 자료(용도·층수)"
+   ]
+  },
+  {
+   "id": "space.seoul.northeast-3gu",
+   "kind": "space",
+   "version": "2026.11.13-1",
+   "unit": "서울 동북 3구(중랑·동대문·광진)와 주변 · 20.7km × 11.6km · 북쪽이 위인 평면 · 세 구는 1점 = 2.5m",
+   "files": [
+    {
+     "path": "hongdal-gu-base.bytes",
+     "role": "gu-detail-color",
+     "bytes": 2581368,
+     "sha256": "7d7b0aea100f0bdb94bf5ae243f9d4958054a84c6fa41b3901b208579a8d4a22"
+    },
+    {
+     "path": "hongdal-gu-base-grey.bytes",
+     "role": "gu-overview-grey",
+     "bytes": 817294,
+     "sha256": "f25fd45e22e2f50498977176c8f5eed4af745ea45717f719c582a52924397d5a"
+    },
+    {
+     "path": "hongdal-gu-detail-grey.bytes",
+     "role": "gu-detail-grey",
+     "bytes": 1019728,
+     "sha256": "06cc7517f8860fdfd82d3d070611337d5a2d7a786bffc2f45a0158cf1cf918e6"
+    },
+    {
+     "path": "hongdal-gu-space.json",
+     "role": "gu-space",
+     "bytes": 43278,
+     "sha256": "db42e2773a1fec661c652248988f6ae24fd87b424c7cd1d162e7403902269463"
+    }
+   ],
+   "sources": [
+    {
+     "name": "ESA WorldCover 2021 v200 (N36E126)",
+     "date": "2021",
+     "terms": "CC BY 4.0 · 출처 표시"
+    },
+    {
+     "name": "서울시 차선 선형 A058_L",
+     "date": "2021 계약 기준",
+     "terms": "공공누리 1유형으로 기록됨 · 재확인 필요"
+    },
+    {
+     "name": "브이월드 법정구역 AL_D001",
+     "date": "2026-07-01",
+     "terms": "이용 조건 미확인"
+    },
+    {
+     "name": "국토교통부 표준노드링크 (data.go.kr 15025526)",
+     "date": "2025-05-12 갱신분",
+     "terms": "이용허락범위 제한 없음으로 기록됨"
+    },
+    {
+     "name": "서울시 등고선·표고점 (열린데이터광장 OA-22241, 2023년 수치지형도)",
+     "date": "2025-03-20",
+     "terms": "공공누리 1유형 · 출처 표시"
+    }
+   ],
+   "distribution": "내부 검토 (경계와 차선의 이용 조건을 확인하기 전에는 배포하지 않는다)",
+   "privacy": "개인정보 없음",
+   "conversion": "make_gu_packs.py 머리말의 여섯 단계. 중간 자료(gu.js, cover.png)는 mockups/통합구조-20261112/구지도-스크립트/prep.py가 원본에서 만든다.",
+   "gaps": [
+    "지하철 노선과 역",
+    "지명·시설 (산·하천 이름은 손으로 붙였다)",
+    "구 전체의 건물 윤곽",
+    "서울 밖의 지형 (음영 없음)",
+    "세 구 밖의 촘촘한 바탕"
+   ]
+  },
+  {
+   "id": "space.korea.nation-sea-air",
+   "kind": "space",
+   "version": "2026.11.13-1",
+   "unit": "전국(한국과 주변 바다) · 경위도 116.5~137.5°E, 29.5~43.0°N · 시안 화면 좌표(위도 1도 = 88점) · 항만 11곳·공항 3곳 × 나라 출입구 6개 × 2025년 12달",
+   "files": [
+    {
+     "path": "hongdal-nation-base.bytes",
+     "role": "nation-base",
+     "bytes": 544424,
+     "sha256": "e3b50e28275fdf9efcbfb6624cb145f9ab3e8ac8a19e5480f2f494ed1788bbf4"
+    },
+    {
+     "path": "hongdal-nation-space.json",
+     "role": "nation-space",
+     "bytes": 109600,
+     "sha256": "1288a54187ffb137d0c4c4f600a31a5319da69299cdeda0583375ee802b06dd7"
+    }
+   ],
+   "sources": [
+    {
+     "name": "Natural Earth 10m admin-1 states/provinces",
+     "date": "판 기록 없음 (korea-admin1-context-r1)",
+     "terms": "public domain"
+    },
+    {
+     "name": "관세청 국가별 입항물동량 (data.go.kr 15151805)",
+     "date": "2025.01~2025.12",
+     "terms": "이용 조건 재확인 필요"
+    },
+    {
+     "name": "관세청 국가별 출항물동량 (data.go.kr 15151809)",
+     "date": "2025.01~2025.12",
+     "terms": "이용 조건 재확인 필요"
+    }
+   ],
+   "distribution": "내부 검토 (관세청 자료의 이용 조건을 확인하기 전에는 배포하지 않는다)",
+   "privacy": "개인정보 없음 (항만·나라·월 집계)",
+   "conversion": "Tools~/make_nation_pack.py. BL 건수와 TEU만 쓰고 중량은 단위 확인 전이라 뺀다. 항만·공항 위치, 바다 길목, 출입구 자리와 나라 묶음, 가상 회차 경로는 손으로 정했다. 바탕 PNG는 PC로 옮길 때 다시 압축되어(화소는 같음) 목록의 SHA는 모듈에 놓인 파일 기준이다.",
+   "gaps": [
+    "항만·공항 좌표·코드 대장 (지금은 대략)",
+    "정식 해안선·섬 (Natural Earth는 시안 정밀도)",
+    "중량 단위",
+    "부산항·부산신항 포함 관계",
+    "상대국 '한국' 행의 뜻",
+    "바다 상태·입출항 사건·산지 층"
+   ]
+  },
+  {
+   "id": "game.territory.seoul.northeast-3gu",
+   "kind": "game-rules",
+   "version": "2026.11.12-1",
+   "unit": "영역 규칙과 법정동 인접 표 (23개 동) · 홈 동의 실제 자리",
+   "files": [
+    {
+     "path": "hongdal-territory.json",
+     "role": "territory",
+     "bytes": 6181,
+     "sha256": "a6ee1501b0ff97428211a4354cf9de207cc7666bb3478aaa57bd321a97a67628"
+    }
+   ],
+   "sources": [
+    {
+     "name": "임시 규칙 (Claude 초안)",
+     "date": "2026-11-12",
+     "terms": "자체 작성"
+    },
+    {
+     "name": "브이월드 법정구역 AL_D001에서 계산한 인접 표",
+     "date": "2026-07-01",
+     "terms": "이용 조건 미확인"
+    }
+   ],
+   "distribution": "내부 검토",
+   "privacy": "개인정보 없음",
+   "conversion": "make_gu_packs.py. 표식 자리는 토지피복의 시가지 칸에서 고른 가상 위치다.",
+   "gaps": [
+    "진출·운영·자리 잡음의 조건 (기획 판본이 정한다)",
+    "가상 매장의 주문·정산",
+    "진출 비용"
+   ]
+  },
+  {
+   "id": "business.franchise.cafe.first-chain",
+   "kind": "business",
+   "version": "2026.11.12-1",
+   "unit": "가맹 카페 첫 인계 사슬",
+   "files": [
+    {
+     "path": "hongdal-business-first-chain.json",
+     "role": "first-chain",
+     "bytes": 1681,
+     "sha256": "e8c5578f359e07c78fc90cf8a87c45bb8ee32b568927fb307aa9deb85909de83"
+    }
+   ],
+   "sources": [
+    {
+     "name": "가상 표본 (PLAN-SYSTEM-FRANCHISE-OPERATIONS r71 첫 모의 검증)",
+     "date": "2026-11-12",
+     "terms": "자체 작성"
+    }
+   ],
+   "distribution": "배포 가능",
+   "privacy": "개인정보 없음",
+   "conversion": "손으로 적은 가상 값. 개인 배달 기록의 분포는 아직 입히지 않았다.",
+   "gaps": [
+    "메뉴·준비 시간·시간대 주문 비율의 집계 분포"
+   ]
+  },
+  {
+   "id": "business.food-delivery.sagajeong-sample",
+   "kind": "business",
+   "version": "core-sample",
+   "unit": "음식 배달 표본 (공통 Core)",
+   "files": [
+    {
+     "path": "HongdalWindows/delivery-sample.json",
+     "role": "delivery-sample",
+     "bytes": 2398,
+     "sha256": "6d13d20358565235f8111b15cdaec100078c45b190d13fe307e7932f306b68bb"
+    }
+   ],
+   "sources": [
+    {
+     "name": "공통 Core 표본 (Ssalddel.Sagajeong.Core)",
+     "date": "",
+     "terms": "HongdalWindows/NOTICE.md"
+    }
+   ],
+   "distribution": "내부 검토",
+   "privacy": "가상 매장·가상 주문",
+   "conversion": "MobileGame 모듈의 표본을 그대로 옮긴 것",
+   "gaps": []
+  }
+ ]
+}

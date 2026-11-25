@@ -30,6 +30,7 @@ Shader "Hongdal/DioramaShadow"
 
             fixed4 _Color;
             float4 _Window;
+            float4 _HongdalTier;      // 역 세 겹(HongdalDiorama와 같다). 낮아진 바깥 건물의 그림자는 옅게
 
             struct v2f
             {
@@ -50,6 +51,8 @@ Shader "Hongdal/DioramaShadow"
                 float outside = _Window.z > 0.0 ? saturate((distance(i.ground, _Window.xy) - _Window.z) / max(1.0, _Window.w)) : 0.0;
                 fixed4 c = _Color;
                 c.a *= 1.0 - outside;
+                if (_Window.z > 0.0 && _HongdalTier.z > 0.0)
+                    c.a *= 1.0 - 0.7 * _HongdalTier.z * smoothstep(_HongdalTier.y * 0.94, _HongdalTier.y * 1.12, distance(i.ground, _Window.xy));
                 return c;
             }
             ENDCG

@@ -1,0 +1,11 @@
+{
+  "items": [
+    {"id": "region:kr:bjd:1126010100", "district": "중랑구", "name": "면목동", "description": "사가정역 일대", "latitude": 37.5815829, "longitude": 127.0876125},
+    {"id": "region:kr:bjd:1126010200", "district": "중랑구", "name": "상봉동", "description": "망우로38길 인근", "latitude": 37.5937124, "longitude": 127.0802312},
+    {"id": "region:kr:bjd:1126010300", "district": "중랑구", "name": "중화동", "description": "동일로129길 인근", "latitude": 37.5998408, "longitude": 127.0798209},
+    {"id": "region:kr:bjd:1126010400", "district": "중랑구", "name": "묵동", "description": "동일로·공릉로 인근", "latitude": 37.6114362, "longitude": 127.0776081},
+    {"id": "region:kr:bjd:1123010600", "district": "동대문구", "name": "장안동", "description": "장안사거리 일대", "latitude": 37.5688187, "longitude": 127.0662422},
+    {"id": "region:kr:bjd:1121510100", "district": "광진구", "name": "중곡동", "description": "중곡역 일대", "latitude": 37.5633904, "longitude": 127.0841638},
+    {"id": "region:kr:bjd:1135010300", "district": "노원구", "name": "공릉동", "description": "경춘선숲길 일대", "latitude": 37.6250554, "longitude": 127.0718346}
+  ]
+}

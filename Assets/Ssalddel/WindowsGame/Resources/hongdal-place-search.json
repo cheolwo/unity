@@ -1,0 +1,30 @@
+{
+  "schema": "hongdal.place-search.v0",
+  "version": "2026.11.15-test-1",
+  "note": "홍달 플레이스 주문자 뷰의 시험 자료(종합 계획 플1 초안, Claude). 가상 경쟁점의 이름 · 판매 태그 · 정보 상태는 지어낸 값이고 실제 점포와 무관하다. 자리는 게임이 그 동의 근린생활시설 가상 자리 후보에서 고른다. 점수 비중은 r238 시험값이며 실제 서비스의 알고리즘이 아니다. 내부 검토용 · 배포 아님.",
+  "region": "region:kr:hjd:1126057000",
+  "defaultKeyword": "kw:latte",
+  "mine": { "placeId": "place:cafe-1", "category": "카페", "tags": [] },
+  "keywords": [
+    { "id": "kw:cafe", "label": "카페", "kind": "category", "value": "카페", "category": "" },
+    { "id": "kw:latte", "label": "라떼", "kind": "menu", "value": "라떼", "category": "카페" }
+  ],
+  "weights": { "fit": 40, "access": 25, "info": 15, "prior": 20, "categoryOnlyFit": 0.6, "neutralPrior": 0.5, "reachMetres": 1000, "pageSize": 10, "maxPages": 10 },
+  "rivals": [
+    { "id": "virtual:cafe-01", "name": "가상카페 가", "category": "카페", "tags": ["라떼", "아메리카노"], "info": 0.8, "state": "영업시간 정보 없음" },
+    { "id": "virtual:cafe-02", "name": "가상카페 나", "category": "카페", "tags": ["라떼"], "info": 1.0, "state": "영업 중" },
+    { "id": "virtual:cafe-03", "name": "가상카페 다", "category": "카페", "tags": ["라떼", "아메리카노"], "info": 1.0, "state": "영업 중" },
+    { "id": "virtual:cafe-04", "name": "가상카페 라", "category": "카페", "tags": ["라떼"], "info": 1.0, "state": "영업 중" },
+    { "id": "virtual:cafe-05", "name": "가상카페 마", "category": "카페", "tags": ["디저트"], "info": 1.0, "state": "영업 중" },
+    { "id": "virtual:cafe-06", "name": "가상카페 바", "category": "카페", "tags": ["라떼"], "info": 1.0, "state": "영업 중" },
+    { "id": "virtual:cafe-07", "name": "가상카페 사", "category": "카페", "tags": ["라떼"], "info": 0.6, "state": "위치 정보 확인 중" },
+    { "id": "virtual:cafe-08", "name": "가상카페 아", "category": "카페", "tags": ["라떼", "디저트"], "info": 1.0, "state": "영업 중" },
+    { "id": "virtual:cafe-09", "name": "가상카페 자", "category": "카페", "tags": ["라떼"], "info": 1.0, "state": "영업 중" },
+    { "id": "virtual:cafe-10", "name": "가상카페 차", "category": "카페", "tags": ["라떼"], "info": 0.8, "state": "영업시간 정보 없음" },
+    { "id": "virtual:cafe-11", "name": "가상카페 카", "category": "카페", "tags": ["떡", "디저트"], "info": 0.8, "state": "영업시간 정보 없음" },
+    { "id": "virtual:cafe-12", "name": "가상카페 타", "category": "카페", "tags": ["라떼"], "info": 1.0, "state": "영업 중" }
+  ],
+  "others": [
+    { "id": "virtual:snack-01", "name": "가상분식 하", "category": "분식", "tags": ["떡볶이"], "info": 1.0, "state": "영업 중" }
+  ]
+}
