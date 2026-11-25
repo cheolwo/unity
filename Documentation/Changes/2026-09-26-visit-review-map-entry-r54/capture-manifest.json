@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "visit-review-map-entry-capture.r54.v1",
+  "profilePassed": false,
+  "scenarioChecksPassed": true,
+  "failureCode": "VisitCaptureConsoleErrorsObserved",
+  "scope": "IsolatedCanonicalScenePresentationOnly",
+  "sourceMode": "FrozenPrivateMapAndExplicitSyntheticVisits",
+  "sceneSaved": false,
+  "sceneHashBefore": "c31167703c4a7683da374e237cba3c9584a5f1de4b5fb5746939a3632635ac65",
+  "sceneHashAfter": "c31167703c4a7683da374e237cba3c9584a5f1de4b5fb5746939a3632635ac65",
+  "sceneCleanAfterReload": true,
+  "isolationRootCount": 6,
+  "npcOrOperationalControllerContinuityVerified": false,
+  "actualRecordCount": 7,
+  "actualRejectionVerified": true,
+  "actualRecordReadyCount": 0,
+  "actualRecordMarkerCount": 0,
+  "actualRejectionCode": "VisitPlaybackPreparationRequired",
+  "actualPreparationDiagnosticCount": 7,
+  "actualRecordSha256": "1bfdc56363d5611de0c1d0a5a2a5be755b35e4004167a7816842cfd2b5719661",
+  "projectionHashSha256": "fb5627097f1c380b7a24744174d10551fcfb171056a6c83a18cf4ecf4e939cfe",
+  "syntheticVisitCount": 3,
+  "syntheticDistinctPointCount": 2,
+  "syntheticInputFingerprint": "BC7BF57F7D26B9D23190A912452ECDD56C2282CBAFB6F8947A60B674E08665B1",
+  "syntheticPointsValidatedInsideFocusAndHistoricalBoundary": true,
+  "realClockMovementVerified": true,
+  "pauseHeldVerified": true,
+  "seekThirdVisitVerified": true,
+  "clearPreservedMapVerified": true,
+  "entryOwnedHostsReleasedVerified": true,
+  "usesActualHttp": false,
+  "databaseWrites": false,
+  "operationalEffectsAllowed": false,
+  "actualDeliveryPlaybackClaimed": false,
+  "evidenceStageClaimed": null,
+  "consoleErrorsAtStart": 0,
+  "consoleErrorsAtEnd": 1,
+  "runErrorExceptionAssertCount": 1,
+  "runWarningCount": 9,
+  "consoleRawMessagesStored": false,
+  "consoleCleanDuringProfile": false,
+  "gameViewSettingsRestored": true,
+  "recoveredOwnedGameViewSizeCount": 0,
+  "startedUtc": "2026-09-26T11:08:09.1066407Z",
+  "finishedUtc": "2026-09-26T11:08:27.9837846Z",
+  "checkpoints": [
+    {
+      "code": "actual-seven-records-rejected-zero-markers",
+      "frame": 1,
+      "markerCount": 0,
+      "state": "Empty",
+      "sequence": 0,
+      "presentationSeconds": 0.0
+    },
+    {
+      "code": "synthetic-three-visits-playing",
+      "frame": 3,
+      "markerCount": 1,
+      "state": "Playing",
+      "sequence": 1,
+      "presentationSeconds": 0.0
+    },
+    {
+      "code": "synthetic-moved-on-real-clock",
+      "frame": 902,
+      "markerCount": 1,
+      "state": "Playing",
+      "sequence": 1,
+      "presentationSeconds": 3.0011501999999979
+    },
+    {
+      "code": "synthetic-paused",
+      "frame": 902,
+      "markerCount": 1,
+      "state": "Paused",
+      "sequence": 1,
+      "presentationSeconds": 3.0035577999999958
+    },
+    {
+      "code": "synthetic-pause-held",
+      "frame": 1046,
+      "markerCount": 1,
+      "state": "Paused",
+      "sequence": 1,
+      "presentationSeconds": 3.0035577999999958
+    },
+    {
+      "code": "synthetic-seek-third-visit",
+      "frame": 1046,
+      "markerCount": 1,
+      "state": "Paused",
+      "sequence": 3,
+      "presentationSeconds": 12.0
+    },
+    {
+      "code": "presenter-cleared-map-preserved",
+      "frame": 1228,
+      "markerCount": 0,
+      "state": "Empty",
+      "sequence": 0,
+      "presentationSeconds": 0.0
+    },
+    {
+      "code": "entry-owned-hosts-released",
+      "frame": 1388,
+      "markerCount": 0,
+      "state": "Released",
+      "sequence": 0,
+      "presentationSeconds": 0.0
+    }
+  ],
+  "captures": [
+    {
+      "fileName": "01-actual-record-rejected.png",
+      "sha256": "c4bab7349426161f22fee9f672f8246c3c4d498f80a292b5632cb96c1c749d58",
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true
+    },
+    {
+      "fileName": "02-synthetic-paused.png",
+      "sha256": "e0cabfe6f0c83c6df4b496533696db427644c259b80e45222013c1418cf7ceb5",
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true
+    },
+    {
+      "fileName": "03-synthetic-seek.png",
+      "sha256": "82a8ff1c25d6ace7d2d5a03f01136fff3a545a0059fcf1cfc9c1387a2e391596",
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true
+    },
+    {
+      "fileName": "04-cleared.png",
+      "sha256": "12d621ed4fbe1e3bae7bbcbdb37aaa5593b78c2e8ca1d03608e48f7a7c3c6cc1",
+      "width": 1280,
+      "height": 720,
+      "actualScreenCapture": true
+    }
+  ],
+  "newDioramaRuleCandidate": false
+}
