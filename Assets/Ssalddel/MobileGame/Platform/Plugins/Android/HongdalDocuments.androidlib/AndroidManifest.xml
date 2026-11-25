@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.hongdal.mobile.documents">
+    <application>
+        <activity android:name="com.hongdal.mobile.documents.HongdalDocumentsActivity"
+                  android:exported="false"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:excludeFromRecents="true"
+                  android:configChanges="orientation|screenSize|keyboardHidden" />
+    </application>
+</manifest>

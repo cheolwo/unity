@@ -1,0 +1,5 @@
+<linker>
+  <assembly fullname="Ssalddel.Sagajeong.Core" preserve="all" />
+  <assembly fullname="Ssalddel.WorkflowRules" preserve="all" />
+  <assembly fullname="Ssalddel.WorkflowRules.Contracts" preserve="all" />
+</linker>

@@ -1,0 +1,5 @@
+Nanum Gothic Regular (Korean.ttf)
+Source: https://github.com/google/fonts/tree/main/ofl/nanumgothic
+Download: https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Regular.ttf
+License: SIL Open Font License 1.1; original license text is Korean-OFL.txt.
+Font unmodified. Retrieved 2026-11-11.
