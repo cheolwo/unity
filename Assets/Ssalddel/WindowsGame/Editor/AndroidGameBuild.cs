@@ -39,8 +39,8 @@ namespace Ssalddel.WindowsGame.Editor
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.ssalddel.hongdal");
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
-            PlayerSettings.bundleVersion = "0.1.0";
-            PlayerSettings.Android.bundleVersionCode = 1;
+            PlayerSettings.bundleVersion = "0.2.1";      // 2026-11-25 나눠 보기 판: 공개판 디오라마 · 출처 화면 · 주소 자료 · 확인 전 자료 뺌
+            PlayerSettings.Android.bundleVersionCode = 3;      // 0.2.1(2026-11-25 Claude): 출처 · 오픈소스 고지 정리, INTERNET 권한 뺌
             PlayerSettings.runInBackground = false;                      // 폰: 뒤로 가면 멈추고, 다시 열면 그 사이를 셈한다
             PlayerSettings.defaultInterfaceOrientation = PortraitFirst ? UIOrientation.Portrait : UIOrientation.LandscapeLeft;
             EditorUserBuildSettings.buildAppBundle = false;               // 내 폰에 USB로 바로 넣는 APK(스토어용 AAB는 나중)
