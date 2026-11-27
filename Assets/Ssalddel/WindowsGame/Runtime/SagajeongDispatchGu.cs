@@ -156,7 +156,10 @@ namespace Ssalddel.WindowsGame
             var space = ReadMapResource<GuSpace>(GuSpaceResource);
             var colorAsset = Resources.Load<TextAsset>(GuBaseResource);
             var greyAsset = Resources.Load<TextAsset>(GuGreyResource);
-            if (space?.dongs == null || space.width <= 0 || space.height <= 0 || colorAsset == null || greyAsset == null)
+            // 폰 · 나눠 보기 빌드(2026-11-25): 세 구 바탕(서울시 차선 · 브이월드 경계 — 이용 조건 확인 전)을 싣지 않는다.
+            // 그때는 공개 자료로 구운 수도권 바탕(SagajeongDispatchCapital.cs)만 깔고, 세 구 바탕 자리는 비워 둔다.
+            var noBase = colorAsset == null || greyAsset == null;
+            if (space?.dongs == null || space.width <= 0 || space.height <= 0 || noBase && !CapitalReady)
             {
                 Debug.LogWarning("Hongdal gu map: 구 공간 팩이 없어 예전 구 지도를 씁니다.");
                 return false;
@@ -164,10 +167,18 @@ namespace Ssalddel.WindowsGame
 
             var started = Time.realtimeSinceStartup;
             var color = new Texture2D(2, 2, TextureFormat.RGB24, false) { name = "Hongdal gu base" };
-            var grey = new Texture2D(2, 2, TextureFormat.RGB24, true) { name = "Hongdal gu base grey", wrapMode = TextureWrapMode.Clamp };
-            var loaded = color.LoadImage(colorAsset.bytes, false) && grey.LoadImage(greyAsset.bytes, true);
-            Resources.UnloadAsset(colorAsset);
-            Resources.UnloadAsset(greyAsset);
+            var grey = new Texture2D(2, 2, noBase ? TextureFormat.RGBA32 : TextureFormat.RGB24, !noBase) { name = "Hongdal gu base grey", wrapMode = TextureWrapMode.Clamp };
+            bool loaded;
+            if (noBase)
+            {
+                grey.SetPixels32(new Color32[4]);      // 투명: 수도권 바탕이 그대로 보인다
+                grey.Apply(false);
+                loaded = true;
+            }
+            else
+                loaded = color.LoadImage(colorAsset.bytes, false) && grey.LoadImage(greyAsset.bytes, true);
+            if (colorAsset != null) Resources.UnloadAsset(colorAsset);
+            if (greyAsset != null) Resources.UnloadAsset(greyAsset);
             if (!loaded)
             {
                 Destroy(color);
@@ -506,7 +517,7 @@ namespace Ssalddel.WindowsGame
                 DrawGuSky(now);          // 실제 달력의 낮과 밤: 그날 가로등 점등 시각에 저문다 (SagajeongDispatchDataPacks.cs)
                 var free = !MapOverlayCovers(current.mousePosition + Field.position);
                 guHover = free && !guDragging ? GuDongAt(GuWorld(current.mousePosition))?.code : null;
-                if (territory != null) DrawGuGround(territory, now, delta);
+                if (territory != null && !BranchBoardOn) DrawGuGround(territory, now, delta);      // 지사장 판은 영역 빛 대신 동별 몫을 본다
                 else DrawGuSeason();     // 철: 숲 · 공원 · 하천 · 눈 · 젖음 (SagajeongDispatchGuSeason.cs)
                 DrawGuHexTiles(now);     // 구와 동 사이의 타일 지도: 다가가면 떠오른다 (SagajeongDispatchHexTiles.cs)
                 DrawCapitalHex(now);     // 수도권 육각 타일(공개판): 두 번 누르면 동 디오라마 (SagajeongDispatchCapitalHex.cs)
@@ -516,14 +527,16 @@ namespace Ssalddel.WindowsGame
                 DrawGuSubway(now);       // 지하철 노선도와 역 번화가 (SagajeongDispatchSubwayGu.cs)
                 DrawGuFacilities();      // 가까이에서 생활 시설 참고점(중랑 16동, SagajeongDispatchDataPacks.cs)
                 DrawGuFloating(now);     // 유동인구: 행정동 생활인구 원(SagajeongDispatchFloating.cs)
-                PrepareGuNames(territory);
-                DrawCapitalNames();      // 수도권 시군구 · 행정동 이름(세 구 밖)
-                DrawGuNames(now);
-                DrawGuRoads();           // 축척 자는 이어 보기 띠로 옮겼다. 동네 범위 점선 상자는 없앴다(사용자 11-16)
+                var quiet = BranchBoardOn;      // 배달 판: 이름 · 길 이름을 걷고 판의 표식만 둔다(11-27 「지도에 자료가 많아 몰입이 어렵다」)
+                if (!quiet) PrepareGuNames(territory);
+                if (!quiet) DrawCapitalNames();      // 수도권 시군구 · 행정동 이름(세 구 밖)
+                if (!quiet) DrawGuNames(now);
+                if (BranchBoardOn) DrawBranchMapMarks(CapitalHexAlpha);      // 지사 깃발 · 동별 몫 (SagajeongDispatchBranchBoard.cs)
+                if (!quiet) DrawGuRoads();           // 축척 자는 이어 보기 띠로 옮겼다. 동네 범위 점선 상자는 없앴다(사용자 11-16)
             }
             if (!guCameraSet) return;
             // 폰 빌드에는 영역 팩(주소 자료 파생)이 없다(2026-11-25) → 표식 · 이름표만 건너뛰고, 누르기(수도권 칸 · 공개판 디오라마)는 받는다.
-            if (territory != null)
+            if (territory != null && !BranchBoardOn)
             {
                 DrawGuPins(territory, now, repaint);
                 DrawGuLabels(territory);
@@ -563,6 +576,11 @@ namespace Ssalddel.WindowsGame
             }
             else if (current.type == EventType.MouseDrag && guPressed)
             {
+                if (Input.touchCount > 0)      // 폰: 옮기기는 손 제스처가 맡는다(SagajeongDispatchTouchMap.cs)
+                {
+                    current.Use();
+                    return;
+                }
                 var moved = current.mousePosition - guPressPoint;
                 if (!guDragging && moved.sqrMagnitude < 36f) return;
                 guDragging = true;
@@ -577,7 +595,7 @@ namespace Ssalddel.WindowsGame
                 if (!guDragging && !covered)
                 {
                     if (!dongMapOpen) expansionPanelOpen = false;      // 기본 판: 지도에서 고르면 사업 창을 걷고 영역 패널로
-                    if (PickGuStation(current.mousePosition)) hexSelected = -1;
+                    if (!BranchBoardOn && PickGuStation(current.mousePosition)) hexSelected = -1;      // 지사장 판에서는 칸만 고른다
                     else if (!PickHexTile(current.mousePosition) && !PickCapitalHex(current.mousePosition)) guSelected = GuDongAt(GuWorld(current.mousePosition))?.code;      // 타일 지도에서는 타일을 고른다
                 }
                 guDragging = false;

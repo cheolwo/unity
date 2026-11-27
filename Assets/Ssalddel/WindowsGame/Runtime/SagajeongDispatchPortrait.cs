@@ -22,7 +22,7 @@ namespace Ssalddel.WindowsGame
         private const float PortraitHandle = 54f;
 
         private bool PortraitScreen => Screen.height > Screen.width * 1.2f;
-        private bool PortraitPickerOpen => stancePickerOpen || CurrentStance == null;
+        private bool PortraitPickerOpen => stancePickerOpen || CurrentStance == null || portraitTitleOpen || portraitLadderOpen;      // 시작 화면 · 배달 판 자리 고르기도(SagajeongDispatchBranchBoard.cs)
         private float PortraitMapTop => portraitTopInset + PortraitTopBar + PortraitChipRow;
 
         private float portraitScale = 1f;
@@ -39,6 +39,7 @@ namespace Ssalddel.WindowsGame
         private float portraitPinch = -1f;
 
         private float PortraitSheetHeight(int level) =>
+            BranchSheetOn ? BranchSheetHeight(level) :      // 지사장 판의 아래 판(SagajeongDispatchBranchBoard.cs)
             level <= 0 ? PortraitHandle + 8f + portraitBottomInset :
             level == 1 ? Mathf.Round(Field.height * 0.44f) :
             Field.height - PortraitMapTop - 6f;
@@ -55,7 +56,7 @@ namespace Ssalddel.WindowsGame
         private Rect PortraitFloatRect(float width, float height) => new Rect((PortraitWidth - width) * 0.5f,
             Mathf.Max(PortraitMapTop + 4f, portraitSheetRect.y - height - 20f), width, height);
 
-        private bool PortraitCardOpen => GuMapVisible && (GuStationNow() != null || HexCardVisible || CapitalHexCardVisible);      // 수도권 칸 창도(SagajeongDispatchCapitalHex.cs)
+        private bool PortraitCardOpen => GuMapVisible && (GuStationNow() != null || HexCardVisible || CapitalHexCardVisible && !BranchRiderSeat);      // 수도권 칸 창도(SagajeongDispatchCapitalHex.cs)
         private bool PortraitZoomShown => portraitSheet < 2 && !PortraitCardOpen;
         private string portraitChipKey;              // 칩 줄을 맞춘 입장(바뀌면 그 칩이 보이게 넘긴다)
 
@@ -98,7 +99,9 @@ namespace Ssalddel.WindowsGame
 
             var stance = CurrentStance;
             if (stance != null) DrawPortraitChrome(stance);
-            if (PortraitPickerOpen) DrawPortraitPicker();
+            if (portraitTitleOpen) DrawPortraitTitle();      // 시작 화면 (SagajeongDispatchBranchBoard.cs)
+            else if (portraitLadderOpen) DrawPortraitLadder();      // 배달 판 자리 고르기
+            else if (PortraitPickerOpen) DrawPortraitPicker();
             GUI.matrix = previous;
         }
 
@@ -123,8 +126,14 @@ namespace Ssalddel.WindowsGame
         {
             var current = Event.current;
             if (current.type != EventType.KeyDown || current.keyCode != KeyCode.Escape) return;
-            if (stancePickerOpen && CurrentStance != null) stancePickerOpen = false;
+            if (portraitTitleOpen) { }
+            else if (portraitLadderOpen)
+            {
+                if (CurrentStance != null) { portraitLadderOpen = false; stancePickerOpen = false; }
+            }
+            else if (stancePickerOpen && CurrentStance != null) stancePickerOpen = false;
             else if (GuStationNow() != null || HexCardVisible) PortraitCloseCards();
+            else if (CapitalHexCardVisible) chSelected = -1;
             else if (portraitSheet > 0) portraitSheet--;
             current.Use();
         }
@@ -144,27 +153,13 @@ namespace Ssalddel.WindowsGame
         }
 
         // 두 손가락 벌리기 · 오므리기 = 구 지도 확대 · 축소(가운데를 붙잡고)
+        // 2026-11-25: 두 손가락 · 끌기 · 미끄러짐 · 두 번 톡톡은 SagajeongDispatchTouchMap.cs가 프레임마다 맡는다. 여기서는 IMGUI 누르기만 쉬게 한다.
         private void PortraitPinch()
         {
-            if (Input.touchCount < 2 || !GuMapVisible || !guCameraSet)
-            {
-                portraitPinch = -1f;
-                return;
-            }
+            portraitPinch = -1f;
+            if (Input.touchCount < 2 || !GuMapVisible || !guCameraSet) return;
             guPressed = false;
-            guDragging = false;
-            if (Event.current.type != EventType.Repaint) return;
-            var first = Input.GetTouch(0).position;
-            var second = Input.GetTouch(1).position;
-            var distance = Vector2.Distance(first, second) / portraitScale;
-            var middle = (first + second) * 0.5f;
-            var point = new Vector2(middle.x / portraitScale, (Screen.height - middle.y) / portraitScale);
-            if (portraitPinch > 0f && distance > 8f && !PortraitCovers(point))
-            {
-                var full = GuFullScale;
-                ZoomGu(Mathf.Clamp(guScale * distance / portraitPinch, full, Mathf.Max(full, GuMaxScale)), point);
-            }
-            portraitPinch = distance;
+            guDragging = true;          // 두 손가락을 놓을 때 누르기로 세지 않는다
         }
 
         // 판 · 칩 위의 누르기와 끌기. 지도보다 먼저 받는다(지도는 가린 자리의 누르기를 받지 않는다).
@@ -235,6 +230,9 @@ namespace Ssalddel.WindowsGame
             portraitSheet = 1;
             portraitSheetScroll = 0f;
             PortraitCloseCards();
+            // 지휘관(11-25): 고르면 바로 집 동의 작전 지도로(다른 입장은 지도에 남아 타일을 두 번 눌러 들어간다)
+            var package = stance.Info?.package;
+            if (stance.Key == "commander" && !string.IsNullOrEmpty(package?.home)) OpenPublicDong(package.home, package.homeName, package.homeGu);
         }
 
         private void DrawPortraitChrome(Stance stance)
@@ -243,10 +241,18 @@ namespace Ssalddel.WindowsGame
             if (CapitalReady)      // 수도권 바탕이 들어오면 출처가 길어 두 줄(오늘 칩은 그만큼 위로, SagajeongDispatchDataPacks.cs)
             {
                 Text(new Rect(8f, portraitSheetRect.y - 27f, PortraitWidth - 16f, 12f), "© ESA WorldCover CC BY 4.0 · Copernicus DEM · 국토교통부 표준노드링크", 8, Fade(Soft, 0.85f));
-                Text(new Rect(8f, portraitSheetRect.y - 15f, PortraitWidth - 16f, 12f), "서울시 · 브이월드 · 통계청 SGIS · vuski/admdongkor (CC BY 4.0)", 8, Fade(Soft, 0.85f));
+                Text(new Rect(8f, portraitSheetRect.y - 15f, PortraitWidth - 16f, 12f), "서울시 · 통계청 SGIS · vuski/admdongkor (CC BY 4.0) · 출처 전체 ›", 8, Fade(Soft, 0.85f));
+                CreditsTapArea(new Rect(0f, portraitSheetRect.y - 29f, PortraitWidth * 0.75f, 29f));      // 누르면 출처 · 라이선스 (SagajeongDispatchCredits.cs)
             }
             else
                 Text(new Rect(8f, portraitSheetRect.y - 15f, PortraitWidth - 16f, 13f), "© ESA WorldCover CC BY 4.0 · 서울시 · 브이월드 · 통계청 SGIS · vuski/admdongkor", 8, Fade(Soft, 0.85f));
+
+            if (BranchSheetOn)      // 지사장 판: 위 띠 · 아래 판을 판 쪽이 그린다 (SagajeongDispatchBranchBoard.cs)
+            {
+                DrawBranchChrome(stance);
+                return;
+            }
+            branchCameraSet = false;
 
             // 위 띠
             Paint(new Rect(0f, 0f, PortraitWidth, PortraitMapTop), Fade(Canvas, 0.95f));
@@ -264,7 +270,7 @@ namespace Ssalddel.WindowsGame
             {
                 portraitChipKey = stance.Key;
                 var at = 10f;
-                foreach (var item in Stances)
+                foreach (var item in Stances.Where(entry => entry.Key != BranchKey))      // 지사장은 배달 판에서 고른다
                 {
                     var w = PortraitTextWidth(item.Name, 13) + 28f;
                     if (item == stance) { portraitChipScroll = at + w * 0.5f - PortraitWidth * 0.5f; break; }
@@ -274,7 +280,7 @@ namespace Ssalddel.WindowsGame
             }
             var x = 10f - portraitChipScroll;
             Stance picked = null;
-            foreach (var item in Stances)
+            foreach (var item in Stances.Where(entry => entry.Key != BranchKey))      // 지사장은 배달 판에서 고른다
             {
                 var width = PortraitTextWidth(item.Name, 13) + 28f;
                 var chip = new Rect(x, portraitChips.y + 4f, width, 32f);
@@ -437,12 +443,17 @@ namespace Ssalddel.WindowsGame
             var top = y + 90f;
             const float gap = 10f;
             var cardWidth = (PortraitWidth - 32f - gap) * 0.5f;
-            var rows = (Stances.Length + 1) / 2;
+            var cards = Stances.Where(entry => entry.Key != BranchKey).ToArray();      // 배달 판의 자리는 따로 고른다(SagajeongDispatchBranchBoard.cs)
+            var back = new Rect(10f, y - 7f, 92f, 30f);
+            Paint(back, Tile, 15f);
+            Text(back, "◂ 배달 판", 11, Paper, true, TextAnchor.MiddleCenter);
+            if (PortraitTapped(back)) portraitLadderOpen = true;
+            var rows = (cards.Length + 1) / 2;
             var cardHeight = Mathf.Clamp((Field.height - top - portraitBottomInset - 14f - gap * (rows - 1)) / rows, 112f, 172f);
             Stance picked = null;
-            for (var index = 0; index < Stances.Length; index++)
+            for (var index = 0; index < cards.Length; index++)
             {
-                var item = Stances[index];
+                var item = cards[index];
                 var card = new Rect(16f + index % 2 * (cardWidth + gap), top + index / 2 * (cardHeight + gap), cardWidth, cardHeight);
                 Paint(card, Panel, 12f);
                 Paint(new Rect(card.x + 12f, card.y + 15f, 10f, 10f), item.Tint, 5f);
@@ -481,6 +492,16 @@ namespace Ssalddel.WindowsGame
             expansionPanelOpen = false;
             PortraitCloseCards();
             guManual = false;
+            portraitTitleOpen = true;      // 시작 화면(11-27)
+            for (var frame = 0; frame < 8; frame++) yield return null;
+            yield return SaveFrame(directory, "portrait-00-title.png");
+            receipt.portraitShots++;
+            portraitTitleOpen = false;
+            portraitLadderOpen = true;      // 배달 판 자리 고르기(11-27)
+            for (var frame = 0; frame < 8; frame++) yield return null;
+            yield return SaveFrame(directory, "portrait-00b-ladder.png");
+            receipt.portraitShots++;
+            portraitLadderOpen = false;
             stanceKey = string.Empty;
             stancePickerOpen = true;
             for (var frame = 0; frame < 8; frame++) yield return null;
@@ -563,6 +584,27 @@ namespace Ssalddel.WindowsGame
                     ClosePublicDong();
                     for (var frame = 0; frame < 4; frame++) yield return null;
                 }
+                var commander = Array.Find(Stances, item => item.Key == "commander");      // 지휘관: 고르면 바로 사가정역 동의 작전 지도(11-25)
+                if (commander != null)
+                {
+                    ApplyStance(commander, false);      // 촬영은 저장한 입장을 건드리지 않는다
+                    stancePickerOpen = false;
+                    var home = commander.Info?.package;
+                    if (home != null) OpenPublicDong(home.home, home.homeName, home.homeGu);
+                    for (var frame = 0; frame < 30; frame++) yield return null;
+                    if (PublicDongOpen)
+                    {
+                        opsPanelFull = false;
+                        yield return SaveFrame(directory, "portrait-27-commander.png");
+                        opsPanelFull = true;
+                        for (var frame = 0; frame < 4; frame++) yield return null;
+                        yield return SaveFrame(directory, "portrait-28-commander-full.png");
+                        receipt.portraitShots += 2;
+                        opsPanelFull = false;
+                        ClosePublicDong();
+                        for (var frame = 0; frame < 4; frame++) yield return null;
+                    }
+                }
             }
 
             // 배달 기사: 판을 접고 지도만
@@ -576,6 +618,107 @@ namespace Ssalddel.WindowsGame
                 yield return new WaitForSecondsRealtime(1.5f);
                 yield return SaveFrame(directory, "portrait-24-rider-map.png");
                 receipt.portraitShots++;
+            }
+
+            // 지사장 판(11-27): 구 지도 점유율 → 동 카드 → 할 일 · 턴 → 사람 · 돈 칸 → 칸 두 번 = 동 디오라마 → 구 지도로
+            var branch = Array.Find(Stances, item => item.Key == BranchKey);
+            if (branch != null && CapitalReady && GuReady)
+            {
+                branchSeat = 2;      // 지사장(먼저 보기)
+                ApplyStance(branch, false);
+                dataPanelOpen = false;
+                stancePickerOpen = false;
+                portraitSheet = 1;
+                branchCameraSet = false;
+                branchTab = 0;
+                chSelected = -1;
+                yield return new WaitForSecondsRealtime(1.2f);
+                if (BranchBoardOn)
+                {
+                    var slot = BranchSlotOfCode("1126054000");
+                    if (slot >= 0 && branchCell[slot] >= 0) chSelected = branchCell[slot];
+                    for (var frame = 0; frame < 8; frame++) yield return null;
+                    yield return SaveFrame(directory, "portrait-40-branch-dong-card.png");
+                    chSelected = -1;
+                    if (branchTodos.Count > 0) BranchDo(branchTodos[0]);
+                    BranchNextTurn();
+                    for (var frame = 0; frame < 8; frame++) yield return null;
+                    yield return SaveFrame(directory, "portrait-41-branch-next-turn.png");
+                    branchTab = 1;
+                    for (var frame = 0; frame < 6; frame++) yield return null;
+                    yield return SaveFrame(directory, "portrait-42-branch-people.png");
+                    branchTab = 2;
+                    for (var frame = 0; frame < 6; frame++) yield return null;
+                    yield return SaveFrame(directory, "portrait-43-branch-money.png");
+                    branchTab = 0;
+                    receipt.portraitShots += 4;
+                    var home = BranchSlotOfCode("1126057500");
+                    if (home >= 0 && branchCell[home] >= 0)
+                    {
+                        var at = GuPoint(chX[branchCell[home]], chY[branchCell[home]]);
+                        PickCapitalHex(at);      // 같은 칸을 두 번 누른다
+                        PickCapitalHex(at);
+                        for (var frame = 0; frame < 30; frame++) yield return null;
+                        if (PublicDongOpen)
+                        {
+                            yield return new WaitForSecondsRealtime(3f);
+                            yield return SaveFrame(directory, "portrait-44-branch-diorama.png");
+                            pdDistance *= 0.42f;      // 가까이: 기사 빛과 꼬리
+                            yield return new WaitForSecondsRealtime(2.5f);
+                            yield return SaveFrame(directory, "portrait-44b-branch-diorama-near.png");
+                            receipt.portraitShots++;
+                            ClosePublicDong();
+                            for (var frame = 0; frame < 8; frame++) yield return null;
+                            yield return SaveFrame(directory, "portrait-45-branch-back-gu.png");
+                            receipt.portraitShots += 2;
+                        }
+                        chSelected = -1;
+                    }
+                }
+
+                // 기사 자리(11-27 18:45): 칸 고르기 → 기다리기 세 번(지사 한 회차) → 쉬기 → 콜 기록 · 카드
+                branchSeat = 0;
+                branchCameraSet = false;
+                branchTab = 0;
+                portraitSheet = 1;
+                chSelected = -1;
+                for (var frame = 0; frame < 10; frame++) yield return null;
+                if (BranchBoardOn)
+                {
+                    EnsureRiderSeatCells();
+                    var home = BranchSlotOfCode(RiderHomeDong);
+                    var best = -1;
+                    var bestCalls = -1f;
+                    foreach (var cell in rsCells ?? Array.Empty<int>())
+                        if (BranchSlotOfCell(cell) == home && RiderSeatExpected(cell) > bestCalls) { bestCalls = RiderSeatExpected(cell); best = cell; }
+                    yield return SaveFrame(directory, "portrait-50-rider-start.png");
+                    chSelected = best;
+                    for (var frame = 0; frame < 4; frame++) yield return null;
+                    yield return SaveFrame(directory, "portrait-51-rider-pick.png");
+                    if (best >= 0)
+                    {
+                        RiderSeatWork(best);
+                        chSelected = -1;
+                        yield return new WaitForSecondsRealtime(1.6f);
+                        yield return SaveFrame(directory, "portrait-52-rider-calls.png");
+                        yield return new WaitForSecondsRealtime(1.4f);
+                        yield return SaveFrame(directory, "portrait-52b-rider-calls-later.png");
+                        receipt.portraitShots++;
+                        RiderSeatWork(best);
+                        RiderSeatWork(best);
+                        RiderSeatRest();
+                        for (var frame = 0; frame < 6; frame++) yield return null;
+                        yield return SaveFrame(directory, "portrait-53-rider-rest.png");
+                        branchTab = 1;
+                        for (var frame = 0; frame < 4; frame++) yield return null;
+                        yield return SaveFrame(directory, "portrait-54-rider-log.png");
+                        branchTab = 3;
+                        for (var frame = 0; frame < 4; frame++) yield return null;
+                        yield return SaveFrame(directory, "portrait-55-rider-card.png");
+                        branchTab = 0;
+                        receipt.portraitShots += 6;
+                    }
+                }
             }
 
             stanceKey = before;

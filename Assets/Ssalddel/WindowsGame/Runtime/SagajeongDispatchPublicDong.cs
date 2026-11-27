@@ -141,6 +141,7 @@ namespace Ssalddel.WindowsGame
                 pdPitch = 52f;
                 pdDistance = PublicDongHomeDistance;
                 pdongCode = code;
+                BuildBranchRiders(mesh, code);      // 지사장 판: 기사 빛 (SagajeongDispatchBranchRiders.cs)
                 pdongName = name;
                 pdongDistrict = district;
                 pdongSource = source;
@@ -218,6 +219,8 @@ namespace Ssalddel.WindowsGame
                 camera.orthographic = pdPreviousOrthographic;
             }
             pdongCode = null;
+            ClearBranchRiders();
+            ResetOpsRead();
             pdPanning = pdTurning = false;
             pdTouchCount = 0;
         }
@@ -327,6 +330,8 @@ namespace Ssalddel.WindowsGame
             var previous = GUI.matrix;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(pdGuiScale, pdGuiScale, 1f));
             pdUiRects.Clear();
+            DrawBranchRiders();                  // 지사장 판: 달리는 기사 빛 (SagajeongDispatchBranchRiders.cs)
+            DrawOpsWorld();                      // 지휘관: 판독 층(진입로 · 길목 · 고지, SagajeongDispatchOpsRead.cs)
             var safeTop = PortraitScreen ? portraitTopInset : 0f;
             var safeBottom = PortraitScreen ? portraitBottomInset : 0f;
             var bar = new Rect(0f, 0f, logicalWidth, safeTop + 58f);
@@ -334,12 +339,14 @@ namespace Ssalddel.WindowsGame
             Paint(bar, Fade(Canvas, 0.86f));
             var back = new Rect(10f, safeTop + 11f, 92f, 36f);
             Paint(back, Mint, 8);
-            Text(back, "◂ 지도로", 13, Canvas, true, TextAnchor.MiddleCenter);
+            Text(back, BranchStance ? "← 구 지도" : "← 지도로", 13, Canvas, true, TextAnchor.MiddleCenter);
             Text(new Rect(112f, safeTop + 6f, logicalWidth - 230f, 26f), pdongName ?? "", 18, Paper, true);
-            Text(new Rect(112f, safeTop + 31f, logicalWidth - 230f, 18f), PortraitScreen ? $"{pdongDistrict} · 건물 {pdongBuildings:N0}채" : $"{pdongDistrict} · 건물 {pdongBuildings:N0}채 · 공개판 디오라마", 11, Soft);
+            Text(new Rect(112f, safeTop + 31f, logicalWidth - 230f, 18f), branchRiders.Count > 0 ? $"{pdongDistrict} · 내 기사 {branchRiderMine}명 달리는 중" : PortraitScreen ? $"{pdongDistrict} · 건물 {pdongBuildings:N0}채" : $"{pdongDistrict} · 건물 {pdongBuildings:N0}채 · 공개판 디오라마", 11, Soft);
             var reset = new Rect(logicalWidth - 108f, safeTop + 11f, 98f, 36f);
             Paint(reset, Tile, 8);
             Text(reset, "처음 보기", 12, Paper, true, TextAnchor.MiddleCenter);
+            DrawOpsPanel(logicalWidth, logicalHeight, safeTop, logicalHeight - safeBottom - (PortraitScreen ? 52f : 40f));
+            DrawPublicDongEnterBand(logicalWidth, safeTop);
             var foot = new Rect(0f, logicalHeight - safeBottom - (PortraitScreen ? 52f : 40f), logicalWidth, (PortraitScreen ? 52f : 40f) + safeBottom);
             pdUiRects.Add(foot);
             Paint(foot, Fade(Canvas, 0.72f));
@@ -347,6 +354,7 @@ namespace Ssalddel.WindowsGame
                 : "왼쪽 끌기 옮기기 · 오른쪽 끌기 돌리기 · 휠 가깝게 · Esc 지도로";
             Text(new Rect(10f, foot.y + 4f, logicalWidth - 20f, 16f), hint, 10, Fade(Paper, 0.85f));
             Text(new Rect(10f, foot.y + (PortraitScreen ? 21f : 21f), logicalWidth - 20f, PortraitScreen ? 28f : 15f), PublicDongAttribution, 8, Fade(Soft, 0.85f), false, TextAnchor.UpperLeft, PortraitScreen);
+            CreditsTapArea(new Rect(0f, foot.y + 18f, logicalWidth, foot.height - 18f));      // 출처 줄을 누르면 출처 · 라이선스
             var current = Event.current;
             if (current.type == EventType.MouseUp && current.button == 0)
             {

@@ -63,6 +63,16 @@ namespace Ssalddel.WindowsGame
                 Facilities = new[] { 0, F(1, 6), F(1, 6, 7) },
                 Global = 16 | 2048,
             },
+            new Stance      // 지사장(11-27): 세로 화면에서 고르면 구 지도 위 지사장 판 (SagajeongDispatchBranchBoard.cs)
+            {
+                Key = "branch", Name = "지사장", Who = "나는 구에서 배달 지사를 맡은 사람", Tint = Ink(0xF2C35B),
+                Look = "동마다 내 몫, 기사와 가게, 다음 할 일",
+                First = new[] { ("구", "동별 내 몫 · 지사 깃발 · 다음 할 일"), ("타일", "칸을 두 번 누르면 동 디오라마"), ("동", "동 디오라마") },
+                Where = "폰 세로 화면에서 구 지도의 칸을 누르면 동 카드, 두 번 누르면 동 디오라마",
+                Bits = new[] { 0, 0, 0 },
+                Facilities = new[] { 0, 0, 0 },
+                Global = 16,
+            },
             new Stance
             {
                 Key = "resident", Name = "동네 주민", Who = "나는 이 동네에 살며 장 보고 주문하는 사람", Tint = Ink(0x6FA8FF),
@@ -98,6 +108,18 @@ namespace Ssalddel.WindowsGame
                 Where = "전국 지도에서 절기 장터를 켜 보세요",
                 Bits = new[] { 32 | 4 | 2 | 8, 32 | 4, 32 | 4 | 2 },
                 Facilities = new[] { 0, F(6), F(6) },
+            },
+            new Stance
+            {
+                // 지휘관(2026-11-25 13:43 「입장을 보는 카드에 지휘관을 추가 … 적군이랑 싸우는 식으로 … 데이터들이 불러와져가지고 … 플레이」):
+                //  자료를 보는 데서 그치지 않고 할 일까지 바뀌는 첫 입장. 들어가면 동 디오라마에 판독 층(SagajeongDispatchOpsRead.cs).
+                Key = "commander", Name = "지휘관", Who = "나는 동을 지키는 분대를 이끄는 사람", Tint = Ink(0xFF7A6B),
+                Look = "적이 어디로 오나, 어디서 막나, 어디서 내려다보나",
+                First = new[] { ("동", "진입로 · 길목 · 고지 · 사각"), ("늘", "키워드 순위(플레이스)"), ("구", "지하철 노선 · 타일") },
+                Where = "타일을 두 번 누르면 그 동의 작전 지도",
+                Bits = new[] { 32, 32, 32 | 2 },
+                Facilities = new[] { 0, 0, 0 },
+                Global = 16 | 2048,
             },
             new Stance
             {
@@ -143,6 +165,7 @@ namespace Ssalddel.WindowsGame
             var proof = Array.Exists(Environment.GetCommandLineArgs(), value =>
                 value.StartsWith("--sagajeong-", StringComparison.Ordinal) || value.StartsWith(ViewProofFlag, StringComparison.Ordinal));
             stancePickerOpen = !proof;
+            portraitTitleOpen = !proof;      // 세로 화면: 시작 화면부터 (SagajeongDispatchBranchBoard.cs)
         }
 
         private void ApplyStance(Stance stance, bool save)
@@ -185,7 +208,7 @@ namespace Ssalddel.WindowsGame
 
             var list = Stances;
             const float left = 48f, top = 116f, gap = 12f, cardHeight = 276f;      // 276: 부가 칩 두 줄(16:28)
-            const int perRow = 4;
+            var perRow = Mathf.Max(4, (list.Length + 1) / 2);      // 두 줄 그대로(아홉 장이면 다섯 장씩 · 11-25 지휘관)
             var width = (Width - left * 2 - gap * (perRow - 1)) / perRow;
             for (var i = 0; i < list.Length; i++)
             {

@@ -62,7 +62,8 @@ namespace Ssalddel.WindowsGame
             if (chX != null) return true;
             if (capitalHexTried || !CapitalReady) return false;
             capitalHexTried = true;
-            var asset = Resources.Load<TextAsset>(CapitalHexResource);
+            var asset = Resources.Load<TextAsset>("HongdalNation/hongdal-nation-hex");      // 전국 칸(2026-11-25 make_nation_hex.py)이 있으면 그것을
+            if (asset == null) asset = Resources.Load<TextAsset>(CapitalHexResource);
             if (asset == null) return false;
             try
             {
@@ -163,6 +164,7 @@ namespace Ssalddel.WindowsGame
                 return;
             }
             EnsureHexSprites();
+            var branchOn = BranchBoardOn;      // 지사장 판: 동마다 내 몫으로 칠한다 (SagajeongDispatchBranchBoard.cs)
             var old = HexTilesAlpha;
             if (old > 0.003f) MarkCapitalHexUnderOld();
             var current = Event.current;
@@ -192,10 +194,12 @@ namespace Ssalddel.WindowsGame
                         var kind = chKind[i];
                         var cover = chCover[i] / 255f;
                         var strength = kind <= 4 ? 0.26f : kind == 5 ? 0.14f : 0.14f + 0.26f * Mathf.Sqrt(cover);      // 밑 지도가 비치게
+                        var tint = HexKindColour(kind);
+                        if (branchOn) BranchHexColour(i, ref tint, ref strength);
                         if (i == chHover) strength += 0.12f;
                         if (i == chSelected) strength += 0.2f;
                         GUI.DrawTexture(new Rect(at.x - width / 2f, at.y - height / 2f, width, height), hexFill,
-                            ScaleMode.StretchToFill, true, 0, Fade(HexKindColour(kind), strength * a), 0, 0);
+                            ScaleMode.StretchToFill, true, 0, Fade(tint, strength * a), 0, 0);
                     }
                 }
             if (chHover >= 0 && chHover != chSelected) DrawCapitalHexRing(chHover, Fade(Paper, 0.75f * alpha), 0f);
@@ -244,7 +248,7 @@ namespace Ssalddel.WindowsGame
             OpenPublicDong(dong.code, dong.name, dong.sgg);
         }
 
-        private Rect CapitalHexCardRect => PortraitScreen
+        private Rect CapitalHexCardRect => BranchBoardOn ? BranchDongCardRect : PortraitScreen
             ? new Rect(10f, portraitSheetRect.y - 124f - (CapitalReady ? 34f : 22f), PortraitWidth - 20f, 118f)
             : new Rect((Field.width - 344f) * 0.5f, Field.height - 268f, 344f, 120f);      // 가운데 아래: 「자료 창」 · 「영역 전체 보기」 위
 
@@ -256,6 +260,8 @@ namespace Ssalddel.WindowsGame
         private bool DrawCapitalHexCard()
         {
             if (!CapitalHexCardVisible) return false;
+            if (BranchBoardOn && BranchSlotOfCell(chSelected) >= 0)      // 배달 판: 기사는 칸을 고르기만 · 지사장은 동 카드
+                return branchSeat != 0 && DrawBranchDongCard(BranchSlotOfCell(chSelected));      // 지사장 판의 동 카드
             var card = CapitalHexCardRect;
             var i = chSelected;
             var dong = CapitalHexDongOf(i);
@@ -275,9 +281,9 @@ namespace Ssalddel.WindowsGame
             Text(new Rect(x, card.y + 88f, wide - 120f, 24f), "두 번 누르면 이 동의 디오라마로", 10, Fade(Soft, 0.9f));
             var go = new Rect(card.xMax - 120f, card.y + 82f, 108f, 28f);
             Paint(go, Mint, 7);
-            Text(go, "디오라마 ▸", 12, Canvas, true, TextAnchor.MiddleCenter);
+            Text(go, "디오라마 →", 12, Canvas, true, TextAnchor.MiddleCenter);
             var close = new Rect(card.xMax - 34f, card.y + 6f, 26f, 22f);
-            Text(close, "✕", 12, Soft, false, TextAnchor.MiddleCenter);
+            Text(close, "×", 14, Soft, false, TextAnchor.MiddleCenter);
             var current = Event.current;
             if (current.type == EventType.MouseUp && current.button == 0)
             {

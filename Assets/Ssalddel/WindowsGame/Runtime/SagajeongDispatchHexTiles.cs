@@ -82,6 +82,7 @@ namespace Ssalddel.WindowsGame
             public int n = -1;       // 음식점 수, 모르면 -1
             public int[] m;          // 갈래별 음식점 수(foods 차례)
             public int p = -1;       // 사는 사람(추정), 모르면 -1
+            public int[] lp;         // 지나는 사람(서울 생활인구 250m → 타일): 평일 점심 · 평일 저녁 · 주말 점심 · 주말 저녁(시간 평균, 명). 없으면 null
         }
 
         // 성격 색. 차례는 팩의 kinds와 같다:
@@ -171,6 +172,7 @@ namespace Ssalddel.WindowsGame
             get
             {
                 if (!GuMapVisible || !guCameraSet || guScale < HexFadeStart || !hexLayerOn || EnsureHexTiles() == null) return 0f;
+                if (BranchBoardOn) return 0f;      // 지사장 판은 공개판 칸만 쓴다 (SagajeongDispatchBranchBoard.cs)
                 return Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(HexFadeStart, HexFadeFull, guScale));
             }
         }
@@ -310,8 +312,9 @@ namespace Ssalddel.WindowsGame
                 var strength = !ready ? 0.55f : tile.k == 0 ? 0.46f : tile.k <= 4 ? 0.36f : 0.32f;      // 물 · 산 · 들 · 공원은 조금 짙게
                 if (i == hexHover) strength += 0.12f;
                 if (i == hexSelected) strength += 0.2f;
+                if (ready && HexYieldNow != null) strength = Mathf.Min(0.82f, strength + 0.30f);      // 타일 수치 입장: 합의 색(SagajeongDispatchHexYields.cs)
                 GUI.DrawTexture(new Rect(at.x - width / 2f, at.y - height / 2f, width, height), ready ? hexFill : hexHatch,
-                    ScaleMode.StretchToFill, true, 0, Fade(HexKindColour(tile.k), strength * alpha), 0, 0);
+                    ScaleMode.StretchToFill, true, 0, Fade(HexTileFill(i, tile), strength * alpha), 0, 0);
             }
             // 테두리: 역 칸 · 가리킨 칸 · 영향권 · 고른 칸
             foreach (var index in hexStationIndex) DrawHexRing(pack.tiles[index], Fade(Gold, 0.7f * alpha), 0f);
@@ -326,6 +329,7 @@ namespace Ssalddel.WindowsGame
             // 가까이에서는 칸마다 성격 이름(역 칸은 역 이름이 따로 선다)
             if (guScale < HexLabelScale) return;
             var labelAlpha = alpha * Mathf.InverseLerp(HexLabelScale, HexLabelScale + 0.03f, guScale);
+            if (DrawHexYieldLabels(labelAlpha, radius)) return;      // 수치 입장이면 칸마다 수치 세 줄
             for (var i = 0; i < pack.tiles.Length; i++)
             {
                 var tile = pack.tiles[i];
@@ -615,7 +619,7 @@ namespace Ssalddel.WindowsGame
         private bool HexCardVisible =>
             hexSelected >= 0 && hexPack != null && hexSelected < hexPack.tiles.Length && HexTilesActive && GuStationNow() == null && !dataPanelOpen;
 
-        private bool HexCardCovers(Vector2 point) => HexCardVisible && HexTileCardRect.Contains(point);
+        private bool HexCardCovers(Vector2 point) => HexCardVisible && (HexTileCardRect.Contains(point) || HexYieldPanelCovers(point));
 
         // 타일 그릇 창. DrawGuMap이 역 창 다음에 부른다. 창 위의 누름은 지도로 넘기지 않는다(true).
         private bool DrawHexTileCard()
@@ -626,6 +630,7 @@ namespace Ssalddel.WindowsGame
             var card = HexTileCardRect;
             var current = Event.current;
             var over = card.Contains(current.mousePosition);
+            if (DrawHexYieldPanel(card)) return true;      // 수치 입장: 창 옆 「이 칸의 수치」 · 「좋은 칸」(SagajeongDispatchHexYields.cs)
             var tint = HexKindColour(tile.k);
             var ready = tile.w >= 500;
             Paint(new Rect(card.x - 1.5f, card.y - 1.5f, card.width + 3f, card.height + 3f), Fade(tint, 0.7f), 13);
