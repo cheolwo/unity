@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,11 +18,11 @@ namespace Ssalddel.WindowsGame
         [Serializable] private sealed class CapitalName { public string code, name, sgg, sido; public float x, y, km2; public int dongs; }
         [Serializable] private sealed class CapitalSpace
         {
-            public string schema, revision, attributionShort;
+            public string schema, revision, attributionShort, scope, tilePrefix;
             public float west, east, south, north, x0, y1, width, height;
             public int[] background;
             public CapitalLevelRaw[] levels;
-            public CapitalName[] sggs, dongs;
+            public CapitalName[] sggs, dongs, sidos;
         }
 
         private const string CapitalFolder = "HongdalCapital/";
@@ -31,6 +32,11 @@ namespace Ssalddel.WindowsGame
 
         private CapitalSpace capital;
         private bool capitalTried;
+        // 전국 바탕(2026-11-25, make_nation_base.py)이 있으면 그것을, 없으면 수도권 바탕을 쓴다. 조각 이름 = 폴더 + 앞말-단계-열-줄.
+        private string capitalFolder = CapitalFolder;
+        private string capitalPrefix = "hongdal-cap";
+        private string capitalTilesDirectory;
+        private bool CapitalIsNation => capital?.scope == "nation";
         private HashSet<long>[] capitalPresent;
         private readonly Dictionary<long, Texture2D> capitalTiles = new();
         private readonly LinkedList<long> capitalOrder = new();
@@ -44,7 +50,12 @@ namespace Ssalddel.WindowsGame
         {
             if (capitalTried) return capital != null;
             capitalTried = true;
-            var text = Resources.Load<TextAsset>(CapitalFolder + "hongdal-capital-space");
+            var text = Resources.Load<TextAsset>("HongdalNation/hongdal-nation-base-space");
+            if (text != null) capitalFolder = "HongdalNation/";
+            else text = Resources.Load<TextAsset>(CapitalFolder + "hongdal-capital-space");
+            // PC: 앱에 싣지 않은 8 m 조각(수도권 밖)은 이 폴더에서 읽는다(실행 인자 --hongdal-tiles-dir= 또는 HONGDAL_TILES_DIR)
+            var argument = Environment.GetCommandLineArgs().FirstOrDefault(item => item.StartsWith("--hongdal-tiles-dir=", StringComparison.Ordinal));
+            capitalTilesDirectory = argument != null ? argument.Substring("--hongdal-tiles-dir=".Length).Trim('"') : Environment.GetEnvironmentVariable("HONGDAL_TILES_DIR");
             if (text == null)
             {
                 Debug.Log("Hongdal capital: 수도권 바탕 자료가 없어 구 지도 범위만 씁니다.");
@@ -60,6 +71,7 @@ namespace Ssalddel.WindowsGame
                 if (space.background is { Length: 3 })
                     capitalBackground = new Color(space.background[0] / 255f, space.background[1] / 255f, space.background[2] / 255f, 1f);
                 capital = space;
+                if (!string.IsNullOrEmpty(space.tilePrefix)) capitalPrefix = space.tilePrefix;
                 Debug.Log($"Hongdal capital: {space.revision} · 시군구 {space.sggs?.Length ?? 0} · 행정동 {space.dongs?.Length ?? 0} · 조각 {capitalPresent[0].Count}+{(capitalPresent.Length > 1 ? capitalPresent[1].Count : 0)}");
             }
             catch (Exception exception)
@@ -163,11 +175,23 @@ namespace Ssalddel.WindowsGame
             }
             if (budget <= 0) return null;
             budget--;
-            var asset = Resources.Load<TextAsset>($"{CapitalFolder}hongdal-cap-{level}-{i}-{j}");
-            if (asset == null) { capitalPresent[level].Remove(key); return null; }
-            texture = new Texture2D(2, 2, TextureFormat.RGB24, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, name = asset.name };
-            texture.LoadImage(asset.bytes, true);       // 읽은 뒤 CPU 쪽 사본은 버린다
-            Resources.UnloadAsset(asset);
+            var name = $"{capitalPrefix}-{level}-{i}-{j}";
+            var asset = Resources.Load<TextAsset>(capitalFolder + name);
+            byte[] bytes = null;
+            if (asset != null) bytes = asset.bytes;
+            else if (!string.IsNullOrEmpty(capitalTilesDirectory))
+            {
+                try
+                {
+                    var file = System.IO.Path.Combine(capitalTilesDirectory, name + ".bytes");
+                    if (System.IO.File.Exists(file)) bytes = System.IO.File.ReadAllBytes(file);
+                }
+                catch (Exception) { bytes = null; }
+            }
+            if (bytes == null) { capitalPresent[level].Remove(key); return null; }      // 앱에 없는 조각: 아래 단계(32 m)가 대신 보인다
+            texture = new Texture2D(2, 2, TextureFormat.RGB24, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, name = name };
+            texture.LoadImage(bytes, true);       // 읽은 뒤 CPU 쪽 사본은 버린다
+            if (asset != null) Resources.UnloadAsset(asset);
             capitalTiles[key] = texture;
             capitalNodes[key] = capitalOrder.AddLast(key);
             while (capitalTiles.Count > CapitalCacheLimit)
@@ -186,6 +210,11 @@ namespace Ssalddel.WindowsGame
             if (!CapitalReady) return;
             capitalNameRects.Clear();
             var near = guScale >= 0.05f;
+            if (CapitalIsNation && guScale < 0.0045f && capital.sidos != null)      // 전국을 멀리서: 시도 이름만
+            {
+                foreach (var name in capital.sidos) DrawCapitalName(name.x, name.y, name.name, 12, Paper);
+                return;
+            }
             if (!near && capital.sggs != null)
                 foreach (var name in capital.sggs)
                     DrawCapitalName(name.x, name.y, name.name, guScale < 0.016f ? 11 : 13, name.sido == "11" ? Paper : Soft);

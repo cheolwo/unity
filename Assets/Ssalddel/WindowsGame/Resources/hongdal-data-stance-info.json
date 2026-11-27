@@ -3,7 +3,7 @@
  "topic": "stance-info",
  "title": "입장 × 정보 · 필수(하루 한 번 이상) · 부가(주 1~2번 · 달 2~3번)",
  "release": "review",
- "asOf": "2026-11-24",
+ "asOf": "2026-11-25",
  "note": "필수 = 그 사람이 되어 하루 한 번 이상 마주치는 것(입장을 고르면 켠다). 부가 = 주 1~2번 · 달 2~3번(꺼 두고 「부가도 켜기」로). 목록에 없는 것은 그 입장에서 거의 마주치지 않는 것.",
  "sources": [
   {
@@ -356,6 +356,70 @@
    "kind": "fact",
    "value": 0,
    "where": "전국 지도 · 장터 자료 줄"
+  },
+  {
+   "id": "ops:keyword",
+   "name": "키워드 검색량 → 오는 적",
+   "brief": "검색량",
+   "kind": "ops",
+   "value": 0,
+   "where": "동 디오라마 · 작전 지도"
+  },
+  {
+   "id": "ops:approach",
+   "name": "진입로(길 그래프)",
+   "brief": "진입로",
+   "kind": "ops",
+   "value": 0,
+   "where": "동 디오라마 · 작전 지도"
+  },
+  {
+   "id": "ops:choke",
+   "name": "길목 폭(차로 수)",
+   "brief": "길목",
+   "kind": "ops",
+   "value": 0,
+   "where": "동 디오라마 · 작전 지도"
+  },
+  {
+   "id": "ops:height",
+   "name": "건물 높이 · 옥상(고지)",
+   "brief": "고지",
+   "kind": "ops",
+   "value": 0,
+   "where": "동 디오라마 · 작전 지도"
+  },
+  {
+   "id": "ops:blind",
+   "name": "사각(안 보이는 뒤 골목)",
+   "brief": "사각",
+   "kind": "ops",
+   "value": 0,
+   "where": "동 디오라마 · 작전 지도"
+  },
+  {
+   "id": "ops:squad",
+   "name": "내 분대 · 남은 진지",
+   "brief": "분대",
+   "kind": "ops",
+   "value": 0,
+   "where": "동 디오라마 · 작전 지도"
+  },
+  {
+   "id": "ops:wave",
+   "name": "물결 시각",
+   "brief": "물결",
+   "kind": "ops",
+   "value": 0,
+   "where": "동 디오라마 · 작전 지도"
+  },
+  {
+   "id": "ops:bridge",
+   "name": "다리 · 교두 진지 자리",
+   "brief": "다리",
+   "kind": "ops",
+   "value": 0,
+   "where": "동 디오라마 · 작전 지도"
   }
  ],
  "stances": [
@@ -514,7 +578,18 @@
      "freq": "달 2~3번",
      "why": "장터 제철"
     }
-   ]
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [
+     "facilities"
+    ],
+    "todo": "delivery",
+    "first": "길 속도 · 날씨 · 건물 입구",
+    "steps": []
+   }
   },
   {
    "key": "store",
@@ -701,7 +776,18 @@
      "freq": "달 2~3번",
      "why": "가락의 몫"
     }
-   ]
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [
+     "facilities"
+    ],
+    "todo": "store",
+    "first": "유동인구 · 역 불빛 · 플레이스 창",
+    "steps": []
+   }
   },
   {
    "key": "resident",
@@ -860,7 +946,18 @@
      "freq": "달 2~3번",
      "why": "유통이 가져가는 몫"
     }
-   ]
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [
+     "facilities"
+    ],
+    "todo": "none",
+    "first": "정류장 · 쉼터 · 공원",
+    "steps": []
+   }
   },
   {
    "key": "cargo",
@@ -986,7 +1083,18 @@
      "freq": "달 2~3번",
      "why": "가락의 몫"
     }
-   ]
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [
+     "facilities"
+    ],
+    "todo": "none",
+    "first": "큰길 속도 · 주차 · 택배함",
+    "steps": []
+   }
   },
   {
    "key": "wholesale",
@@ -1133,7 +1241,16 @@
      "freq": "달 2~3번",
      "why": "심은 넓이"
     }
-   ]
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [],
+    "todo": "none",
+    "first": "전국 장터 · 경락",
+    "steps": []
+   }
   },
   {
    "key": "farm",
@@ -1267,7 +1384,182 @@
      "freq": "달 2~3번",
      "why": "수입안정보험"
     }
-   ]
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [],
+    "todo": "none",
+    "first": "전국 장터 · 받는 값",
+    "steps": []
+   }
+  },
+  {
+   "key": "commander",
+   "name": "지휘관",
+   "entries": [
+    {
+     "id": "subway",
+     "tier": 1,
+     "units": [
+      0,
+      1,
+      2
+     ],
+     "freq": "늘(지도 바탕)",
+     "why": "역이 거점"
+    },
+    {
+     "id": "tiles",
+     "tier": 1,
+     "units": [],
+     "freq": "늘(지도 바탕)",
+     "why": "타일을 두 번 누르면 그 동의 작전 지도"
+    },
+    {
+     "id": "ops:keyword",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "전투마다",
+     "why": "검색량이 곧 몰려오는 적 수"
+    },
+    {
+     "id": "ops:approach",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "전투마다",
+     "why": "어디로 오나 — 화살표 굵기 = 오는 몫"
+    },
+    {
+     "id": "ops:choke",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "전투마다",
+     "why": "어디서 막나 — 좁고 몫이 큰 길목"
+    },
+    {
+     "id": "ops:height",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "전투마다",
+     "why": "어디서 내려다보나 — 높은 옥상"
+    },
+    {
+     "id": "ops:blind",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "전투마다",
+     "why": "못 보는 곳 — 뚫리면 숨어드는 뒤 골목"
+    },
+    {
+     "id": "ops:squad",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "전투마다",
+     "why": "누가 설 수 있나 — 깨어 있는 일꾼"
+    },
+    {
+     "id": "ops:wave",
+     "tier": 1,
+     "units": [
+      2
+     ],
+     "freq": "전투마다",
+     "why": "언제 오나 — 물결 셋"
+    },
+    {
+     "id": "place",
+     "tier": 1,
+     "units": [],
+     "freq": "하루 여러 번",
+     "why": "키워드 순위가 곧 전선"
+    },
+    {
+     "id": "ops:bridge",
+     "tier": 2,
+     "units": [
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "다리를 넘어오지 못하게"
+    },
+    {
+     "id": "day-night",
+     "tier": 2,
+     "units": [
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "밤에는 시야가 줄어듦"
+    },
+    {
+     "id": "weather",
+     "tier": 2,
+     "units": [
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "비 · 눈이면 시야 · 걸음이 줄어듦"
+    },
+    {
+     "id": "fac:7",
+     "tier": 2,
+     "units": [
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "역 출입구로 사람이 쏟아짐"
+    },
+    {
+     "id": "road",
+     "tier": 2,
+     "units": [
+      0,
+      2
+     ],
+     "freq": "주 1~2번",
+     "why": "분대가 서 있는 동안 비는 내 배달 길"
+    },
+    {
+     "id": "floating",
+     "tier": 2,
+     "units": [
+      0
+     ],
+     "freq": "주 1~2번",
+     "why": "사람이 몰리는 동네 = 다툼이 큰 곳"
+    }
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [
+     "ops-read"
+    ],
+    "todo": "ops",
+    "first": "판독 — 진입로 · 길목 · 고지",
+    "steps": [
+     "판독",
+     "배치",
+     "모의전",
+     "실전",
+     "복기"
+    ]
+   }
   },
   {
    "key": "owner",
@@ -1366,7 +1658,18 @@
      "freq": "달 2~3번",
      "why": "장터 제철"
     }
-   ]
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [
+     "facilities"
+    ],
+    "todo": "delivery",
+    "first": "경 수치 · 플레이스 · 역 불빛",
+    "steps": []
+   }
   },
   {
    "key": "custom",
@@ -1390,7 +1693,16 @@
      "freq": "늘(지도 바탕)",
      "why": "바탕"
     }
-   ]
+   ],
+   "package": {
+    "home": "1126057500",
+    "homeName": "면목3·8동",
+    "homeGu": "중랑구",
+    "layers": [],
+    "todo": "none",
+    "first": "자료 창에서 직접",
+    "steps": []
+   }
   }
  ]
 }

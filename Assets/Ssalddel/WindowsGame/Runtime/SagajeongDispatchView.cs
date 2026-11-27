@@ -296,6 +296,11 @@ namespace Ssalddel.WindowsGame
                 boldFont = bundled != null ? bundled : Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "맑은 고딕", "Arial" }, 18);
             }
             NoteHands();                         // 손이 빈 시간 (SagajeongDispatchAutopilot.cs)
+            if (creditsOpen)                     // 출처 · 라이선스 (SagajeongDispatchCredits.cs)
+            {
+                DrawCreditsScreen();
+                return;
+            }
             if (PublicDongOpen)                  // 공개판 동 디오라마: 지도 대신 동 하나 (SagajeongDispatchPublicDong.cs)
             {
                 DrawPublicDongScreen();
@@ -380,6 +385,7 @@ namespace Ssalddel.WindowsGame
                 NationMapVisible ? "경계 Natural Earth · 관세청 2025 · 내부 검토용" :
                 DioramaVisible && DongModulesLoaded ? dongManifest.attribution : "© OpenStreetMap contributors · ODbL", 11, Soft,
                 align: TextAnchor.MiddleRight);
+            CreditsTapArea(AttributionPanel);      // 누르면 출처 · 라이선스 전체 (SagajeongDispatchCredits.cs)
             GUI.enabled = controlsEnabled;
             if (CampaignPolicyOpen && TidyScreen && expansionView && !mapOnly && !SettingsVisible && !DongPickerVisible && !PlaceVisible && !helpOpen && !집중전환대기)
                 DrawAutopilotChip();

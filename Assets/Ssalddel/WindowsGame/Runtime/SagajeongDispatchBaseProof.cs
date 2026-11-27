@@ -41,6 +41,8 @@ namespace Ssalddel.WindowsGame
             public bool capitalHexCard;
             public bool pdongOpened;           // 공개판 동 디오라마(SagajeongDispatchPublicDong.cs)
             public string pdongFromTile;
+            public int opsEntries, opsPeaks, opsMouths;      // 지휘관 판독 층(11-25)
+            public bool commanderInPicker;
             public int pdongBuildings;
             public int pdongTrees;
             public string pdongSource;
@@ -203,6 +205,8 @@ namespace Ssalddel.WindowsGame
                     ("base-23-capital-suwon.png", 127.03, 37.27, 0.06f),
                     ("base-24-capital-incheon.png", 126.70, 37.46, 0.03f),
                     ("base-25-capital-edge-gu.png", 127.15, 37.60, 0.09f),
+                    ("base-29-nation-busan.png", 129.06, 35.16, 0.035f),      // 전국 바탕(있을 때): 부산 · 제주
+                    ("base-30-nation-jeju.png", 126.55, 33.38, 0.012f),
                 };
                 foreach (var spot in spots)
                 {
@@ -243,9 +247,52 @@ namespace Ssalddel.WindowsGame
                         ClosePublicDong();
                         for (var frame = 0; frame < 4; frame++) yield return null;
                     }
+                    // 전국 칸 → 부산 중앙동(PC 굽기 폴더가 있을 때, 2026-11-25)
+                    var busan = 이어지는지도Policy.구미터(129.0335, 35.1036, guSpace.west, guSpace.south);
+                    guScale = 0.12f;
+                    guOrigin = new Vector2(Field.width * 0.5f - busan.x * guScale, Field.height * 0.5f - (guSpace.height - busan.y) * guScale);
+                    ClampGu();
+                    for (var frame = 0; frame < 30; frame++) yield return null;
+                    chSelected = CapitalHexAt(new Vector2(busan.x, busan.y));
+                    for (var frame = 0; frame < 6; frame++) yield return null;
+                    yield return SaveFrame(directory, "base-31-nation-hex-busan.png");
+                    if (chSelected >= 0) OpenCapitalHexDong(chSelected);
+                    for (var frame = 0; frame < 30; frame++) yield return null;
+                    if (PublicDongOpen)
+                    {
+                        yield return SaveFrame(directory, "base-32-pdong-busan.png");
+                        ClosePublicDong();
+                        for (var frame = 0; frame < 4; frame++) yield return null;
+                    }
                     chSelected = -1;
                 }
                 guManual = false;
+            }
+
+            // 지휘관 입장 · 판독 층(2026-11-25, SagajeongDispatchOpsRead.cs): 입장 카드(아홉 장) → 면목3·8동(사가정역) 작전 지도
+            scene = "지휘관";
+            {
+                var keepStance = stanceKey;
+                receipt.commanderInPicker = Array.Exists(Stances, item => item.Key == "commander" && item.Info?.package != null);
+                stancePickerOpen = true;
+                for (var frame = 0; frame < 6; frame++) yield return null;
+                yield return SaveFrame(directory, "base-31-stance-picker.png");
+                stancePickerOpen = false;
+                stanceKey = "commander";
+                if (OpenPublicDong("1126057500", "면목3·8동", "중랑구"))
+                {
+                    for (var frame = 0; frame < 30; frame++) yield return null;
+                    receipt.opsEntries = opsEntries.Count;
+                    receipt.opsPeaks = opsPeaks.Count;
+                    receipt.opsMouths = opsMouths;
+                    yield return SaveFrame(directory, "base-32-commander-ops.png");
+                    pdPitch = 64f; pdDistance *= 0.62f;
+                    for (var frame = 0; frame < 10; frame++) yield return null;
+                    yield return SaveFrame(directory, "base-33-commander-near.png");
+                    ClosePublicDong();
+                    for (var frame = 0; frame < 4; frame++) yield return null;
+                }
+                stanceKey = keepStance;
             }
 
             // 세로 화면(폰): 입장으로 자료 보기(2026-11-25, SagajeongDispatchPortrait.cs)

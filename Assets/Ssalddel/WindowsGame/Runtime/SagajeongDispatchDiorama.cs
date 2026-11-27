@@ -56,6 +56,7 @@ namespace Ssalddel.WindowsGame
             SyncMusic();                 // 고른 곡: 불러오기 · 분석 · 지금의 박 (SagajeongDispatchMusic.cs)
             if (!dioramaTried && state != null && roadTexture != null) LoadDiorama();
             if (dioramaCamera == null) dioramaCamera = Camera.main;
+            UpdatePhoneMapTouch();       // 폰 지도 손 제스처 (SagajeongDispatchTouchMap.cs)
             if (SyncPublicDong(dioramaCamera)) return;      // 공개판 동 디오라마가 열려 있으면 카메라를 맡긴다 (SagajeongDispatchPublicDong.cs)
             var camera = dioramaCamera;
             var scale = Mathf.Min(Screen.width / (float)Width, Screen.height / (float)Height);

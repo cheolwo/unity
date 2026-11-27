@@ -71,6 +71,7 @@ namespace Ssalddel.WindowsGame
             "subway" => "subway",
             "place" or "grade" or "gyeong" or "downtown" or "lore" or "spread" => "game",
             "season-list" => "market",
+            _ when id.StartsWith("ops:", StringComparison.Ordinal) => "ops",      // 지휘관 작전 자료(11-25)
             _ => id.StartsWith("fac:", StringComparison.Ordinal) ? "facilities" : id.StartsWith("fact:", StringComparison.Ordinal) ? "market" : "game",
         };
 
@@ -85,6 +86,7 @@ namespace Ssalddel.WindowsGame
             "floating" => ("유동인구(서울 행정동)", () => LoadFloat() ? $"{floatPack.dongs.Length}동" : "없음"),
             "tiles" => ("타일 지도", () => EnsureHexTiles() != null ? "읽음" : "없음"),
             "market" => ("절기 장터 · 농수산물 흐름", () => $"품목 {(LoadJangteo() ? jangteo.items.Length : 0)} · 자료 줄 {(LoadFlow() ? flow.facts.Length : 0)}"),
+            "ops" => ("작전 자료(키워드 · 진입로 · 길목 · 고지)", () => "동에 들어가면 그 동의 길 · 건물로 셈"),
             _ => ("게임 요소(경 수치 · 플레이스 · 등급 …)", () => "바로"),
         };
 
@@ -155,6 +157,19 @@ namespace Ssalddel.WindowsGame
 
         private string EnterStanceDiorama()
         {
+            // 입장 패키지(11-25 13:45): 기본 판(폰 포함)은 동네 지도가 닫혀 있다 → 패키지의 집 동을 공개판 디오라마로 연다.
+            //  지휘관은 판독 층이 공개판 디오라마에 있으므로 전체판에서도 공개판으로 들어간다.
+            var package = stanceLoading?.Info?.package;
+            if ((!dongMapOpen || stanceLoading?.Key == "commander") && !string.IsNullOrEmpty(package?.home))
+            {
+                stanceEnterAt = Time.unscaledTime;
+                stanceEnterNote = stanceLoading.Key == "commander"
+                    ? $"입장 · 지휘관 — {package.homeName} 작전 지도 · 판독 층을 켰습니다(진입로 · 길목 · 고지)"
+                    : $"입장 · {stanceLoading.Name} — {package.homeName} 디오라마에 자료를 올렸습니다";
+                if (OpenPublicDong(package.home, package.homeName, package.homeGu)) return package.homeName + " 디오라마(공개판)";
+                stanceEnterNote = null;
+                return "지도(디오라마를 열지 못함)";
+            }
             if (mapLevel != MapLevel.Dong) ReturnToDong();
             if (dioramaRoot != null && !dioramaOn) dioramaOn = true;
             LoadDataUnit(CurrentDataUnit());                                  // 동 단위 묶음을 바로 꺼낸다(동 시설 · 입구 등)

@@ -529,6 +529,17 @@ namespace Ssalddel.WindowsGame
                 yield break;
             }
             yield return new WaitForSecondsRealtime(0.5f);
+            // 골라 찍기(2026-11-25): 빌드 폴더에 view-proof-only.txt가 있으면 그 줄에 적힌 장면만 찍고 끝낸다.
+            //  전체 촬영이 길어 240초에 걸릴 때, 고친 장면만 빨리 본다. 지금 받는 이름: hex-yields
+            var only = ViewProofOnly(directory);
+            if (only != null)
+            {
+                if (only.Contains("hex-yields")) yield return ViewProofHexYields(directory, receipt);
+                receipt.passed = true;
+                receipt.failure = "골라 찍기: " + string.Join(",", only);
+                FinishViewProof(directory, receipt);
+                yield break;
+            }
             receipt.startedInStationView = StationView;
             receipt.startedStation = StationView ? Station.Name : string.Empty;
 
@@ -609,6 +620,7 @@ namespace Ssalddel.WindowsGame
             yield return ViewProofPackage(directory, receipt);       // 배달 플랫폼 패키지 뼈대: 고르기 · 아래 줄 · 본사 띠 · 지사 쪽 (SagajeongDispatchPlatformPackageProof.cs, 관찰용)
             yield return ViewProofContinuity(directory, receipt);    // 이어지는 지도: 전국 → 권역 → 구 넘김 · 되돌아옴 · 동 → 구 (SagajeongDispatchContinuityProof.cs, 관찰용)
             yield return ViewProofHexTiles(directory, receipt);      // 구와 동 사이의 타일 지도: 두 번 눌러 동으로 · 올라와 같은 타일로 (SagajeongDispatchHexTiles.cs, 관찰용)
+            yield return ViewProofHexYields(directory, receipt);     // 타일 수치: 세 입장으로 사가정역 칸 (SagajeongDispatchHexYields.cs, 관찰용)
             // 판 가름(2026-11-19): 기본 판처럼 닫아 놓고 시작 화면과 닫힌 길을 찍는다. 이 뒤의 장면이 있으면 다시 연다.
             ReturnToDong();
             for (var frame = 0; frame < 4; frame++) yield return null;
@@ -1168,6 +1180,21 @@ namespace Ssalddel.WindowsGame
                 if (PickBuildingInScene(top) == index) picked++;
             }
             return (sampled, picked);
+        }
+
+        private static HashSet<string> ViewProofOnly(string directory)
+        {
+            try
+            {
+                var parent = Path.GetDirectoryName(Path.GetFullPath(directory).TrimEnd('\\', '/'));
+                var file = parent == null ? null : Path.Combine(parent, "view-proof-only.txt");
+                if (file == null || !File.Exists(file)) return null;
+                var names = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var line in File.ReadAllLines(file))
+                    if (!string.IsNullOrWhiteSpace(line)) names.Add(line.Trim());
+                return names.Count == 0 ? null : names;
+            }
+            catch (Exception) { return null; }
         }
 
         private static void FinishViewProof(string directory, ViewProofReceipt receipt)

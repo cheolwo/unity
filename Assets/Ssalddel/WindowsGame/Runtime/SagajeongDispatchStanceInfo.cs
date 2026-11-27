@@ -27,7 +27,9 @@ namespace Ssalddel.WindowsGame
 
         [Serializable] private sealed class StanceInfoPack { public string schema, topic, title, note; public StanceInfoItem[] items; public StanceInfoSet[] stances; }
         [Serializable] private sealed class StanceInfoItem { public string id, name, brief, kind, where; public int value; }
-        [Serializable] private sealed class StanceInfoSet { public string key, name; public StanceInfoEntry[] entries; }
+        [Serializable] private sealed class StanceInfoSet { public string key, name; public StanceInfoEntry[] entries; public StancePackage package; }
+        // 입장 패키지(2026-11-25 13:45 「역할을 … 선택을 하면은 관련한 데이터들을 이제 불러오는 식으로 … 패키지화」): 자료(entries) + 지도 조각 · 할 일 · 화면
+        [Serializable] private sealed class StancePackage { public string home, homeName, homeGu, todo, first; public string[] layers, steps; }
         [Serializable] private sealed class StanceInfoEntry { public string id, freq, why; public int tier; public int[] units; }
 
         private static StanceInfoPack stanceInfo;
