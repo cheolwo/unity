@@ -9,6 +9,30 @@
 | [![수도권 전체를 한 화면에 본 지도](Documentation/readme/capital-map.png)](Documentation/readme/capital-map.png) | [![수원 행궁동을 공개 자료로 만든 입체 동네](Documentation/readme/public-dong-diorama.png)](Documentation/readme/public-dong-diorama.png) | [![서울 25개 구를 일반음식점 수로 칠한 지도](Documentation/readme/seoul-gu-compare.png)](Documentation/readme/seoul-gu-compare.png) |
 | 수도권을 한 장으로 보고, 휠로 구 · 동까지 다가갑니다 | 칸을 두 번 누르면 그 동이 입체 모형(디오라마)으로 열립니다 | 공표 통계로 구를 칠하고, 구를 누르면 숫자 카드가 나옵니다 |
 
+## 원방각 카드 — ○ 철학 · △ 사람 · □ 과학
+
+[![원방각 카드: 위 동그라미는 철학, 가운데 세모는 사람, 아래 네모는 과학](Documentation/readme/wonbanggak-card.png)](Documentation/readme/wonbanggak-card.png)
+
+게임에서 일을 고를 때 보는 카드 한 장은 세 도형이 조금씩 겹쳐 있습니다. 아직 기획 시안 단계라 게임에는 일부만 들어가 있고, 그림 속 숫자는 예시입니다.
+
+- **○ 동그라미 = 철학** — 맨 위. 이 일을 어떤 마음으로 보는가. 접속 → 인가 → 맡김 세 마디가 돌고, 가운데 작은 구멍은 「몰라」(텅 비었으나 알아차림)입니다.
+- **△ 세모 = 사람(입장)** — 가운데. 배달 기사 · 지사장 · 플랫폼처럼 내가 선 자리와 그 사람의 기분 관리. 사람은 위로 철학, 아래로 과학을 함께 딛고 섭니다.
+- **□ 네모 = 과학** — 아래. 그 입장이 쓰는 연구 칸(운행 기록 · 정산 · 배차 조정 …)과 숫자.
+- **두 이음매** — ○와 △ 사이는 「선인가 악인가」, △와 □ 사이는 「이익인가 손해인가」입니다. 무엇을 고르든 두 눈금이 함께 뜨고, 판단은 사용자가 합니다. 이익 · 손해는 입장마다 들어오는 돈 · 나가는 돈(현금 흐름표)으로 보이고, 줄을 누르면 지도에서 그 돈이 오가는 자리로 갑니다.
+
+## 배달 판 — 기사로 시작해 한 자리씩 오른다
+
+[![배달 판: 배달은 늘 기본이고 자리가 오를 때마다 하는 일이 하나씩 더해진다](Documentation/readme/delivery-board-ladder.png)](Documentation/readme/delivery-board-ladder.png)
+
+[![배달 판 실제 게임 화면: 자리 고르기와 기사 자리의 구 지도 · 콜 기록 · 카드](Documentation/readme/delivery-board-rider-seat.png)](Documentation/readme/delivery-board-rider-seat.png)
+
+- 배달 쪽 입장(**기사 → 팀장 → 지사장 → 지사 대표 → 배달 플랫폼**, 그리고 어느 자리에나 겹쳐 보는 철학자)을 「배달 판」으로 따로 떼어 다듬고 있습니다.
+- **배달은 늘 기본**입니다. 자리가 올라도 달리는 것은 같고, 오를 때마다 하는 일(소통 · 사람 · 베이스라인 · 조절판)과 몫이 하나씩 더해집니다.
+- 구 지도의 육각형 칸에서 기다릴 칸을 고르면 콜이 들어옵니다. 주소를 특정하지 않고 **픽업 칸과 전달 칸을 칸으로 이어** 기사가 달리는 모습을 그립니다. 칸을 두 번 누르면 동 디오라마로 내려가고, 거기서는 기사들이 빛으로 달립니다.
+- 가게 입점을 늘리는 일은 배달 플랫폼 자리의 몫이고(입점이 늘면 콜이 늘어납니다), 가게를 열고 운영하는 일은 음식점 판에서 따로 다룹니다.
+- 지금 되는 것: 시작 화면 · 자리 고르기 · 기사 자리 · 지사장 자리(먼저 보기). 나머지 자리는 다음 조각입니다. 코드는 `Assets/Ssalddel/WindowsGame/Runtime/SagajeongDispatchBranch*.cs`에 있고, 내려받는 시험판 APK에는 아직 들어 있지 않습니다.
+- 자세한 기준: 함께 쓰는 Mirror 저장소의 [배달 판 기준](https://github.com/cheolwo/mirror/blob/dev/mirror-integration/docs/AI/Handoffs/2026-11-27-Claude-배달판-기준.md)
+
 ## 휴대폰에서 바로 해 보기 (안드로이드)
 
 [**안드로이드 시험판 내려받기 (최신판 APK, 약 117 MB)**](https://github.com/cheolwo/unity/releases/latest/download/hongdal-android.apk) · [릴리스 안내 페이지](https://github.com/cheolwo/unity/releases/latest)
@@ -36,6 +60,8 @@
 | 굽기 | 공개 자료(건물 · 길 · 경계)를 게임이 바로 읽는 파일로 미리 만들어 두는 일 |
 | 팩 | 게임이 읽는 자료 묶음 파일(`Resources/hongdal-data-*.json` 등). 게임은 원본 자료를 직접 읽지 않고 팩만 읽습니다 |
 | 커널 | 주문 · 돈 · 재고 같은 게임 규칙을 화면과 따로 계산하는 부분(`WindowsGame/Kernel`) |
+| 원방각 카드 | ○ 철학 · △ 사람(입장) · □ 과학을 한 장에 겹쳐 그린 카드. 일을 고를 때 선 · 악과 이익 · 손해를 함께 봅니다 |
+| 배달 판 | 기사 · 팀장 · 지사장 · 지사 대표 · 배달 플랫폼의 자리를 따로 떼어 만든 판. 기사로 시작해 한 자리씩 오릅니다 |
 | 자료 창 · 입장 카드 | 지도에 무엇을 켤지 고르는 창. 「배달 기사」 「음식점 사장」처럼 입장을 고르면 그 사람에게 필요한 자료가 켜집니다 |
 
 ## 폴더 안내
